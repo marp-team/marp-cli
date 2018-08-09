@@ -1,5 +1,5 @@
-// import MarpCLI from '../src/marp'
+import MarpCLI from '../src/marp'
 
 describe('Marp CLI', () => {
-  // TODO: Write test about MarpCLI
+  it('returns exit code 1', () => expect(MarpCLI()).resolves.toBe(1))
 })
