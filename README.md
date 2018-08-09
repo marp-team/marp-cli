@@ -1,6 +1,6 @@
 # @marp-team/marp-cli
 
-**The CLI interface, for [Marp](https://github.com/marp-team/marp)** (using [@marp-team/marp-core](https://github.com/marp-team/marp-core)) and any slide deck converter based on [Marpit](https://github.com/marp-team/marpit) framework.
+**A CLI interface, for [Marp](https://github.com/marp-team/marp)** (using [@marp-team/marp-core](https://github.com/marp-team/marp-core)) and any slide deck converter based on [Marpit](https://github.com/marp-team/marpit) framework.
 
 It can convert Marp / Marpit Markdown files to static HTML (and CSS).
 
