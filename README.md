@@ -1,5 +1,8 @@
 # @marp-team/marp-cli
 
+[![CircleCI](https://img.shields.io/circleci/project/github/marp-team/marp-cli/master.svg?style=flat-square)](https://circleci.com/gh/marp-team/marp-cli/)
+[![Codecov](https://img.shields.io/codecov/c/github/marp-team/marp-cli/master.svg?style=flat-square)](https://codecov.io/gh/marp-team/marp-cli)
+
 **A CLI interface, for [Marp](https://github.com/marp-team/marp)** (using [@marp-team/marp-core](https://github.com/marp-team/marp-core)) and any slide deck converter based on [Marpit](https://github.com/marp-team/marpit) framework.
 
 It can convert Marp / Marpit Markdown files to static HTML (and CSS).
