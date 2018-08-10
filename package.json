@@ -45,5 +45,8 @@
     "tslint-config-airbnb": "^5.9.2",
     "tslint-config-prettier": "^1.14.0",
     "typescript": "^3.0.1"
+  },
+  "dependencies": {
+    "@marp-team/marp-core": "^0.0.1"
   }
 }
