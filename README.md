@@ -59,6 +59,7 @@ Under construction.
 - [ ] HTML templates
   - User can choice the base template, such as HTML that is ready to actual presentation.
 - [ ] Select engine to use any Marpit based module
+- [ ] Export PDF directly by using [Puppetter](https://github.com/GoogleChrome/puppeteer)
 
 ## Author
 
