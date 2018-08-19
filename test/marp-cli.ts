@@ -3,7 +3,7 @@ import { useSpy } from './_helpers/spy'
 import marpCli from '../src/marp-cli'
 
 const { version } = require('../package.json')
-const corePkg = require('@marp-team/marp-core/package.json')
+const coreVersion = require('@marp-team/marp-core/package.json').version
 
 describe('Marp CLI', () => {
   ;['--version', '-v'].forEach(cmd => {
@@ -18,7 +18,7 @@ describe('Marp CLI', () => {
 
           const [logged] = log.mock.calls[0]
           expect(logged).toContain(`@marp-team/marp-cli v${version}`)
-          expect(logged).toContain(`@marp-team/marp-core v${corePkg.version}`)
+          expect(logged).toContain(`@marp-team/marp-core v${coreVersion}`)
         })
       })
     })

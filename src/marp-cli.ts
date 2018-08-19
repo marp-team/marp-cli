@@ -1,17 +1,16 @@
+import { version as coreVersion } from '@marp-team/marp-core/package.json'
 import { Argv } from 'yargs'
 import yargs from 'yargs/yargs'
+import { name, version } from '../package.json'
 
-const { name, version } = require('../package.json')
-const corePkg = require('@marp-team/marp-core/package.json')
-
-export default async (argv: string[] = []): Promise<number> => {
+export default async function(argv: string[] = []): Promise<number> {
   const cli: Argv = yargs(argv)
   const args = cli
     .alias('help', 'h')
     .version(
       'version',
       'Show package versions',
-      `${name} v${version} (/w ${corePkg.name} v${corePkg.version})`
+      `${name} v${version} (/w @marp-team/marp-core v${coreVersion})`
     )
     .alias('version', 'v').argv
 

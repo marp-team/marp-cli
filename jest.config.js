@@ -4,6 +4,6 @@ module.exports = {
   coverageThreshold: { global: { lines: 95 } },
   transform: { '^.*\\.ts$': 'ts-jest' },
   testEnvironment: 'node',
-  testRegex: '(/(test|__tests__)/(?!_).*|(\\.|/)(test|spec))\\.[jt]s$',
+  testRegex: '(/(test|__tests__)/(?!_).*|(\\.|/)(test|spec))(?<!\\.d)\\.[jt]s$',
   moduleFileExtensions: ['ts', 'js', 'json', 'node'],
 }
