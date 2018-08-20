@@ -10,7 +10,7 @@ export interface ConverterOption {
   template: string
 }
 
-type MarpitEngine = new () => Marpit
+type MarpitEngine = new (opts?: {}) => Marpit
 
 const { log } = console
 
