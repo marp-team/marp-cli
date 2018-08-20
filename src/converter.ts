@@ -12,7 +12,9 @@ export interface ConverterOption {
 
 type MarpitEngine = new () => Marpit
 
-const error = (msg: string, errorCode = 1) => {
+const { log } = console
+
+function error(msg: string, errorCode = 1): never {
   throw new CLIError(msg, errorCode)
 }
 
@@ -55,8 +57,6 @@ export class Converter {
     if (files.length === 0) error('Please specify input markdown files.')
 
     // TODO: Convert markdown files and save into HTML by using bare template
-    console.log(
-      this.template(this.engine.render('# <!--fit--> Hello, marp-cli!'))
-    )
+    log(this.template(this.engine.render('# <!--fit--> Hello, marp-cli!')))
   }
 }
