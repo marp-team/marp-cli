@@ -1,7 +1,9 @@
-import { Marpit } from '@marp-team/marpit'
+import { Marpit, MarpitRenderResult, MarpitOptions } from '@marp-team/marpit'
+import fs from 'fs'
+import path from 'path'
 import { compileTemplate } from 'pug'
-import { CLIError } from './error'
-import bare from './templates/bare.pug'
+import { CLIError, error } from './error'
+import templates from './templates'
 
 export interface ConverterOption {
   engine: MarpitEngine | string
@@ -9,20 +11,22 @@ export interface ConverterOption {
   template: string
 }
 
-type MarpitEngine = new (opts?: {}) => Marpit
+export interface ConvertResult {
+  newPath: string
+  path: string
+  result: MarpitRenderResult
+}
+
+type MarpitEngine = new (opts?: MarpitOptions) => Marpit
 
 const { log } = console
-
-function error(msg: string, errorCode = 1): never {
-  throw new CLIError(msg, errorCode)
-}
 
 export class Converter {
   readonly engine!: Marpit
   readonly options: ConverterOption
-  readonly templates: { [name: string]: compileTemplate } = { bare }
+  readonly template: compileTemplate
 
-  constructor(public opts: ConverterOption) {
+  constructor(opts: ConverterOption) {
     this.options = opts
 
     try {
@@ -32,7 +36,11 @@ export class Converter {
           ? <MarpitEngine>require(opts.engine)[opts.engineName]
           : opts.engine
 
-      this.engine = new specifiedEngine()
+      this.engine = new specifiedEngine({
+        inlineSVG: true,
+        container: [],
+        slideContainer: [],
+      })
     } catch (err) {
       if (err instanceof CLIError) throw err
       error(`Failed to resolve engine. (${err.message})`)
@@ -41,18 +49,33 @@ export class Converter {
     if (!(this.engine instanceof Marpit))
       error('Specified engine has not extended from Marpit framework.')
 
-    if (!this.templates.hasOwnProperty(opts.template))
-      error(`Selected template "${opts.template}" is not found.`)
+    this.template = templates[opts.template]
+    if (!this.template) error(`Template "${opts.template}" is not found.`)
   }
 
-  get template() {
-    return this.templates[this.options.template]
+  async convertFile(fn: string): Promise<ConvertResult> {
+    const markdown = await new Promise<Buffer>((resolve, reject) =>
+      fs.readFile(fn, (err, data) => (err ? reject(err) : resolve(data)))
+    )
+
+    const newFn = path.join(
+      path.dirname(fn),
+      `${path.basename(fn, path.extname(fn))}.html`
+    )
+
+    const result = this.engine.render(markdown.toString())
+
+    return new Promise<ConvertResult>((resolve, reject) =>
+      fs.writeFile(
+        newFn,
+        this.template(result),
+        err =>
+          err ? reject(err) : resolve({ result, newPath: newFn, path: fn })
+      )
+    )
   }
 
-  convert(...files: string[]) {
-    if (files.length === 0) error('Please specify input markdown files.')
-
-    // TODO: Convert markdown files and save into HTML by using bare template
-    log(this.template(this.engine.render('# <!--fit--> Hello, marp-cli!')))
+  convertFiles(...files: string[]) {
+    return Promise.all(files.map(fn => this.convertFile(fn)))
   }
 }

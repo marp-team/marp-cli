@@ -7,3 +7,7 @@ export class CLIError implements Error {
     return this.message
   }
 }
+
+export function error(msg: string, errorCode = 1): never {
+  throw new CLIError(msg, errorCode)
+}

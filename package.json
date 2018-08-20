@@ -70,6 +70,7 @@
     "@marp-team/marp-core": "^0.0.2",
     "@marp-team/marpit": "^0.0.12",
     "chalk": "^2.4.1",
+    "globby": "^8.0.1",
     "yargs": "^12.0.1"
   }
 }

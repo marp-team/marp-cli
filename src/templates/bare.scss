@@ -1,0 +1,17 @@
+@media screen {
+  html,
+  body {
+    background: #000;
+    height: 100%;
+    margin: 0;
+    overflow: auto;
+    scroll-snap-type: y mandatory;
+  }
+
+  body > svg {
+    display: block;
+    height: 100%;
+    scroll-snap-align: center center;
+    width: 100%;
+  }
+}
