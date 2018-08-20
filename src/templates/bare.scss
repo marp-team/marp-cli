@@ -6,6 +6,10 @@
     margin: 0;
     overflow: auto;
     scroll-snap-type: y mandatory;
+
+    /* older spec */
+    scroll-snap-type: mandatory;
+    scroll-snap-points-y: repeat(100%);
   }
 
   body > svg {
