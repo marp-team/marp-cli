@@ -1,5 +1,6 @@
 import { Marp } from '@marp-team/marp-core'
 import { version as coreVersion } from '@marp-team/marp-core/package.json'
+import chalk from 'chalk'
 import { Argv } from 'yargs'
 import yargs from 'yargs/yargs'
 import { Converter, ConverterOption } from './converter'
@@ -41,7 +42,7 @@ export default async function(argv: string[] = []): Promise<number> {
     return 0
   } catch (e) {
     if (e instanceof CLIError) {
-      console.error(`[ERROR] ${e.message}`)
+      console.error(`${chalk.white.bgRed('[ERROR]')} ${e.message}`)
       return e.errorCode
     }
     throw e

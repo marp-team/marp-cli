@@ -1,7 +1,7 @@
 import { Marpit } from '@marp-team/marpit'
 import { compileTemplate } from 'pug'
 import { CLIError } from './error'
-import bareTemplate from './templates/bare.pug'
+import bare from './templates/bare.pug'
 
 export interface ConverterOption {
   engine: MarpitEngine | string
@@ -20,10 +20,7 @@ function error(msg: string, errorCode = 1): never {
 export class Converter {
   readonly engine!: Marpit
   readonly options: ConverterOption
-
-  readonly templates: { [name: string]: compileTemplate } = {
-    bare: bareTemplate,
-  }
+  readonly templates: { [name: string]: compileTemplate } = { bare }
 
   constructor(public opts: ConverterOption) {
     this.options = opts
