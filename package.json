@@ -67,6 +67,7 @@
     "uglify-es": "^3.3.9"
   },
   "dependencies": {
+    "@marp-team/marpit": "^0.0.12",
     "@marp-team/marp-core": "^0.0.2",
     "yargs": "^12.0.1"
   }
