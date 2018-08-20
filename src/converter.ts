@@ -1,41 +1,62 @@
 import { Marpit } from '@marp-team/marpit'
 import Marp from '@marp-team/marp-core'
+import { compileTemplate } from 'pug'
 import { CLIError } from './error'
+import bareTemplate from './templates/bare.pug'
 
 export interface ConverterOption {
   engine: MarpitEngine | string
   engineName: string
+  template: string
 }
 
 type MarpitEngine = new () => Marpit
 
+const error = (msg: string, errorCode = 1) => {
+  throw new CLIError(msg, errorCode)
+}
+
 export class Converter {
-  readonly engine: MarpitEngine
+  readonly engine!: Marpit
   readonly options: ConverterOption
+
+  readonly templates: { [name: string]: compileTemplate } = {
+    bare: bareTemplate,
+  }
 
   constructor(public opts: ConverterOption) {
     this.options = opts
 
-    const { engine, engineName } = opts
-
     try {
       // Resolve Marp engine
       const specifiedEngine =
-        typeof engine === 'string'
-          ? <MarpitEngine>require(engine)[engineName]
-          : engine
+        typeof opts.engine === 'string'
+          ? <MarpitEngine>require(opts.engine)[opts.engineName]
+          : opts.engine
 
-      if (!(new specifiedEngine() instanceof Marpit)) {
-        throw new CLIError(
-          'Specified engine has not extended from Marpit framework.'
-        )
-      }
-
-      this.engine = specifiedEngine
+      this.engine = new specifiedEngine()
     } catch (err) {
-      throw err instanceof CLIError
-        ? err
-        : new CLIError(`Failed to resolve engine. (${err.message})`)
+      if (err instanceof CLIError) throw err
+      error(`Failed to resolve engine. (${err.message})`)
     }
+
+    if (!(this.engine instanceof Marpit))
+      error('Specified engine has not extended from Marpit framework.')
+
+    if (!this.templates.hasOwnProperty(opts.template))
+      error(`Selected template "${opts.template}" is not found.`)
+  }
+
+  get template() {
+    return this.templates[this.options.template]
+  }
+
+  convert(...files: string[]) {
+    if (files.length === 0) error('Please specify input markdown files.')
+
+    // TODO: Convert markdown files and save into HTML by using bare template
+    console.log(
+      this.template(this.engine.render('# <!--fit--> Hello, marp-cli!'))
+    )
   }
 }

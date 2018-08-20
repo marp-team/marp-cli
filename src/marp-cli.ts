@@ -25,12 +25,20 @@ export default async function(argv: string[] = []): Promise<number> {
       .option('engineName', {
         describe: "Engine module's exported name",
         type: 'string',
+      })
+      .option('template', {
+        describe: 'Template name',
+        type: 'string',
       }).argv
 
     const converter = new Converter({
       engine: args.engine || Marp,
       engineName: args.engineName || 'default',
+      template: args.template || 'bare',
     })
+
+    converter.convert(...args._)
+    return 0
   } catch (e) {
     if (e instanceof CLIError) {
       console.error(`[ERROR] ${e.message}`)
