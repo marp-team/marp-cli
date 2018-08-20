@@ -1,5 +1,4 @@
 import { Marpit } from '@marp-team/marpit'
-import Marp from '@marp-team/marp-core'
 import { compileTemplate } from 'pug'
 import { CLIError } from './error'
 import bareTemplate from './templates/bare.pug'
