@@ -1,56 +1,57 @@
+import { MarpOptions } from '@marp-team/marp-core'
 import { Marpit, MarpitRenderResult, MarpitOptions } from '@marp-team/marpit'
 import fs from 'fs'
 import path from 'path'
-import { compileTemplate } from 'pug'
 import { CLIError, error } from './error'
 import templates from './templates'
 
 export interface ConverterOption {
   engine: MarpitEngine | string
   engineName: string
+  options: MarpOptions | MarpitOptions
   template: string
 }
 
 export interface ConvertResult {
   newPath: string
   path: string
-  result: MarpitRenderResult
+  rendered: MarpitRenderResult
+  result: string
 }
 
 type MarpitEngine = new (opts?: MarpitOptions) => Marpit
 
-const { log } = console
-
 export class Converter {
-  readonly engine!: Marpit
+  readonly engine!: MarpitEngine
   readonly options: ConverterOption
-  readonly template: compileTemplate
 
   constructor(opts: ConverterOption) {
     this.options = opts
 
     try {
-      // Resolve Marp engine
-      const specifiedEngine =
+      this.engine =
         typeof opts.engine === 'string'
           ? <MarpitEngine>require(opts.engine)[opts.engineName]
           : opts.engine
-
-      this.engine = new specifiedEngine({
-        inlineSVG: true,
-        container: [],
-        slideContainer: [],
-      })
     } catch (err) {
       if (err instanceof CLIError) throw err
       error(`Failed to resolve engine. (${err.message})`)
     }
+  }
 
-    if (!(this.engine instanceof Marpit))
+  get renderer() {
+    const renderer = new this.engine(this.options.options)
+    if (!(renderer instanceof Marpit))
       error('Specified engine has not extended from Marpit framework.')
 
-    this.template = templates[opts.template]
-    if (!this.template) error(`Template "${opts.template}" is not found.`)
+    return renderer
+  }
+
+  get template() {
+    const template = templates[this.options.template]
+    if (!template) error(`Template "${this.options.template}" is not found.`)
+
+    return template
   }
 
   async convertFile(fn: string): Promise<ConvertResult> {
@@ -63,14 +64,25 @@ export class Converter {
       `${path.basename(fn, path.extname(fn))}.html`
     )
 
-    const result = this.engine.render(markdown.toString())
+    const converted = this.template({
+      engine: this.engine,
+      markdown: markdown.toString(),
+      options: this.options.options,
+    })
 
     return new Promise<ConvertResult>((resolve, reject) =>
       fs.writeFile(
         newFn,
-        this.template(result),
+        converted.result,
         err =>
-          err ? reject(err) : resolve({ result, newPath: newFn, path: fn })
+          err
+            ? reject(err)
+            : resolve({
+                result: converted.result,
+                rendered: converted.rendered,
+                newPath: newFn,
+                path: fn,
+              })
       )
     )
   }

@@ -5,7 +5,7 @@ import globby from 'globby'
 import { Argv } from 'yargs'
 import yargs from 'yargs/yargs'
 import * as cli from './cli'
-import { Converter, ConverterOption } from './converter'
+import { Converter } from './converter'
 import { CLIError, error } from './error'
 import { name, version } from '../package.json'
 
@@ -38,6 +38,7 @@ export default async function(argv: string[] = []): Promise<number> {
     const converter = new Converter({
       engine: args.engine || Marp,
       engineName: args.engineName || 'default',
+      options: { html: true },
       template: args.template || 'bare',
     })
 
@@ -55,20 +56,21 @@ export default async function(argv: string[] = []): Promise<number> {
       return 0
     }
 
+    const plural = files.length > 1 ? 's' : ''
+    cli.info(`Converting ${files.length} file${plural}...`)
+
     // Convert markdown into HTML
     try {
       const processed = await converter.convertFiles(...files)
 
-      processed.forEach(opts => {
-        cli.info(
-          `${path.relative(process.cwd(), opts.path)} => ${path.relative(
-            process.cwd(),
-            opts.newPath
-          )}`
-        )
+      processed.forEach(result => {
+        const originalPath = path.relative(process.cwd(), result.path)
+        const newPath = path.relative(process.cwd(), result.newPath)
+
+        cli.info(`${originalPath} => ${newPath}`)
       })
     } catch (e) {
-      error(`Failed convert Markdown (${e.message})`)
+      error(`Failed converting Markdown (${e.message})`)
     }
 
     return 0
