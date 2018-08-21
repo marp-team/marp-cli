@@ -25,16 +25,21 @@ export default async function(argv: string[] = []): Promise<number> {
     const base: Argv = yargs(argv)
     const program = base
       .usage(usage)
-      .help('error')
-      .alias('help', 'h')
+      .help(false)
       .version(
         'version',
         'Show package versions',
         `${name} v${version} (/w @marp-team/marp-core v${coreVersion})`
       )
       .alias('version', 'v')
-      .group(['help', 'version'], OptionGroup.Basic)
+      .group('version', OptionGroup.Basic)
       .options({
+        help: {
+          alias: 'h',
+          describe: 'Show help',
+          group: OptionGroup.Basic,
+          type: 'boolean',
+        },
         output: {
           alias: 'o',
           describe: 'Output file name',
@@ -65,6 +70,11 @@ export default async function(argv: string[] = []): Promise<number> {
       })
 
     const args = program.argv
+
+    if (args.help) {
+      program.showHelp()
+      return 0
+    }
 
     const converter = new Converter({
       engine: args.engine || Marp,
