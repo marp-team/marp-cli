@@ -9,12 +9,13 @@ export interface ConverterOption {
   engine: MarpitEngine | string
   engineName: string
   options: MarpOptions | MarpitOptions
+  output?: string
   template: string
   theme?: string
 }
 
 export interface ConvertResult {
-  newPath: string
+  output: string
   path: string
   rendered: MarpitRenderResult
   result: string
@@ -55,45 +56,54 @@ export class Converter {
     return template
   }
 
-  async convertFile(fn: string): Promise<ConvertResult> {
-    const buffer = await new Promise<Buffer>((resolve, reject) =>
-      fs.readFile(fn, (err, data) => (err ? reject(err) : resolve(data)))
-    )
+  convert(markdown: string) {
+    const { options, theme } = this.options
 
-    const newFn = path.join(
-      path.dirname(fn),
-      `${path.basename(fn, path.extname(fn))}.html`
-    )
+    let additionals = ''
+    if (theme) additionals += `\n<!-- theme: ${JSON.stringify(theme)} -->`
 
-    let markdown = buffer.toString()
-
-    if (this.options.theme)
-      markdown += `\n<!-- theme: ${JSON.stringify(this.options.theme)} -->`
-
-    const converted = this.template({
+    return this.template({
+      options,
+      markdown: `${markdown}${additionals}`,
       engine: this.engine,
-      markdown: markdown.toString(),
-      options: this.options.options,
     })
+  }
 
-    return new Promise<ConvertResult>((resolve, reject) =>
-      fs.writeFile(
-        newFn,
-        converted.result,
-        err =>
-          err
-            ? reject(err)
-            : resolve({
-                result: converted.result,
-                rendered: converted.rendered,
-                newPath: newFn,
-                path: fn,
-              })
-      )
+  async convertFile(path: string): Promise<ConvertResult> {
+    const buffer = await new Promise<Buffer>((resolve, reject) =>
+      fs.readFile(path, (e, data) => (e ? reject(e) : resolve(data)))
     )
+
+    const converted = this.convert(buffer.toString())
+    const output = this.outputPath(path)
+
+    if (output !== '-') {
+      await new Promise<void>((resolve, reject) =>
+        fs.writeFile(output, converted.result, e => (e ? reject(e) : resolve()))
+      )
+    }
+
+    return {
+      output,
+      path,
+      rendered: converted.rendered,
+      result: converted.result,
+    }
   }
 
   convertFiles(...files: string[]) {
+    if (this.options.output && this.options.output !== '-' && files.length > 1)
+      error('Output path cannot specify with processing multiple files')
+
     return Promise.all(files.map(fn => this.convertFile(fn)))
+  }
+
+  private outputPath(from: string, extension = 'html'): string {
+    if (this.options.output) return this.options.output
+
+    return path.join(
+      path.dirname(from),
+      `${path.basename(from, path.extname(from))}.${extension}`
+    )
   }
 }

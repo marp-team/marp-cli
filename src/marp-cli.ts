@@ -70,6 +70,7 @@ export default async function(argv: string[] = []): Promise<number> {
       engine: args.engine || Marp,
       engineName: args.engineName || 'default',
       options: {},
+      output: args.output,
       template: args.template || 'bare',
       theme: args.theme,
     })
@@ -95,14 +96,18 @@ export default async function(argv: string[] = []): Promise<number> {
     try {
       const processed = await converter.convertFiles(...files)
 
-      processed.forEach(result => {
-        const originalPath = path.relative(process.cwd(), result.path)
-        const newPath = path.relative(process.cwd(), result.newPath)
+      processed.forEach(ret => {
+        const from = path.relative(process.cwd(), ret.path)
+        const output =
+          ret.output === '-'
+            ? '[stdout]'
+            : path.relative(process.cwd(), ret.output)
 
-        cli.info(`${originalPath} => ${newPath}`)
+        cli.info(`${from} => ${output}`)
+        if (ret.output === '-') console.log(ret.result)
       })
     } catch (e) {
-      error(`Failed converting Markdown (${e.message})`)
+      error(`Failed converting Markdown. (${e.message})`)
     }
 
     return 0
