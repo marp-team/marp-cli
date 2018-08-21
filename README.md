@@ -7,9 +7,7 @@
 
 It can convert Marp / Marpit Markdown files to static HTML (and CSS).
 
-### :warning: _marp-cli is under construction and not ready to use._
-
-<!--
+### :warning: _marp-cli is under construction and not ready to use stable._
 
 ## Try it now!
 
@@ -45,15 +43,13 @@ npm install --save-dev @marp-team/marp-cli
 
 Under construction.
 
--->
-
 ## ToDo
 
-- [ ] Add `marp` bin
-- [ ] Convert to plain HTML (includes style)
+- [x] Add `marp` bin
+- [x] Convert to plain HTML (includes style)
 - [ ] Split into HTML and CSS
 - [ ] Import external theme file(s)
-- [ ] Select theme by option
+- [x] Select theme by option
 - [ ] Support configuration file (like `.marprc`)
 - [ ] Watch mode
 - [ ] HTML templates
