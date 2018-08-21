@@ -1,9 +1,6 @@
-version: 2
-jobs:
-  build:
-    docker:
-      - image: circleci/node:8.11.3
-    working_directory: ~/marp-core
+references:
+  base: &base
+    working_directory: ~/marp-cli
     steps:
       - checkout
 
@@ -47,3 +44,22 @@ jobs:
       - store_artifacts:
           path: ./coverage
           destination: coverage
+
+version: 2
+jobs:
+  '8.11.4':
+    <<: *base
+    docker:
+      - image: circleci/node:8.11.4
+
+  '6.14.2':
+    <<: *base
+    docker:
+      - image: circleci/node:6.14.2
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - 8.11.4
+      - 6.14.2
