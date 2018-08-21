@@ -1,13 +1,13 @@
 import chalk from 'chalk'
 
 export function info(message: string): void {
-  console.info(`${chalk.black.bgCyan('[  INFO ]')} ${message}`)
+  console.info(`${chalk.bgCyan.black('[  INFO ]')} ${message}`)
 }
 
 export function warn(message: string): void {
-  console.warn(`${chalk.black.bgYellow('[  WARN ]')} ${message}`)
+  console.warn(`${chalk.bgYellow.black('[  WARN ]')} ${message}`)
 }
 
 export function error(message: string): void {
-  console.error(`${chalk.white.bgRed('[ ERROR ]')} ${message}`)
+  console.error(`${chalk.bgRed.white('[ ERROR ]')} ${message}`)
 }
