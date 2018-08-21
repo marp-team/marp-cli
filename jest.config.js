@@ -8,6 +8,6 @@ module.exports = {
     '^.*\\.pug$': '<rootDir>/test/_transformers/pug.js',
   },
   testEnvironment: 'node',
-  testRegex: '(/(test|__tests__)/(?!_).*|(\\.|/)(test|spec))(?<!\\.d)\\.[jt]s$',
+  testRegex: '(/(test|__tests__)/(?!_).*|(\\.|/)(test|spec))\\.[jt]s$',
   moduleFileExtensions: ['ts', 'js', 'json', 'node'],
 }
