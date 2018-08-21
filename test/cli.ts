@@ -17,12 +17,13 @@ describe('CLI helpers', () => {
   })
 
   describe('#info', () => {
-    it('passes message with colored header to console.info', () => {
-      const infoSpy = jest.spyOn(console, 'info')
+    it('passes message with colored header to console.warn', () => {
+      // Use console.warn to output into stderr
+      const warnSpy = jest.spyOn(console, 'warn')
 
-      useSpy([infoSpy], () => {
+      useSpy([warnSpy], () => {
         info('cli-helper')
-        expect(infoSpy).toHaveBeenCalledWith(
+        expect(warnSpy).toHaveBeenCalledWith(
           chalk`{bgCyan.black [  INFO ]} cli-helper`
         )
       })

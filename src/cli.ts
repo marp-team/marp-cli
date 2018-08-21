@@ -1,7 +1,8 @@
 import chalk from 'chalk'
 
 export function info(message: string): void {
-  console.info(`${chalk.bgCyan.black('[  INFO ]')} ${message}`)
+  // Use console.warn to output into stderr
+  console.warn(`${chalk.bgCyan.black('[  INFO ]')} ${message}`)
 }
 
 export function warn(message: string): void {

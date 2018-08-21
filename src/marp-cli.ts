@@ -7,12 +7,25 @@ import yargs from 'yargs/yargs'
 import * as cli from './cli'
 import { Converter } from './converter'
 import { CLIError, error } from './error'
+import templates from './templates'
 import { name, version } from '../package.json'
+
+enum OptionGroup {
+  Basic = 'Basic Options:',
+  Converter = 'Converter Options:',
+}
+
+const usage = `
+Usage:
+  marp [options] <files...>
+`.trim()
 
 export default async function(argv: string[] = []): Promise<number> {
   try {
     const base: Argv = yargs(argv)
     const program = base
+      .usage(usage)
+      .help('error')
       .alias('help', 'h')
       .version(
         'version',
@@ -20,21 +33,35 @@ export default async function(argv: string[] = []): Promise<number> {
         `${name} v${version} (/w @marp-team/marp-core v${coreVersion})`
       )
       .alias('version', 'v')
-      .option('engine', {
-        describe: 'Engine module to conversion',
-        type: 'string',
-      })
-      .option('engineName', {
-        describe: "Engine module's exported name",
-        type: 'string',
-      })
-      .option('template', {
-        describe: 'Template name',
-        type: 'string',
-      })
-      .option('theme', {
-        describe: 'Override theme',
-        type: 'string',
+      .group(['help', 'version'], OptionGroup.Basic)
+      .options({
+        output: {
+          alias: 'o',
+          describe: 'Output file name',
+          group: OptionGroup.Basic,
+          type: 'string',
+        },
+        engine: {
+          describe: 'Engine module to conversion',
+          group: OptionGroup.Converter,
+          type: 'string',
+        },
+        'engine-name': {
+          describe: "Engine module's exported name",
+          group: OptionGroup.Converter,
+          type: 'string',
+        },
+        template: {
+          describe: 'Template name',
+          group: OptionGroup.Converter,
+          choices: Object.keys(templates),
+          type: 'string',
+        },
+        theme: {
+          describe: 'Override theme',
+          group: OptionGroup.Converter,
+          type: 'string',
+        },
       })
 
     const args = program.argv
@@ -42,7 +69,7 @@ export default async function(argv: string[] = []): Promise<number> {
     const converter = new Converter({
       engine: args.engine || Marp,
       engineName: args.engineName || 'default',
-      options: { html: true },
+      options: {},
       template: args.template || 'bare',
       theme: args.theme,
     })
@@ -57,7 +84,7 @@ export default async function(argv: string[] = []): Promise<number> {
       if (args._.length > 0)
         cli.warn('Not found processable Markdown file(s).\n')
 
-      program.showHelp('log')
+      program.showHelp()
       return 0
     }
 
