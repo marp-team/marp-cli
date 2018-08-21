@@ -10,6 +10,7 @@ export interface ConverterOption {
   engineName: string
   options: MarpOptions | MarpitOptions
   template: string
+  theme?: string
 }
 
 export interface ConvertResult {
@@ -55,7 +56,7 @@ export class Converter {
   }
 
   async convertFile(fn: string): Promise<ConvertResult> {
-    const markdown = await new Promise<Buffer>((resolve, reject) =>
+    const buffer = await new Promise<Buffer>((resolve, reject) =>
       fs.readFile(fn, (err, data) => (err ? reject(err) : resolve(data)))
     )
 
@@ -63,6 +64,11 @@ export class Converter {
       path.dirname(fn),
       `${path.basename(fn, path.extname(fn))}.html`
     )
+
+    let markdown = buffer.toString()
+
+    if (this.options.theme)
+      markdown += `\n<!-- theme: ${JSON.stringify(this.options.theme)} -->`
 
     const converted = this.template({
       engine: this.engine,

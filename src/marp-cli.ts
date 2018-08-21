@@ -32,6 +32,10 @@ export default async function(argv: string[] = []): Promise<number> {
         describe: 'Template name',
         type: 'string',
       })
+      .option('theme', {
+        describe: 'Override theme',
+        type: 'string',
+      })
 
     const args = program.argv
 
@@ -40,6 +44,7 @@ export default async function(argv: string[] = []): Promise<number> {
       engineName: args.engineName || 'default',
       options: { html: true },
       template: args.template || 'bare',
+      theme: args.theme,
     })
 
     // Find target markdown files
