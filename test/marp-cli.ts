@@ -6,23 +6,38 @@ const { version } = require('../package.json')
 const coreVersion = require('@marp-team/marp-core/package.json').version
 
 describe('Marp CLI', () => {
-  ;['--version', '-v'].forEach(cmd => {
-    context(`with ${cmd} option`, () => {
-      it('outputs package versions about cli and core', () => {
-        const exit = jest.spyOn(process, 'exit')
-        const log = jest.spyOn(console, 'log')
+  const confirmVersion = (...cmd: string[]) => {
+    it('outputs package versions about cli and core', async () => {
+      const exit = jest.spyOn(process, 'exit')
+      const log = jest.spyOn(console, 'log')
+      const error = jest.spyOn(console, 'error')
 
-        useSpy([exit, log], () => {
-          marpCli([cmd])
-          expect(exit).toHaveBeenCalledWith(0)
+      return useSpy([exit, log, error], async () => {
+        await marpCli(cmd)
+        expect(exit).toHaveBeenCalledWith(0)
 
-          const [logged] = log.mock.calls[0]
-          expect(logged).toContain(`@marp-team/marp-cli v${version}`)
-          expect(logged).toContain(`@marp-team/marp-core v${coreVersion}`)
-        })
+        const [logged] = log.mock.calls[0]
+        expect(logged).toContain(`@marp-team/marp-cli v${version}`)
+        expect(logged).toContain(`@marp-team/marp-core v${coreVersion}`)
       })
     })
-  })
+  }
+  ;['--version', '-v'].forEach(cmd =>
+    context(`with ${cmd} option`, () => confirmVersion(cmd))
+  )
 
-  it('returns exit code 1', () => expect(marpCli()).resolves.toBe(1))
+  const confirmHelp = (...cmd: string[]) => {
+    it('outputs help to output', async () => {
+      const exit = jest.spyOn(process, 'exit')
+      const log = jest.spyOn(console, 'log')
+
+      return useSpy([exit, log], async () => {
+        expect(await marpCli(cmd)).toBe(0)
+        expect(log).toHaveBeenCalledWith(expect.stringContaining('Options'))
+      })
+    })
+  }
+  ;[null, ['--help'], ['-h']].forEach(cmd =>
+    context(`with ${cmd || 'empty'} option`, () => confirmHelp(...(cmd || [])))
+  )
 })

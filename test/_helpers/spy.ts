@@ -1,12 +1,39 @@
 export function useSpy(
   spies: jest.SpyInstance[],
-  func: Function,
-  mock: boolean = true
-): void {
+  func: () => void,
+  mock?: boolean
+): void
+
+export function useSpy(
+  spies: jest.SpyInstance[],
+  func: () => Promise<any>,
+  mock?: boolean
+): Promise<any>
+
+export function useSpy(
+  spies: jest.SpyInstance[],
+  func: () => any,
+  mock = true
+) {
+  const finallyFunc = (ret?) => {
+    spies.forEach(spy => spy.mockRestore())
+    return ret
+  }
+
+  let funcResult
+
   try {
     if (mock) spies.forEach(spy => spy.mockImplementation())
-    func()
+
+    funcResult = func()
+
+    if (funcResult instanceof Promise) {
+      return funcResult.then(finallyFunc, err => {
+        finallyFunc()
+        return Promise.reject(err)
+      })
+    }
   } finally {
-    spies.forEach(spy => spy.mockRestore())
+    if (!(funcResult instanceof Promise)) finallyFunc()
   }
 }

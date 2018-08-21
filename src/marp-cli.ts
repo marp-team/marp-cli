@@ -57,7 +57,7 @@ export default async function(argv: string[] = []): Promise<number> {
       if (args._.length > 0)
         cli.warn('Not found processable Markdown file(s).\n')
 
-      program.showHelp()
+      program.showHelp('log')
       return 0
     }
 
