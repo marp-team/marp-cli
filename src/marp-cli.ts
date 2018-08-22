@@ -46,16 +46,6 @@ export default async function(argv: string[] = []): Promise<number> {
           group: OptionGroup.Basic,
           type: 'string',
         },
-        engine: {
-          describe: 'Engine module to conversion',
-          group: OptionGroup.Converter,
-          type: 'string',
-        },
-        'engine-name': {
-          describe: "Engine module's exported name",
-          group: OptionGroup.Converter,
-          type: 'string',
-        },
         template: {
           describe: 'Template name',
           group: OptionGroup.Converter,
@@ -77,8 +67,7 @@ export default async function(argv: string[] = []): Promise<number> {
     }
 
     const converter = new Converter({
-      engine: args.engine || Marp,
-      engineName: args.engineName || 'default',
+      engine: Marp,
       options: {},
       output: args.output,
       template: args.template || 'bare',

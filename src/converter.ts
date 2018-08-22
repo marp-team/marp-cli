@@ -1,14 +1,12 @@
-import { MarpOptions } from '@marp-team/marp-core'
 import { Marpit, MarpitRenderResult, MarpitOptions } from '@marp-team/marpit'
 import fs from 'fs'
 import path from 'path'
-import { CLIError, error } from './error'
+import { error } from './error'
 import templates from './templates'
 
 export interface ConverterOption {
-  engine: MarpitEngine | string
-  engineName: string
-  options: MarpOptions | MarpitOptions
+  engine: typeof Marpit
+  options: MarpitOptions
   output?: string
   template: string
   theme?: string
@@ -21,32 +19,11 @@ export interface ConvertResult {
   result: string
 }
 
-type MarpitEngine = new (opts?: MarpitOptions) => Marpit
-
 export class Converter {
-  readonly engine!: MarpitEngine
   readonly options: ConverterOption
 
   constructor(opts: ConverterOption) {
     this.options = opts
-
-    try {
-      this.engine =
-        typeof opts.engine === 'string'
-          ? <MarpitEngine>require(opts.engine)[opts.engineName]
-          : opts.engine
-    } catch (err) {
-      if (err instanceof CLIError) throw err
-      error(`Failed to resolve engine. (${err.message})`)
-    }
-  }
-
-  get renderer() {
-    const renderer = new this.engine(this.options.options)
-    if (!(renderer instanceof Marpit))
-      error('Specified engine has not extended from Marpit framework.')
-
-    return renderer
   }
 
   get template() {
@@ -57,15 +34,14 @@ export class Converter {
   }
 
   convert(markdown: string) {
-    const { options, theme } = this.options
-
     let additionals = ''
-    if (theme) additionals += `\n<!-- theme: ${JSON.stringify(theme)} -->`
+
+    if (this.options.theme)
+      additionals += `\n<!-- theme: ${JSON.stringify(this.options.theme)} -->`
 
     return this.template({
-      options,
-      markdown: `${markdown}${additionals}`,
-      engine: this.engine,
+      renderer: tplOpts =>
+        this.generateEngine(tplOpts).render(`${markdown}${additionals}`),
     })
   }
 
@@ -96,6 +72,18 @@ export class Converter {
       error('Output path cannot specify with processing multiple files')
 
     return Promise.all(files.map(fn => this.convertFile(fn)))
+  }
+
+  private generateEngine(mergeOptions: MarpitOptions) {
+    const engine = new this.options.engine({
+      ...this.options.options,
+      ...mergeOptions,
+    })
+
+    if (typeof engine.render !== 'function')
+      error('Specified engine has not implemented render() method.')
+
+    return engine
   }
 
   private outputPath(from: string, extension = 'html'): string {
