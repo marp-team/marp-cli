@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Convert slide deck into PDF with Puppeteer
+
 ## v0.0.3 - 2018-08-22
 
 ### Added
