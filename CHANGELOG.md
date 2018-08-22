@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v0.0.3 - 2018-08-22
+
 ### Added
 
 - Support Marp core's fitting header by including browser bundle to exported PDF ([#1](https://github.com/marp-team/marp-cli/pull/1))
