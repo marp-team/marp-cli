@@ -1,3 +1,4 @@
+import path from 'path'
 import fs from 'fs'
 import { useSpy } from './_helpers/spy'
 import { MarpReadyScript } from '../src/ready'
@@ -6,18 +7,17 @@ describe('Ready script resolvers', () => {
   describe('MarpReadyScript', () => {
     describe('#bundled', () => {
       it('returns <script> tag loaded bundled JS from @marp-team/marp-core', async () => {
-        const readFileSpy = jest.spyOn(fs, 'readFile')
+        const bundle = path.join('@marp-team', 'marp-core', 'lib', 'browser.js')
+        const spy = jest.spyOn(fs, 'readFile')
 
         useSpy(
-          [readFileSpy],
+          [spy],
           async () => {
-            readFileSpy.mockImplementation((file, callback) => {
-              expect(file).toContain('@marp-team/marp-core/lib/browser.js')
-              callback(undefined, new Buffer('bundledJS'))
-            })
-
+            spy.mockImplementation((_, cb) => cb(0, new Buffer('bundled')))
             const script = await MarpReadyScript.bundled()
-            expect(script).toBe('<script defer>bundledJS</script>')
+
+            expect(spy.mock.calls[0][0]).toContain(bundle)
+            expect(script).toBe('<script defer>bundled</script>')
           },
           false
         )
