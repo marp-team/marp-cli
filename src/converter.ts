@@ -1,8 +1,15 @@
 import { Marpit, MarpitRenderResult, MarpitOptions } from '@marp-team/marpit'
+import * as chromeFinder from 'chrome-launcher/dist/chrome-finder'
 import fs from 'fs'
 import path from 'path'
+import puppeteer, { PDFOptions } from 'puppeteer-core'
 import { error } from './error'
 import templates from './templates'
+
+export enum ConvertType {
+  html = 'html',
+  pdf = 'pdf',
+}
 
 export interface ConverterOption {
   engine: typeof Marpit
@@ -11,13 +18,14 @@ export interface ConverterOption {
   readyScript?: string
   template: string
   theme?: string
+  type: ConvertType
 }
 
 export interface ConvertResult {
   output: string
   path: string
   rendered: MarpitRenderResult
-  result: string
+  result: Buffer | string
 }
 
 export class Converter {
@@ -25,6 +33,9 @@ export class Converter {
 
   constructor(opts: ConverterOption) {
     this.options = opts
+
+    if (opts.type === ConvertType.pdf && opts.output === '-')
+      error('PDF cannot export to stdout.')
   }
 
   get template() {
@@ -53,27 +64,44 @@ export class Converter {
     )
 
     const converted = this.convert(buffer.toString())
-    const output = this.outputPath(path)
+    const output = this.outputPath(path, this.options.type)
 
-    if (output !== '-') {
+    let result: any = converted.result
+
+    if (this.options.type === ConvertType.pdf) {
+      const browser = await Converter.runBrowser()
+
+      try {
+        const page = await browser.newPage()
+        await page.goto(`data:text/html,${result}`, {
+          waitUntil: ['domcontentloaded', 'networkidle0'],
+        })
+
+        result = await page.pdf(<PDFOptions>{
+          path: output,
+          printBackground: true,
+          preferCSSPageSize: true,
+        })
+      } finally {
+        await browser.close()
+      }
+    } else if (output !== '-') {
       await new Promise<void>((resolve, reject) =>
-        fs.writeFile(output, converted.result, e => (e ? reject(e) : resolve()))
+        fs.writeFile(output, result, e => (e ? reject(e) : resolve()))
       )
     }
 
-    return {
-      output,
-      path,
-      rendered: converted.rendered,
-      result: converted.result,
-    }
+    return { output, path, result, rendered: converted.rendered }
   }
 
-  convertFiles(...files: string[]) {
+  async convertFiles(
+    files: string[],
+    onConverted: (result: ConvertResult) => void = () => {}
+  ) {
     if (this.options.output && this.options.output !== '-' && files.length > 1)
-      error('Output path cannot specify with processing multiple files')
+      error('Output path cannot specify with processing multiple files.')
 
-    return Promise.all(files.map(fn => this.convertFile(fn)))
+    for (const file of files) onConverted(await this.convertFile(file))
   }
 
   private generateEngine(mergeOptions: MarpitOptions) {
@@ -88,12 +116,22 @@ export class Converter {
     return engine
   }
 
-  private outputPath(from: string, extension = 'html'): string {
+  private outputPath(from: string, extension: string): string {
     if (this.options.output) return this.options.output
 
     return path.join(
       path.dirname(from),
       `${path.basename(from, path.extname(from))}.${extension}`
     )
+  }
+
+  private static runBrowser() {
+    const finder: () => string[] = require('is-wsl')
+      ? chromeFinder.wsl
+      : chromeFinder[process.platform]
+
+    return puppeteer.launch({
+      executablePath: finder ? finder()[0] : undefined,
+    })
   }
 }
