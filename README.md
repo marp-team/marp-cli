@@ -54,8 +54,8 @@ Under construction.
 - [x] Select theme by option
 - [ ] Support configuration file (like `.marprc`)
 - [ ] Watch mode
-- [ ] HTML templates
-  - User can choice the base template, such as HTML that is ready to actual presentation.
+- [x] HTML templates
+  - [ ] Template that has ready to actual presentation powered by [Bespoke](https://github.com/bespokejs/bespoke)
 - [ ] Select engine to use any Marpit based module
 - [ ] Export PDF directly by using [Puppetter](https://github.com/GoogleChrome/puppeteer)
 

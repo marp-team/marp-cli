@@ -7,6 +7,7 @@ import yargs from 'yargs/yargs'
 import * as cli from './cli'
 import { Converter } from './converter'
 import { CLIError, error } from './error'
+import { MarpReadyScript } from './ready'
 import templates from './templates'
 import { name, version } from '../package.json'
 
@@ -46,16 +47,6 @@ export default async function(argv: string[] = []): Promise<number> {
           group: OptionGroup.Basic,
           type: 'string',
         },
-        engine: {
-          describe: 'Engine module to conversion',
-          group: OptionGroup.Converter,
-          type: 'string',
-        },
-        'engine-name': {
-          describe: "Engine module's exported name",
-          group: OptionGroup.Converter,
-          type: 'string',
-        },
         template: {
           describe: 'Template name',
           group: OptionGroup.Converter,
@@ -76,11 +67,12 @@ export default async function(argv: string[] = []): Promise<number> {
       return 0
     }
 
+    // Initialize converter
     const converter = new Converter({
-      engine: args.engine || Marp,
-      engineName: args.engineName || 'default',
+      engine: Marp,
       options: {},
       output: args.output,
+      readyScript: await MarpReadyScript.bundled(),
       template: args.template || 'bare',
       theme: args.theme,
     })
@@ -96,7 +88,7 @@ export default async function(argv: string[] = []): Promise<number> {
         cli.warn('Not found processable Markdown file(s).\n')
 
       program.showHelp()
-      return 0
+      return args._.length > 0 ? 1 : 0
     }
 
     const plural = files.length > 1 ? 's' : ''
