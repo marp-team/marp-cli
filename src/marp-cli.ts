@@ -88,7 +88,7 @@ export default async function(argv: string[] = []): Promise<number> {
         cli.warn('Not found processable Markdown file(s).\n')
 
       program.showHelp()
-      return 0
+      return args._.length > 0 ? 1 : 0
     }
 
     const plural = files.length > 1 ? 's' : ''
