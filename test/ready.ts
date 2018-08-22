@@ -10,7 +10,7 @@ describe('Ready script resolvers', () => {
         const bundle = path.join('@marp-team', 'marp-core', 'lib', 'browser.js')
         const spy = jest.spyOn(fs, 'readFile')
 
-        useSpy(
+        return useSpy(
           [spy],
           async () => {
             spy.mockImplementation((_, cb) => cb(0, new Buffer('bundled')))

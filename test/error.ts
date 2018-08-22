@@ -17,4 +17,11 @@ describe('Error helper', () => {
       })
     })
   })
+
+  describe('#toString', () => {
+    it('returns message defined in constructor', () => {
+      const err = new CLIError('Hello, CLI error!')
+      expect(err.toString()).toBe('Hello, CLI error!')
+    })
+  })
 })
