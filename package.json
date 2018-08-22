@@ -79,7 +79,7 @@
     "uglify-es": "^3.3.9"
   },
   "dependencies": {
-    "@marp-team/marp-core": "^0.0.2",
+    "@marp-team/marp-core": "^0.0.3",
     "@marp-team/marpit": "^0.0.12",
     "chalk": "^2.4.1",
     "globby": "^8.0.1",
