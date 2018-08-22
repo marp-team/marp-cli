@@ -7,6 +7,7 @@ import yargs from 'yargs/yargs'
 import * as cli from './cli'
 import { Converter } from './converter'
 import { CLIError, error } from './error'
+import { MarpReadyScript } from './ready'
 import templates from './templates'
 import { name, version } from '../package.json'
 
@@ -66,10 +67,12 @@ export default async function(argv: string[] = []): Promise<number> {
       return 0
     }
 
+    // Initialize converter
     const converter = new Converter({
       engine: Marp,
       options: {},
       output: args.output,
+      readyScript: await MarpReadyScript.bundled(),
       template: args.template || 'bare',
       theme: args.theme,
     })

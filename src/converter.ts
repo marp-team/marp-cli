@@ -8,6 +8,7 @@ export interface ConverterOption {
   engine: typeof Marpit
   options: MarpitOptions
   output?: string
+  readyScript?: string
   template: string
   theme?: string
 }
@@ -40,6 +41,7 @@ export class Converter {
       additionals += `\n<!-- theme: ${JSON.stringify(this.options.theme)} -->`
 
     return this.template({
+      readyScript: this.options.readyScript,
       renderer: tplOpts =>
         this.generateEngine(tplOpts).render(`${markdown}${additionals}`),
     })

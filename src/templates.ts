@@ -3,6 +3,7 @@ import bareScss from './templates/bare.scss'
 import { MarpitOptions, MarpitRenderResult } from '@marp-team/marpit'
 
 export interface TemplateOptions {
+  readyScript?: string
   renderer: (tplOpts: MarpitOptions) => MarpitRenderResult
   [prop: string]: any
 }
@@ -14,9 +15,6 @@ export interface TemplateResult {
 }
 
 export type Template = (locals: TemplateOptions) => TemplateResult
-
-const render = (locals: TemplateOptions) =>
-  new locals.engine(locals.options).render(locals.markdown)
 
 export const bare: Template = opts => {
   const rendered = opts.renderer({

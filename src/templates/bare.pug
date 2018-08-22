@@ -5,4 +5,6 @@ html(lang="en")
     meta(http-equiv="X-UA-Compatible", content="ie=edge")
     style!= bare.css
     style!= css
-  body!= html
+  body
+    != html
+    != readyScript
