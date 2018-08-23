@@ -1,7 +1,8 @@
 import { Marp } from '@marp-team/marp-core'
 import { version as coreVersion } from '@marp-team/marp-core/package.json'
-import path from 'path'
 import globby from 'globby'
+import osLocale from 'os-locale'
+import path from 'path'
 import { Argv } from 'yargs'
 import yargs from 'yargs/yargs'
 import * as cli from './cli'
@@ -76,6 +77,7 @@ export default async function(argv: string[] = []): Promise<number> {
     // Initialize converter
     const converter = new Converter({
       engine: Marp,
+      lang: (await osLocale()).replace(/[_@]/g, '-'),
       options: {},
       output: args.output,
       readyScript: await MarpReadyScript.bundled(),
