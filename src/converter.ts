@@ -4,7 +4,7 @@ import fs from 'fs'
 import path from 'path'
 import puppeteer, { PDFOptions } from 'puppeteer-core'
 import { error } from './error'
-import templates from './templates'
+import templates, { TemplateResult, Template } from './templates'
 
 export enum ConvertType {
   html = 'html',
@@ -24,8 +24,8 @@ export interface ConverterOption {
 export interface ConvertResult {
   output: string
   path: string
-  rendered: MarpitRenderResult
-  result: Buffer | string
+  rendered: TemplateResult['rendered']
+  result: Buffer | TemplateResult['result']
 }
 
 export class Converter {
@@ -35,7 +35,7 @@ export class Converter {
     this.options = opts
 
     if (opts.type === ConvertType.pdf && opts.output === '-')
-      error('PDF cannot export to stdout.')
+      error('PDF cannot output to stdout.')
   }
 
   get template() {
@@ -45,7 +45,7 @@ export class Converter {
     return template
   }
 
-  convert(markdown: string) {
+  convert(markdown: string): TemplateResult {
     let additionals = ''
 
     if (this.options.theme)
@@ -63,10 +63,10 @@ export class Converter {
       fs.readFile(path, (e, data) => (e ? reject(e) : resolve(data)))
     )
 
-    const converted = this.convert(buffer.toString())
+    const tplRet = this.convert(buffer.toString())
     const output = this.outputPath(path, this.options.type)
 
-    let result: any = converted.result
+    let result: any = tplRet.result
 
     if (this.options.type === ConvertType.pdf) {
       const browser = await Converter.runBrowser()
@@ -91,13 +91,13 @@ export class Converter {
       )
     }
 
-    return { output, path, result, rendered: converted.rendered }
+    return { output, path, result, rendered: tplRet.rendered }
   }
 
   async convertFiles(
     files: string[],
     onConverted: (result: ConvertResult) => void = () => {}
-  ) {
+  ): Promise<void> {
     if (this.options.output && this.options.output !== '-' && files.length > 1)
       error('Output path cannot specify with processing multiple files.')
 
