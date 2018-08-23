@@ -7,7 +7,7 @@
 
 **A CLI interface, for [Marp](https://github.com/marp-team/marp)** (using [@marp-team/marp-core](https://github.com/marp-team/marp-core)) and any slide deck converter based on [Marpit](https://github.com/marp-team/marpit) framework.
 
-It can convert Marp / Marpit Markdown files to static HTML (and CSS).
+It can convert Marp / Marpit Markdown files into static HTML (and CSS).
 
 ### :warning: _marp-cli is under construction and not ready to use stable._
 
@@ -16,11 +16,11 @@ It can convert Marp / Marpit Markdown files to static HTML (and CSS).
 [npx](https://blog.npmjs.org/post/162869356040/introducing-npx-an-npm-package-runner) is the best tool when you want to convert Markdown right now. Just run below if you are installed [Node.js](https://nodejs.org/) >= 8.2.0:
 
 ```bash
-# Convert slide deck to HTML
+# Convert slide deck into HTML
 npx @marp-team/marp-cli slide-deck.md
 npx @marp-team/marp-cli slide-deck.md -o output.html
 
-# Convert slide deck to PDF
+# Convert slide deck into PDF
 npx @marp-team/marp-cli slide-deck.md --pdf
 npx @marp-team/marp-cli slide-deck.md -o output.pdf
 ```
