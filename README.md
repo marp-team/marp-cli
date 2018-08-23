@@ -25,6 +25,8 @@ npx @marp-team/marp-cli slide-deck.md --pdf
 npx @marp-team/marp-cli slide-deck.md -o output.pdf
 ```
 
+> :information_source: You have to install [Google Chrome](https://www.google.com/chrome/) (or [Chromium](https://www.chromium.org/)) to convert slide deck into PDF.
+
 ## Install
 
 ### Global install
