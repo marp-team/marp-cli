@@ -1,10 +1,10 @@
-import { Marpit, MarpitRenderResult, MarpitOptions } from '@marp-team/marpit'
+import { Marpit, MarpitOptions } from '@marp-team/marpit'
 import * as chromeFinder from 'chrome-launcher/dist/chrome-finder'
 import fs from 'fs'
 import path from 'path'
 import puppeteer, { PDFOptions } from 'puppeteer-core'
 import { error } from './error'
-import templates, { TemplateResult, Template } from './templates'
+import templates, { TemplateResult } from './templates'
 
 export enum ConvertType {
   html = 'html',
@@ -63,35 +63,35 @@ export class Converter {
       fs.readFile(path, (e, data) => (e ? reject(e) : resolve(data)))
     )
 
-    const tplRet = this.convert(buffer.toString())
+    const converted = this.convert(buffer.toString())
     const output = this.outputPath(path, this.options.type)
+    const result = await (async () => {
+      if (this.options.type === ConvertType.pdf) {
+        const browser = await Converter.runBrowser()
 
-    let result: any = tplRet.result
+        try {
+          const page = await browser.newPage()
+          await page.goto(`data:text/html,${converted.result}`, {
+            waitUntil: ['domcontentloaded', 'networkidle0'],
+          })
 
-    if (this.options.type === ConvertType.pdf) {
-      const browser = await Converter.runBrowser()
-
-      try {
-        const page = await browser.newPage()
-        await page.goto(`data:text/html,${result}`, {
-          waitUntil: ['domcontentloaded', 'networkidle0'],
-        })
-
-        result = await page.pdf(<PDFOptions>{
-          path: output,
-          printBackground: true,
-          preferCSSPageSize: true,
-        })
-      } finally {
-        await browser.close()
+          return await page.pdf(<PDFOptions>{
+            printBackground: true,
+            preferCSSPageSize: true,
+          })
+        } finally {
+          await browser.close()
+        }
       }
-    } else if (output !== '-') {
+      return converted.result
+    })()
+
+    if (output !== '-')
       await new Promise<void>((resolve, reject) =>
         fs.writeFile(output, result, e => (e ? reject(e) : resolve()))
       )
-    }
 
-    return { output, path, result, rendered: tplRet.rendered }
+    return { output, path, result, rendered: converted.rendered }
   }
 
   async convertFiles(

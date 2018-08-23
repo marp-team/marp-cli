@@ -117,15 +117,14 @@ export default async function(argv: string[] = []): Promise<number> {
         if (ret.output === '-') console.log(ret.result)
       })
     } catch (e) {
-      error(`Failed converting Markdown. (${e.message})`)
+      error(`Failed converting Markdown. (${e.message})`, e.errorCode)
     }
 
     return 0
   } catch (e) {
-    if (e instanceof CLIError) {
-      cli.error(e.message)
-      return e.errorCode
-    }
-    throw e
+    if (!(e instanceof CLIError)) throw e
+
+    cli.error(e.message)
+    return e.errorCode
   }
 }

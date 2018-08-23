@@ -140,6 +140,29 @@ describe('Converter', () => {
         expect(result.output).toBe('-')
       })
     })
+
+    context('when convert type is PDF', () => {
+      const pdfInstance = (opts = {}) =>
+        instance({ ...opts, type: ConvertType.pdf })
+
+      it('converts markdown file into PDF', async () => {
+        const write = jest.spyOn(fs, 'writeFile')
+
+        return useSpy([write], async () => {
+          write.mockImplementation((_, __, callback) => callback())
+
+          const opts = { output: 'test.pdf' }
+          const result = await pdfInstance(opts).convertFile(onePath)
+          const pdf: Buffer = write.mock.calls[0][1]
+
+          expect(write).toHaveBeenCalled()
+          expect(write.mock.calls[0][0]).toBe('test.pdf')
+          expect(pdf.toString('ascii', 0, 5)).toBe('%PDF-')
+          expect(result.output).toBe('test.pdf')
+          expect(result.result).toBe(write.mock.calls[0][1])
+        })
+      })
+    })
   })
 
   describe('#convertFiles', () => {

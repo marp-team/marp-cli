@@ -1,7 +1,12 @@
 export class CLIError implements Error {
-  name = 'CLIError'
+  readonly errorCode: number
+  readonly message: string
+  readonly name = 'CLIError'
 
-  constructor(public message: string, public errorCode: number = 1) {}
+  constructor(message: string, errorCode: number = 1) {
+    this.message = message
+    this.errorCode = errorCode
+  }
 
   toString() {
     return this.message
