@@ -49,7 +49,7 @@ export default async function(argv: string[] = []): Promise<number> {
         },
         pdf: {
           default: false,
-          describe: 'Convert slide deck to PDF',
+          describe: 'Convert slide deck into PDF',
           group: OptionGroup.Converter,
           type: 'boolean',
         },
