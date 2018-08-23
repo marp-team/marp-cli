@@ -5,7 +5,7 @@ import globby from 'globby'
 import { Argv } from 'yargs'
 import yargs from 'yargs/yargs'
 import * as cli from './cli'
-import { Converter } from './converter'
+import { Converter, ConvertType } from './converter'
 import { CLIError, error } from './error'
 import { MarpReadyScript } from './ready'
 import templates from './templates'
@@ -47,6 +47,12 @@ export default async function(argv: string[] = []): Promise<number> {
           group: OptionGroup.Basic,
           type: 'string',
         },
+        pdf: {
+          default: false,
+          describe: 'Convert slide deck into PDF',
+          group: OptionGroup.Converter,
+          type: 'boolean',
+        },
         template: {
           describe: 'Template name',
           group: OptionGroup.Converter,
@@ -75,6 +81,10 @@ export default async function(argv: string[] = []): Promise<number> {
       readyScript: await MarpReadyScript.bundled(),
       template: args.template || 'bare',
       theme: args.theme,
+      type:
+        args.pdf || `${args.output}`.toLowerCase().endsWith('.pdf')
+          ? ConvertType.pdf
+          : ConvertType.html,
     })
 
     // Find target markdown files
@@ -96,9 +106,7 @@ export default async function(argv: string[] = []): Promise<number> {
 
     // Convert markdown into HTML
     try {
-      const processed = await converter.convertFiles(...files)
-
-      processed.forEach(ret => {
+      await converter.convertFiles(files, ret => {
         const from = path.relative(process.cwd(), ret.path)
         const output =
           ret.output === '-'
@@ -109,15 +117,14 @@ export default async function(argv: string[] = []): Promise<number> {
         if (ret.output === '-') console.log(ret.result)
       })
     } catch (e) {
-      error(`Failed converting Markdown. (${e.message})`)
+      error(`Failed converting Markdown. (${e.message})`, e.errorCode)
     }
 
     return 0
   } catch (e) {
-    if (e instanceof CLIError) {
-      cli.error(e.message)
-      return e.errorCode
-    }
-    throw e
+    if (!(e instanceof CLIError)) throw e
+
+    cli.error(e.message)
+    return e.errorCode
   }
 }

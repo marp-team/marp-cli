@@ -50,12 +50,12 @@ jobs:
   '8.11.4':
     <<: *base
     docker:
-      - image: circleci/node:8.11.4
+      - image: circleci/node:8.11.4-browsers
 
   '6.14.2':
     <<: *base
     docker:
-      - image: circleci/node:6.14.2
+      - image: circleci/node:6.14.2-browsers
 
 workflows:
   version: 2

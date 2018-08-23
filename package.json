@@ -48,6 +48,7 @@
     "@types/jest": "^23.3.1",
     "@types/node": "^10.7.1",
     "@types/pug": "^2.0.4",
+    "@types/puppeteer": "^1.6.0",
     "@types/yargs": "^11.1.1",
     "autoprefixer": "^9.1.2",
     "codecov": "^3.0.4",
@@ -82,7 +83,10 @@
     "@marp-team/marp-core": "^0.0.3",
     "@marp-team/marpit": "^0.0.12",
     "chalk": "^2.4.1",
+    "chrome-launcher": "^0.10.2",
     "globby": "^8.0.1",
+    "is-wsl": "^1.1.0",
+    "puppeteer-core": "^1.7.0",
     "yargs": "^12.0.1"
   }
 }

@@ -4,7 +4,7 @@ import context from './_helpers/context'
 import { useSpy } from './_helpers/spy'
 import marpCli from '../src/marp-cli'
 import * as cli from '../src/cli'
-import { Converter } from '../src/converter'
+import { Converter, ConvertType } from '../src/converter'
 import { CLIError } from '../src/error'
 
 const { version } = require('../package.json')
@@ -46,8 +46,23 @@ describe('Marp CLI', () => {
     context(`with ${cmd || 'empty'} option`, () => confirmHelp(...(cmd || [])))
   )
 
+  const confirmPDF = (...cmd: string[]) => {
+    it('converts file by Converter with PDF type', async () => {
+      const cliInfo = jest.spyOn(cli, 'info')
+      const cvtFiles = jest.spyOn(Converter.prototype, 'convertFiles')
+
+      return useSpy([cliInfo, cvtFiles], async () => {
+        await marpCli(cmd)
+        expect(cvtFiles).toHaveBeenCalled()
+
+        const converter: any = cvtFiles.mock.instances[0]
+        expect(converter.options.type).toBe(ConvertType.pdf)
+      })
+    })
+  }
+
   context('when passed file is not found', () => {
-    it('outputs warning and help with exit code 1', () => {
+    it('outputs warning and help with exit code 1', async () => {
       const warn = jest.spyOn(console, 'warn')
       const error = jest.spyOn(console, 'error')
 
@@ -62,7 +77,7 @@ describe('Marp CLI', () => {
   context('with passing a file', () => {
     const onePath = path.resolve(__dirname, './_files/1.md')
 
-    it('converts file with Converter#convertFiles', () => {
+    it('converts file', async () => {
       const cliInfo = jest.spyOn(cli, 'info')
       const write = jest.spyOn(fs, 'writeFile')
 
@@ -77,34 +92,42 @@ describe('Marp CLI', () => {
       })
     })
 
-    it('outputs to stdout when output is stdout', () => {
+    it('prints error and return error code when CLIError is raised', async () => {
       const cliInfo = jest.spyOn(cli, 'info')
-      const log = jest.spyOn(console, 'log')
+      const cliError = jest.spyOn(cli, 'error')
+      const cvt = jest.spyOn(Converter.prototype, 'convertFiles')
 
-      return useSpy([cliInfo, log], async () => {
-        expect(await marpCli([onePath, '-o', '-'])).toBe(0)
-        expect(log).toHaveBeenCalledTimes(1)
+      return useSpy([cliInfo, cliError, cvt], async () => {
+        cvt.mockImplementation(() => Promise.reject(new CLIError('FAIL', 123)))
+
+        expect(await marpCli([onePath])).toBe(123)
+        expect(cliError).toHaveBeenCalledWith(expect.stringContaining('FAIL'))
       })
     })
 
-    it('prints error and return error code when CLIError is raised', () => {
-      const cliInfo = jest.spyOn(cli, 'info')
-      const cliError = jest.spyOn(cli, 'error')
-      const converter = jest.spyOn(Converter.prototype, 'convertFiles')
+    context('with --pdf option', () => confirmPDF(onePath, '--pdf'))
 
-      return useSpy([cliInfo, cliError, converter], async () => {
-        converter.mockImplementation(() => Promise.reject(new CLIError('FAIL')))
+    context('with -o option', () => {
+      it('converts file and output to stdout when -o is "-"', async () => {
+        const cliInfo = jest.spyOn(cli, 'info')
+        const log = jest.spyOn(console, 'log')
 
-        expect(await marpCli([onePath])).toBe(1)
-        expect(cliError).toHaveBeenCalledWith(expect.stringContaining('FAIL'))
+        return useSpy([cliInfo, log], async () => {
+          expect(await marpCli([onePath, '-o', '-'])).toBe(0)
+          expect(log).toHaveBeenCalledTimes(1)
+        })
       })
+
+      context('when extension is .pdf', () =>
+        confirmPDF(onePath, '-o', 'example.pdf')
+      )
     })
   })
 
   context('with passing directory', () => {
     const folder = path.resolve(__dirname, './_files')
 
-    it('finds out markdown files recursively', () => {
+    it('finds out markdown files recursively', async () => {
       const cliInfo = jest.spyOn(cli, 'info')
       const converter = jest.spyOn(Converter.prototype, 'convertFiles')
 

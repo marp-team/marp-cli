@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Convert slide deck into PDF with Puppeteer ([#2](https://github.com/marp-team/marp-cli/pull/2))
+
 ## v0.0.3 - 2018-08-22
 
 ### Added

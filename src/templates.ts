@@ -9,7 +9,6 @@ export interface TemplateOptions {
 }
 
 export interface TemplateResult {
-  options: TemplateOptions
   rendered: MarpitRenderResult
   result: string
 }
@@ -23,13 +22,14 @@ export const bare: Template = opts => {
     slideContainer: [],
   })
 
-  const result = barePug({
-    ...opts,
-    ...rendered,
-    bare: { css: bareScss },
-  })
-
-  return { rendered, result, options: opts }
+  return {
+    rendered,
+    result: barePug({
+      ...opts,
+      ...rendered,
+      bare: { css: bareScss },
+    }),
+  }
 }
 
 const templates: { [name: string]: Template } = { bare }

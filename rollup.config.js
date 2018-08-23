@@ -13,7 +13,13 @@ import { dependencies } from './package.json'
 
 export default [
   {
-    external: [...Object.keys(dependencies), 'fs', 'path', 'yargs/yargs'],
+    external: [
+      ...Object.keys(dependencies),
+      'fs',
+      'path',
+      'chrome-launcher/dist/chrome-finder',
+      'yargs/yargs',
+    ],
     input: 'src/marp-cli.ts',
     output: {
       exports: 'named',
