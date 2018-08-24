@@ -85,7 +85,9 @@ describe('Marp CLI', () => {
         write.mockImplementation((_, __, callback) => callback())
 
         expect(await marpCli([onePath])).toBe(0)
-        expect(cliInfo).toHaveBeenCalledWith(expect.stringContaining('1 file'))
+        expect(cliInfo).toHaveBeenCalledWith(
+          expect.stringContaining('1 markdown')
+        )
         expect(cliInfo).toHaveBeenCalledWith(
           expect.stringMatching(/1\.md => .+1\.html/)
         )
@@ -110,11 +112,11 @@ describe('Marp CLI', () => {
     context('with -o option', () => {
       it('converts file and output to stdout when -o is "-"', async () => {
         const cliInfo = jest.spyOn(cli, 'info')
-        const log = jest.spyOn(console, 'log')
+        const write = jest.spyOn(process.stdout, 'write')
 
-        return useSpy([cliInfo, log], async () => {
+        return useSpy([cliInfo, write], async () => {
           expect(await marpCli([onePath, '-o', '-'])).toBe(0)
-          expect(log).toHaveBeenCalledTimes(1)
+          expect(write).toHaveBeenCalledTimes(1)
         })
       })
 
@@ -135,7 +137,9 @@ describe('Marp CLI', () => {
         converter.mockImplementation(() => [])
 
         expect(await marpCli([folder])).toBe(0)
-        expect(cliInfo).toHaveBeenCalledWith(expect.stringContaining('4 files'))
+        expect(cliInfo).toHaveBeenCalledWith(
+          expect.stringContaining('4 markdowns')
+        )
       })
     })
   })
