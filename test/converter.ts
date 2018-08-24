@@ -15,6 +15,7 @@ describe('Converter', () => {
 
   const instance = (opts = {}) =>
     new Converter({
+      lang: 'en',
       engine: Marp,
       options: {},
       template: 'bare',
@@ -25,8 +26,9 @@ describe('Converter', () => {
   describe('#constructor', () => {
     it('assigns initial options to options member', () => {
       const options = {
+        lang: 'en',
         engine: Marp,
-        options: { html: true } as MarpitOptions,
+        options: <MarpitOptions>{ html: true },
         template: 'test-template',
         type: ConvertType.html,
       }
@@ -74,6 +76,11 @@ describe('Converter', () => {
     it('throws CLIError when selected template is not found', () => {
       const subject = () => instance({ template: 'not-found' }).convert('')
       expect(subject).toThrow(CLIError)
+    })
+
+    it('settings lang attribute of <html> by lang option', () => {
+      const { result } = instance({ lang: 'zh' }).convert('')
+      expect(result).toContain('<html lang="zh">')
     })
 
     it("overrides theme by converter's theme option", () => {
@@ -145,23 +152,27 @@ describe('Converter', () => {
       const pdfInstance = (opts = {}) =>
         instance({ ...opts, type: ConvertType.pdf })
 
-      it('converts markdown file into PDF', async () => {
-        const write = jest.spyOn(fs, 'writeFile')
+      it(
+        'converts markdown file into PDF',
+        async () => {
+          const write = jest.spyOn(fs, 'writeFile')
 
-        return useSpy([write], async () => {
-          write.mockImplementation((_, __, callback) => callback())
+          return useSpy([write], async () => {
+            write.mockImplementation((_, __, callback) => callback())
 
-          const opts = { output: 'test.pdf' }
-          const result = await pdfInstance(opts).convertFile(onePath)
-          const pdf: Buffer = write.mock.calls[0][1]
+            const opts = { output: 'test.pdf' }
+            const result = await pdfInstance(opts).convertFile(onePath)
+            const pdf: Buffer = write.mock.calls[0][1]
 
-          expect(write).toHaveBeenCalled()
-          expect(write.mock.calls[0][0]).toBe('test.pdf')
-          expect(pdf.toString('ascii', 0, 5)).toBe('%PDF-')
-          expect(result.output).toBe('test.pdf')
-          expect(result.result).toBe(write.mock.calls[0][1])
-        })
-      })
+            expect(write).toHaveBeenCalled()
+            expect(write.mock.calls[0][0]).toBe('test.pdf')
+            expect(pdf.toString('ascii', 0, 5)).toBe('%PDF-')
+            expect(result.output).toBe('test.pdf')
+            expect(result.result).toBe(write.mock.calls[0][1])
+          })
+        },
+        10000
+      )
     })
   })
 

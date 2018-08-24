@@ -3,6 +3,7 @@ import bareScss from './templates/bare.scss'
 import { MarpitOptions, MarpitRenderResult } from '@marp-team/marpit'
 
 export interface TemplateOptions {
+  lang: string
   readyScript?: string
   renderer: (tplOpts: MarpitOptions) => MarpitRenderResult
   [prop: string]: any

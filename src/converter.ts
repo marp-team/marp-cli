@@ -13,6 +13,7 @@ export enum ConvertType {
 
 export interface ConverterOption {
   engine: typeof Marpit
+  lang: string
   options: MarpitOptions
   output?: string
   readyScript?: string
@@ -52,6 +53,7 @@ export class Converter {
       additionals += `\n<!-- theme: ${JSON.stringify(this.options.theme)} -->`
 
     return this.template({
+      lang: this.options.lang,
       readyScript: this.options.readyScript,
       renderer: tplOpts =>
         this.generateEngine(tplOpts).render(`${markdown}${additionals}`),
