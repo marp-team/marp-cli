@@ -145,23 +145,27 @@ describe('Converter', () => {
       const pdfInstance = (opts = {}) =>
         instance({ ...opts, type: ConvertType.pdf })
 
-      it('converts markdown file into PDF', async () => {
-        const write = jest.spyOn(fs, 'writeFile')
+      it(
+        'converts markdown file into PDF',
+        async () => {
+          const write = jest.spyOn(fs, 'writeFile')
 
-        return useSpy([write], async () => {
-          write.mockImplementation((_, __, callback) => callback())
+          return useSpy([write], async () => {
+            write.mockImplementation((_, __, callback) => callback())
 
-          const opts = { output: 'test.pdf' }
-          const ret = await pdfInstance(opts).convertFile(new File(onePath))
-          const pdf: Buffer = write.mock.calls[0][1]
+            const opts = { output: 'test.pdf' }
+            const ret = await pdfInstance(opts).convertFile(new File(onePath))
+            const pdf: Buffer = write.mock.calls[0][1]
 
-          expect(write).toHaveBeenCalled()
-          expect(write.mock.calls[0][0]).toBe('test.pdf')
-          expect(pdf.toString('ascii', 0, 5)).toBe('%PDF-')
-          expect(ret.newFile.path).toBe('test.pdf')
-          expect(ret.newFile.buffer).toBe(write.mock.calls[0][1])
-        })
-      })
+            expect(write).toHaveBeenCalled()
+            expect(write.mock.calls[0][0]).toBe('test.pdf')
+            expect(pdf.toString('ascii', 0, 5)).toBe('%PDF-')
+            expect(ret.newFile.path).toBe('test.pdf')
+            expect(ret.newFile.buffer).toBe(write.mock.calls[0][1])
+          })
+        },
+        10000
+      )
     })
   })
 
