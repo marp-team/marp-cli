@@ -45,6 +45,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.0.0-rc.1",
+    "@types/get-stdin": "^5.0.1",
     "@types/jest": "^23.3.1",
     "@types/node": "^10.7.1",
     "@types/pug": "^2.0.4",
@@ -84,6 +85,7 @@
     "@marp-team/marpit": "^0.0.12",
     "chalk": "^2.4.1",
     "chrome-launcher": "^0.10.2",
+    "get-stdin": "^6.0.0",
     "globby": "^8.0.1",
     "is-wsl": "^1.1.0",
     "os-locale": "^3.0.0",

@@ -1,13 +1,12 @@
 import { Marp } from '@marp-team/marp-core'
 import { version as coreVersion } from '@marp-team/marp-core/package.json'
-import globby from 'globby'
 import osLocale from 'os-locale'
-import path from 'path'
 import { Argv } from 'yargs'
 import yargs from 'yargs/yargs'
 import * as cli from './cli'
 import { Converter, ConvertType } from './converter'
 import { CLIError, error } from './error'
+import { File, FileType } from './file'
 import { MarpReadyScript } from './ready'
 import templates from './templates'
 import { name, version } from '../package.json'
@@ -90,12 +89,12 @@ export default async function(argv: string[] = []): Promise<number> {
     })
 
     // Find target markdown files
-    const files = await globby(args._, {
-      absolute: true,
-      expandDirectories: { files: ['*.md', '*.mdown', '*.markdown'] },
-    })
+    const files = <File[]>(
+      [await File.stdin(), ...(await File.find(...args._))].filter(f => f)
+    )
+    const { length } = files
 
-    if (files.length === 0) {
+    if (length === 0) {
       if (args._.length > 0)
         cli.warn('Not found processable Markdown file(s).\n')
 
@@ -103,20 +102,16 @@ export default async function(argv: string[] = []): Promise<number> {
       return args._.length > 0 ? 1 : 0
     }
 
-    const plural = files.length > 1 ? 's' : ''
-    cli.info(`Converting ${files.length} file${plural}...`)
+    cli.info(`Converting ${length} markdown${length > 1 ? 's' : ''}...`)
 
     // Convert markdown into HTML
     try {
       await converter.convertFiles(files, ret => {
-        const from = path.relative(process.cwd(), ret.path)
-        const output =
-          ret.output === '-'
-            ? '[stdout]'
-            : path.relative(process.cwd(), ret.output)
+        const { file, newFile } = ret
+        const output = (f: File, io: string) =>
+          f.type === FileType.StandardIO ? `<${io}>` : f.relativePath()
 
-        cli.info(`${from} => ${output}`)
-        if (ret.output === '-') console.log(ret.result)
+        cli.info(`${output(file, 'stdin')} => ${output(newFile, 'stdout')}`)
       })
     } catch (e) {
       error(`Failed converting Markdown. (${e.message})`, e.errorCode)
