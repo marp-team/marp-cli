@@ -7,16 +7,22 @@ body {
 }
 
 .bespoke-marp-parent {
+  position: relative;
   height: 100%;
   width: 100%;
 }
 
 svg.bespoke-marp-slide {
-  display: none;
+  height: 100%;
+  left: 0;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  z-index: -1;
 
   &.bespoke-marp-active {
-    display: block;
-    height: 100%;
-    width: 100%;
+    pointer-events: auto;
+    z-index: 0;
   }
 }
