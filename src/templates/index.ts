@@ -1,5 +1,8 @@
+import fs from 'fs'
+import path from 'path'
 import barePug from './bare/bare.pug'
 import bareScss from './bare/bare.scss'
+import bespokePug from './bespoke/bespoke.pug'
 import { MarpitOptions, MarpitRenderResult } from '@marp-team/marpit'
 
 export interface TemplateOptions {
@@ -33,6 +36,32 @@ export const bare: Template = async opts => {
   }
 }
 
-const templates: { [name: string]: Template } = { bare }
+export const bespoke: Template = async opts => {
+  const rendered = opts.renderer({
+    container: [],
+    inlineSVG: true,
+    slideContainer: [],
+  })
+
+  return {
+    rendered,
+    result: bespokePug({
+      ...opts,
+      ...rendered,
+      bespoke: { js: await bespokeJs() },
+    }),
+  }
+}
+
+export function bespokeJs() {
+  return new Promise<string>((resolve, reject) =>
+    fs.readFile(
+      path.resolve(__dirname, './bespoke.js'), // __dirname is "lib" after bundle
+      (e, data) => (e ? reject(e) : resolve(data.toString()))
+    )
+  )
+}
+
+const templates: { [name: string]: Template } = { bare, bespoke }
 
 export default templates
