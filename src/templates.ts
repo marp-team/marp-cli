@@ -14,9 +14,9 @@ export interface TemplateResult {
   result: string
 }
 
-export type Template = (locals: TemplateOptions) => TemplateResult
+export type Template = (locals: TemplateOptions) => Promise<TemplateResult>
 
-export const bare: Template = opts => {
+export const bare: Template = async opts => {
   const rendered = opts.renderer({
     container: [],
     inlineSVG: true,
