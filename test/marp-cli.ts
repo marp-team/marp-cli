@@ -36,14 +36,9 @@ describe('Marp CLI', () => {
 
   const confirmHelp = (...cmd: string[]) => {
     it('outputs help to stderr', async () => {
-      const exit = jest.spyOn(process, 'exit')
       const error = jest.spyOn(console, 'error')
 
-      return useSpy([exit, error], async () => {
-        exit.mockImplementation(code => {
-          throw new CLIError('EXIT', code)
-        })
-
+      return useSpy([error], async () => {
         expect(await marpCli(cmd)).toBe(0)
         expect(error).toHaveBeenCalledWith(expect.stringContaining('Usage'))
       })
