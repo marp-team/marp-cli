@@ -32,19 +32,20 @@ const plugins = [
     plugins: [autoprefixer(), cssnano({ preset: 'default' })],
   }),
   pugPlugin(),
+  !process.env.ROLLUP_WATCH && uglify({}, minify),
 ]
 
 export default [
   {
+    external,
     plugins,
-    input: 'src/templates/bespoke/bespoke.ts',
-    output: { file: 'lib/bespoke.js', format: 'iife', name: 'marpBespoke' },
-    plugins: [...plugins, uglify({}, minify)],
+    input: 'src/templates/bespoke.js',
+    output: { file: 'lib/bespoke.js', format: 'iife' },
   },
   {
     external,
+    plugins,
     input: 'src/marp-cli.ts',
     output: { exports: 'named', file: 'lib/marp-cli.js', format: 'cjs' },
-    plugins: [...plugins, !process.env.ROLLUP_WATCH && uglify({}, minify)],
   },
 ]

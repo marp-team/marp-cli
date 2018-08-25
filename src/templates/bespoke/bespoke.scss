@@ -1,0 +1,22 @@
+html,
+body {
+  background: #000;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+.bespoke-marp-parent {
+  height: 100%;
+  width: 100%;
+}
+
+svg.bespoke-marp-slide {
+  display: none;
+
+  &.bespoke-marp-active {
+    display: block;
+    height: 100%;
+    width: 100%;
+  }
+}

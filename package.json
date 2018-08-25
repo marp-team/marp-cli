@@ -52,6 +52,8 @@
     "@types/puppeteer": "^1.6.0",
     "@types/yargs": "^11.1.1",
     "autoprefixer": "^9.1.2",
+    "bespoke": "^1.1.0",
+    "bespoke-keys": "^1.1.0",
     "codecov": "^3.0.4",
     "cssnano": "^4.0.5",
     "jest": "^23.5.0",
