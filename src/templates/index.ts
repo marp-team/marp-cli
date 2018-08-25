@@ -1,5 +1,5 @@
-import barePug from './templates/bare.pug'
-import bareScss from './templates/bare.scss'
+import barePug from './bare/bare.pug'
+import bareScss from './bare/bare.scss'
 import { MarpitOptions, MarpitRenderResult } from '@marp-team/marpit'
 
 export interface TemplateOptions {

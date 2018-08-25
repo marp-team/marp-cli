@@ -3,7 +3,7 @@ import * as chromeFinder from 'chrome-launcher/dist/chrome-finder'
 import puppeteer, { PDFOptions } from 'puppeteer-core'
 import { error } from './error'
 import { File } from './file'
-import templates, { TemplateResult } from './templates'
+import templates, { TemplateResult } from './templates/'
 
 export enum ConvertType {
   html = 'html',
