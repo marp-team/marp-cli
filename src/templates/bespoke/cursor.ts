@@ -14,5 +14,7 @@ export default function bespokeCursor(timeout = 2000) {
 
     document.addEventListener('mousedown', activate)
     document.addEventListener('mousemove', activate)
+
+    setTimeout(activate, 0)
   }
 }
