@@ -18,7 +18,7 @@ describe('Marp CLI', () => {
       const error = jest.spyOn(console, 'error')
 
       return useSpy([exit, log, error], async () => {
-        exit.mockImplementation(code => {
+        exit.mockImplementationOnce(code => {
           throw new CLIError('EXIT', code)
         })
 
