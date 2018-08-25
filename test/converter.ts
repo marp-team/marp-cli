@@ -50,11 +50,11 @@ describe('Converter', () => {
   })
 
   describe('#convert', () => {
-    it('returns the result of template', () => {
+    it('returns the result of template', async () => {
       const options = { html: true }
       const readyScript = '<b>ready</b>'
       const md = '# <i>Hello!</i>'
-      const result = instance({ options, readyScript }).convert(md)
+      const result = await instance({ options, readyScript }).convert(md)
 
       expect(result.result).toMatch(/^<!DOCTYPE html>[\s\S]+<\/html>$/)
       expect(result.result).toContain(result.rendered.html)
@@ -64,22 +64,22 @@ describe('Converter', () => {
     })
 
     it('throws CLIError when selected engine is not implemented render() method', () => {
-      const subject = () => instance({ engine: function _() {} }).convert('')
-      expect(subject).toThrow(CLIError)
+      const subject = instance({ engine: function _() {} }).convert('')
+      expect(subject).rejects.toBeInstanceOf(CLIError)
     })
 
     it('throws CLIError when selected template is not found', () => {
-      const subject = () => instance({ template: 'not-found' }).convert('')
-      expect(subject).toThrow(CLIError)
+      const subject = instance({ template: 'not-found' }).convert('')
+      expect(subject).rejects.toBeInstanceOf(CLIError)
     })
 
-    it('settings lang attribute of <html> by lang option', () => {
-      const { result } = instance({ lang: 'zh' }).convert('')
+    it('settings lang attribute of <html> by lang option', async () => {
+      const { result } = await instance({ lang: 'zh' }).convert('')
       expect(result).toContain('<html lang="zh">')
     })
 
-    it("overrides theme by converter's theme option", () => {
-      const { rendered } = instance({ theme: 'gaia' }).convert('')
+    it("overrides theme by converter's theme option", async () => {
+      const { rendered } = await instance({ theme: 'gaia' }).convert('')
       expect(rendered.css).toContain('@theme gaia')
     })
   })
