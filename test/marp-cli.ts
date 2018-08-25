@@ -1,9 +1,11 @@
 import fs from 'fs'
+import getStdin from 'get-stdin'
 import path from 'path'
 import context from './_helpers/context'
 import { useSpy } from './_helpers/spy'
 import marpCli from '../src/marp-cli'
 import * as cli from '../src/cli'
+import { File } from '../src/file'
 import { Converter, ConvertType } from '../src/converter'
 import { CLIError } from '../src/error'
 
@@ -18,8 +20,11 @@ describe('Marp CLI', () => {
       const error = jest.spyOn(console, 'error')
 
       return useSpy([exit, log, error], async () => {
-        await marpCli(cmd)
-        expect(exit).toHaveBeenCalledWith(0)
+        exit.mockImplementationOnce(code => {
+          throw new CLIError('EXIT', code)
+        })
+
+        expect(await marpCli(cmd)).toBe(0)
 
         const [logged] = log.mock.calls[0]
         expect(logged).toContain(`@marp-team/marp-cli v${version}`)
@@ -33,10 +38,9 @@ describe('Marp CLI', () => {
 
   const confirmHelp = (...cmd: string[]) => {
     it('outputs help to stderr', async () => {
-      const exit = jest.spyOn(process, 'exit')
       const error = jest.spyOn(console, 'error')
 
-      return useSpy([exit, error], async () => {
+      return useSpy([error], async () => {
         expect(await marpCli(cmd)).toBe(0)
         expect(error).toHaveBeenCalledWith(expect.stringContaining('Usage'))
       })
@@ -85,7 +89,9 @@ describe('Marp CLI', () => {
         write.mockImplementation((_, __, callback) => callback())
 
         expect(await marpCli([onePath])).toBe(0)
-        expect(cliInfo).toHaveBeenCalledWith(expect.stringContaining('1 file'))
+        expect(cliInfo).toHaveBeenCalledWith(
+          expect.stringContaining('1 markdown')
+        )
         expect(cliInfo).toHaveBeenCalledWith(
           expect.stringMatching(/1\.md => .+1\.html/)
         )
@@ -110,11 +116,11 @@ describe('Marp CLI', () => {
     context('with -o option', () => {
       it('converts file and output to stdout when -o is "-"', async () => {
         const cliInfo = jest.spyOn(cli, 'info')
-        const log = jest.spyOn(console, 'log')
+        const stdout = jest.spyOn(process.stdout, 'write')
 
-        return useSpy([cliInfo, log], async () => {
+        return useSpy([cliInfo, stdout], async () => {
           expect(await marpCli([onePath, '-o', '-'])).toBe(0)
-          expect(log).toHaveBeenCalledTimes(1)
+          expect(stdout).toHaveBeenCalledTimes(1)
         })
       })
 
@@ -135,7 +141,31 @@ describe('Marp CLI', () => {
         converter.mockImplementation(() => [])
 
         expect(await marpCli([folder])).toBe(0)
-        expect(cliInfo).toHaveBeenCalledWith(expect.stringContaining('4 files'))
+        expect(cliInfo).toHaveBeenCalledWith(
+          expect.stringContaining('4 markdowns')
+        )
+      })
+    })
+  })
+
+  context('with passing from stdin', () => {
+    it('converts markdown came from stdin and outputs to stdout', async () => {
+      const cliInfo = jest.spyOn(cli, 'info')
+      const stdin = jest.spyOn(getStdin, 'buffer')
+      const stdout = jest.spyOn(process.stdout, 'write')
+
+      await useSpy([cliInfo, stdin, stdout], async () => {
+        // Reset cached stdin buffer
+        // @ts-ignore
+        File.stdinBuffer = undefined
+
+        stdin.mockImplementation(async () => new Buffer('# markdown'))
+
+        expect(await marpCli()).toBe(0)
+        expect(cliInfo).toHaveBeenCalledWith(
+          expect.stringContaining('<stdin> => <stdout>')
+        )
+        expect(stdout).toHaveBeenCalled()
       })
     })
   })

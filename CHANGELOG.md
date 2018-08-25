@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Support conversion from standard input ([#4](https://github.com/marp-team/marp-cli/pull/4))
+
 ### Fixed
 
 - Fix incorrect CJK fonts in exported PDF ([#3](https://github.com/marp-team/marp-cli/pull/3))
