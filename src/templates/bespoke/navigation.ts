@@ -1,6 +1,6 @@
 import keys from 'bespoke-keys'
 
-export default function bespokeKeys(deck) {
+export default function bespokeNavigation(deck) {
   keys()(deck)
 
   document.addEventListener('keydown', e => {
@@ -8,5 +8,10 @@ export default function bespokeKeys(deck) {
     if (e.which === 36) deck.slide(0) // Home
     if (e.which === 38) deck.prev() // UP
     if (e.which === 40) deck.next() // DOWN
+  })
+
+  document.addEventListener('wheel', e => {
+    if (e.deltaX > 0 || e.deltaY > 0) deck.next()
+    if (e.deltaX < 0 || e.deltaY < 0) deck.prev()
   })
 }
