@@ -31,7 +31,10 @@ export class Converter {
   readonly options: ConverterOption
 
   constructor(opts: ConverterOption) {
-    this.options = opts
+    this.options = {
+      ...opts,
+      template: opts.type === ConvertType.pdf ? 'bare' : opts.template,
+    }
   }
 
   get template() {
