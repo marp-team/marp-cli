@@ -3,6 +3,8 @@ import getStdin from 'get-stdin'
 import globby from 'globby'
 import path from 'path'
 
+const markdownExtensions = ['*.md', '*.mdown', '*.markdown', '*.markdn']
+
 export enum FileType {
   File,
   StandardIO,
@@ -22,23 +24,16 @@ export class File {
   }
 
   convert(output: string | undefined, extension: string): File {
-    // Convert filename
-    if (output === undefined) {
-      const file = new File(this.convertExtension(extension))
-      file.type = this.type
+    if (output === undefined)
+      return File.initialize(
+        this.convertExtension(extension),
+        f => (f.type = this.type)
+      )
 
-      return file
-    }
+    if (output === '-')
+      return File.initialize('-', f => (f.type = FileType.StandardIO))
 
-    // Output to stdout
-    if (output === '-') {
-      const file = new File('')
-      file.type = FileType.StandardIO
-
-      return file
-    }
-
-    return new File(output)
+    return File.initialize(output)
   }
 
   async load() {
@@ -79,7 +74,7 @@ export class File {
   static async find(...pathes: string[]): Promise<File[]> {
     return (await globby(pathes, {
       absolute: true,
-      expandDirectories: { files: ['*.md', '*.mdown', '*.markdown'] },
+      expandDirectories: { files: markdownExtensions },
     })).map(path => new File(path))
   }
 
@@ -87,11 +82,18 @@ export class File {
     this.stdinBuffer = this.stdinBuffer || (await getStdin.buffer())
     if (this.stdinBuffer.length === 0) return undefined
 
-    const file = new File('-')
+    return this.initialize('-', f => {
+      f.buffer = this.stdinBuffer
+      f.type = FileType.StandardIO
+    })
+  }
 
-    file.buffer = this.stdinBuffer
-    file.type = FileType.StandardIO
-
-    return file
+  private static initialize(
+    filepath: string,
+    tap: (instance: File) => void = () => {}
+  ) {
+    const instance = new this(filepath)
+    tap(instance)
+    return instance
   }
 }
