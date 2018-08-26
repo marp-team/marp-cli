@@ -19,10 +19,6 @@ $progressHeight: 5px;
     &.bespoke-marp-cursor-inactive {
       cursor: none;
     }
-
-    &.bespoke-marp-cursor-inactive * {
-      pointer-events: none !important;
-    }
   }
 
   svg.bespoke-marp-slide {

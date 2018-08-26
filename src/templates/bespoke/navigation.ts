@@ -11,6 +11,31 @@ export default function bespokeNavigation(deck) {
   })
 
   document.addEventListener('wheel', e => {
+    // Detect scrollable
+    const applyRecrusive = (
+      elm: HTMLElement,
+      func: (elm: HTMLElement) => void
+    ) => {
+      if (elm) func(elm)
+      if (elm && elm.parentElement) applyRecrusive(elm.parentElement, func)
+    }
+
+    let isScrollable = false
+
+    if (e.deltaY !== 0) {
+      applyRecrusive(<HTMLElement>e.target, elm => {
+        if (elm.clientHeight < elm.scrollHeight) isScrollable = true
+      })
+    }
+    if (e.deltaX !== 0) {
+      applyRecrusive(<HTMLElement>e.target, elm => {
+        if (elm.clientWidth < elm.scrollWidth) isScrollable = true
+      })
+    }
+
+    if (isScrollable) return
+
+    // Navigate slide deck
     if (e.deltaX > 0 || e.deltaY > 0) deck.next()
     if (e.deltaX < 0 || e.deltaY < 0) deck.prev()
   })
