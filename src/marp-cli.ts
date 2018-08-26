@@ -54,6 +54,7 @@ export default async function(argv: string[] = []): Promise<number> {
           type: 'boolean',
         },
         template: {
+          default: 'bespoke',
           describe: 'Template name',
           group: OptionGroup.Converter,
           choices: Object.keys(templates),
@@ -80,7 +81,7 @@ export default async function(argv: string[] = []): Promise<number> {
       options: {},
       output: args.output,
       readyScript: await MarpReadyScript.bundled(),
-      template: args.template || 'bare',
+      template: args.template,
       theme: args.theme,
       type:
         args.pdf || `${args.output}`.toLowerCase().endsWith('.pdf')
