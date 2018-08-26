@@ -27,6 +27,7 @@ export default function bespokeNavigation(deck) {
         if (elm.clientHeight < elm.scrollHeight) isScrollable = true
       })
     }
+
     if (e.deltaX !== 0) {
       applyRecrusive(<HTMLElement>e.target, elm => {
         if (elm.clientWidth < elm.scrollWidth) isScrollable = true
@@ -36,7 +37,14 @@ export default function bespokeNavigation(deck) {
     if (isScrollable) return
 
     // Navigate slide deck
-    if (e.deltaX > 0 || e.deltaY > 0) deck.next()
-    if (e.deltaX < 0 || e.deltaY < 0) deck.prev()
+    if (e.deltaX > 0 || e.deltaY > 0) {
+      deck.next()
+      e.preventDefault()
+    }
+
+    if (e.deltaX < 0 || e.deltaY < 0) {
+      deck.prev()
+      e.preventDefault()
+    }
   })
 }
