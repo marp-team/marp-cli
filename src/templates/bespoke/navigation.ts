@@ -12,28 +12,21 @@ export default function bespokeNavigation(deck) {
 
   document.addEventListener('wheel', e => {
     // Detect scrollable
-    const applyRecrusive = (
-      elm: HTMLElement,
-      func: (elm: HTMLElement) => void
-    ) => {
-      if (elm) func(elm)
-      if (elm && elm.parentElement) applyRecrusive(elm.parentElement, func)
-    }
-
     let isScrollable = false
 
-    if (e.deltaY !== 0) {
-      applyRecrusive(<HTMLElement>e.target, elm => {
-        if (elm.clientHeight < elm.scrollHeight) isScrollable = true
-      })
+    const applyRecrusive = (elm: HTMLElement, target: 'Width' | 'Height') => {
+      const func = (e: HTMLElement) => {
+        // Ignore Marp's fitting element
+        if (e.hasAttribute('data-marp-fitting-svg-content')) return
+        if (e[`client${target}`] < e[`scroll${target}`]) isScrollable = true
+      }
+
+      if (elm) func(elm)
+      if (elm && elm.parentElement) applyRecrusive(elm.parentElement, target)
     }
 
-    if (e.deltaX !== 0) {
-      applyRecrusive(<HTMLElement>e.target, elm => {
-        if (elm.clientWidth < elm.scrollWidth) isScrollable = true
-      })
-    }
-
+    if (e.deltaY !== 0) applyRecrusive(<HTMLElement>e.target, 'Height')
+    if (e.deltaX !== 0) applyRecrusive(<HTMLElement>e.target, 'Width')
     if (isScrollable) return
 
     // Navigate slide deck
