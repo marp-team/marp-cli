@@ -15,10 +15,10 @@ export default function bespokeNavigation(deck) {
     let isScrollable = false
 
     const applyRecrusive = (elm: HTMLElement, target: 'Width' | 'Height') => {
-      const func = (e: HTMLElement) => {
+      const func = (el: HTMLElement) => {
         // Ignore Marp's fitting element
-        if (e.hasAttribute('data-marp-fitting-svg-content')) return
-        if (e[`client${target}`] < e[`scroll${target}`]) isScrollable = true
+        if (el.hasAttribute('data-marp-fitting-svg-content')) return
+        if (el[`client${target}`] < el[`scroll${target}`]) isScrollable = true
       }
 
       if (elm) func(elm)
