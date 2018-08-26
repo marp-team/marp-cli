@@ -49,6 +49,7 @@ export const bespoke: Template = async opts => {
     result: bespokePug({
       ...opts,
       ...rendered,
+      progress: false,
       bespoke: {
         css: bespokeScss,
         js: await bespokeJs(),
