@@ -16,9 +16,17 @@ export default function bespokeNavigation(deck) {
 
     const applyRecrusive = (elm: HTMLElement, target: 'Width' | 'Height') => {
       const func = (el: HTMLElement) => {
-        // Ignore Marp's fitting element
-        if (el.hasAttribute('data-marp-fitting-svg-content')) return
-        if (el[`client${target}`] < el[`scroll${target}`]) isScrollable = true
+        if (el[`client${target}`] < el[`scroll${target}`]) {
+          const style = getComputedStyle(el)
+          const allows = ['auto', 'scroll']
+          const overflowDir = style[`overflow${target === 'Width' ? 'X' : 'Y'}`]
+
+          if (
+            allows.includes(style.overflow || '') ||
+            allows.includes(overflowDir || '')
+          )
+            isScrollable = true
+        }
       }
 
       if (elm) func(elm)
