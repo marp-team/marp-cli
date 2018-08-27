@@ -1,51 +1,101 @@
 import keys from 'bespoke-keys'
 
-export default function bespokeNavigation(deck) {
-  keys()(deck)
+export interface BespokeNavigationOption {
+  interval?: number
+}
 
-  document.addEventListener('keydown', e => {
-    if (e.which === 35) deck.slide(deck.slides.length - 1) // End
-    if (e.which === 36) deck.slide(0) // Home
-    if (e.which === 38) deck.prev() // UP
-    if (e.which === 40) deck.next() // DOWN
-  })
+enum Direction {
+  X = 'X',
+  Y = 'Y',
+}
 
-  document.addEventListener('wheel', e => {
-    // Detect scrollable
-    let isScrollable = false
+export default function bespokeNavigation(opts: BespokeNavigationOption = {}) {
+  const options: BespokeNavigationOption = {
+    interval: 250,
+    ...opts,
+  }
 
-    const applyRecrusive = (elm: HTMLElement, target: 'Width' | 'Height') => {
-      const func = (el: HTMLElement) => {
-        if (el[`client${target}`] < el[`scroll${target}`]) {
-          const style = getComputedStyle(el)
-          const allows = ['auto', 'scroll']
-          const overflowDir = style[`overflow${target === 'Width' ? 'X' : 'Y'}`]
+  return deck => {
+    keys()(deck)
 
-          if (
-            allows.includes(style.overflow || '') ||
-            allows.includes(overflowDir || '')
-          )
-            isScrollable = true
-        }
+    document.addEventListener('keydown', e => {
+      if (e.which === 35) deck.slide(deck.slides.length - 1) // End
+      if (e.which === 36) deck.slide(0) // Home
+      if (e.which === 38) deck.prev() // UP
+      if (e.which === 40) deck.next() // DOWN
+    })
+
+    let lastWheelNavigationAt = 0
+    let lastWheelDelta
+    let wheelIntervalTimer
+
+    document.addEventListener('wheel', e => {
+      // Detect scrollable element
+      let scrollable = false
+
+      const detectScrollable = (elm: HTMLElement, dir: Direction) => {
+        if (elm) scrollable = scrollable || isScrollable(elm, dir)
+        if (elm && elm.parentElement) detectScrollable(elm.parentElement, dir)
       }
 
-      if (elm) func(elm)
-      if (elm && elm.parentElement) applyRecrusive(elm.parentElement, target)
-    }
+      if (e.deltaX !== 0) detectScrollable(<HTMLElement>e.target, Direction.X)
+      if (e.deltaY !== 0) detectScrollable(<HTMLElement>e.target, Direction.Y)
+      if (scrollable) return
 
-    if (e.deltaY !== 0) applyRecrusive(<HTMLElement>e.target, 'Height')
-    if (e.deltaX !== 0) applyRecrusive(<HTMLElement>e.target, 'Width')
-    if (isScrollable) return
-
-    // Navigate slide deck
-    if (e.deltaX > 0 || e.deltaY > 0) {
-      deck.next()
       e.preventDefault()
-    }
 
-    if (e.deltaX < 0 || e.deltaY < 0) {
-      deck.prev()
-      e.preventDefault()
-    }
-  })
+      // Suppress momentum scrolling by trackpad
+      if (wheelIntervalTimer) clearTimeout(wheelIntervalTimer)
+
+      wheelIntervalTimer = setTimeout(
+        () => (lastWheelDelta = 0),
+        options.interval!
+      )
+
+      const debouncing =
+        new Date().getTime() - lastWheelNavigationAt < options.interval!
+
+      const currentWheelDelta = Math.sqrt(e.deltaX ** 2 + e.deltaY ** 2)
+      const attenuated = currentWheelDelta <= lastWheelDelta
+
+      lastWheelDelta = currentWheelDelta
+
+      if (debouncing || attenuated) return
+
+      // Navigate
+      let direction
+
+      if (e.deltaX > 0 || e.deltaY > 0) direction = 'next'
+      if (e.deltaX < 0 || e.deltaY < 0) direction = 'prev'
+      if (!direction) return
+
+      deck[direction]()
+
+      lastWheelNavigationAt = new Date().getTime()
+    })
+  }
+}
+
+function isScrollable(elm: HTMLElement, dir: Direction): boolean {
+  return (
+    hasScrollableArea(elm, dir) &&
+    hasScrollableOverflow(getComputedStyle(elm), dir)
+  )
+}
+
+function hasScrollableArea(elm: HTMLElement, dir: Direction) {
+  const length = dir === Direction.X ? 'Width' : 'Height'
+  return elm[`client${length}`] < elm[`scroll${length}`]
+}
+
+function hasScrollableOverflow(style: CSSStyleDeclaration, dir: Direction) {
+  const { overflow } = style
+  const overflowDir = style[`overflow${dir}`]
+
+  return (
+    overflow === 'auto' ||
+    overflow === 'scroll' ||
+    overflowDir === 'auto' ||
+    overflowDir === 'scroll'
+  )
 }

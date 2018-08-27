@@ -11,7 +11,7 @@ export default function() {
     bespokeClasses,
     bespokeCursor(),
     bespokeHash({ history: false }),
-    bespokeNavigation,
+    bespokeNavigation(),
     bespokeProgress,
     bespokeTouch(),
   ])
