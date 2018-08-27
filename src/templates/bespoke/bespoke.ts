@@ -7,7 +7,7 @@ import bespokeProgress from './progress'
 import bespokeTouch from './touch'
 
 export default function() {
-  bespoke.from(document.getElementById('presentation'), [
+  return bespoke.from(document.getElementById('presentation'), [
     bespokeClasses,
     bespokeCursor(),
     bespokeHash({ history: false }),
