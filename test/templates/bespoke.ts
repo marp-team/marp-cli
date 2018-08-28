@@ -13,7 +13,9 @@ describe("Bespoke template's browser context", () => {
     container: new MarpitElement('div', { id: 'presentation' }),
   })
 
-  const render = (md = '# 1\n\n---\n\n## 2\n\n---\n\n### 3') => {
+  const defaultMarkdown = '# 1\n\n---\n\n## 2\n\n---\n\n### 3'
+
+  const render = (md = defaultMarkdown): HTMLElement => {
     document.body.innerHTML = marp.render(md).html
     return document.getElementById('presentation')
   }
@@ -86,79 +88,67 @@ describe("Bespoke template's browser context", () => {
 
       render()
       const deck = bespoke()
-      const { slides } = deck
 
       jest.runAllTimers()
-      expect(slides[0].classList.contains('bespoke-marp-active')).toBe(false)
-      expect(slides[1].classList.contains('bespoke-marp-active')).toBe(true)
+      expect(deck.slide()).toBe(1)
 
       // Navigate by anchor
       location.hash = '#3'
       window.dispatchEvent(new HashChangeEvent('hashchange'))
 
-      expect(slides[1].classList.contains('bespoke-marp-active')).toBe(false)
-      expect(slides[2].classList.contains('bespoke-marp-active')).toBe(true)
+      expect(deck.slide()).toBe(2)
     })
   })
 
   describe('Navigation', () => {
-    const current = () => document.querySelector('.bespoke-marp-active')
+    let parent: HTMLElement
+    let deck
+
+    beforeEach(() => {
+      parent = render()
+      deck = bespoke()
+
+      jest.clearAllTimers()
+    })
 
     it('navigates page by keyboard', () => {
-      render()
-      const deck = bespoke()
-      const { slides } = deck
-
-      const keydown = opts => {
+      const keydown = opts =>
         document.dispatchEvent(new KeyboardEvent('keydown', opts))
-      }
 
       // bespoke-keys
       keydown({ which: Key.RightArrow })
-      expect(current()).toBe(slides[1])
+      expect(deck.slide()).toBe(1)
 
       keydown({ which: Key.LeftArrow })
-      expect(current()).toBe(slides[0])
+      expect(deck.slide()).toBe(0)
 
       keydown({ which: Key.Space })
-      expect(current()).toBe(slides[1])
+      expect(deck.slide()).toBe(1)
 
       keydown({ which: Key.Space, shiftKey: true })
-      expect(current()).toBe(slides[0])
+      expect(deck.slide()).toBe(0)
 
       keydown({ which: Key.PageDown })
-      expect(current()).toBe(slides[1])
+      expect(deck.slide()).toBe(1)
 
       keydown({ which: Key.PageUp })
-      expect(current()).toBe(slides[0])
+      expect(deck.slide()).toBe(0)
 
       // Additional keys by Marp
       keydown({ which: Key.DownArrow })
-      expect(current()).toBe(slides[1])
+      expect(deck.slide()).toBe(1)
 
       keydown({ which: Key.UpArrow })
-      expect(current()).toBe(slides[0])
+      expect(deck.slide()).toBe(0)
 
       keydown({ which: Key.End })
-      expect(current()).toBe(slides[2])
+      expect(deck.slide()).toBe(2)
 
       keydown({ which: Key.Home })
-      expect(current()).toBe(slides[0])
+      expect(deck.slide()).toBe(0)
     })
 
     context('with wheel', () => {
-      let parent
-      let deck
-      let slides
-
-      beforeEach(() => {
-        parent = render()
-        deck = bespoke()
-        slides = deck.slides
-
-        jest.clearAllTimers()
-      })
-
       const dispatch = (opts: WheelEventInit = {}, elm: Element = parent) =>
         elm.dispatchEvent(new WheelEvent('wheel', { ...opts, bubbles: true }))
 
@@ -169,25 +159,25 @@ describe("Bespoke template's browser context", () => {
           now.mockImplementation(() => 1000)
 
           dispatch({ deltaY: 1 })
-          expect(current()).toBe(slides[1])
+          expect(deck.slide()).toBe(1)
 
           // Suppress navigation by continuous scrolling
           dispatch({ deltaY: 3 })
-          expect(current()).toBe(slides[1])
+          expect(deck.slide()).toBe(1)
 
           // +300ms
           now.mockImplementation(() => 1300)
           jest.advanceTimersByTime(300)
 
           dispatch({ deltaY: 1 })
-          expect(current()).toBe(slides[2])
+          expect(deck.slide()).toBe(2)
 
           // Backward
           now.mockImplementation(() => 1600)
           jest.advanceTimersByTime(600)
 
           dispatch({ deltaY: -1 })
-          expect(current()).toBe(slides[1])
+          expect(deck.slide()).toBe(1)
         })
       })
 
@@ -198,7 +188,7 @@ describe("Bespoke template's browser context", () => {
           now.mockImplementation(() => 1000)
 
           dispatch({ deltaX: 100 })
-          expect(current()).toBe(slides[1])
+          expect(deck.slide()).toBe(1)
 
           // Suppress navigation by momentum scroll
           for (let i = 0; i < 50; i += 1) {
@@ -206,7 +196,7 @@ describe("Bespoke template's browser context", () => {
             now.mockImplementation(() => 1000 + i * 20)
 
             dispatch({ deltaX: Math.round(Math.E ** (i / -12.5) * 100) })
-            expect(current()).toBe(slides[1])
+            expect(deck.slide()).toBe(1)
           }
 
           jest.advanceTimersByTime(20)
@@ -214,7 +204,7 @@ describe("Bespoke template's browser context", () => {
 
           // Navigate if detected a not attenuated delta
           dispatch({ deltaX: 10 })
-          expect(current()).toBe(slides[2])
+          expect(deck.slide()).toBe(2)
         })
       })
 
@@ -236,7 +226,7 @@ describe("Bespoke template's browser context", () => {
         const overflowYAutoElement = overflowAuto('overflowY')
 
         beforeEach(() => {
-          const section = idx => slides[idx].querySelector('section')
+          const section = idx => deck.slides[idx].querySelector('section')
 
           section(0).appendChild(notScrollableElement)
           section(0).appendChild(overflowAutoElement)
@@ -250,19 +240,19 @@ describe("Bespoke template's browser context", () => {
             now.mockImplementation(() => 1000)
 
             dispatch({ deltaY: 1 }, overflowAutoElement)
-            expect(current()).toBe(slides[0])
+            expect(deck.slide()).toBe(0)
 
             dispatch({ deltaY: 1 }, notScrollableElement)
-            expect(current()).toBe(slides[1])
+            expect(deck.slide()).toBe(1)
 
             now.mockImplementation(() => 2000)
             jest.runAllTimers()
 
             dispatch({ deltaY: 1 }, overflowYAutoElement)
-            expect(current()).toBe(slides[1])
+            expect(deck.slide()).toBe(1)
 
             dispatch({ deltaX: 1 }, overflowYAutoElement)
-            expect(current()).toBe(slides[2])
+            expect(deck.slide()).toBe(2)
           })
         })
       })
@@ -295,6 +285,117 @@ describe("Bespoke template's browser context", () => {
 
       deck.slide(2)
       expect(progressBar.style.flexBasis).toBe('100%')
+    })
+  })
+
+  describe('Touch', () => {
+    let parent
+    let deck
+
+    beforeEach(() => {
+      parent = render()
+
+      // jsdom is not supported touch events currently.
+      const original = parent.addEventListener
+
+      parent.addEventListener = (type: string, listener, useCapture?) => {
+        if (!type.startsWith('touch'))
+          return original.call(parent, type, listener, useCapture)
+
+        parent[type] = listener
+      }
+
+      parent.getBoundingClientRect = () => ({
+        left: 0,
+        top: 0,
+        right: 200,
+        bottom: 200,
+        width: 200,
+        height: 200,
+      })
+
+      deck = bespoke()
+    })
+
+    const touch = (event: string, ...touches: [number, number][]) => {
+      const type = `touch${event}`
+
+      return parent[type]({
+        touches: touches.map(t => ({ pageX: t[0], pageY: t[1] })),
+        preventDefault: jest.fn(),
+      })
+    }
+
+    it('supports swipe navigation', () => {
+      // Swipe to left
+      touch('start', [150, 150])
+      touch('move', [120, 150])
+      touch('end')
+
+      expect(deck.slide()).toBe(1)
+
+      // Swipe to up (Recognize direction until 35deg)
+      touch('start', [0, 0])
+      touch('move', [42, -50])
+      touch('end')
+
+      expect(deck.slide()).toBe(2)
+
+      // Swipe to right
+      touch('start', [0, 0])
+      touch('move', [43, -50])
+      touch('end')
+
+      expect(deck.slide()).toBe(1)
+
+      // Swipe to down
+      touch('start', [42, 30])
+      touch('move', [0, 80])
+      touch('end')
+
+      expect(deck.slide()).toBe(0)
+    })
+
+    it('does not recognize short swipe', () => {
+      deck.slide(1)
+
+      touch('start', [0, 0])
+      touch('move', [-29, 0])
+      touch('end')
+
+      expect(deck.slide()).toBe(1)
+
+      touch('start', [0, 0])
+      touch('move', [21, 21])
+      touch('end')
+
+      expect(deck.slide()).toBe(1)
+
+      // Recognize swipe if distance is longer than 30
+      touch('start', [0, 0])
+      touch('move', [22, 22])
+      touch('end')
+
+      expect(deck.slide()).toBe(0)
+    })
+
+    it('does not navigate when touched with multi fingers', () => {
+      deck.slide(1)
+
+      // Pinch
+      touch('start', [20, 20], [40, 20])
+      touch('move', [0, 20], [80, 20])
+      touch('end')
+
+      expect(deck.slide()).toBe(1)
+
+      // Add finger while moving
+      touch('start', [50, 50])
+      touch('move', [0, 50])
+      touch('move', [0, 50], [20, 40])
+      touch('end')
+
+      expect(deck.slide()).toBe(1)
     })
   })
 })

@@ -1,6 +1,6 @@
 export interface BespokeTouchOption {
+  slope?: number
   swipeThreshold?: number
-  tapSlope?: number
 }
 
 export interface TouchPoint {
@@ -12,8 +12,8 @@ export interface TouchPoint {
 
 export default function bespokeTouch(opts: BespokeTouchOption = {}) {
   const options: BespokeTouchOption = {
+    slope: Math.tan((-35 * Math.PI) / 180), // -35deg
     swipeThreshold: 30,
-    tapSlope: Math.tan((-35 * Math.PI) / 180), // -35deg
     ...opts,
   }
 
@@ -35,22 +35,26 @@ export default function bespokeTouch(opts: BespokeTouchOption = {}) {
     })
 
     parent.addEventListener('touchmove', e => {
-      if (touchStart && e.touches.length === 1) {
-        e.preventDefault()
+      if (touchStart) {
+        if (e.touches.length === 1) {
+          e.preventDefault()
 
-        const current = touchPoint(e.touches[0])
-        const x = current.x - touchStart.x
-        const y = current.y - touchStart.y
+          const current = touchPoint(e.touches[0])
+          const x = current.x - touchStart.x
+          const y = current.y - touchStart.y
 
-        touchStart.delta = Math.sqrt(Math.abs(x) ** 2 + Math.abs(y) ** 2)
-        touchStart.radian = Math.atan2(x, y)
+          touchStart.delta = Math.sqrt(Math.abs(x) ** 2 + Math.abs(y) ** 2)
+          touchStart.radian = Math.atan2(x, y)
+        } else {
+          touchStart = undefined
+        }
       }
     })
 
-    parent.addEventListener('touchend', e => {
+    parent.addEventListener('touchend', () => {
       if (touchStart) {
         if (touchStart.delta && touchStart.delta >= options.swipeThreshold!) {
-          let radian = touchStart.radian! - options.tapSlope!
+          let radian = touchStart.radian! - options.slope!
           radian = ((radian + Math.PI) % (Math.PI * 2)) - Math.PI
 
           deck[radian < 0 ? 'next' : 'prev']()
