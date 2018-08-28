@@ -268,4 +268,33 @@ describe("Bespoke template's browser context", () => {
       })
     })
   })
+
+  describe('Progress', () => {
+    let progressParent: HTMLElement
+    let progressBar: HTMLElement
+
+    beforeEach(() => {
+      render()
+
+      progressBar = document.createElement('div')
+      progressBar.classList.add('bespoke-progress-bar')
+
+      progressParent = document.createElement('div')
+      progressParent.classList.add('bespoke-progress-parent')
+      progressParent.appendChild(progressBar)
+
+      document.body.appendChild(progressParent)
+    })
+
+    it('changes flexBasis style by navigate', () => {
+      const deck = bespoke()
+      expect(progressBar.style.flexBasis).toBe('0%')
+
+      deck.slide(1)
+      expect(progressBar.style.flexBasis).toBe('50%')
+
+      deck.slide(2)
+      expect(progressBar.style.flexBasis).toBe('100%')
+    })
+  })
 })
