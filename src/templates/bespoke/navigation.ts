@@ -1,4 +1,5 @@
 import keys from 'bespoke-keys'
+import { Key } from 'ts-keycode-enum'
 
 export interface BespokeNavigationOption {
   interval?: number
@@ -11,7 +12,7 @@ enum Direction {
 
 export default function bespokeNavigation(opts: BespokeNavigationOption = {}) {
   const options: BespokeNavigationOption = {
-    interval: 250,
+    interval: 200,
     ...opts,
   }
 
@@ -19,17 +20,17 @@ export default function bespokeNavigation(opts: BespokeNavigationOption = {}) {
     keys()(deck)
 
     document.addEventListener('keydown', e => {
-      if (e.which === 35) deck.slide(deck.slides.length - 1) // End
-      if (e.which === 36) deck.slide(0) // Home
-      if (e.which === 38) deck.prev() // UP
-      if (e.which === 40) deck.next() // DOWN
+      if (e.which === Key.End) deck.slide(deck.slides.length - 1)
+      if (e.which === Key.Home) deck.slide(0)
+      if (e.which === Key.UpArrow) deck.prev()
+      if (e.which === Key.DownArrow) deck.next()
     })
 
     let lastWheelNavigationAt = 0
     let lastWheelDelta
     let wheelIntervalTimer
 
-    document.addEventListener('wheel', e => {
+    deck.parent.addEventListener('wheel', e => {
       // Detect scrollable element
       let scrollable = false
 
@@ -47,14 +48,11 @@ export default function bespokeNavigation(opts: BespokeNavigationOption = {}) {
       // Suppress momentum scrolling by trackpad
       if (wheelIntervalTimer) clearTimeout(wheelIntervalTimer)
 
-      wheelIntervalTimer = setTimeout(
-        () => (lastWheelDelta = 0),
-        options.interval!
-      )
+      wheelIntervalTimer = setTimeout(() => {
+        lastWheelDelta = 0
+      }, options.interval!)
 
-      const debouncing =
-        new Date().getTime() - lastWheelNavigationAt < options.interval!
-
+      const debouncing = Date.now() - lastWheelNavigationAt < options.interval!
       const currentWheelDelta = Math.sqrt(e.deltaX ** 2 + e.deltaY ** 2)
       const attenuated = currentWheelDelta <= lastWheelDelta
 
@@ -71,7 +69,7 @@ export default function bespokeNavigation(opts: BespokeNavigationOption = {}) {
 
       deck[direction]()
 
-      lastWheelNavigationAt = new Date().getTime()
+      lastWheelNavigationAt = Date.now()
     })
   }
 }
