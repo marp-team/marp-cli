@@ -5,6 +5,7 @@
 ### Added
 
 - Support conversion from standard input ([#4](https://github.com/marp-team/marp-cli/pull/4))
+- Add `bespoke` HTML template for ready to presentation ([#5](https://github.com/marp-team/marp-cli/pull/5))
 
 ### Fixed
 
