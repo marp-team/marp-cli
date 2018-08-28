@@ -1,5 +1,4 @@
 import keys from 'bespoke-keys'
-import { Key } from 'ts-keycode-enum'
 
 export interface BespokeNavigationOption {
   interval?: number
@@ -20,10 +19,10 @@ export default function bespokeNavigation(opts: BespokeNavigationOption = {}) {
     keys()(deck)
 
     document.addEventListener('keydown', e => {
-      if (e.which === Key.End) deck.slide(deck.slides.length - 1)
-      if (e.which === Key.Home) deck.slide(0)
-      if (e.which === Key.UpArrow) deck.prev()
-      if (e.which === Key.DownArrow) deck.next()
+      if (e.which === 35) deck.slide(deck.slides.length - 1) // END
+      if (e.which === 36) deck.slide(0) // HOME
+      if (e.which === 38) deck.prev() // UP
+      if (e.which === 40) deck.next() // DOWN
     })
 
     let lastWheelNavigationAt = 0
