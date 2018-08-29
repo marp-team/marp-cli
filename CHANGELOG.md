@@ -7,6 +7,10 @@
 - Support conversion from standard input ([#4](https://github.com/marp-team/marp-cli/pull/4))
 - Add `bespoke` HTML template for ready to presentation ([#5](https://github.com/marp-team/marp-cli/pull/5))
 
+### Changed
+
+- Update [@marp-team/marp-core](https://github.com/marp-team/marp-core) to [v0.0.4](https://github.com/marp-team/marp-core/releases/tag/v0.0.4) ([#6](https://github.com/marp-team/marp-cli/pull/5))
+
 ### Fixed
 
 - Fix incorrect CJK fonts in exported PDF ([#3](https://github.com/marp-team/marp-cli/pull/3))
