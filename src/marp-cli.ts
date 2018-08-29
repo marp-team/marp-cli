@@ -14,6 +14,7 @@ import { name, version } from '../package.json'
 enum OptionGroup {
   Basic = 'Basic Options:',
   Converter = 'Converter Options:',
+  Marp = 'Marp / Marpit Options:',
 }
 
 const usage = `
@@ -60,9 +61,14 @@ export default async function(argv: string[] = []): Promise<number> {
           choices: Object.keys(templates),
           type: 'string',
         },
+        html: {
+          describe: 'Enable or disable HTML tag',
+          group: OptionGroup.Marp,
+          type: 'boolean',
+        },
         theme: {
           describe: 'Override theme',
-          group: OptionGroup.Converter,
+          group: OptionGroup.Marp,
           type: 'string',
         },
       })
@@ -77,6 +83,7 @@ export default async function(argv: string[] = []): Promise<number> {
     // Initialize converter
     const converter = new Converter({
       engine: Marp,
+      html: args.html,
       lang: (await osLocale()).replace(/[_@]/g, '-'),
       options: {},
       output: args.output,
