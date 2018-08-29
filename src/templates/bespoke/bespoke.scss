@@ -1,0 +1,65 @@
+$progressHeight: 5px;
+
+@media screen {
+  html,
+  body {
+    background: #000;
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+  }
+
+  .bespoke-marp-parent {
+    bottom: 0;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+
+    &.bespoke-marp-cursor-inactive {
+      cursor: none;
+    }
+  }
+
+  svg.bespoke-marp-slide {
+    height: 100%;
+    left: 0;
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    z-index: -1;
+
+    &.bespoke-marp-active {
+      pointer-events: auto;
+      z-index: 0;
+    }
+  }
+
+  .bespoke-progress-parent {
+    background: #222;
+    display: flex;
+    height: $progressHeight;
+    width: 100%;
+
+    & + .bespoke-marp-parent {
+      top: $progressHeight;
+    }
+
+    .bespoke-progress-bar {
+      flex: 0 0 0;
+      background: #0288d1;
+      transition: flex-basis 0.2s cubic-bezier(0, 1, 1, 1);
+    }
+  }
+}
+
+@media print {
+  .bespoke-progress-parent {
+    display: none;
+  }
+
+  .bespoke-marp-parent {
+    top: 0;
+  }
+}

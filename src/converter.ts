@@ -3,7 +3,7 @@ import * as chromeFinder from 'chrome-launcher/dist/chrome-finder'
 import puppeteer, { PDFOptions } from 'puppeteer-core'
 import { error } from './error'
 import { File } from './file'
-import templates, { TemplateResult } from './templates'
+import templates, { TemplateResult } from './templates/'
 
 export enum ConvertType {
   html = 'html',
@@ -41,13 +41,13 @@ export class Converter {
     return template
   }
 
-  convert(markdown: string): TemplateResult {
+  async convert(markdown: string): Promise<TemplateResult> {
     let additionals = ''
 
     if (this.options.theme)
       additionals += `\n<!-- theme: ${JSON.stringify(this.options.theme)} -->`
 
-    return this.template({
+    return await this.template({
       lang: this.options.lang,
       readyScript: this.options.readyScript,
       renderer: tplOpts =>
@@ -57,7 +57,7 @@ export class Converter {
 
   async convertFile(file: File): Promise<ConvertResult> {
     const buffer = await file.load()
-    const template = this.convert(buffer.toString())
+    const template = await this.convert(buffer.toString())
     const newFile = file.convert(this.options.output, this.options.type)
 
     newFile.buffer = await (async () => {
