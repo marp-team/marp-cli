@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v0.0.5 - 2018-08-29
+
 ### Added
 
 - Support conversion from standard input ([#4](https://github.com/marp-team/marp-cli/pull/4))
