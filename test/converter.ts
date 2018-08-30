@@ -50,10 +50,11 @@ describe('Converter', () => {
   })
 
   describe('#convert', () => {
+    const md = '# <i>Hello!</i>'
+
     it('returns the result of template', async () => {
       const options = { html: true }
       const readyScript = '<b>ready</b>'
-      const md = '# <i>Hello!</i>'
       const result = await instance({ options, readyScript }).convert(md)
 
       expect(result.result).toMatch(/^<!DOCTYPE html>[\s\S]+<\/html>$/)
@@ -64,23 +65,31 @@ describe('Converter', () => {
     })
 
     it('throws CLIError when selected engine is not implemented render() method', () => {
-      const subject = instance({ engine: function _() {} }).convert('')
+      const subject = instance({ engine: function _() {} }).convert(md)
       expect(subject).rejects.toBeInstanceOf(CLIError)
     })
 
     it('throws CLIError when selected template is not found', () => {
-      const subject = instance({ template: 'not-found' }).convert('')
+      const subject = instance({ template: 'not-found' }).convert(md)
       expect(subject).rejects.toBeInstanceOf(CLIError)
     })
 
     it('settings lang attribute of <html> by lang option', async () => {
-      const { result } = await instance({ lang: 'zh' }).convert('')
+      const { result } = await instance({ lang: 'zh' }).convert(md)
       expect(result).toContain('<html lang="zh">')
     })
 
     it("overrides theme by converter's theme option", async () => {
-      const { rendered } = await instance({ theme: 'gaia' }).convert('')
+      const { rendered } = await instance({ theme: 'gaia' }).convert(md)
       expect(rendered.css).toContain('@theme gaia')
+    })
+
+    it("overrides html option by converter's html option", async () => {
+      const enabled = (await instance({ html: true }).convert(md)).rendered
+      expect(enabled.html).toContain('<i>Hello!</i>')
+
+      const disabled = (await instance({ html: false }).convert(md)).rendered
+      expect(disabled.html).toContain('&lt;i&gt;Hello!&lt;/i&gt;')
     })
   })
 

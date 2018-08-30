@@ -12,6 +12,7 @@ export enum ConvertType {
 
 export interface ConverterOption {
   engine: typeof Marpit
+  html?: boolean
   lang: string
   options: MarpitOptions
   output?: string
@@ -96,13 +97,19 @@ export class Converter {
   }
 
   private generateEngine(mergeOptions: MarpitOptions) {
-    const engine = new this.options.engine({
-      ...this.options.options,
-      ...mergeOptions,
-    })
+    const { html, options } = this.options
+    const opts: any = { ...options, ...mergeOptions }
+
+    // for marp-core
+    if (html !== undefined) opts.html = !!html
+
+    const engine = new this.options.engine(opts)
 
     if (typeof engine.render !== 'function')
       error('Specified engine has not implemented render() method.')
+
+    // for Marpit engine
+    engine.markdown.set({ html: !!html })
 
     return engine
   }
