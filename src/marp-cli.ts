@@ -4,12 +4,24 @@ import osLocale from 'os-locale'
 import { Argv } from 'yargs'
 import yargs from 'yargs/yargs'
 import * as cli from './cli'
-import { Converter, ConvertType } from './converter'
+import config from './config'
+import { Converter, ConvertType, ConverterOption } from './converter'
 import { CLIError, error } from './error'
 import { File, FileType } from './file'
 import { MarpReadyScript } from './ready'
 import templates from './templates'
 import { name, version } from '../package.json'
+
+interface MarpCLIConfig {
+  engine?: ConverterOption['engine']
+  html?: ConverterOption['html']
+  lang?: string
+  options?: ConverterOption['options']
+  output?: string
+  pdf?: boolean
+  template?: string
+  theme?: string
+}
 
 enum OptionGroup {
   Basic = 'Basic Options:',
@@ -42,6 +54,12 @@ export default async function(argv: string[] = []): Promise<number> {
           group: OptionGroup.Basic,
           type: 'boolean',
         },
+        config: {
+          alias: 'c',
+          describe: 'Path to configuration file',
+          group: OptionGroup.Basic,
+          type: 'string',
+        },
         output: {
           alias: 'o',
           describe: 'Output file name',
@@ -49,13 +67,11 @@ export default async function(argv: string[] = []): Promise<number> {
           type: 'string',
         },
         pdf: {
-          default: false,
           describe: 'Convert slide deck into PDF',
           group: OptionGroup.Converter,
           type: 'boolean',
         },
         template: {
-          default: 'bespoke',
           describe: 'Template name',
           group: OptionGroup.Converter,
           choices: Object.keys(templates),
@@ -80,18 +96,25 @@ export default async function(argv: string[] = []): Promise<number> {
       return 0
     }
 
+    // Load configuration file
+    const confResult = await config(args.config)
+    const conf: MarpCLIConfig = confResult ? confResult.config : {}
+
     // Initialize converter
+    const engine = conf.engine || Marp
+    const output = args.output || conf.output
     const converter = new Converter({
-      engine: Marp,
-      html: args.html,
-      lang: (await osLocale()).replace(/[_@]/g, '-'),
-      options: {},
-      output: args.output,
-      readyScript: await MarpReadyScript.bundled(),
-      template: args.template,
-      theme: args.theme,
+      engine,
+      output,
+      html: args.html !== undefined ? args.html : conf.html,
+      lang: conf.lang || (await osLocale()).replace(/[_@]/g, '-'),
+      options: conf.options || {},
+      readyScript:
+        engine === Marp ? await MarpReadyScript.bundled() : undefined,
+      template: args.template || conf.template || 'bespoke',
+      theme: args.theme || conf.theme,
       type:
-        args.pdf || `${args.output}`.toLowerCase().endsWith('.pdf')
+        args.pdf || conf.pdf || `${output}`.toLowerCase().endsWith('.pdf')
           ? ConvertType.pdf
           : ConvertType.html,
     })

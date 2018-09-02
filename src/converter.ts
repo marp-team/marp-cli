@@ -1,3 +1,4 @@
+import { Marp, MarpOptions } from '@marp-team/marp-core'
 import { Marpit, MarpitOptions } from '@marp-team/marpit'
 import * as chromeFinder from 'chrome-launcher/dist/chrome-finder'
 import puppeteer, { PDFOptions } from 'puppeteer-core'
@@ -12,7 +13,7 @@ export enum ConvertType {
 
 export interface ConverterOption {
   engine: typeof Marpit
-  html?: boolean
+  html?: MarpOptions['html']
   lang: string
   options: MarpitOptions
   output?: string
@@ -101,7 +102,7 @@ export class Converter {
     const opts: any = { ...options, ...mergeOptions }
 
     // for marp-core
-    if (html !== undefined) opts.html = !!html
+    if (html !== undefined) opts.html = html
 
     const engine = new this.options.engine(opts)
 
@@ -109,7 +110,7 @@ export class Converter {
       error('Specified engine has not implemented render() method.')
 
     // for Marpit engine
-    engine.markdown.set({ html: !!html })
+    if (!(engine instanceof Marp)) engine.markdown.set({ html: !!html })
 
     return engine
   }
