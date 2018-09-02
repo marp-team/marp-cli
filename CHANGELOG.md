@@ -6,6 +6,10 @@
 
 - Add `--html` option ([#7](https://github.com/marp-team/marp-cli/pull/7))
 
+### Changed
+
+- Upgrade dependent package versions to latest ([#8](https://github.com/marp-team/marp-cli/pull/8))
+
 ## v0.0.5 - 2018-08-29
 
 ### Added
