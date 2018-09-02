@@ -1,6 +1,7 @@
 import fs from 'fs'
 import getStdin from 'get-stdin'
 import globby from 'globby'
+import mkdirp from 'mkdirp'
 import path from 'path'
 
 const markdownExtensions = ['*.md', '*.mdown', '*.markdown', '*.markdn']
@@ -36,6 +37,10 @@ export class File {
     return File.initialize(output)
   }
 
+  get directory() {
+    return path.dirname(this.absolutePath)
+  }
+
   async load() {
     this.buffer =
       this.buffer ||
@@ -53,6 +58,9 @@ export class File {
   async save() {
     switch (this.type) {
       case FileType.File:
+        await new Promise<void>((resolve, reject) =>
+          mkdirp(this.directory, e => (e ? reject(e) : resolve()))
+        )
         await new Promise<void>((resolve, reject) =>
           fs.writeFile(this.path, this.buffer, e => (e ? reject(e) : resolve()))
         )
