@@ -1,10 +1,10 @@
+import { MarpitOptions, MarpitRenderResult, Element } from '@marp-team/marpit'
 import fs from 'fs'
 import path from 'path'
 import barePug from './bare/bare.pug'
 import bareScss from './bare/bare.scss'
 import bespokePug from './bespoke/bespoke.pug'
 import bespokeScss from './bespoke/bespoke.scss'
-import { MarpitOptions, MarpitRenderResult, Element } from '@marp-team/marpit'
 
 export interface TemplateOptions {
   lang: string

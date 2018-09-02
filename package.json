@@ -83,7 +83,7 @@
     "typescript": "^3.0.3"
   },
   "dependencies": {
-    "@marp-team/marp-core": "^0.0.4",
+    "@marp-team/marp-core": "^0.0.5",
     "@marp-team/marpit": "^0.0.14",
     "chalk": "^2.4.1",
     "chrome-launcher": "^0.10.2",
