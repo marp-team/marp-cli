@@ -1,10 +1,11 @@
 import cosmiconfig, { CosmiconfigResult } from 'cosmiconfig'
+import fs from 'fs'
 import path from 'path'
 import { ConverterOption } from './converter'
 import { CLIError } from './error'
 
 export interface IMarpCLIConfig {
-  engine?: ConverterOption['engine']
+  engine?: ConverterOption['engine'] | string
   html?: ConverterOption['html']
   lang?: string
   options?: ConverterOption['options']
@@ -12,6 +13,10 @@ export interface IMarpCLIConfig {
   pdf?: boolean
   template?: string
   theme?: string
+}
+
+interface MarpCLINormalizedConfig extends IMarpCLIConfig {
+  engine?: ConverterOption['engine']
 }
 
 export class MarpCLIConfig {
@@ -39,22 +44,54 @@ export class MarpCLIConfig {
   }
 
   readonly filePath?: string = undefined
-  readonly config: IMarpCLIConfig = {}
+  readonly config: MarpCLINormalizedConfig = {}
 
   private constructor(confRet?: CosmiconfigResult) {
     if (confRet) {
       this.filePath = confRet.filepath
-      this.config = <IMarpCLIConfig>confRet.config
+
+      const dirPath = path.dirname(this.filePath)
+      const config = { ...confRet.config } as IMarpCLIConfig
 
       // Resolve the relative output path from config file
-      if (this.config.output !== undefined) {
-        this.config.output = path.resolve(
-          path.dirname(this.filePath),
-          this.config.output
-        )
+      if (config.output !== undefined)
+        config.output = path.resolve(dirPath, config.output)
+
+      // Load engine dynamically
+      if (typeof config.engine === 'string') {
+        const engine = requireFrom(dirPath, config.engine)
+        config.engine = engine && engine.__esModule ? engine.default : engine
       }
+
+      this.config = config as MarpCLINormalizedConfig
     }
   }
 }
 
 export default MarpCLIConfig.loadConfig
+
+function requireFrom(directory: string, moduleName: string) {
+  const resolvedPath = (() => {
+    let dir = directory
+    let previousDir
+
+    while (dir !== previousDir) {
+      const resolvedDir = path.resolve(dir, './node_modules/')
+      if (module.paths.includes(resolvedDir)) break
+
+      const modulePath = path.resolve(resolvedDir, moduleName)
+
+      try {
+        fs.accessSync(modulePath)
+        return modulePath
+      } catch (e) {}
+
+      previousDir = dir
+      dir = path.dirname(dir)
+    }
+
+    return moduleName
+  })()
+
+  return require(resolvedPath)
+}
