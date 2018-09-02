@@ -4,24 +4,13 @@ import osLocale from 'os-locale'
 import { Argv } from 'yargs'
 import yargs from 'yargs/yargs'
 import * as cli from './cli'
-import config from './config'
-import { Converter, ConvertType, ConverterOption } from './converter'
+import loadConfig from './config'
+import { Converter, ConvertType } from './converter'
 import { CLIError, error } from './error'
 import { File, FileType } from './file'
 import { MarpReadyScript } from './ready'
 import templates from './templates'
 import { name, version } from '../package.json'
-
-interface MarpCLIConfig {
-  engine?: ConverterOption['engine']
-  html?: ConverterOption['html']
-  lang?: string
-  options?: ConverterOption['options']
-  output?: string
-  pdf?: boolean
-  template?: string
-  theme?: string
-}
 
 enum OptionGroup {
   Basic = 'Basic Options:',
@@ -97,12 +86,12 @@ export default async function(argv: string[] = []): Promise<number> {
     }
 
     // Load configuration file
-    const confResult = await config(args.config)
-    const conf: MarpCLIConfig = confResult ? confResult.config : {}
+    const confInstance = await loadConfig(args.config)
+    const conf = confInstance.config
+    const engine = conf.engine || Marp
+    const output: string = args.output || conf.output
 
     // Initialize converter
-    const engine = conf.engine || Marp
-    const output = args.output || conf.output
     const converter = new Converter({
       engine,
       output,
