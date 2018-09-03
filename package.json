@@ -94,7 +94,9 @@
     "is-wsl": "^1.1.0",
     "mkdirp": "^0.5.1",
     "os-locale": "^3.0.1",
+    "pkg-up": "^2.0.0",
     "puppeteer-core": "^1.7.0",
+    "resolve-from": "^4.0.0",
     "yargs": "^12.0.1"
   }
 }

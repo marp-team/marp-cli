@@ -1,4 +1,3 @@
-import { Marp } from '@marp-team/marp-core'
 import { version as coreVersion } from '@marp-team/marp-core/package.json'
 import osLocale from 'os-locale'
 import { Argv } from 'yargs'
@@ -8,7 +7,6 @@ import loadConfig from './config'
 import { Converter, ConvertType } from './converter'
 import { CLIError, error } from './error'
 import { File, FileType } from './file'
-import { MarpReadyScript } from './ready'
 import templates from './templates'
 import { name, version } from '../package.json'
 
@@ -88,18 +86,17 @@ export default async function(argv: string[] = []): Promise<number> {
     // Load configuration file
     const confInstance = await loadConfig(args.config)
     const conf = confInstance.config
-    const engine = conf.engine || Marp
+
     const output: string = args.output || conf.output
 
     // Initialize converter
     const converter = new Converter({
-      engine,
       output,
+      engine: conf.engine,
       html: args.html !== undefined ? args.html : conf.html,
       lang: conf.lang || (await osLocale()).replace(/[_@]/g, '-'),
       options: conf.options || {},
-      readyScript:
-        engine === Marp ? await MarpReadyScript.bundled() : undefined,
+      readyScript: await confInstance.loadBrowserScript(),
       template: args.template || conf.template || 'bespoke',
       theme: args.theme || conf.theme,
       type:
