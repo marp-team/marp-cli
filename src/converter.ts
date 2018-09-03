@@ -2,7 +2,7 @@ import { Marpit, MarpitOptions } from '@marp-team/marpit'
 import * as chromeFinder from 'chrome-launcher/dist/chrome-finder'
 import puppeteer, { PDFOptions } from 'puppeteer-core'
 import { error } from './error'
-import { File } from './file'
+import { File, FileType } from './file'
 import templates, { TemplateResult } from './templates/'
 
 export enum ConvertType {
@@ -42,13 +42,22 @@ export class Converter {
     return template
   }
 
-  async convert(markdown: string): Promise<TemplateResult> {
+  async convert(markdown: string, file?: File): Promise<TemplateResult> {
     let additionals = ''
+    let base
 
     if (this.options.theme)
       additionals += `\n<!-- theme: ${JSON.stringify(this.options.theme)} -->`
 
+    if (
+      this.options.type === ConvertType.pdf &&
+      file &&
+      file.type === FileType.File
+    )
+      base = file.absolutePath
+
     return await this.template({
+      base,
       lang: this.options.lang,
       readyScript: this.options.readyScript,
       renderer: tplOpts =>
@@ -58,7 +67,7 @@ export class Converter {
 
   async convertFile(file: File): Promise<ConvertResult> {
     const buffer = await file.load()
-    const template = await this.convert(buffer.toString())
+    const template = await this.convert(buffer.toString(), file)
     const newFile = file.convert(this.options.output, this.options.type)
 
     newFile.buffer = await (async () => {
@@ -120,6 +129,11 @@ export class Converter {
       : chromeFinder[process.platform]
 
     return puppeteer.launch({
+      args: [
+        // FIXME: Insecure options are not working.
+        '--allow-file-access-from-files',
+        '--enable-local-file-accesses',
+      ],
       executablePath: finder ? finder()[0] : undefined,
     })
   }

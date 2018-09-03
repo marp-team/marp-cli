@@ -6,6 +6,8 @@ html(lang=lang)
     meta(http-equiv="X-UA-Compatible", content="ie=edge")
     style!= bespoke.css
     style!= css
+    if base
+      base(href=base)
   body
     if progress
       .bespoke-progress-parent
