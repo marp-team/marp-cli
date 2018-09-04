@@ -44,18 +44,14 @@ export class Converter {
     return template
   }
 
-  async convert(markdown: string, file?: File): Promise<TemplateResult> {
+  async convert(markdown: string, file: File): Promise<TemplateResult> {
     let additionals = ''
     let base
 
     if (this.options.theme)
       additionals += `\n<!-- theme: ${JSON.stringify(this.options.theme)} -->`
 
-    if (
-      this.options.type === ConvertType.pdf &&
-      file &&
-      file.type === FileType.File
-    )
+    if (this.options.type === ConvertType.pdf && file.type === FileType.File)
       base = file.absolutePath
 
     return await this.template({
@@ -92,7 +88,7 @@ export class Converter {
   }
 
   private async convertFileToPDF(file: File) {
-    const tmpFile: File.TmpFileInterface | undefined = await (async () => {
+    const tmpFile: File.TmpFileInterface | undefined = await (() => {
       if (!this.options.allowLocalFiles) return undefined
 
       const warning = `Insecure local file accessing is enabled for conversion of ${file.relativePath()}.`
@@ -101,20 +97,18 @@ export class Converter {
       return file.saveTmpFile('.html')
     })()
 
+    const uri = tmpFile
+      ? `file://${tmpFile.path}`
+      : `data:text/html,${file.buffer!.toString()}`
+
     try {
       const browser = await Converter.runBrowser()
 
       try {
         const page = await browser.newPage()
-
-        await page.goto(
-          tmpFile
-            ? `file://${tmpFile.path}`
-            : `data:text/html,${file.buffer!.toString()}`,
-          {
-            waitUntil: ['domcontentloaded', 'networkidle0'],
-          }
-        )
+        await page.goto(uri, {
+          waitUntil: ['domcontentloaded', 'networkidle0'],
+        })
 
         file.buffer = await page.pdf(<PDFOptions>{
           printBackground: true,
