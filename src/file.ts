@@ -2,6 +2,7 @@ import fs from 'fs'
 import getStdin from 'get-stdin'
 import globby from 'globby'
 import path from 'path'
+import { tmpName } from 'tmp'
 
 const markdownExtensions = ['*.md', '*.mdown', '*.markdown', '*.markdn']
 
@@ -53,19 +54,46 @@ export class File {
   async save() {
     switch (this.type) {
       case FileType.File:
-        await new Promise<void>((resolve, reject) =>
-          fs.writeFile(this.path, this.buffer, e => (e ? reject(e) : resolve()))
-        )
+        await this.saveToFile()
         break
       case FileType.StandardIO:
         process.stdout.write(this.buffer!)
     }
   }
 
+  async saveTmpFile(ext?: string): Promise<File.TmpFileInterface> {
+    const path: string = await new Promise<string>((resolve, reject) => {
+      tmpName({ postfix: ext }, (e, path) => (e ? reject(e) : resolve(path)))
+    })
+
+    await this.saveToFile(path)
+
+    return {
+      path,
+      cleanup: async () => {
+        try {
+          await this.cleanup(path)
+        } catch (e) {}
+      },
+    }
+  }
+
+  private async cleanup(path: string) {
+    return new Promise<void>((resolve, reject) =>
+      fs.unlink(path, e => (e ? reject(e) : resolve()))
+    )
+  }
+
   private convertExtension(extension: string): string {
     return path.join(
       path.dirname(this.path),
       `${path.basename(this.path, path.extname(this.path))}.${extension}`
+    )
+  }
+
+  private async saveToFile(path: string = this.path) {
+    return new Promise<void>((resolve, reject) =>
+      fs.writeFile(path, this.buffer, e => (e ? reject(e) : resolve()))
     )
   }
 
@@ -95,5 +123,12 @@ export class File {
     const instance = new this(filepath)
     tap(instance)
     return instance
+  }
+}
+
+export namespace File {
+  export interface TmpFileInterface {
+    path: string
+    cleanup: () => Promise<void>
   }
 }

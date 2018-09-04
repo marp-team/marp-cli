@@ -61,6 +61,13 @@ export default async function(argv: string[] = []): Promise<number> {
           choices: Object.keys(templates),
           type: 'string',
         },
+        'allow-local-files': {
+          default: false,
+          describe:
+            'Allow to access local files from Markdown while converting PDF (INSECURE)',
+          group: OptionGroup.Converter,
+          type: 'boolean',
+        },
         html: {
           describe: 'Enable or disable HTML tag',
           group: OptionGroup.Marp,
@@ -82,6 +89,7 @@ export default async function(argv: string[] = []): Promise<number> {
 
     // Initialize converter
     const converter = new Converter({
+      allowLocalFiles: args.allowLocalFiles,
       engine: Marp,
       html: args.html,
       lang: (await osLocale()).replace(/[_@]/g, '-'),

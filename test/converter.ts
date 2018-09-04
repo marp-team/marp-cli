@@ -1,6 +1,7 @@
 import Marp from '@marp-team/marp-core'
 import { MarpitOptions } from '@marp-team/marpit'
 import fs from 'fs'
+import os from 'os'
 import path from 'path'
 import context from './_helpers/context'
 import { useSpy } from './_helpers/spy'
@@ -16,6 +17,7 @@ describe('Converter', () => {
 
   const instance = (opts = {}) =>
     new Converter({
+      allowLocalFiles: false,
       lang: 'en',
       engine: Marp,
       options: {},
@@ -27,7 +29,8 @@ describe('Converter', () => {
   describe('#constructor', () => {
     it('assigns initial options to options member', () => {
       const options = {
-        lang: 'en',
+        allowLocalFiles: true,
+        lang: 'fr',
         engine: Marp,
         options: <MarpitOptions>{ html: true },
         template: 'test-template',
@@ -61,6 +64,7 @@ describe('Converter', () => {
       expect(result.result).toContain(result.rendered.html)
       expect(result.result).toContain(result.rendered.css)
       expect(result.result).toContain(readyScript)
+      expect(result.result).not.toContain('<base')
       expect(result.rendered.css).toContain('@theme default')
     })
 
@@ -90,6 +94,16 @@ describe('Converter', () => {
 
       const disabled = (await instance({ html: false }).convert(md)).rendered
       expect(disabled.html).toContain('&lt;i&gt;Hello!&lt;/i&gt;')
+    })
+
+    context('with PDF convert type', () => {
+      const converter = instance({ type: ConvertType.pdf })
+      const dummyFile = new File(process.cwd())
+
+      it('adds <base> element with specified base path from passed file', async () => {
+        const { result } = await converter.convert(md, dummyFile)
+        expect(result).toContain(`<base href="${process.cwd()}">`)
+      })
     })
   })
 
@@ -170,11 +184,53 @@ describe('Converter', () => {
             expect(write.mock.calls[0][0]).toBe('test.pdf')
             expect(pdf.toString('ascii', 0, 5)).toBe('%PDF-')
             expect(ret.newFile.path).toBe('test.pdf')
-            expect(ret.newFile.buffer).toBe(write.mock.calls[0][1])
+            expect(ret.newFile.buffer).toBe(pdf)
           })
         },
         10000
       )
+
+      context('with allowLocalFiles option as true', () => {
+        it(
+          'converts into PDF by using temporally file',
+          async () => {
+            const file = new File(onePath)
+
+            // @ts-ignore to check cleanup tmpfile
+            const fileCleanup = jest.spyOn(File.prototype, 'cleanup')
+            const fileSave = jest.spyOn(File.prototype, 'save')
+            const fileTmp = jest.spyOn(File.prototype, 'saveTmpFile')
+
+            const warn = jest.spyOn(console, 'warn')
+
+            return useSpy(
+              [fileCleanup, fileSave, fileTmp, warn],
+              async () => {
+                fileSave.mockImplementation()
+                warn.mockImplementation()
+
+                await pdfInstance({
+                  allowLocalFiles: true,
+                  output: '-',
+                }).convertFile(file)
+
+                expect(warn).toBeCalledWith(
+                  expect.stringContaining(
+                    'Insecure local file accessing is enabled'
+                  )
+                )
+                expect(fileTmp).toBeCalledWith('.html')
+                expect(fileCleanup).toBeCalledWith(
+                  expect.stringContaining(os.tmpdir())
+                )
+                expect(fileSave).toBeCalled()
+              },
+              false
+            )
+          },
+          10000
+        )
+      })
     })
   })
 
