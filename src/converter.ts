@@ -1,8 +1,9 @@
 import { Marp, MarpOptions } from '@marp-team/marp-core'
-import { Marpit, MarpitOptions } from '@marp-team/marpit'
+import { MarpitOptions } from '@marp-team/marpit'
 import * as chromeFinder from 'chrome-launcher/dist/chrome-finder'
 import puppeteer, { PDFOptions } from 'puppeteer-core'
 import { warn } from './cli'
+import { Engine } from './engine'
 import { error } from './error'
 import { File, FileType } from './file'
 import templates, { TemplateResult } from './templates/'
@@ -14,7 +15,7 @@ export enum ConvertType {
 
 export interface ConverterOption {
   allowLocalFiles: boolean
-  engine: typeof Marpit
+  engine: Engine
   html?: MarpOptions['html']
   lang: string
   options: MarpitOptions

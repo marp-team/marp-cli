@@ -1,10 +1,9 @@
 import { version as coreVersion } from '@marp-team/marp-core/package.json'
-import osLocale from 'os-locale'
 import { Argv } from 'yargs'
 import yargs from 'yargs/yargs'
 import * as cli from './cli'
-import loadConfig from './config'
-import { Converter, ConvertType } from './converter'
+import fromArguments, { IMarpCLIArguments } from './config'
+import { Converter } from './converter'
 import { CLIError, error } from './error'
 import { File, FileType } from './file'
 import templates from './templates'
@@ -41,15 +40,15 @@ export default async function(argv: string[] = []): Promise<number> {
           group: OptionGroup.Basic,
           type: 'boolean',
         },
-        config: {
-          alias: 'c',
-          describe: 'Path to configuration file',
+        output: {
+          alias: 'o',
+          describe: 'Output file path',
           group: OptionGroup.Basic,
           type: 'string',
         },
-        output: {
-          alias: 'o',
-          describe: 'Output file name',
+        'config-file': {
+          alias: 'c',
+          describe: 'Path to configuration file',
           group: OptionGroup.Basic,
           type: 'string',
         },
@@ -59,16 +58,21 @@ export default async function(argv: string[] = []): Promise<number> {
           type: 'boolean',
         },
         template: {
-          describe: 'Template name',
+          describe: 'Select template',
           group: OptionGroup.Converter,
           choices: Object.keys(templates),
           type: 'string',
         },
         'allow-local-files': {
           describe:
-            'Allow to access local files from Markdown while converting PDF (INSECURE)',
+            'Allow to access local files from Markdown while converting PDF (NOT SECURE)',
           group: OptionGroup.Converter,
           type: 'boolean',
+        },
+        engine: {
+          describe: 'Select Marpit based engine by module name/path',
+          group: OptionGroup.Marp,
+          type: 'string',
         },
         html: {
           describe: 'Enable or disable HTML tag',
@@ -89,31 +93,9 @@ export default async function(argv: string[] = []): Promise<number> {
       return 0
     }
 
-    // Load configuration file
-    const confInstance = await loadConfig(args.config)
-    const conf = confInstance.config
-
-    const output: string = args.output || conf.output
-
     // Initialize converter
-    const converter = new Converter({
-      output,
-      allowLocalFiles:
-        args.allowLocalFiles !== undefined
-          ? args.allowLocalFiles
-          : conf.allowLocalFiles,
-      engine: conf.engine,
-      html: args.html !== undefined ? args.html : conf.html,
-      lang: conf.lang || (await osLocale()).replace(/[_@]/g, '-'),
-      options: conf.options || {},
-      readyScript: await confInstance.loadBrowserScript(),
-      template: args.template || conf.template || 'bespoke',
-      theme: args.theme || conf.theme,
-      type:
-        args.pdf || conf.pdf || `${output}`.toLowerCase().endsWith('.pdf')
-          ? ConvertType.pdf
-          : ConvertType.html,
-    })
+    const config = await fromArguments(<IMarpCLIArguments>args)
+    const converter = new Converter(await config.converterOption())
 
     // Find target markdown files
     const files = <File[]>(

@@ -1,150 +1,113 @@
 import { Marp } from '@marp-team/marp-core'
-import cosmiconfig, { CosmiconfigResult } from 'cosmiconfig'
-import fs from 'fs'
-import path from 'path'
-import pkgUp from 'pkg-up'
-import resolveFrom from 'resolve-from'
-import { ConverterOption } from './converter'
+import cosmiconfig from 'cosmiconfig'
+import osLocale from 'os-locale'
+import { ConverterOption, ConvertType } from './converter'
+import resolveEngine, { ResolvableEngine } from './engine'
 import { CLIError } from './error'
 
-export interface IMarpCLIConfig {
+type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
+type Overwrite<T, U> = Omit<T, Extract<keyof T, keyof U>> & U
+
+export interface IMarpCLIArguments {
   allowLocalFiles?: boolean
-  engine?: ConverterOption['engine'] | string
-  html?: ConverterOption['html']
-  lang?: string
-  options?: ConverterOption['options']
+  configFile?: string
+  engine?: string
+  html?: boolean
   output?: string
   pdf?: boolean
   template?: string
   theme?: string
 }
 
-interface MarpCLINormalizedConfig extends IMarpCLIConfig {
-  engine: ConverterOption['engine']
-}
-
-const defaultConfig: MarpCLINormalizedConfig = {
-  engine: Marp,
-}
+export type IMarpCLIConfig = Overwrite<
+  Omit<IMarpCLIArguments, 'configFile'>,
+  {
+    engine?: ResolvableEngine
+    html?: ConverterOption['html']
+    lang?: string
+    options?: ConverterOption['options']
+  }
+>
 
 export class MarpCLIConfig {
-  private static moduleName = 'marp'
-  private static browserScriptKey = 'marpBrowser'
+  args: IMarpCLIArguments = {}
+  conf: IMarpCLIConfig = {}
+  confPath?: string
 
-  static async loadConfig(path?: string): Promise<MarpCLIConfig> {
+  static moduleName = 'marp'
+
+  static async fromArguments(args: IMarpCLIArguments) {
+    const conf = new MarpCLIConfig()
+    conf.args = args
+
+    await conf.loadConf(args.configFile)
+    return conf
+  }
+
+  async converterOption(): Promise<ConverterOption> {
+    const engine = await (async () => {
+      if (this.args.engine) return resolveEngine(this.args.engine)
+      if (this.conf.engine)
+        return resolveEngine(this.conf.engine, this.confPath)
+
+      return resolveEngine(Marp)
+    })()
+
+    const output = this.args.output || this.conf.output
+
+    return {
+      output,
+      allowLocalFiles:
+        this.pickDefined(
+          this.args.allowLocalFiles,
+          this.conf.allowLocalFiles
+        ) || false,
+      engine: engine.klass,
+      html: this.pickDefined(this.args.html, this.conf.html),
+      lang: this.conf.lang || (await osLocale()).replace(/[_@]/g, '-'),
+      options: this.conf.options || {},
+      readyScript: engine.browserScript
+        ? `<script defer>${engine.browserScript}</script>`
+        : undefined,
+      template: this.args.template || this.conf.template || 'bespoke',
+      theme: this.args.theme || this.conf.theme,
+      type:
+        this.args.pdf ||
+        this.conf.pdf ||
+        `${output}`.toLowerCase().endsWith('.pdf')
+          ? ConvertType.pdf
+          : ConvertType.html,
+    }
+  }
+
+  private pickDefined<T>(...args: T[]): T | undefined {
+    return args.find(v => v !== undefined)
+  }
+
+  private async loadConf(confPath?: string) {
     const explorer = cosmiconfig(MarpCLIConfig.moduleName)
-    let ret: CosmiconfigResult
 
     try {
-      ret = await (path === undefined ? explorer.search() : explorer.load(path))
+      const ret = await (confPath === undefined
+        ? explorer.search()
+        : explorer.load(confPath))
+
+      if (ret) {
+        this.confPath = ret.filepath
+        this.conf = ret.config
+      }
     } catch (e) {
       throw new CLIError(
         [
           'Could not find or parse configuration file.',
           e.name !== 'Error' && `(${e.name})`,
-          path !== undefined && `[${path}]`,
+          confPath !== undefined && `[${confPath}]`,
         ]
           .filter(m => m)
           .join(' ')
       )
     }
-
-    return new MarpCLIConfig(ret)
-  }
-
-  readonly config: MarpCLINormalizedConfig = { ...defaultConfig }
-  readonly filePath?: string = undefined
-
-  async loadBrowserScript(): Promise<string | undefined> {
-    if (this.browserScript) return this.browserScript
-    if (this.engineModuleId === undefined) return undefined
-
-    // Resolve package path
-    const pkgPath: string | null = await pkgUp(
-      path.dirname(this.engineModuleId)
-    )
-    if (!pkgPath) return undefined
-
-    // Read browser script key
-    const marpBrowser = require(pkgPath)[MarpCLIConfig.browserScriptKey]
-    if (!marpBrowser) return undefined
-
-    // Load script
-    const scriptBody = await new Promise<string>((res, rej) =>
-      fs.readFile(
-        path.resolve(path.dirname(pkgPath), marpBrowser),
-        (e, buf) => (e ? rej(e) : res(buf.toString()))
-      )
-    )
-
-    this.browserScript = `<script defer>${scriptBody}</script>`
-    return this.browserScript
-  }
-
-  private browserScript?: string
-  private engineModuleId?: string
-
-  private constructor(confRet?: CosmiconfigResult) {
-    if (confRet) {
-      this.filePath = confRet.filepath
-
-      const dirPath = path.dirname(this.filePath)
-      const config = { ...this.config, ...confRet.config } as IMarpCLIConfig
-
-      // Resolve the relative output path from config file
-      if (config.output !== undefined)
-        config.output = path.resolve(dirPath, config.output)
-
-      // Load engine dynamically
-      if (typeof config.engine === 'string') {
-        let resolved
-
-        try {
-          resolved =
-            resolveFrom.silent(dirPath, config.engine) ||
-            require.resolve(config.engine)
-        } catch (e) {
-          throw new CLIError(
-            `The specified engine "${config.engine}" has not resolved. (${
-              e.message
-            })`
-          )
-        }
-
-        config.engine = resolved
-          ? (() => {
-              const required = require(resolved)
-              return required && required.__esModule
-                ? required.default
-                : required
-            })()
-          : undefined
-
-        if (resolved) this.engineModuleId = resolved
-      }
-
-      this.config = config as MarpCLINormalizedConfig
-    }
-
-    if (this.config.engine && !this.engineModuleId) {
-      // Resolve engine's module id
-      for (const moduleId in require.cache) {
-        const expt = require.cache[moduleId].exports
-
-        if (
-          expt === this.config.engine ||
-          (expt &&
-            expt.__esModule &&
-            Object.keys(expt)
-              .map(k => expt[k])
-              .includes(this.config.engine))
-        ) {
-          this.engineModuleId = moduleId
-          break
-        }
-      }
-    }
   }
 }
 
-export default MarpCLIConfig.loadConfig
+export default MarpCLIConfig.fromArguments

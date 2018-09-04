@@ -128,6 +128,41 @@ describe('Marp CLI', () => {
         confirmPDF(onePath, '-o', 'example.pdf')
       )
     })
+
+    context('with configuration file', () => {
+      const confDir = path.resolve(__dirname, './_files/configs')
+
+      it('uses configuration file found from process.cwd()', () => {
+        const cwd = jest.spyOn(process, 'cwd')
+        const stdout = jest.spyOn(process.stdout, 'write')
+        const warn = jest.spyOn(console, 'warn')
+
+        return useSpy([cwd, stdout, warn], async () => {
+          cwd.mockImplementation(() => path.resolve(confDir, './basic'))
+          expect(await marpCli(['html.txt'])).toBe(0)
+
+          const [buffer] = stdout.mock.calls[0]
+          expect(buffer.toString()).toContain('<b>html</b>')
+        })
+      })
+
+      context('when --config-file option is passed', () => {
+        it('prints error when specified config is not found', async () => {
+          const error = jest.spyOn(console, 'error')
+
+          return useSpy([error], async () => {
+            expect(await marpCli(['--config-file', '_NOT_FOUND_FILE_'])).toBe(1)
+            expect(error).toHaveBeenCalledTimes(1)
+            expect(error).toHaveBeenCalledWith(
+              expect.stringContaining('_NOT_FOUND_FILE_')
+            )
+            expect(error).toHaveBeenCalledWith(
+              expect.stringContaining('Could not find or parse configuration')
+            )
+          })
+        })
+      })
+    })
   })
 
   context('with passing directory', () => {
@@ -155,8 +190,7 @@ describe('Marp CLI', () => {
       const stdout = jest.spyOn(process.stdout, 'write')
 
       await useSpy([cliInfo, stdin, stdout], async () => {
-        // Reset cached stdin buffer
-        // @ts-ignore
+        // @ts-ignore: reset cached stdin buffer
         File.stdinBuffer = undefined
 
         stdin.mockImplementation(async () => new Buffer('# markdown'))
