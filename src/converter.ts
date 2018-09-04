@@ -44,20 +44,21 @@ export class Converter {
     return template
   }
 
-  async convert(markdown: string, file: File): Promise<TemplateResult> {
+  async convert(markdown: string, file?: File): Promise<TemplateResult> {
+    const { lang, readyScript, theme, type } = this.options
+
     let additionals = ''
     let base
 
-    if (this.options.theme)
-      additionals += `\n<!-- theme: ${JSON.stringify(this.options.theme)} -->`
+    if (theme) additionals += `\n<!-- theme: ${JSON.stringify(theme)} -->`
 
-    if (this.options.type === ConvertType.pdf && file.type === FileType.File)
+    if (type === ConvertType.pdf && file && file.type === FileType.File)
       base = file.absolutePath
 
     return await this.template({
       base,
-      lang: this.options.lang,
-      readyScript: this.options.readyScript,
+      lang,
+      readyScript,
       renderer: tplOpts =>
         this.generateEngine(tplOpts).render(`${markdown}${additionals}`),
     })

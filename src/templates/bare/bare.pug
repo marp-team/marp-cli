@@ -1,13 +1,14 @@
 doctype
 html(lang=lang)
   head
+    if base
+      base(href=base)
+
     meta(charset="UTF-8")
     meta(name="viewport", content="width=device-width, initial-scale=1.0")
     meta(http-equiv="X-UA-Compatible", content="ie=edge")
     style(media="screen")!= bare.css
     style!= css
-    if base
-      base(href=base)
   body
     != html
     != readyScript
