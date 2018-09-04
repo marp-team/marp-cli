@@ -1,6 +1,7 @@
 import { Marpit, MarpitOptions } from '@marp-team/marpit'
 import * as chromeFinder from 'chrome-launcher/dist/chrome-finder'
 import puppeteer, { PDFOptions } from 'puppeteer-core'
+import { warn } from './cli'
 import { error } from './error'
 import { File, FileType } from './file'
 import templates, { TemplateResult } from './templates/'
@@ -11,6 +12,7 @@ export enum ConvertType {
 }
 
 export interface ConverterOption {
+  allowLocalFiles: boolean
   engine: typeof Marpit
   html?: boolean
   lang: string
@@ -70,26 +72,10 @@ export class Converter {
     const template = await this.convert(buffer.toString(), file)
     const newFile = file.convert(this.options.output, this.options.type)
 
-    newFile.buffer = await (async () => {
-      if (this.options.type === ConvertType.pdf) {
-        const browser = await Converter.runBrowser()
+    newFile.buffer = new Buffer(template.result)
 
-        try {
-          const page = await browser.newPage()
-          await page.goto(`data:text/html,${template.result}`, {
-            waitUntil: ['domcontentloaded', 'networkidle0'],
-          })
-
-          return await page.pdf(<PDFOptions>{
-            printBackground: true,
-            preferCSSPageSize: true,
-          })
-        } finally {
-          await browser.close()
-        }
-      }
-      return new Buffer(template.result)
-    })()
+    if (this.options.type === ConvertType.pdf)
+      await this.convertFileToPDF(newFile)
 
     await newFile.save()
     return { file, newFile, template }
@@ -103,6 +89,45 @@ export class Converter {
       error('Output path cannot specify with processing multiple files.')
 
     for (const file of files) onConverted(await this.convertFile(file))
+  }
+
+  private async convertFileToPDF(file: File) {
+    const { allowLocalFiles } = this.options
+
+    let tmpFile: File.TmpFileInterface | undefined
+
+    try {
+      if (allowLocalFiles) {
+        warn(
+          `Insecure local file accessing is enabled for conversion of ${file.relativePath()}.`
+        )
+        tmpFile = await file.saveTmpFile('.html')
+      }
+
+      const browser = await Converter.runBrowser()
+
+      try {
+        const page = await browser.newPage()
+
+        await page.goto(
+          allowLocalFiles
+            ? `file://${tmpFile.path}`
+            : `data:text/html,${file.buffer!.toString()}`,
+          {
+            waitUntil: ['domcontentloaded', 'networkidle0'],
+          }
+        )
+
+        file.buffer = await page.pdf(<PDFOptions>{
+          printBackground: true,
+          preferCSSPageSize: true,
+        })
+      } finally {
+        await browser.close()
+      }
+    } finally {
+      if (tmpFile) await tmpFile.cleanup()
+    }
   }
 
   private generateEngine(mergeOptions: MarpitOptions) {
@@ -129,11 +154,6 @@ export class Converter {
       : chromeFinder[process.platform]
 
     return puppeteer.launch({
-      args: [
-        // FIXME: Insecure options are not working.
-        '--allow-file-access-from-files',
-        '--enable-local-file-accesses',
-      ],
       executablePath: finder ? finder()[0] : undefined,
     })
   }
