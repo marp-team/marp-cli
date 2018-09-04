@@ -8,6 +8,7 @@ import { ConverterOption } from './converter'
 import { CLIError } from './error'
 
 export interface IMarpCLIConfig {
+  allowLocalFiles?: boolean
   engine?: ConverterOption['engine'] | string
   html?: ConverterOption['html']
   lang?: string

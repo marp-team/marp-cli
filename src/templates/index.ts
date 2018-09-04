@@ -7,6 +7,7 @@ import bespokePug from './bespoke/bespoke.pug'
 import bespokeScss from './bespoke/bespoke.scss'
 
 export interface TemplateOptions {
+  base?: string
   lang: string
   readyScript?: string
   renderer: (tplOpts: MarpitOptions) => MarpitRenderResult

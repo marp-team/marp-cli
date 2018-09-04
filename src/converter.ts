@@ -2,8 +2,9 @@ import { Marp, MarpOptions } from '@marp-team/marp-core'
 import { Marpit, MarpitOptions } from '@marp-team/marpit'
 import * as chromeFinder from 'chrome-launcher/dist/chrome-finder'
 import puppeteer, { PDFOptions } from 'puppeteer-core'
+import { warn } from './cli'
 import { error } from './error'
-import { File } from './file'
+import { File, FileType } from './file'
 import templates, { TemplateResult } from './templates/'
 
 export enum ConvertType {
@@ -12,6 +13,7 @@ export enum ConvertType {
 }
 
 export interface ConverterOption {
+  allowLocalFiles: boolean
   engine: typeof Marpit
   html?: MarpOptions['html']
   lang: string
@@ -43,15 +45,21 @@ export class Converter {
     return template
   }
 
-  async convert(markdown: string): Promise<TemplateResult> {
-    let additionals = ''
+  async convert(markdown: string, file?: File): Promise<TemplateResult> {
+    const { lang, readyScript, theme, type } = this.options
 
-    if (this.options.theme)
-      additionals += `\n<!-- theme: ${JSON.stringify(this.options.theme)} -->`
+    let additionals = ''
+    let base
+
+    if (theme) additionals += `\n<!-- theme: ${JSON.stringify(theme)} -->`
+
+    if (type === ConvertType.pdf && file && file.type === FileType.File)
+      base = file.absolutePath
 
     return await this.template({
-      lang: this.options.lang,
-      readyScript: this.options.readyScript,
+      base,
+      lang,
+      readyScript,
       renderer: tplOpts =>
         this.generateEngine(tplOpts).render(`${markdown}${additionals}`),
     })
@@ -59,29 +67,13 @@ export class Converter {
 
   async convertFile(file: File): Promise<ConvertResult> {
     const buffer = await file.load()
-    const template = await this.convert(buffer.toString())
+    const template = await this.convert(buffer.toString(), file)
     const newFile = file.convert(this.options.output, this.options.type)
 
-    newFile.buffer = await (async () => {
-      if (this.options.type === ConvertType.pdf) {
-        const browser = await Converter.runBrowser()
+    newFile.buffer = new Buffer(template.result)
 
-        try {
-          const page = await browser.newPage()
-          await page.goto(`data:text/html,${template.result}`, {
-            waitUntil: ['domcontentloaded', 'networkidle0'],
-          })
-
-          return await page.pdf(<PDFOptions>{
-            printBackground: true,
-            preferCSSPageSize: true,
-          })
-        } finally {
-          await browser.close()
-        }
-      }
-      return new Buffer(template.result)
-    })()
+    if (this.options.type === ConvertType.pdf)
+      await this.convertFileToPDF(newFile)
 
     await newFile.save()
     return { file, newFile, template }
@@ -95,6 +87,41 @@ export class Converter {
       error('Output path cannot specify with processing multiple files.')
 
     for (const file of files) onConverted(await this.convertFile(file))
+  }
+
+  private async convertFileToPDF(file: File) {
+    const tmpFile: File.TmpFileInterface | undefined = await (() => {
+      if (!this.options.allowLocalFiles) return undefined
+
+      const warning = `Insecure local file accessing is enabled for conversion of ${file.relativePath()}.`
+      warn(warning)
+
+      return file.saveTmpFile('.html')
+    })()
+
+    const uri = tmpFile
+      ? `file://${tmpFile.path}`
+      : `data:text/html,${file.buffer!.toString()}`
+
+    try {
+      const browser = await Converter.runBrowser()
+
+      try {
+        const page = await browser.newPage()
+        await page.goto(uri, {
+          waitUntil: ['domcontentloaded', 'networkidle0'],
+        })
+
+        file.buffer = await page.pdf(<PDFOptions>{
+          printBackground: true,
+          preferCSSPageSize: true,
+        })
+      } finally {
+        await browser.close()
+      }
+    } finally {
+      if (tmpFile) await tmpFile.cleanup()
+    }
   }
 
   private generateEngine(mergeOptions: MarpitOptions) {

@@ -5,6 +5,7 @@
 ### Added
 
 - Add `--html` option ([#7](https://github.com/marp-team/marp-cli/pull/7))
+- Render local resources in converting PDF by `--allow-local-files option` ([#10](https://github.com/marp-team/marp-cli/pull/10))
 
 ### Changed
 
