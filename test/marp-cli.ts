@@ -78,6 +78,19 @@ describe('Marp CLI', () => {
     })
   })
 
+  context('with --engine option', () => {
+    it('prints error and return error code when passed module is invalid', async () => {
+      const error = jest.spyOn(console, 'error')
+
+      return useSpy([error], async () => {
+        expect(await marpCli(['--engine', '@marp-team/invalid'])).toBe(1)
+        expect(error).toHaveBeenCalledWith(
+          expect.stringContaining('"@marp-team/invalid" has not resolved.')
+        )
+      })
+    })
+  })
+
   context('with passing a file', () => {
     const onePath = path.resolve(__dirname, './_files/1.md')
 
@@ -138,15 +151,29 @@ describe('Marp CLI', () => {
         const warn = jest.spyOn(console, 'warn')
 
         return useSpy([cwd, stdout, warn], async () => {
-          cwd.mockImplementation(() => path.resolve(confDir, './basic'))
-          expect(await marpCli(['html.txt'])).toBe(0)
+          cwd.mockImplementation(() => path.resolve(confDir, './basic/'))
+          expect(await marpCli(['md.txt'])).toBe(0)
 
-          const [buffer] = stdout.mock.calls[0]
-          expect(buffer.toString()).toContain('<b>html</b>')
+          const html = stdout.mock.calls[0][0].toString()
+          expect(html).toContain('<b>html</b>')
         })
       })
 
-      context('when --config-file option is passed', () => {
+      it('uses marp section in package.json that is found in process.cwd()', () => {
+        const cwd = jest.spyOn(process, 'cwd')
+        const stdout = jest.spyOn(process.stdout, 'write')
+        const warn = jest.spyOn(console, 'warn')
+
+        return useSpy([cwd, stdout, warn], async () => {
+          cwd.mockImplementation(() => path.resolve(confDir, './package-json/'))
+          expect(await marpCli(['md.txt', '-o', '-'])).toBe(0)
+
+          const html = stdout.mock.calls[0][0].toString()
+          expect(html).toContain('@theme gaia')
+        })
+      })
+
+      context('when --config-file / -c option is passed', () => {
         it('prints error when specified config is not found', async () => {
           const error = jest.spyOn(console, 'error')
 
@@ -159,6 +186,36 @@ describe('Marp CLI', () => {
             expect(error).toHaveBeenCalledWith(
               expect.stringContaining('Could not find or parse configuration')
             )
+          })
+        })
+
+        it('applies specified config', async () => {
+          const stdout = jest.spyOn(process.stdout, 'write')
+          const warn = jest.spyOn(console, 'warn')
+
+          return useSpy([stdout, warn], async () => {
+            const conf = path.resolve(confDir, './marpit/config.js')
+            expect(await marpCli(['-c', conf, onePath, '-o', '-'])).toBe(0)
+
+            const html = stdout.mock.calls[0][0].toString()
+            expect(html).not.toContain('@theme default') // Marpit engine has not default theme
+          })
+        })
+
+        it('allows custom engine specified in js config', () => {
+          const cwd = jest.spyOn(process, 'cwd')
+          const stdout = jest.spyOn(process.stdout, 'write')
+          const warn = jest.spyOn(console, 'warn')
+
+          return useSpy([cwd, stdout, warn], async () => {
+            cwd.mockImplementation(() =>
+              path.resolve(confDir, './custom-engine/')
+            )
+            expect(await marpCli(['md.txt', '-o', '-'])).toBe(0)
+
+            const html = stdout.mock.calls[0][0].toString()
+            expect(html).toContain('<b>custom</b>')
+            expect(html).toContain('/* custom */')
           })
         })
       })
