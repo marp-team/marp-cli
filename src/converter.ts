@@ -92,25 +92,23 @@ export class Converter {
   }
 
   private async convertFileToPDF(file: File) {
-    const { allowLocalFiles } = this.options
+    const tmpFile: File.TmpFileInterface | undefined = await (async () => {
+      if (!this.options.allowLocalFiles) return undefined
 
-    let tmpFile: File.TmpFileInterface | undefined
+      const warning = `Insecure local file accessing is enabled for conversion of ${file.relativePath()}.`
+      warn(warning)
+
+      return file.saveTmpFile('.html')
+    })()
 
     try {
-      if (allowLocalFiles) {
-        warn(
-          `Insecure local file accessing is enabled for conversion of ${file.relativePath()}.`
-        )
-        tmpFile = await file.saveTmpFile('.html')
-      }
-
       const browser = await Converter.runBrowser()
 
       try {
         const page = await browser.newPage()
 
         await page.goto(
-          allowLocalFiles
+          tmpFile
             ? `file://${tmpFile.path}`
             : `data:text/html,${file.buffer!.toString()}`,
           {
