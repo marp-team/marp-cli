@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v0.0.6 - 2018-09-05
+
 ### Added
 
 - Add `--html` option ([#7](https://github.com/marp-team/marp-cli/pull/7))
