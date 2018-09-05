@@ -48,7 +48,7 @@ export default async function(argv: string[] = []): Promise<number> {
         },
         'config-file': {
           alias: 'c',
-          describe: 'Path to configuration file',
+          describe: 'Specify path to configuration file',
           group: OptionGroup.Basic,
           type: 'string',
         },
@@ -70,7 +70,7 @@ export default async function(argv: string[] = []): Promise<number> {
           type: 'boolean',
         },
         engine: {
-          describe: 'Select Marpit based engine by module name/path',
+          describe: 'Select Marpit based engine by module name or path',
           group: OptionGroup.Marp,
           type: 'string',
         },
