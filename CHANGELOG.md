@@ -5,11 +5,14 @@
 ### Added
 
 - Add `--html` option ([#7](https://github.com/marp-team/marp-cli/pull/7))
-- Render local resources in converting PDF by `--allow-local-files option` ([#10](https://github.com/marp-team/marp-cli/pull/10))
+- Support configuration file (`.marprc` / `marp.config.js`) ([#9](https://github.com/marp-team/marp-cli/pull/9))
+- Come back `--engine` option that can specify Marpit based module ([#9](https://github.com/marp-team/marp-cli/pull/9))
+- Render local resources in converting PDF by `--allow-local-files` option ([#10](https://github.com/marp-team/marp-cli/pull/10))
 
 ### Changed
 
 - Upgrade dependent package versions to latest ([#8](https://github.com/marp-team/marp-cli/pull/8))
+- Create directories for the output path recursively ([#9](https://github.com/marp-team/marp-cli/pull/9))
 
 ## v0.0.5 - 2018-08-29
 

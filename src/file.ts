@@ -1,6 +1,7 @@
 import fs from 'fs'
 import getStdin from 'get-stdin'
 import globby from 'globby'
+import mkdirp from 'mkdirp'
 import path from 'path'
 import { tmpName } from 'tmp'
 
@@ -91,9 +92,15 @@ export class File {
     )
   }
 
-  private async saveToFile(path: string = this.path) {
+  private async saveToFile(savePath: string = this.path) {
+    await new Promise<void>((resolve, reject) =>
+      mkdirp(
+        path.dirname(path.resolve(savePath)),
+        e => (e ? reject(e) : resolve())
+      )
+    )
     return new Promise<void>((resolve, reject) =>
-      fs.writeFile(path, this.buffer, e => (e ? reject(e) : resolve()))
+      fs.writeFile(savePath, this.buffer, e => (e ? reject(e) : resolve()))
     )
   }
 

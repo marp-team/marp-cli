@@ -45,6 +45,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",
+    "@types/cosmiconfig": "^5.0.3",
     "@types/get-stdin": "^5.0.1",
     "@types/jest": "^23.3.1",
     "@types/node": "^10.9.4",
@@ -87,10 +88,14 @@
     "@marp-team/marpit": "^0.0.14",
     "chalk": "^2.4.1",
     "chrome-launcher": "^0.10.2",
+    "cosmiconfig": "^5.0.6",
     "get-stdin": "^6.0.0",
     "globby": "^8.0.1",
+    "import-from": "^2.1.0",
     "is-wsl": "^1.1.0",
+    "mkdirp": "^0.5.1",
     "os-locale": "^3.0.1",
+    "pkg-up": "^2.0.0",
     "puppeteer-core": "^1.7.0",
     "tmp": "^0.0.33",
     "yargs": "^12.0.1"

@@ -1,13 +1,11 @@
-import { Marp } from '@marp-team/marp-core'
 import { version as coreVersion } from '@marp-team/marp-core/package.json'
-import osLocale from 'os-locale'
 import { Argv } from 'yargs'
 import yargs from 'yargs/yargs'
 import * as cli from './cli'
-import { Converter, ConvertType } from './converter'
+import fromArguments, { IMarpCLIArguments } from './config'
+import { Converter } from './converter'
 import { CLIError, error } from './error'
 import { File, FileType } from './file'
-import { MarpReadyScript } from './ready'
 import templates from './templates'
 import { name, version } from '../package.json'
 
@@ -44,29 +42,37 @@ export default async function(argv: string[] = []): Promise<number> {
         },
         output: {
           alias: 'o',
-          describe: 'Output file name',
+          describe: 'Output file path',
+          group: OptionGroup.Basic,
+          type: 'string',
+        },
+        'config-file': {
+          alias: 'c',
+          describe: 'Specify path to configuration file',
           group: OptionGroup.Basic,
           type: 'string',
         },
         pdf: {
-          default: false,
           describe: 'Convert slide deck into PDF',
           group: OptionGroup.Converter,
           type: 'boolean',
         },
         template: {
-          default: 'bespoke',
-          describe: 'Template name',
+          describe: 'Select template',
           group: OptionGroup.Converter,
           choices: Object.keys(templates),
           type: 'string',
         },
         'allow-local-files': {
-          default: false,
           describe:
-            'Allow to access local files from Markdown while converting PDF (INSECURE)',
+            'Allow to access local files from Markdown while converting PDF (NOT SECURE)',
           group: OptionGroup.Converter,
           type: 'boolean',
+        },
+        engine: {
+          describe: 'Select Marpit based engine by module name or path',
+          group: OptionGroup.Marp,
+          type: 'string',
         },
         html: {
           describe: 'Enable or disable HTML tag',
@@ -88,21 +94,8 @@ export default async function(argv: string[] = []): Promise<number> {
     }
 
     // Initialize converter
-    const converter = new Converter({
-      allowLocalFiles: args.allowLocalFiles,
-      engine: Marp,
-      html: args.html,
-      lang: (await osLocale()).replace(/[_@]/g, '-'),
-      options: {},
-      output: args.output,
-      readyScript: await MarpReadyScript.bundled(),
-      template: args.template,
-      theme: args.theme,
-      type:
-        args.pdf || `${args.output}`.toLowerCase().endsWith('.pdf')
-          ? ConvertType.pdf
-          : ConvertType.html,
-    })
+    const config = await fromArguments(<IMarpCLIArguments>args)
+    const converter = new Converter(await config.converterOption())
 
     // Find target markdown files
     const files = <File[]>(
