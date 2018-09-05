@@ -59,12 +59,12 @@ Under construction.
 - [x] Convert to plain HTML (includes style)
 - [ ] Import external theme file(s)
 - [x] Select theme by option
-- [ ] Support configuration file (like `.marprc`)
+- [x] Support configuration file (like `.marprc`)
 - [ ] Watch mode
 - [ ] Server mode
 - [x] HTML templates
   - [x] Template that has ready to actual presentation powered by [Bespoke](https://github.com/bespokejs/bespoke)
-- [ ] Select engine to use any Marpit based module
+- [x] Select engine to use any Marpit based module
 - [x] Export PDF directly by using [Puppeteer](https://github.com/GoogleChrome/puppeteer)
 
 ## Author
