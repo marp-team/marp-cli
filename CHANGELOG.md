@@ -11,7 +11,7 @@
 
 ### Changed
 
-- Upgrade dependent package versions to latest ([#8](https://github.com/marp-team/marp-cli/pull/8))
+- Upgrade dependent package versions to latest ([#8](https://github.com/marp-team/marp-cli/pull/8), [#11](https://github.com/marp-team/marp-cli/pull/11))
 - Create directories for the output path recursively ([#9](https://github.com/marp-team/marp-cli/pull/9))
 
 ## v0.0.5 - 2018-08-29
