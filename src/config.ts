@@ -22,7 +22,7 @@ export interface IMarpCLIArguments {
 export type IMarpCLIConfig = Overwrite<
   Omit<IMarpCLIArguments, 'configFile'>,
   {
-    engine?: ResolvableEngine
+    engine?: ResolvableEngine | ResolvableEngine[]
     html?: ConverterOption['html']
     lang?: string
     options?: ConverterOption['options']
@@ -50,7 +50,7 @@ export class MarpCLIConfig {
       if (this.conf.engine)
         return resolveEngine(this.conf.engine, this.confPath)
 
-      return resolveEngine(Marp)
+      return resolveEngine(['@marp-team/marp-core', Marp])
     })()
 
     const output = this.args.output || this.conf.output

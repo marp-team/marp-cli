@@ -85,7 +85,7 @@ describe('Marp CLI', () => {
       return useSpy([error], async () => {
         expect(await marpCli(['--engine', '@marp-team/invalid'])).toBe(1)
         expect(error).toHaveBeenCalledWith(
-          expect.stringContaining('"@marp-team/invalid" has not resolved.')
+          expect.stringContaining('The specified engine has not resolved.')
         )
       })
     })
