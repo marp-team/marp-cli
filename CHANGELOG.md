@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v0.0.7 - 2018-09-06
+
 ### Changed
 
 - Use user-installed marp-core by default ([#12](https://github.com/marp-team/marp-cli/pull/12))
