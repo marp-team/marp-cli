@@ -6,6 +6,10 @@
 
 - Use user-installed marp-core by default ([#12](https://github.com/marp-team/marp-cli/pull/12))
 
+### Fixed
+
+- Fix over-sanitized header and footer by upgrading [@marp-team/marp-core to v0.0.6](https://github.com/marp-team/marp-core/pull/29) ([#13](https://github.com/marp-team/marp-cli/pull/13))
+
 ## v0.0.6 - 2018-09-05
 
 ### Added
