@@ -45,7 +45,7 @@ export class MarpCLIConfig {
   }
 
   async converterOption(): Promise<ConverterOption> {
-    const engine = await (async () => {
+    const engine = await (() => {
       if (this.args.engine) return resolveEngine(this.args.engine)
       if (this.conf.engine)
         return resolveEngine(this.conf.engine, this.confPath)
