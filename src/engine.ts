@@ -15,32 +15,37 @@ export class ResolvedEngine {
   private static browserScriptKey = 'marpBrowser'
 
   static async resolve(
-    engine: ResolvableEngine,
+    engine: ResolvableEngine | ResolvableEngine[],
     from?: string
   ): Promise<ResolvedEngine> {
     const resolvedEngine = new ResolvedEngine(
-      typeof engine === 'string'
-        ? ResolvedEngine.resolveModule(engine, from)
-        : engine
+      ResolvedEngine.resolveModule(engine, from)
     )
 
     await resolvedEngine.resolveBrowserScript()
     return resolvedEngine
   }
 
-  private static resolveModule(moduleId: string, from?: string) {
-    try {
-      const resolved =
-        (from &&
-          importFrom.silent(path.dirname(path.resolve(from)), moduleId)) ||
-        importFrom(process.cwd(), moduleId)
+  private static resolveModule(
+    engine: ResolvableEngine | ResolvableEngine[],
+    from?: string
+  ) {
+    let resolved
+    ;(Array.isArray(engine) ? engine : [engine]).some(eng => {
+      if (typeof eng === 'string') {
+        resolved =
+          (from && importFrom.silent(path.dirname(path.resolve(from)), eng)) ||
+          importFrom.silent(process.cwd(), eng)
 
-      return resolved && resolved.__esModule ? resolved.default : resolved
-    } catch (e) {
-      throw new CLIError(
-        `The specified engine "${moduleId}" has not resolved. (${e.message})`
-      )
-    }
+        if (resolved && resolved.__esModule) resolved = resolved.default
+      } else {
+        resolved = eng
+      }
+      return resolved
+    })
+
+    if (!resolved) throw new CLIError(`The specified engine has not resolved.`)
+    return resolved
   }
 
   private constructor(klass: Engine) {

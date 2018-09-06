@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Use user-installed marp-core by default ([#12](https://github.com/marp-team/marp-cli/pull/12))
+
 ## v0.0.6 - 2018-09-05
 
 ### Added
@@ -25,7 +29,7 @@
 
 ### Changed
 
-- Update [@marp-team/marp-core](https://github.com/marp-team/marp-core) to [v0.0.4](https://github.com/marp-team/marp-core/releases/tag/v0.0.4) ([#6](https://github.com/marp-team/marp-cli/pull/5))
+- Update [@marp-team/marp-core](https://github.com/marp-team/marp-core) to [v0.0.4](https://github.com/marp-team/marp-core/releases/tag/v0.0.4) ([#6](https://github.com/marp-team/marp-cli/pull/6))
 
 ### Fixed
 
