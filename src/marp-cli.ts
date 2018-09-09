@@ -94,13 +94,13 @@ export default async function(argv: string[] = []): Promise<number> {
           type: 'boolean',
         },
         theme: {
-          describe: 'Override theme',
+          describe: 'Override theme by name or CSS file',
           group: OptionGroup.Marp,
           type: 'string',
         },
         'theme-set': {
           array: true,
-          describe: 'Path to additional theme CSS file(s)',
+          describe: 'Path to additional theme CSS files',
           group: OptionGroup.Marp,
           type: 'string',
         },

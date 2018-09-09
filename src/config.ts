@@ -7,7 +7,7 @@ import { warn } from './cli'
 import { ConverterOption, ConvertType } from './converter'
 import resolveEngine, { ResolvableEngine } from './engine'
 import { CLIError } from './error'
-import { ThemeSet } from './theme'
+import { Theme, ThemeSet } from './theme'
 
 type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 type Overwrite<T, U> = Omit<T, Extract<keyof T, keyof U>> & U
@@ -70,6 +70,9 @@ export class MarpCLIConfig {
           })()
         : undefined)
 
+    const theme = await this.loadTheme()
+    const initialThemes = theme instanceof Theme ? [theme] : []
+
     const themeSetPathes =
       this.args.themeSet ||
       (this.conf.themeSet
@@ -79,8 +82,12 @@ export class MarpCLIConfig {
           ).map(f => path.resolve(path.dirname(this.confPath!), f))
         : [])
 
-    const themeSet = await ThemeSet.initialize(themeSetPathes)
-    if (themeSet.themes.size === 0 && themeSetPathes.length > 0)
+    const themeSet = await ThemeSet.initialize(themeSetPathes, initialThemes)
+
+    if (
+      themeSet.themes.size <= initialThemes.length &&
+      themeSetPathes.length > 0
+    )
       warn('Not found additional theme CSS files.')
 
     return {
@@ -100,7 +107,7 @@ export class MarpCLIConfig {
         ? `<script defer>${engine.browserScript}</script>`
         : undefined,
       template: this.args.template || this.conf.template || 'bespoke',
-      theme: this.args.theme || this.conf.theme,
+      theme: theme instanceof Theme ? theme.name : theme,
       type:
         this.args.pdf ||
         this.conf.pdf ||
@@ -158,6 +165,28 @@ export class MarpCLIConfig {
           .join(' ')
       )
     }
+  }
+
+  private async loadTheme(): Promise<string | Theme | undefined> {
+    const theme = (() => {
+      if (this.args.theme)
+        return { name: this.args.theme, path: path.resolve(this.args.theme) }
+
+      if (this.conf.theme)
+        return {
+          name: this.conf.theme,
+          path: path.resolve(path.dirname(this.confPath!), this.conf.theme),
+        }
+    })()
+    if (!theme) return undefined
+
+    try {
+      return await Theme.initialize(theme.path, { overrideName: true })
+    } catch (e) {
+      if (e.code !== 'ENOENT') throw e
+    }
+
+    return theme.name
   }
 
   private pickDefined<T>(...args: T[]): T | undefined {
