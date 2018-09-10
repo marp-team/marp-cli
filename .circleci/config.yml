@@ -85,6 +85,6 @@ workflows:
           requires:
             - 8.11.4
             - 6.14.2
-#         filters:
-#           branches:
-#             only: master
+          filters:
+            branches:
+              only: master
