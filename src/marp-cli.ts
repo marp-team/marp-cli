@@ -18,6 +18,7 @@ enum OptionGroup {
 const usage = `
 Usage:
   marp [options] <files...>
+  marp [options] -I <dir>
 `.trim()
 
 export default async function(argv: string[] = []): Promise<number> {
@@ -42,7 +43,13 @@ export default async function(argv: string[] = []): Promise<number> {
         },
         output: {
           alias: 'o',
-          describe: 'Output file path',
+          describe: 'Output file path (or directory if passed input-dir)',
+          group: OptionGroup.Basic,
+          type: 'string',
+        },
+        'input-dir': {
+          alias: 'I',
+          describe: 'The base input directory to find markdown',
           group: OptionGroup.Basic,
           type: 'string',
         },
@@ -58,7 +65,7 @@ export default async function(argv: string[] = []): Promise<number> {
           type: 'boolean',
         },
         template: {
-          describe: 'Select template',
+          describe: 'Choose template',
           group: OptionGroup.Converter,
           choices: Object.keys(templates),
           type: 'string',
@@ -98,9 +105,26 @@ export default async function(argv: string[] = []): Promise<number> {
     const converter = new Converter(await config.converterOption())
 
     // Find target markdown files
-    const files = <File[]>(
-      [await File.stdin(), ...(await File.find(...args._))].filter(f => f)
-    )
+    const files = await (async (): Promise<File[]> => {
+      // Input directory to keep tree structure of folders
+      const inputDir = await config.inputDir()
+
+      if (inputDir) {
+        if (args._.length > 0) {
+          cli.error('Cannot pass filepath together with input directory.')
+          return []
+        }
+
+        // TODO: Create File instance to keep structure of input dir in output
+        return File.find(inputDir)
+      }
+
+      // Regular file finding powered by globby
+      return <File[]>(
+        [await File.stdin(), ...(await File.find(...args._))].filter(f => f)
+      )
+    })()
+
     const { length } = files
 
     if (length === 0) {

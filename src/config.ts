@@ -1,5 +1,6 @@
 import { Marp } from '@marp-team/marp-core'
 import cosmiconfig from 'cosmiconfig'
+import fs from 'fs'
 import osLocale from 'os-locale'
 import { ConverterOption, ConvertType } from './converter'
 import resolveEngine, { ResolvableEngine } from './engine'
@@ -13,6 +14,7 @@ export interface IMarpCLIArguments {
   configFile?: string
   engine?: string
   html?: boolean
+  inputDir?: string
   output?: string
   pdf?: boolean
   template?: string
@@ -78,6 +80,26 @@ export class MarpCLIConfig {
           ? ConvertType.pdf
           : ConvertType.html,
     }
+  }
+
+  async inputDir(): Promise<string | undefined> {
+    const dir = this.args.inputDir || this.conf.inputDir
+    if (dir === undefined) return dir
+
+    let stat: fs.Stats
+
+    try {
+      stat = await new Promise<fs.Stats>((resolve, reject) =>
+        fs.lstat(dir, (e, stats) => (e ? reject(e) : resolve(stats)))
+      )
+    } catch (e) {
+      if (e.code !== 'ENOENT') throw e
+      throw new CLIError(`Input directory "${dir}" is not found.`)
+    }
+
+    if (!stat.isDirectory()) throw new CLIError(`"${dir}" is not directory.`)
+
+    return dir
   }
 
   private pickDefined<T>(...args: T[]): T | undefined {
