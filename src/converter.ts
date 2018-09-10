@@ -144,11 +144,16 @@ export class Converter {
   }
 
   private static runBrowser() {
+    const args: string[] = []
     const finder: () => string[] = require('is-wsl')
       ? chromeFinder.wsl
       : chromeFinder[process.platform]
 
+    if (process.env.IS_DOCKER)
+      args.push('--no-sandbox', '--disable-dev-shm-usage')
+
     return puppeteer.launch({
+      args,
       executablePath: finder ? finder()[0] : undefined,
     })
   }
