@@ -1,5 +1,6 @@
 **/*
 !src/
+!lib/
 !LICENSE
 !marp-cli.js
 !package.json
