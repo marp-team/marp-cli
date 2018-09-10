@@ -31,7 +31,7 @@ npx @marp-team/marp-cli slide-deck.md -o output.pdf
 
 ### Docker
 
-Do you hate to install node/chrome locally? We have an official Docker image ready to use CLI.
+Do you hate to install node/chrome locally? We have [an official Docker image](https://hub.docker.com/r/marpteam/marp-cli/) ready to use CLI.
 
 ```bash
 # Convert slide deck into HTML
