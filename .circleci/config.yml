@@ -57,9 +57,34 @@ jobs:
     docker:
       - image: circleci/node:6.14.2-browsers
 
+  docker-image:
+    docker:
+      - image: docker:git
+    working_directory: ~/marp-cli
+    steps:
+      - checkout
+      - setup_remote_docker
+
+      - run:
+          name: Build Docker image
+          command: docker build --no-cache -t marpteam/marp-cli:latest .
+
+      - run:
+          name: Push to Docker Hub
+          command: |
+            docker login -u $DOCKER_USER -p $DOCKER_PASS
+            docker push marpteam/marp-cli:latest
+
 workflows:
   version: 2
   build:
     jobs:
       - 8.11.4
       - 6.14.2
+      - docker-image:
+          requires:
+            - 8.11.4
+            - 6.14.2
+#         filters:
+#           branches:
+#             only: master
