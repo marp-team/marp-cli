@@ -13,6 +13,8 @@ It can convert Marp / Marpit Markdown files into static HTML (and CSS).
 
 ## Try it now!
 
+### npx
+
 [npx](https://blog.npmjs.org/post/162869356040/introducing-npx-an-npm-package-runner) is the best tool when you want to convert Markdown right now. Just run below if you are installed [Node.js](https://nodejs.org/) >= 8.2.0:
 
 ```bash
@@ -26,6 +28,18 @@ npx @marp-team/marp-cli slide-deck.md -o output.pdf
 ```
 
 > :information_source: You have to install [Google Chrome](https://www.google.com/chrome/) (or [Chromium](https://www.chromium.org/)) to convert slide deck into PDF.
+
+### Docker
+
+Do you hate to install node/chrome locally? We have an official Docker image ready to use CLI.
+
+```bash
+# Convert slide deck into HTML
+docker run --rm -v $PWD:/home/marp/app/ marpteam/marp-cli slide-deck.md
+
+# Convert slide deck into PDF by using Chromium in Docker
+docker run --rm -v $PWD:/home/marp/app/ marpteam/marp-cli slide-deck.md --pdf
+```
 
 ## Install
 
