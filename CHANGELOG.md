@@ -6,6 +6,10 @@
 
 - Add official Docker image ([#14](https://github.com/marp-team/marp-cli/pull/14))
 
+### Fixed
+
+- Fix incorrect SVG scaling on Chrome ([#15](https://github.com/marp-team/marp-cli/pull/15))
+
 ## v0.0.7 - 2018-09-06
 
 ### Changed
