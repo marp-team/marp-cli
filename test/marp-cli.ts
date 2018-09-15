@@ -10,9 +10,13 @@ import { CLIError } from '../src/error'
 const { version } = require('../package.json')
 const coreVersion = require('@marp-team/marp-core/package.json').version
 
+jest.mock('fs').mock('mkdirp')
+
 afterEach(() => jest.restoreAllMocks())
 
 describe('Marp CLI', () => {
+  const assetFn = fn => path.resolve(__dirname, fn)
+
   const confirmVersion = (...cmd: string[]) => {
     it('outputs package versions about cli and core', async () => {
       const log = jest.spyOn(console, 'log').mockImplementation()
@@ -83,15 +87,69 @@ describe('Marp CLI', () => {
     })
   })
 
+  context('with --input-dir option', () => {
+    const files = assetFn('_files')
+
+    let writeFile: jest.Mock
+    beforeEach(() => (writeFile = (<any>fs).__mockWriteFile()))
+
+    it('converts files in specified dir', async () => {
+      jest.spyOn(cli, 'info').mockImplementation()
+
+      expect(await marpCli(['--input-dir', files])).toBe(0)
+      expect(writeFile).toHaveBeenCalledTimes(4)
+      writeFile.mock.calls.forEach(([fn]) => expect(fn).toMatch(/\.html$/))
+    })
+
+    it('prints error and return error code with invalid option(s)', async () => {
+      const err = jest.spyOn(console, 'error').mockImplementation()
+      jest.spyOn(console, 'warn').mockImplementation()
+
+      // Pass file path, not folder
+      expect(await marpCli(['--input-dir', assetFn('_files/1.md')])).toBe(1)
+      expect(err).toHaveBeenCalledWith(
+        expect.stringContaining('is not directory.')
+      )
+
+      // Pass not found path
+      err.mockReset()
+      expect(await marpCli(['--input-dir', assetFn('__NOT_FOUND__')])).toBe(1)
+      expect(err).toHaveBeenCalledWith(expect.stringContaining('is not found.'))
+
+      // Pass together with regular input files
+      err.mockReset()
+      expect(await marpCli(['test.md', '--input-dir', files])).toBe(1)
+      expect(err).toHaveBeenCalledWith(
+        expect.stringContaining(
+          'Cannot pass files together with input directory'
+        )
+      )
+    })
+
+    context('when the output folder is specified by -o option', () => {
+      it('converts markdowns with keeping folder structure', async () => {
+        const args = ['--input-dir', files, '-o', assetFn('dist')]
+
+        jest.spyOn(cli, 'info').mockImplementation()
+
+        expect(await marpCli(args)).toBe(0)
+        expect(writeFile).toHaveBeenCalledTimes(4)
+
+        const outputFiles = writeFile.mock.calls.map(([fn]) => fn)
+        expect(outputFiles).toContain(assetFn('dist/1.html'))
+        expect(outputFiles).toContain(assetFn('dist/2.html'))
+        expect(outputFiles).toContain(assetFn('dist/3.html'))
+        expect(outputFiles).toContain(assetFn('dist/subfolder/5.html'))
+      })
+    })
+  })
+
   context('with passing a file', () => {
-    const onePath = path.resolve(__dirname, './_files/1.md')
+    const onePath = assetFn('_files/1.md')
 
     it('converts file', async () => {
       const cliInfo = jest.spyOn(cli, 'info').mockImplementation()
-
-      jest
-        .spyOn(fs, 'writeFile')
-        .mockImplementation((_, __, callback) => callback())
+      ;(<any>fs).__mockWriteFile()
 
       expect(await marpCli([onePath])).toBe(0)
       expect(cliInfo).toHaveBeenCalledWith(
@@ -132,7 +190,7 @@ describe('Marp CLI', () => {
     })
 
     context('with configuration file', () => {
-      const confDir = path.resolve(__dirname, './_files/configs')
+      const confDir = assetFn('./_files/configs')
 
       it('uses configuration file found from process.cwd()', async () => {
         const stdout = jest.spyOn(process.stdout, 'write').mockImplementation()
@@ -211,8 +269,6 @@ describe('Marp CLI', () => {
   })
 
   context('with passing directory', () => {
-    const folder = path.resolve(__dirname, './_files')
-
     it('finds out markdown files recursively', async () => {
       const cliInfo = jest.spyOn(cli, 'info').mockImplementation()
 
@@ -220,7 +276,7 @@ describe('Marp CLI', () => {
         .spyOn(Converter.prototype, 'convertFiles')
         .mockImplementation(() => [])
 
-      expect(await marpCli([folder])).toBe(0)
+      expect(await marpCli([assetFn('_files')])).toBe(0)
       expect(cliInfo).toHaveBeenCalledWith(
         expect.stringContaining('4 markdowns')
       )

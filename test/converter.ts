@@ -8,6 +8,8 @@ import { File, FileType } from '../src/file'
 import { bare as bareTpl } from '../src/templates'
 import { CLIError } from '../src/error'
 
+jest.mock('fs')
+
 afterEach(() => jest.restoreAllMocks())
 
 describe('Converter', () => {
@@ -118,7 +120,7 @@ describe('Converter', () => {
     })
 
     it('converts markdown file and save as html file', async () => {
-      const write = mockWriteFile()
+      const write = (<any>fs).__mockWriteFile()
       await instance().convertFile(new File(onePath))
 
       expect(write).toHaveBeenCalledWith(
@@ -129,7 +131,7 @@ describe('Converter', () => {
     })
 
     it('converts markdown file and save to specified path when output is defined', async () => {
-      const write = mockWriteFile()
+      const write = (<any>fs).__mockWriteFile()
       const output = './specified.html'
       await instance({ output }).convertFile(new File(twoPath))
 
@@ -141,7 +143,7 @@ describe('Converter', () => {
     })
 
     it('converts markdown file but not save when output is stdout', async () => {
-      const write = mockWriteFile()
+      const write = (<any>fs).__mockWriteFile()
       const stdout = jest.spyOn(process.stdout, 'write').mockImplementation()
 
       const output = '-'
@@ -160,7 +162,7 @@ describe('Converter', () => {
       it(
         'converts markdown file into PDF',
         async () => {
-          const write = mockWriteFile()
+          const write = (<any>fs).__mockWriteFile()
           const opts = { output: 'test.pdf' }
           const ret = await pdfInstance(opts).convertFile(new File(onePath))
           const pdf: Buffer = write.mock.calls[0][1]
@@ -214,7 +216,7 @@ describe('Converter', () => {
   describe('#convertFiles', () => {
     context('with multiple files', () => {
       it('converts passed files', async () => {
-        const write = mockWriteFile()
+        const write = (<any>fs).__mockWriteFile()
 
         await instance().convertFiles([new File(onePath), new File(twoPath)])
         expect(write).toHaveBeenCalledTimes(2)
@@ -231,7 +233,7 @@ describe('Converter', () => {
         ).rejects.toBeInstanceOf(CLIError))
 
       it('converts passed files when output is stdout', async () => {
-        const write = mockWriteFile()
+        const write = (<any>fs).__mockWriteFile()
         const stdout = jest.spyOn(process.stdout, 'write').mockImplementation()
         const files = [new File(onePath), new File(twoPath)]
 
