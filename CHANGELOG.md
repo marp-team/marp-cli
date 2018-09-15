@@ -5,6 +5,7 @@
 ### Added
 
 - Add official Docker image ([#14](https://github.com/marp-team/marp-cli/pull/14))
+- Add `--input-dir` (`-I`) option to keep directory structure ([#16](https://github.com/marp-team/marp-cli/pull/16))
 
 ### Fixed
 

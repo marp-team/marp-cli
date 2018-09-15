@@ -3,10 +3,10 @@ import Marp from '@marp-team/marp-core'
 import { Element as MarpitElement } from '@marp-team/marpit'
 import { Key } from 'ts-keycode-enum'
 import bespoke from '../../src/templates/bespoke/bespoke'
-import context from '../_helpers/context'
-import { useSpy } from '../_helpers/spy'
 
 jest.useFakeTimers()
+
+afterEach(() => jest.restoreAllMocks())
 
 describe("Bespoke template's browser context", () => {
   const marp = new Marp({
@@ -154,58 +154,52 @@ describe("Bespoke template's browser context", () => {
 
       it('navigates page by vertical wheel with interval', () => {
         const now = jest.spyOn(Date, 'now')
+        now.mockImplementation(() => 1000)
 
-        useSpy([now], () => {
-          now.mockImplementation(() => 1000)
+        dispatch({ deltaY: 1 })
+        expect(deck.slide()).toBe(1)
 
-          dispatch({ deltaY: 1 })
-          expect(deck.slide()).toBe(1)
+        // Suppress navigation by continuous scrolling
+        dispatch({ deltaY: 3 })
+        expect(deck.slide()).toBe(1)
 
-          // Suppress navigation by continuous scrolling
-          dispatch({ deltaY: 3 })
-          expect(deck.slide()).toBe(1)
+        // +300ms
+        now.mockImplementation(() => 1300)
+        jest.advanceTimersByTime(300)
 
-          // +300ms
-          now.mockImplementation(() => 1300)
-          jest.advanceTimersByTime(300)
+        dispatch({ deltaY: 1 })
+        expect(deck.slide()).toBe(2)
 
-          dispatch({ deltaY: 1 })
-          expect(deck.slide()).toBe(2)
+        // Backward
+        now.mockImplementation(() => 1600)
+        jest.advanceTimersByTime(600)
 
-          // Backward
-          now.mockImplementation(() => 1600)
-          jest.advanceTimersByTime(600)
-
-          dispatch({ deltaY: -1 })
-          expect(deck.slide()).toBe(1)
-        })
+        dispatch({ deltaY: -1 })
+        expect(deck.slide()).toBe(1)
       })
 
       it('navigates page by horizontal wheel with momentum scroll', () => {
         const now = jest.spyOn(Date, 'now')
+        now.mockImplementation(() => 1000)
 
-        useSpy([now], () => {
-          now.mockImplementation(() => 1000)
+        dispatch({ deltaX: 100 })
+        expect(deck.slide()).toBe(1)
 
-          dispatch({ deltaX: 100 })
-          expect(deck.slide()).toBe(1)
-
-          // Suppress navigation by momentum scroll
-          for (let i = 0; i < 50; i += 1) {
-            jest.advanceTimersByTime(20)
-            now.mockImplementation(() => 1000 + i * 20)
-
-            dispatch({ deltaX: Math.round(Math.E ** (i / -12.5) * 100) })
-            expect(deck.slide()).toBe(1)
-          }
-
+        // Suppress navigation by momentum scroll
+        for (let i = 0; i < 50; i += 1) {
           jest.advanceTimersByTime(20)
-          now.mockImplementation(() => 2000)
+          now.mockImplementation(() => 1000 + i * 20)
 
-          // Navigate if detected a not attenuated delta
-          dispatch({ deltaX: 10 })
-          expect(deck.slide()).toBe(2)
-        })
+          dispatch({ deltaX: Math.round(Math.E ** (i / -12.5) * 100) })
+          expect(deck.slide()).toBe(1)
+        }
+
+        jest.advanceTimersByTime(20)
+        now.mockImplementation(() => 2000)
+
+        // Navigate if detected a not attenuated delta
+        dispatch({ deltaX: 10 })
+        expect(deck.slide()).toBe(2)
       })
 
       context('when the target element is scrollable', () => {
@@ -235,25 +229,22 @@ describe("Bespoke template's browser context", () => {
 
         it('does not navigate page', () => {
           const now = jest.spyOn(Date, 'now')
+          now.mockImplementation(() => 1000)
 
-          useSpy([now], () => {
-            now.mockImplementation(() => 1000)
+          dispatch({ deltaY: 1 }, overflowAutoElement)
+          expect(deck.slide()).toBe(0)
 
-            dispatch({ deltaY: 1 }, overflowAutoElement)
-            expect(deck.slide()).toBe(0)
+          dispatch({ deltaY: 1 }, notScrollableElement)
+          expect(deck.slide()).toBe(1)
 
-            dispatch({ deltaY: 1 }, notScrollableElement)
-            expect(deck.slide()).toBe(1)
+          now.mockImplementation(() => 2000)
+          jest.runAllTimers()
 
-            now.mockImplementation(() => 2000)
-            jest.runAllTimers()
+          dispatch({ deltaY: 1 }, overflowYAutoElement)
+          expect(deck.slide()).toBe(1)
 
-            dispatch({ deltaY: 1 }, overflowYAutoElement)
-            expect(deck.slide()).toBe(1)
-
-            dispatch({ deltaX: 1 }, overflowYAutoElement)
-            expect(deck.slide()).toBe(2)
-          })
+          dispatch({ deltaX: 1 }, overflowYAutoElement)
+          expect(deck.slide()).toBe(2)
         })
       })
     })

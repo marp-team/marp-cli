@@ -1,4 +1,3 @@
-import context from './_helpers/context'
 import { CLIError, error } from '../src/error'
 
 describe('Error helper', () => {

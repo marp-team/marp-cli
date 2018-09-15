@@ -18,6 +18,7 @@ enum OptionGroup {
 const usage = `
 Usage:
   marp [options] <files...>
+  marp [options] -I <dir>
 `.trim()
 
 export default async function(argv: string[] = []): Promise<number> {
@@ -42,7 +43,13 @@ export default async function(argv: string[] = []): Promise<number> {
         },
         output: {
           alias: 'o',
-          describe: 'Output file path',
+          describe: 'Output file path (or directory when input-dir is passed)',
+          group: OptionGroup.Basic,
+          type: 'string',
+        },
+        'input-dir': {
+          alias: 'I',
+          describe: 'The base input directory to find markdown',
           group: OptionGroup.Basic,
           type: 'string',
         },
@@ -58,7 +65,7 @@ export default async function(argv: string[] = []): Promise<number> {
           type: 'boolean',
         },
         template: {
-          describe: 'Select template',
+          describe: 'Choose template',
           group: OptionGroup.Converter,
           choices: Object.keys(templates),
           type: 'string',
@@ -95,12 +102,27 @@ export default async function(argv: string[] = []): Promise<number> {
 
     // Initialize converter
     const config = await fromArguments(<IMarpCLIArguments>args)
-    const converter = new Converter(await config.converterOption())
+    const converterOpts = await config.converterOption()
+    const converter = new Converter(converterOpts)
 
     // Find target markdown files
-    const files = <File[]>(
-      [await File.stdin(), ...(await File.find(...args._))].filter(f => f)
-    )
+    const files = await (async (): Promise<File[]> => {
+      if (converterOpts.inputDir) {
+        if (args._.length > 0) {
+          cli.error('Cannot pass files together with input directory.')
+          return []
+        }
+
+        // Find directory to keep dir structure of input dir in output
+        return File.findDir(converterOpts.inputDir)
+      }
+
+      // Regular file finding powered by globby
+      return <File[]>(
+        [await File.stdin(), ...(await File.find(...args._))].filter(f => f)
+      )
+    })()
+
     const { length } = files
 
     if (length === 0) {

@@ -17,6 +17,7 @@ export interface ConverterOption {
   allowLocalFiles: boolean
   engine: Engine
   html?: MarpOptions['html']
+  inputDir?: string
   lang: string
   options: MarpitOptions
   output?: string
@@ -84,7 +85,9 @@ export class Converter {
     files: File[],
     onConverted: (result: ConvertResult) => void = () => {}
   ): Promise<void> {
-    if (this.options.output && this.options.output !== '-' && files.length > 1)
+    const { inputDir, output } = this.options
+
+    if (!inputDir && output && output !== '-' && files.length > 1)
       error('Output path cannot specify with processing multiple files.')
 
     for (const file of files) onConverted(await this.convertFile(file))
