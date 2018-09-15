@@ -66,6 +66,7 @@ export class MarpCLIConfig {
         ) || false,
       engine: engine.klass,
       html: this.pickDefined(this.args.html, this.conf.html),
+      inputDir: await this.inputDir(),
       lang: this.conf.lang || (await osLocale()).replace(/[_@]/g, '-'),
       options: this.conf.options || {},
       readyScript: engine.browserScript
@@ -82,9 +83,9 @@ export class MarpCLIConfig {
     }
   }
 
-  async inputDir(): Promise<string | undefined> {
+  private async inputDir(): Promise<string | undefined> {
     const dir = this.args.inputDir || this.conf.inputDir
-    if (dir === undefined) return dir
+    if (dir === undefined) return undefined
 
     let stat: fs.Stats
 

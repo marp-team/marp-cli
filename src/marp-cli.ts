@@ -43,7 +43,7 @@ export default async function(argv: string[] = []): Promise<number> {
         },
         output: {
           alias: 'o',
-          describe: 'Output file path (or directory if passed input-dir)',
+          describe: 'Output file path (or directory when input-dir is passed)',
           group: OptionGroup.Basic,
           type: 'string',
         },
@@ -102,21 +102,19 @@ export default async function(argv: string[] = []): Promise<number> {
 
     // Initialize converter
     const config = await fromArguments(<IMarpCLIArguments>args)
-    const converter = new Converter(await config.converterOption())
+    const converterOpts = await config.converterOption()
+    const converter = new Converter(converterOpts)
 
     // Find target markdown files
     const files = await (async (): Promise<File[]> => {
-      // Input directory to keep tree structure of folders
-      const inputDir = await config.inputDir()
-
-      if (inputDir) {
+      if (converterOpts.inputDir) {
         if (args._.length > 0) {
-          cli.error('Cannot pass filepath together with input directory.')
+          cli.error('Cannot pass files together with input directory.')
           return []
         }
 
-        // TODO: Create File instance to keep structure of input dir in output
-        return File.find(inputDir)
+        // Find directory to keep dir structure of input dir in output
+        return File.findDir(converterOpts.inputDir)
       }
 
       // Regular file finding powered by globby

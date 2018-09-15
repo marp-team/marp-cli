@@ -14,6 +14,7 @@ export enum FileType {
 
 export class File {
   buffer?: Buffer
+  inputDir?: string
   type: FileType = FileType.File
   readonly path: string
 
@@ -34,6 +35,14 @@ export class File {
 
     if (output === '-')
       return File.initialize('-', f => (f.type = FileType.StandardIO))
+
+    if (this.inputDir)
+      return File.initialize(
+        this.convertExtension(
+          extension,
+          path.join(output, this.relativePath(this.inputDir))
+        )
+      )
 
     return File.initialize(output)
   }
@@ -63,32 +72,35 @@ export class File {
   }
 
   async saveTmpFile(ext?: string): Promise<File.TmpFileInterface> {
-    const path: string = await new Promise<string>((resolve, reject) => {
-      tmpName({ postfix: ext }, (e, path) => (e ? reject(e) : resolve(path)))
+    const tmp: string = await new Promise<string>((resolve, reject) => {
+      tmpName(
+        { postfix: ext },
+        (e, tmpPath) => (e ? reject(e) : resolve(tmpPath))
+      )
     })
 
-    await this.saveToFile(path)
+    await this.saveToFile(tmp)
 
     return {
-      path,
       cleanup: async () => {
         try {
-          await this.cleanup(path)
+          await this.cleanup(tmp)
         } catch (e) {}
       },
+      path: tmp,
     }
   }
 
-  private async cleanup(path: string) {
+  private async cleanup(tmpPath: string) {
     return new Promise<void>((resolve, reject) =>
-      fs.unlink(path, e => (e ? reject(e) : resolve()))
+      fs.unlink(tmpPath, e => (e ? reject(e) : resolve()))
     )
   }
 
-  private convertExtension(extension: string): string {
+  private convertExtension(extension: string, basePath = this.path): string {
     return path.join(
-      path.dirname(this.path),
-      `${path.basename(this.path, path.extname(this.path))}.${extension}`
+      path.dirname(basePath),
+      `${path.basename(basePath, path.extname(basePath))}.${extension}`
     )
   }
 
@@ -110,7 +122,14 @@ export class File {
     return (await globby(pathes, {
       absolute: true,
       expandDirectories: { files: markdownExtensions },
-    })).map(path => new File(path))
+    })).map(p => new File(p))
+  }
+
+  static async findDir(directory: string): Promise<File[]> {
+    const found = await this.find(directory)
+    found.forEach(p => (p.inputDir = path.resolve(directory)))
+
+    return found
   }
 
   static async stdin(): Promise<File | undefined> {
