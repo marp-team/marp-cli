@@ -1,7 +1,6 @@
 import fs from 'fs'
 import getStdin from 'get-stdin'
 import path from 'path'
-import context from './_helpers/context'
 import { useSpy } from './_helpers/spy'
 import marpCli from '../src/marp-cli'
 import * as cli from '../src/cli'

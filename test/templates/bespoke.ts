@@ -3,7 +3,6 @@ import Marp from '@marp-team/marp-core'
 import { Element as MarpitElement } from '@marp-team/marpit'
 import { Key } from 'ts-keycode-enum'
 import bespoke from '../../src/templates/bespoke/bespoke'
-import context from '../_helpers/context'
 import { useSpy } from '../_helpers/spy'
 
 jest.useFakeTimers()
