@@ -3,11 +3,12 @@ import { MarpitOptions } from '@marp-team/marpit'
 import fs from 'fs'
 import os from 'os'
 import path from 'path'
-import { useSpy } from './_helpers/spy'
 import { Converter, ConvertType } from '../src/converter'
 import { File, FileType } from '../src/file'
 import { bare as bareTpl } from '../src/templates'
 import { CLIError } from '../src/error'
+
+afterEach(() => jest.restoreAllMocks())
 
 describe('Converter', () => {
   const onePath = path.resolve(__dirname, '_files/1.md')
@@ -24,6 +25,9 @@ describe('Converter', () => {
       type: ConvertType.html,
       ...opts,
     })
+
+  const mockWriteFile = (mockFn = (_, __, callback) => callback()) =>
+    jest.spyOn(fs, 'writeFile').mockImplementation(mockFn)
 
   describe('#constructor', () => {
     it('assigns initial options to options member', () => {
@@ -114,53 +118,39 @@ describe('Converter', () => {
     })
 
     it('converts markdown file and save as html file', async () => {
-      const write = jest.spyOn(fs, 'writeFile')
+      const write = mockWriteFile()
+      await instance().convertFile(new File(onePath))
 
-      return useSpy([write], async () => {
-        write.mockImplementation((_, __, callback) => callback())
-
-        const output = `${onePath.slice(0, -3)}.html`
-        await instance().convertFile(new File(onePath))
-
-        expect(write).toHaveBeenCalledWith(
-          output,
-          expect.any(Buffer),
-          expect.anything()
-        )
-      })
+      expect(write).toHaveBeenCalledWith(
+        `${onePath.slice(0, -3)}.html`,
+        expect.any(Buffer),
+        expect.anything()
+      )
     })
 
     it('converts markdown file and save to specified path when output is defined', async () => {
-      const write = jest.spyOn(fs, 'writeFile')
+      const write = mockWriteFile()
+      const output = './specified.html'
+      await instance({ output }).convertFile(new File(twoPath))
 
-      return useSpy([write], async () => {
-        write.mockImplementation((_, __, callback) => callback())
-
-        const output = './specified.html'
-        await instance({ output }).convertFile(new File(twoPath))
-
-        expect(write).toHaveBeenCalledWith(
-          output,
-          expect.any(Buffer),
-          expect.anything()
-        )
-      })
+      expect(write).toHaveBeenCalledWith(
+        output,
+        expect.any(Buffer),
+        expect.anything()
+      )
     })
 
     it('converts markdown file but not save when output is stdout', async () => {
-      const write = jest.spyOn(fs, 'writeFile')
-      const stdout = jest.spyOn(process.stdout, 'write')
+      const write = mockWriteFile()
+      const stdout = jest.spyOn(process.stdout, 'write').mockImplementation()
 
-      return useSpy([write, stdout], async () => {
-        const result = await instance({ output: '-' }).convertFile(
-          new File(threePath)
-        )
+      const output = '-'
+      const ret = await instance({ output }).convertFile(new File(threePath))
 
-        expect(write).not.toHaveBeenCalled()
-        expect(stdout).toHaveBeenCalledTimes(1)
-        expect(result.file.path).toBe(threePath)
-        expect(result.newFile.type).toBe(FileType.StandardIO)
-      })
+      expect(write).not.toHaveBeenCalled()
+      expect(stdout).toHaveBeenCalledTimes(1)
+      expect(ret.file.path).toBe(threePath)
+      expect(ret.newFile.type).toBe(FileType.StandardIO)
     })
 
     context('when convert type is PDF', () => {
@@ -170,21 +160,16 @@ describe('Converter', () => {
       it(
         'converts markdown file into PDF',
         async () => {
-          const write = jest.spyOn(fs, 'writeFile')
+          const write = mockWriteFile()
+          const opts = { output: 'test.pdf' }
+          const ret = await pdfInstance(opts).convertFile(new File(onePath))
+          const pdf: Buffer = write.mock.calls[0][1]
 
-          return useSpy([write], async () => {
-            write.mockImplementation((_, __, callback) => callback())
-
-            const opts = { output: 'test.pdf' }
-            const ret = await pdfInstance(opts).convertFile(new File(onePath))
-            const pdf: Buffer = write.mock.calls[0][1]
-
-            expect(write).toHaveBeenCalled()
-            expect(write.mock.calls[0][0]).toBe('test.pdf')
-            expect(pdf.toString('ascii', 0, 5)).toBe('%PDF-')
-            expect(ret.newFile.path).toBe('test.pdf')
-            expect(ret.newFile.buffer).toBe(pdf)
-          })
+          expect(write).toHaveBeenCalled()
+          expect(write.mock.calls[0][0]).toBe('test.pdf')
+          expect(pdf.toString('ascii', 0, 5)).toBe('%PDF-')
+          expect(ret.newFile.path).toBe('test.pdf')
+          expect(ret.newFile.buffer).toBe(pdf)
         },
         10000
       )
@@ -197,35 +182,28 @@ describe('Converter', () => {
 
             // @ts-ignore to check cleanup tmpfile
             const fileCleanup = jest.spyOn(File.prototype, 'cleanup')
-            const fileSave = jest.spyOn(File.prototype, 'save')
+            const fileSave = jest
+              .spyOn(File.prototype, 'save')
+              .mockImplementation()
+
             const fileTmp = jest.spyOn(File.prototype, 'saveTmpFile')
+            const warn = jest.spyOn(console, 'warn').mockImplementation()
 
-            const warn = jest.spyOn(console, 'warn')
+            await pdfInstance({
+              allowLocalFiles: true,
+              output: '-',
+            }).convertFile(file)
 
-            return useSpy(
-              [fileCleanup, fileSave, fileTmp, warn],
-              async () => {
-                fileSave.mockImplementation()
-                warn.mockImplementation()
-
-                await pdfInstance({
-                  allowLocalFiles: true,
-                  output: '-',
-                }).convertFile(file)
-
-                expect(warn).toBeCalledWith(
-                  expect.stringContaining(
-                    'Insecure local file accessing is enabled'
-                  )
-                )
-                expect(fileTmp).toBeCalledWith('.html')
-                expect(fileCleanup).toBeCalledWith(
-                  expect.stringContaining(os.tmpdir())
-                )
-                expect(fileSave).toBeCalled()
-              },
-              false
+            expect(warn).toBeCalledWith(
+              expect.stringContaining(
+                'Insecure local file accessing is enabled'
+              )
             )
+            expect(fileTmp).toBeCalledWith('.html')
+            expect(fileCleanup).toBeCalledWith(
+              expect.stringContaining(os.tmpdir())
+            )
+            expect(fileSave).toBeCalled()
           },
           10000
         )
@@ -236,16 +214,12 @@ describe('Converter', () => {
   describe('#convertFiles', () => {
     context('with multiple files', () => {
       it('converts passed files', async () => {
-        const write = jest.spyOn(fs, 'writeFile')
+        const write = mockWriteFile()
 
-        return useSpy([write], async () => {
-          write.mockImplementation((_, __, callback) => callback())
-
-          await instance().convertFiles([new File(onePath), new File(twoPath)])
-          expect(write).toHaveBeenCalledTimes(2)
-          expect(write.mock.calls[0][0]).toBe(`${onePath.slice(0, -3)}.html`)
-          expect(write.mock.calls[1][0]).toBe(`${twoPath.slice(0, -6)}.html`)
-        })
+        await instance().convertFiles([new File(onePath), new File(twoPath)])
+        expect(write).toHaveBeenCalledTimes(2)
+        expect(write.mock.calls[0][0]).toBe(`${onePath.slice(0, -3)}.html`)
+        expect(write.mock.calls[1][0]).toBe(`${twoPath.slice(0, -6)}.html`)
       })
 
       it('throws CLIError when output is defined', () =>
@@ -257,19 +231,16 @@ describe('Converter', () => {
         ).rejects.toBeInstanceOf(CLIError))
 
       it('converts passed files when output is stdout', async () => {
-        const write = jest.spyOn(fs, 'writeFile')
-        const stdout = jest.spyOn(process.stdout, 'write')
+        const write = mockWriteFile()
+        const stdout = jest.spyOn(process.stdout, 'write').mockImplementation()
+        const files = [new File(onePath), new File(twoPath)]
 
-        return useSpy([write, stdout], async () => {
-          const files = [new File(onePath), new File(twoPath)]
+        await instance({ output: '-' }).convertFiles(files, result =>
+          expect(files.includes(result.file)).toBe(true)
+        )
 
-          await instance({ output: '-' }).convertFiles(files, result =>
-            expect(files.includes(result.file)).toBe(true)
-          )
-
-          expect(write).not.toHaveBeenCalled()
-          expect(stdout).toHaveBeenCalledTimes(2)
-        })
+        expect(write).not.toHaveBeenCalled()
+        expect(stdout).toHaveBeenCalledTimes(2)
       })
     })
   })
