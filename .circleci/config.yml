@@ -47,10 +47,10 @@ references:
 
 version: 2
 jobs:
-  '8.11.4':
+  '8.12.0':
     <<: *base
     docker:
-      - image: circleci/node:8.11.4-browsers
+      - image: circleci/node:8.12.0-browsers
 
   '6.14.2':
     <<: *base
@@ -79,11 +79,11 @@ workflows:
   version: 2
   build:
     jobs:
-      - 8.11.4
+      - 8.12.0
       - 6.14.2
       - docker-image:
           requires:
-            - 8.11.4
+            - 8.12.0
             - 6.14.2
           filters:
             branches:
