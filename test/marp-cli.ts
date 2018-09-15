@@ -146,7 +146,7 @@ describe('Marp CLI', () => {
     context('with specified by configuration file', () => {
       const confFile = assetFn('_configs/input-dir/.marprc.yml')
       const slides = assetFn('_configs/input-dir/slides')
-      const distHtml = assetFn('_configs/input-dir/dist/slide.html')
+      const distHtml = assetFn('_configs/input-dir/dist/nested/slide.html')
 
       it('resolves relative directory path from conf dir', async () => {
         const findDir = jest.spyOn(File, 'findDir')
