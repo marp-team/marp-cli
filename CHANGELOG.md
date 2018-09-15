@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v0.0.8 - 2018-09-15
+
 ### Added
 
 - Add official Docker image ([#14](https://github.com/marp-team/marp-cli/pull/14))
