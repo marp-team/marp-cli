@@ -44,21 +44,21 @@
     "watch": "rollup -w -c"
   },
   "devDependencies": {
-    "@babel/core": "^7.0.0",
+    "@babel/core": "^7.0.1",
     "@types/cosmiconfig": "^5.0.3",
     "@types/get-stdin": "^5.0.1",
-    "@types/jest": "^23.3.1",
+    "@types/jest": "^23.3.2",
     "@types/jest-plugin-context": "^2.9.0",
     "@types/node": "^10.9.4",
     "@types/pug": "^2.0.4",
-    "@types/puppeteer": "^1.6.3",
+    "@types/puppeteer": "^1.6.4",
     "@types/yargs": "^11.1.1",
     "autoprefixer": "^9.1.5",
     "bespoke": "^1.1.0",
     "bespoke-keys": "^1.1.0",
     "codecov": "^3.1.0",
     "cssnano": "^4.1.0",
-    "jest": "^23.5.0",
+    "jest": "^23.6.0",
     "jest-junit": "^5.1.0",
     "jest-plugin-context": "^2.9.0",
     "node-sass": "^4.9.3",
@@ -68,7 +68,7 @@
     "rimraf": "^2.6.2",
     "rollup": "^0.65.2",
     "rollup-plugin-commonjs": "^9.1.6",
-    "rollup-plugin-json": "^3.0.0",
+    "rollup-plugin-json": "^3.1.0",
     "rollup-plugin-node-resolve": "^3.4.0",
     "rollup-plugin-postcss": "^1.6.2",
     "rollup-plugin-pug": "^0.1.6",
@@ -86,8 +86,8 @@
     "typescript": "^3.0.3"
   },
   "dependencies": {
-    "@marp-team/marp-core": "^0.0.6",
-    "@marp-team/marpit": "^0.0.15",
+    "@marp-team/marp-core": "^0.0.7",
+    "@marp-team/marpit": "^0.1.0",
     "chalk": "^2.4.1",
     "chrome-launcher": "^0.10.2",
     "cosmiconfig": "^5.0.6",
@@ -98,8 +98,8 @@
     "mkdirp": "^0.5.1",
     "os-locale": "^3.0.1",
     "pkg-up": "^2.0.0",
-    "puppeteer-core": "^1.7.0",
+    "puppeteer-core": "^1.8.0",
     "tmp": "^0.0.33",
-    "yargs": "^12.0.1"
+    "yargs": "^12.0.2"
   }
 }
