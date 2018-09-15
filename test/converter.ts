@@ -28,9 +28,6 @@ describe('Converter', () => {
       ...opts,
     })
 
-  const mockWriteFile = (mockFn = (_, __, callback) => callback()) =>
-    jest.spyOn(fs, 'writeFile').mockImplementation(mockFn)
-
   describe('#constructor', () => {
     it('assigns initial options to options member', () => {
       const options = {

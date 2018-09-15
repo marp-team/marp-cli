@@ -142,6 +142,25 @@ describe('Marp CLI', () => {
         expect(outputFiles).toContain(assetFn('dist/subfolder/5.html'))
       })
     })
+
+    context('with specified by configuration file', () => {
+      const confFile = assetFn('_configs/input-dir/.marprc.yml')
+      const slides = assetFn('_configs/input-dir/slides')
+      const distHtml = assetFn('_configs/input-dir/dist/slide.html')
+
+      it('resolves relative directory path from conf dir', async () => {
+        const findDir = jest.spyOn(File, 'findDir')
+        jest.spyOn(console, 'warn').mockImplementation()
+
+        expect(await marpCli(['-c', confFile])).toBe(0)
+        expect(findDir).toHaveBeenCalledWith(slides)
+        expect(writeFile).toHaveBeenCalledWith(
+          distHtml,
+          expect.any(Buffer),
+          expect.anything()
+        )
+      })
+    })
   })
 
   context('with passing a file', () => {
@@ -190,17 +209,15 @@ describe('Marp CLI', () => {
     })
 
     context('with configuration file', () => {
-      const confDir = assetFn('./_files/configs')
-
       it('uses configuration file found from process.cwd()', async () => {
         const stdout = jest.spyOn(process.stdout, 'write').mockImplementation()
 
         jest.spyOn(console, 'warn').mockImplementation()
         jest
           .spyOn(process, 'cwd')
-          .mockImplementation(() => path.resolve(confDir, './basic/'))
+          .mockImplementation(() => assetFn('_configs/basic/'))
 
-        expect(await marpCli(['md.txt'])).toBe(0)
+        expect(await marpCli(['md.md'])).toBe(0)
 
         const html = stdout.mock.calls[0][0].toString()
         expect(html).toContain('<b>html</b>')
@@ -212,9 +229,9 @@ describe('Marp CLI', () => {
         jest.spyOn(console, 'warn').mockImplementation()
         jest
           .spyOn(process, 'cwd')
-          .mockImplementation(() => path.resolve(confDir, './package-json/'))
+          .mockImplementation(() => assetFn('_configs/package-json/'))
 
-        expect(await marpCli(['md.txt', '-o', '-'])).toBe(0)
+        expect(await marpCli(['md.md', '-o', '-'])).toBe(0)
 
         const html = stdout.mock.calls[0][0].toString()
         expect(html).toContain('@theme gaia')
@@ -241,7 +258,7 @@ describe('Marp CLI', () => {
 
           jest.spyOn(console, 'warn').mockImplementation()
 
-          const conf = path.resolve(confDir, './marpit/config.js')
+          const conf = assetFn('_configs/marpit/config.js')
           expect(await marpCli(['-c', conf, onePath, '-o', '-'])).toBe(0)
 
           const html = stdout.mock.calls[0][0].toString()
@@ -256,9 +273,9 @@ describe('Marp CLI', () => {
           jest.spyOn(console, 'warn').mockImplementation()
           jest
             .spyOn(process, 'cwd')
-            .mockImplementation(() => path.resolve(confDir, './custom-engine/'))
+            .mockImplementation(() => assetFn('_configs/custom-engine/'))
 
-          expect(await marpCli(['md.txt', '-o', '-'])).toBe(0)
+          expect(await marpCli(['md.md', '-o', '-'])).toBe(0)
 
           const html = stdout.mock.calls[0][0].toString()
           expect(html).toContain('<b>custom</b>')

@@ -1,5 +1,6 @@
 import { Marp } from '@marp-team/marp-core'
 import cosmiconfig from 'cosmiconfig'
+import path from 'path'
 import fs from 'fs'
 import osLocale from 'os-locale'
 import { ConverterOption, ConvertType } from './converter'
@@ -55,7 +56,14 @@ export class MarpCLIConfig {
       return resolveEngine(['@marp-team/marp-core', Marp])
     })()
 
-    const output = this.args.output || this.conf.output
+    const output =
+      this.args.output ||
+      (this.conf.output
+        ? (() => {
+            if (this.conf.output === '-') return '-'
+            return path.resolve(path.dirname(this.confPath!), this.conf.output)
+          })()
+        : undefined)
 
     return {
       output,
@@ -84,7 +92,11 @@ export class MarpCLIConfig {
   }
 
   private async inputDir(): Promise<string | undefined> {
-    const dir = this.args.inputDir || this.conf.inputDir
+    const dir = (() => {
+      if (this.args.inputDir) return path.resolve(this.args.inputDir)
+      if (this.conf.inputDir)
+        return path.resolve(path.dirname(this.confPath!), this.conf.inputDir)
+    })()
     if (dir === undefined) return undefined
 
     let stat: fs.Stats
