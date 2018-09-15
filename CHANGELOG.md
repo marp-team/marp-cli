@@ -7,6 +7,10 @@
 - Add official Docker image ([#14](https://github.com/marp-team/marp-cli/pull/14))
 - Add `--input-dir` (`-I`) option to keep directory structure ([#16](https://github.com/marp-team/marp-cli/pull/16))
 
+### Changed
+
+- Upgrade Node LTS and depenent packages ([#17](https://github.com/marp-team/marp-cli/pull/17))
+
 ### Fixed
 
 - Fix incorrect SVG scaling on Chrome ([#15](https://github.com/marp-team/marp-cli/pull/15))
