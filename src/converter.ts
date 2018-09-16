@@ -112,9 +112,9 @@ export class Converter {
 
     try {
       const browser = await Converter.runBrowser()
+      const page = await browser.newPage()
 
       try {
-        const page = await browser.newPage()
         await page.goto(uri, {
           waitUntil: ['domcontentloaded', 'networkidle0'],
         })
@@ -124,12 +124,18 @@ export class Converter {
           preferCSSPageSize: true,
         })
       } finally {
-        await browser.close()
+        await page.close()
       }
     } finally {
       if (tmpFile) await tmpFile.cleanup()
     }
   }
+
+  static async closeBrowser() {
+    if (Converter.browser) await Converter.browser.close()
+  }
+
+  private static browser?: puppeteer.Browser
 
   private generateEngine(mergeOptions: MarpitOptions) {
     const { html, options } = this.options
@@ -149,18 +155,25 @@ export class Converter {
     return engine
   }
 
-  private static runBrowser() {
-    const args: string[] = []
-    const finder: () => string[] = require('is-wsl')
-      ? chromeFinder.wsl
-      : chromeFinder[process.platform]
+  private static async runBrowser() {
+    if (!Converter.browser) {
+      const args: string[] = []
+      const finder: () => string[] = require('is-wsl')
+        ? chromeFinder.wsl
+        : chromeFinder[process.platform]
 
-    if (process.env.IS_DOCKER)
-      args.push('--no-sandbox', '--disable-dev-shm-usage')
+      if (process.env.IS_DOCKER)
+        args.push('--no-sandbox', '--disable-dev-shm-usage')
 
-    return puppeteer.launch({
-      args,
-      executablePath: finder ? finder()[0] : undefined,
-    })
+      Converter.browser = await puppeteer.launch({
+        args,
+        executablePath: finder ? finder()[0] : undefined,
+      })
+
+      Converter.browser.once('disconnected', () => {
+        Converter.browser = undefined
+      })
+    }
+    return Converter.browser
   }
 }

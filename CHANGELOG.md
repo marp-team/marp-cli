@@ -6,6 +6,10 @@
 
 - Add `--watch` (`-w`) option to support watch mode ([#18](https://github.com/marp-team/marp-cli/pull/18))
 
+### Fixed
+
+- Use singleton Chrome instance to convert into PDF ([#19](https://github.com/marp-team/marp-cli/pull/19))
+
 ## v0.0.8 - 2018-09-15
 
 ### Added

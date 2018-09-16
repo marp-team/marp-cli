@@ -10,6 +10,7 @@ import { CLIError } from '../src/error'
 
 jest.mock('fs')
 
+afterAll(() => Converter.closeBrowser())
 afterEach(() => jest.restoreAllMocks())
 
 describe('Converter', () => {

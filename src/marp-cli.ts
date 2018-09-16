@@ -176,5 +176,7 @@ export default async function(argv: string[] = []): Promise<number> {
 
     cli.error(e.message)
     return e.errorCode
+  } finally {
+    await Converter.closeBrowser()
   }
 }
