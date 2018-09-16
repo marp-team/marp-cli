@@ -6775,6 +6775,12 @@ ws@^5.1.1, ws@^5.2.0:
   dependencies:
     async-limiter "~1.0.0"
 
+ws@^6.0.0:
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/ws/-/ws-6.0.0.tgz#eaa494aded00ac4289d455bac8d84c7c651cef35"
+  dependencies:
+    async-limiter "~1.0.0"
+
 x-is-string@^0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/x-is-string/-/x-is-string-0.1.0.tgz#474b50865af3a49a9c4657f05acd145458f77d82"
