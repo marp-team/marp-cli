@@ -20,6 +20,7 @@ export interface IMarpCLIArguments {
   pdf?: boolean
   template?: string
   theme?: string
+  watch?: boolean
 }
 
 export type IMarpCLIConfig = Overwrite<
@@ -88,6 +89,7 @@ export class MarpCLIConfig {
         `${output}`.toLowerCase().endsWith('.pdf')
           ? ConvertType.pdf
           : ConvertType.html,
+      watch: this.pickDefined(this.args.watch || this.conf.watch) || false,
     }
   }
 

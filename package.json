@@ -45,6 +45,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.0.1",
+    "@types/chokidar": "^1.7.5",
     "@types/cosmiconfig": "^5.0.3",
     "@types/get-stdin": "^5.0.1",
     "@types/jest": "^23.3.2",
@@ -89,6 +90,7 @@
     "@marp-team/marp-core": "^0.0.7",
     "@marp-team/marpit": "^0.1.0",
     "chalk": "^2.4.1",
+    "chokidar": "^2.0.4",
     "chrome-launcher": "^0.10.2",
     "cosmiconfig": "^5.0.6",
     "get-stdin": "^6.0.0",

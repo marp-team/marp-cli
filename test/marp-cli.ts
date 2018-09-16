@@ -6,11 +6,15 @@ import * as cli from '../src/cli'
 import { File } from '../src/file'
 import { Converter, ConvertType } from '../src/converter'
 import { CLIError } from '../src/error'
+import { Watcher } from '../src/watcher'
 
 const { version } = require('../package.json')
 const coreVersion = require('@marp-team/marp-core/package.json').version
 
-jest.mock('fs').mock('mkdirp')
+jest
+  .mock('fs')
+  .mock('mkdirp')
+  .mock('../src/watcher')
 
 afterEach(() => jest.restoreAllMocks())
 
@@ -206,6 +210,16 @@ describe('Marp CLI', () => {
       context('when extension is .pdf', () =>
         confirmPDF(onePath, '-o', 'example.pdf')
       )
+    })
+
+    context('with -w option', () => {
+      it('starts watching by Watcher.watch()', async () => {
+        jest.spyOn(cli, 'info').mockImplementation()
+        ;(<any>fs).__mockWriteFile()
+
+        expect(await marpCli([onePath, '-w'])).toBe(0)
+        expect(Watcher.watch).toHaveBeenCalledWith([onePath], expect.anything())
+      })
     })
 
     context('with configuration file', () => {

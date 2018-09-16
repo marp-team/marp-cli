@@ -25,6 +25,7 @@ export interface ConverterOption {
   template: string
   theme?: string
   type: ConvertType
+  watch: boolean
 }
 
 export interface ConvertResult {
@@ -32,6 +33,8 @@ export interface ConvertResult {
   newFile: File
   template: TemplateResult
 }
+
+export type ConvertedCallback = (result: ConvertResult) => void
 
 export class Converter {
   readonly options: ConverterOption
@@ -83,7 +86,7 @@ export class Converter {
 
   async convertFiles(
     files: File[],
-    onConverted: (result: ConvertResult) => void = () => {}
+    onConverted: ConvertedCallback = () => {}
   ): Promise<void> {
     const { inputDir, output } = this.options
 
