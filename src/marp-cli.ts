@@ -3,10 +3,11 @@ import { Argv } from 'yargs'
 import yargs from 'yargs/yargs'
 import * as cli from './cli'
 import fromArguments, { IMarpCLIArguments } from './config'
-import { Converter } from './converter'
+import { Converter, ConvertResult, ConvertedCallback } from './converter'
 import { CLIError, error } from './error'
 import { File, FileType } from './file'
 import templates from './templates'
+import watcher from './watcher'
 import { name, version } from '../package.json'
 
 enum OptionGroup {
@@ -59,6 +60,12 @@ export default async function(argv: string[] = []): Promise<number> {
           group: OptionGroup.Basic,
           type: 'string',
         },
+        watch: {
+          alias: 'w',
+          describe: 'Watch input markdowns for changes',
+          group: OptionGroup.Basic,
+          type: 'boolean',
+        },
         pdf: {
           describe: 'Convert slide deck into PDF',
           group: OptionGroup.Converter,
@@ -102,27 +109,28 @@ export default async function(argv: string[] = []): Promise<number> {
 
     // Initialize converter
     const config = await fromArguments(<IMarpCLIArguments>args)
-    const converterOpts = await config.converterOption()
-    const converter = new Converter(converterOpts)
+    const converter = new Converter(await config.converterOption())
+    const cvtOpts = converter.options
 
     // Find target markdown files
-    const files = await (async (): Promise<File[]> => {
-      if (converterOpts.inputDir) {
+    const finder = async () => {
+      if (cvtOpts.inputDir) {
         if (args._.length > 0) {
           cli.error('Cannot pass files together with input directory.')
           return []
         }
 
         // Find directory to keep dir structure of input dir in output
-        return File.findDir(converterOpts.inputDir)
+        return File.findDir(cvtOpts.inputDir)
       }
 
       // Regular file finding powered by globby
       return <File[]>(
         [await File.stdin(), ...(await File.find(...args._))].filter(f => f)
       )
-    })()
+    }
 
+    const files = await finder()
     const { length } = files
 
     if (length === 0) {
@@ -136,16 +144,30 @@ export default async function(argv: string[] = []): Promise<number> {
     cli.info(`Converting ${length} markdown${length > 1 ? 's' : ''}...`)
 
     // Convert markdown into HTML
-    try {
-      await converter.convertFiles(files, ret => {
-        const { file, newFile } = ret
-        const output = (f: File, io: string) =>
-          f.type === FileType.StandardIO ? `<${io}>` : f.relativePath()
+    const onConverted: ConvertedCallback = ret => {
+      const { file, newFile } = ret
+      const output = (f: File, io: string) =>
+        f.type === FileType.StandardIO ? `<${io}>` : f.relativePath()
 
-        cli.info(`${output(file, 'stdin')} => ${output(newFile, 'stdout')}`)
-      })
+      cli.info(`${output(file, 'stdin')} => ${output(newFile, 'stdout')}`)
+    }
+
+    try {
+      await converter.convertFiles(files, onConverted)
     } catch (e) {
       error(`Failed converting Markdown. (${e.message})`, e.errorCode)
+    }
+
+    // Watch mode
+    if (cvtOpts.watch) {
+      watcher(cvtOpts.inputDir || args._, {
+        converter,
+        finder,
+        events: {
+          onConverted,
+          onError: e => cli.error(`Failed converting Markdown. (${e.message})`),
+        },
+      })
     }
 
     return 0
