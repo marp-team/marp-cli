@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Add `--watch` (`-w`) option to support watch mode ([#18](https://github.com/marp-team/marp-cli/pull/18))
+
 ## v0.0.8 - 2018-09-15
 
 ### Added

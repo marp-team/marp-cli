@@ -74,7 +74,8 @@ Under construction.
 - [ ] Import external theme file(s)
 - [x] Select theme by option
 - [x] Support configuration file (like `.marprc`)
-- [ ] Watch mode
+- [x] Watch mode
+  - [ ] Auto-reload
 - [ ] Server mode
 - [x] HTML templates
   - [x] Template that has ready to actual presentation powered by [Bespoke](https://github.com/bespokejs/bespoke)
