@@ -9,18 +9,13 @@ export class Watcher {
   chokidar: chokidar.FSWatcher
 
   readonly converter: Converter
-  readonly events: Required<Watcher.Events>
+  readonly events: Watcher.Events
   readonly finder: Watcher.Options['finder']
 
   private constructor(watchPath: string | string[], opts: Watcher.Options) {
     this.converter = opts.converter
     this.finder = opts.finder
-
-    const events = opts.events || {}
-    this.events = {
-      onConverted: events.onConverted || (() => {}),
-      onError: events.onError || (() => {}),
-    }
+    this.events = opts.events
 
     this.chokidar = chokidar.watch(watchPath, { ignoreInitial: true })
     this.chokidar
@@ -52,12 +47,12 @@ export default Watcher.watch
 export namespace Watcher {
   export interface Options {
     converter: Converter
-    events?: Watcher.Events
+    events: Watcher.Events
     finder: () => Promise<File[]>
   }
 
   export interface Events {
-    onConverted?: ConvertedCallback
-    onError?: (e: Error) => void
+    onConverted: ConvertedCallback
+    onError: (e: Error) => void
   }
 }
