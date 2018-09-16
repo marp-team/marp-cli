@@ -25,6 +25,7 @@ describe('Converter', () => {
       options: {},
       template: 'bare',
       type: ConvertType.html,
+      watch: false,
       ...opts,
     })
 
@@ -37,6 +38,7 @@ describe('Converter', () => {
         options: <MarpitOptions>{ html: true },
         template: 'test-template',
         type: ConvertType.html,
+        watch: false,
       }
 
       expect(new Converter(options).options).toMatchObject(options)
