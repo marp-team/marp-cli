@@ -1,3 +1,3 @@
-import watch from './watch/'
+import watch from './watch/watch'
 
 watch()
