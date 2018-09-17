@@ -43,7 +43,10 @@ describe('Watcher', () => {
 
         const [files, onConverted] = convertFiles.mock.calls[0]
         expect(files).toContain(file)
-        expect(onConverted).toBe(events.onConverted)
+
+        events.onConverted.mockClear()
+        onConverted({ file: {} })
+        expect(events.onConverted).toHaveBeenCalled()
 
         // Error handling
         events.onError.mockClear()
