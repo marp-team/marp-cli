@@ -53,8 +53,9 @@ export class Watcher {
 }
 
 export class WatchNotifier {
+  listeners: Map<string, Set<any>> = new Map()
+
   private wss?: WSServer
-  private listeners: Map<string, Set<any>> = new Map()
   private portNumber?: number
 
   async port() {
@@ -65,7 +66,7 @@ export class WatchNotifier {
   }
 
   async register(fn: string) {
-    const identifier = WatchNotifier.generateIdentifier(fn)
+    const identifier = WatchNotifier.sha256(fn)
 
     if (!this.listeners.has(identifier))
       this.listeners.set(identifier, new Set())
@@ -76,7 +77,7 @@ export class WatchNotifier {
   sendTo(fn: string, command: string) {
     if (!this.wss) return false
 
-    const sockets = this.listeners.get(WatchNotifier.generateIdentifier(fn))
+    const sockets = this.listeners.get(WatchNotifier.sha256(fn))
     if (!sockets) return false
 
     sockets.forEach(ws => ws.send(command))
@@ -92,13 +93,8 @@ export class WatchNotifier {
 
         if (wsSet !== undefined) {
           this.listeners.set(identifier, wsSet.add(ws))
+          ws.on('close', () => this.listeners.get(identifier)!.delete(ws))
 
-          ws.on('close', () => {
-            const wsSetForClose = this.listeners.get(identifier)!
-            wsSetForClose.delete(ws)
-
-            this.listeners.set(identifier, wsSetForClose)
-          })
           ws.send('ready')
           return
         }
@@ -107,7 +103,14 @@ export class WatchNotifier {
     })
   }
 
-  static generateIdentifier(fn: string) {
+  stop() {
+    if (this.wss !== undefined) {
+      this.wss.close()
+      this.wss = undefined
+    }
+  }
+
+  static sha256(fn: string) {
     const hmac = crypto.createHash('sha256')
     hmac.update(fn)
 
