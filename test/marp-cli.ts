@@ -14,7 +14,7 @@ const coreVersion = require('@marp-team/marp-core/package.json').version
 jest
   .mock('fs')
   .mock('mkdirp')
-  .mock('../src/watcher')
+  .mock('../src/watcher', () => jest.genMockFromModule('../src/watcher'))
 
 afterEach(() => jest.restoreAllMocks())
 

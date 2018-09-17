@@ -3,13 +3,15 @@ import * as cli from '../src/cli'
 import { File } from '../src/file'
 import { Watcher } from '../src/watcher'
 
-jest.mock('chokidar', () => ({
-  watch: jest.fn(() => ({
-    on: jest.fn(function() {
-      return this
-    }),
-  })),
-}))
+jest
+  .mock('chokidar', () => ({
+    watch: jest.fn(() => ({
+      on: jest.fn(function() {
+        return this
+      }),
+    })),
+  }))
+  .mock('../src/watcher')
 
 describe('Watcher', () => {
   describe('.watch', () => {
