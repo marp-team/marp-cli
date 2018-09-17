@@ -54,7 +54,7 @@ export class Watcher {
 
 export class WatchNotifier {
   private wss?: WSServer
-  private listeners: Map<string, any> = new Map()
+  private listeners: Map<string, Set<any>> = new Map()
   private portNumber?: number
 
   async port() {
@@ -68,7 +68,7 @@ export class WatchNotifier {
     const identifier = WatchNotifier.generateIdentifier(fn)
 
     if (!this.listeners.has(identifier))
-      this.listeners.set(identifier, undefined)
+      this.listeners.set(identifier, new Set())
 
     return `ws://localhost:${await this.port()}/${identifier}`
   }
@@ -76,10 +76,10 @@ export class WatchNotifier {
   sendTo(fn: string, command: string) {
     if (!this.wss) return false
 
-    const ws = this.listeners.get(WatchNotifier.generateIdentifier(fn))
-    if (!ws) return false
+    const sockets = this.listeners.get(WatchNotifier.generateIdentifier(fn))
+    if (!sockets) return false
 
-    ws.send(command)
+    sockets.forEach(ws => ws.send(command))
     return true
   }
 
@@ -88,9 +88,17 @@ export class WatchNotifier {
     this.wss.on('connection', (ws, sock) => {
       if (sock.url) {
         const [, identifier] = sock.url.split('/')
+        const wsSet = this.listeners.get(identifier)
 
-        if (this.listeners.has(identifier)) {
-          this.listeners.set(identifier, ws)
+        if (wsSet !== undefined) {
+          this.listeners.set(identifier, wsSet.add(ws))
+
+          ws.on('close', () => {
+            const wsSetForClose = this.listeners.get(identifier)!
+            wsSetForClose.delete(ws)
+
+            this.listeners.set(identifier, wsSetForClose)
+          })
           ws.send('ready')
           return
         }
