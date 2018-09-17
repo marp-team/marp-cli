@@ -16,6 +16,8 @@ jest
   }))
   .mock('../src/watcher')
 
+afterEach(() => jest.restoreAllMocks())
+
 describe('Watcher', () => {
   describe('.watch', () => {
     const { watch } = Watcher
