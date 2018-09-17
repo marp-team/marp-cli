@@ -45,7 +45,7 @@ export default [
   {
     external,
     plugins,
-    input: 'src/templates/watch.ts',
+    input: 'src/templates/watch.js',
     output: { file: 'lib/watch.js', format: 'iife' },
   },
   {
