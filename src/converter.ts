@@ -67,7 +67,10 @@ export class Converter {
       lang,
       readyScript,
       notifyWS:
-        this.options.watch && file && file.type === FileType.File
+        this.options.watch &&
+        file &&
+        file.type === FileType.File &&
+        type === ConvertType.html
           ? await notifier.register(file.absolutePath)
           : undefined,
       renderer: tplOpts =>
