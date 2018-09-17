@@ -1,7 +1,7 @@
 import chokidar from 'chokidar'
 import http from 'http'
 import portfinder from 'portfinder'
-import WebSocket from 'ws'
+import WebSocket, { Server as WSServer } from 'ws'
 import * as cli from '../src/cli'
 import { File, FileType } from '../src/file'
 import { Watcher, WatchNotifier, notifier } from '../src/watcher'
@@ -156,9 +156,14 @@ describe('WatchNotifier', () => {
   })
 
   describe('#start', () => {
+    let ws
     let instance: WatchNotifier
 
-    beforeEach(() => (instance = new WatchNotifier()))
+    beforeEach(() => {
+      instance = new WatchNotifier()
+      ws = { close: jest.fn(), on: jest.fn(), send: jest.fn() }
+    })
+
     afterEach(() => instance.stop())
 
     const wss = () => (<any>instance).wss
@@ -171,43 +176,39 @@ describe('WatchNotifier', () => {
     })
 
     context('when client is connected to registered path', () => {
-      beforeEach(() => {
-        instance.start({ host: '0.0.0.0' })
-        instance.register('test')
-      })
+      beforeEach(() => instance.register('test'))
 
-      it('adds socket to registered set and sends "ready" command', done => {
+      it('adds socket to registered set and sends "ready" command', async () => {
+        const eventSpy = jest.spyOn(WSServer.prototype, 'on')
+        await instance.start()
+
+        expect(eventSpy).toBeCalledTimes(1)
+        expect(eventSpy).toBeCalledWith('connection', expect.any(Function))
         expect(instance.listeners.get(testIdentifier).size).toBe(0)
-        const client = new WebSocket(`ws://localhost:52000/${testIdentifier}`)
 
-        client.once('message', data => {
-          expect(data).toBe('ready')
-          expect(instance.listeners.get(testIdentifier).size).toBe(1)
+        const [, connection] = eventSpy.mock.calls[0]
+        connection(ws, { url: `/${testIdentifier}` })
+        expect(ws.send).toHaveBeenCalledWith('ready')
+        expect(instance.listeners.get(testIdentifier).has(ws)).toBe(true)
 
-          // Remove listener by closing connection
-          client.close()
-        })
+        // Remove listener by closing connection
+        expect(ws.on).toHaveBeenCalledTimes(1)
+        expect(ws.on).toHaveBeenCalledWith('close', expect.any(Function))
 
-        client.once('close', () =>
-          setTimeout(() => {
-            expect(instance.listeners.get(testIdentifier).size).toBe(0)
-            done()
-          }, 100)
-        )
+        const [, onclose] = ws.on.mock.calls[0]
+        onclose()
+        expect(instance.listeners.get(testIdentifier).has(ws)).toBe(false)
       })
 
-      it('closes client socket immediately when passed invalid URL', done => {
-        const messageEvent = jest.fn()
-        const client = new WebSocket(`ws://localhost:52000/invalid`)
+      it('closes client socket immediately when passed invalid URL', async () => {
+        const eventSpy = jest.spyOn(WSServer.prototype, 'on')
+        await instance.start()
 
-        client.once('message', messageEvent)
-        client.once('close', () =>
-          setTimeout(() => {
-            expect(messageEvent).not.toHaveBeenCalled()
-            expect(instance.listeners.get(testIdentifier).size).toBe(0)
-            done()
-          }, 100)
-        )
+        const [, connection] = eventSpy.mock.calls[0]
+        connection(ws, { url: '/invalid' })
+
+        expect(ws.send).not.toHaveBeenCalled()
+        expect(ws.close).toHaveBeenCalled()
       })
     })
   })
