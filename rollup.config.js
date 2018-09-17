@@ -45,6 +45,12 @@ export default [
   {
     external,
     plugins,
+    input: 'src/templates/watch.ts',
+    output: { file: 'lib/watch.js', format: 'iife' },
+  },
+  {
+    external,
+    plugins,
     input: 'src/marp-cli.ts',
     output: { exports: 'named', file: 'lib/marp-cli.js', format: 'cjs' },
   },

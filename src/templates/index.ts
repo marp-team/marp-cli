@@ -35,6 +35,7 @@ export const bare: Template = async opts => {
       ...opts,
       ...rendered,
       bare: { css: bareScss },
+      watchJs: await watchJs(opts.notifyWS),
     }),
   }
 }
@@ -51,22 +52,30 @@ export const bespoke: Template = async opts => {
     result: bespokePug({
       ...opts,
       ...rendered,
-      progress: false,
       bespoke: {
         css: bespokeScss,
-        js: await bespokeJs(),
+        js: await libJs('bespoke.js'),
+        progress: false,
       },
+      watchJs: await watchJs(opts.notifyWS),
     }),
   }
 }
 
-export function bespokeJs() {
+export function libJs(fn: string) {
   return new Promise<string>((resolve, reject) =>
     fs.readFile(
-      path.resolve(__dirname, './bespoke.js'), // __dirname is "lib" after bundle
+      path.resolve(__dirname, fn), // __dirname is "lib" after bundle
       (e, data) => (e ? reject(e) : resolve(data.toString()))
     )
   )
+}
+
+export async function watchJs(notifyWS?: string) {
+  if (notifyWS === undefined) return false
+
+  const watchJs = await libJs('watch.js')
+  return `window.__marpCliWatchWS=${JSON.stringify(notifyWS)};${watchJs}`
 }
 
 const templates: { [name: string]: Template } = { bare, bespoke }

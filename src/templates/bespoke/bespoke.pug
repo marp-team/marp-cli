@@ -10,10 +10,12 @@ html(lang=lang)
     style!= bespoke.css
     style!= css
   body
-    if progress
+    if bespoke.progress
       .bespoke-progress-parent
         .bespoke-progress-bar
 
     != html
     != readyScript
-    script(defer)!= bespoke.js
+    script!= bespoke.js
+    if watchJs
+      script!= watchJs

@@ -12,3 +12,5 @@ html(lang=lang)
   body
     != html
     != readyScript
+    if watchJs
+      script!= watchJs
