@@ -7,6 +7,7 @@ import { Converter, ConvertType } from '../src/converter'
 import { File, FileType } from '../src/file'
 import { bare as bareTpl } from '../src/templates'
 import { CLIError } from '../src/error'
+import { WatchNotifier } from '../src/watcher'
 
 jest.mock('fs')
 
@@ -108,6 +109,19 @@ describe('Converter', () => {
       it('adds <base> element with specified base path from passed file', async () => {
         const { result } = await converter.convert(md, dummyFile)
         expect(result).toContain(`<base href="${process.cwd()}">`)
+      })
+    })
+
+    context('with watch mode', () => {
+      const converter = instance({ watch: true })
+      const dummyFile = new File(process.cwd())
+      const hash = WatchNotifier.sha256(process.cwd())
+
+      it('adds script for auto-reload', async () => {
+        const { result } = await converter.convert(md, dummyFile)
+        expect(result).toContain(
+          `<script>window\.__marpCliWatchWS="ws://localhost:52000/${hash}";`
+        )
       })
     })
   })
