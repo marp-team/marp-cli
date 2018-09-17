@@ -172,7 +172,7 @@ describe('WatchNotifier', () => {
 
     context('when client is connected to registered path', () => {
       beforeEach(() => {
-        instance.start()
+        instance.start({ host: '0.0.0.0' })
         instance.register('test')
       })
 

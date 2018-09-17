@@ -3,7 +3,7 @@ import chokidar from 'chokidar'
 import crypto from 'crypto'
 import path from 'path'
 import portfinder from 'portfinder'
-import { Server as WSServer } from 'ws'
+import { Server as WSServer, ServerOptions } from 'ws'
 import * as cli from './cli'
 import { Converter, ConvertedCallback } from './converter'
 import { File, FileType } from './file'
@@ -84,8 +84,8 @@ export class WatchNotifier {
     return true
   }
 
-  async start() {
-    this.wss = new WSServer({ port: await this.port() })
+  async start(opts: ServerOptions = {}) {
+    this.wss = new WSServer({ ...opts, port: await this.port() })
     this.wss.on('connection', (ws, sock) => {
       if (sock.url) {
         const [, identifier] = sock.url.split('/')
