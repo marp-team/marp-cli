@@ -9,6 +9,7 @@ import bespokeScss from './bespoke/bespoke.scss'
 export interface TemplateOptions {
   base?: string
   lang: string
+  notifyWS?: string
   readyScript?: string
   renderer: (tplOpts: MarpitOptions) => MarpitRenderResult
   [prop: string]: any

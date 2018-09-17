@@ -7,6 +7,7 @@ import { Engine } from './engine'
 import { error } from './error'
 import { File, FileType } from './file'
 import templates, { TemplateResult } from './templates/'
+import { notifier } from './watcher'
 
 export enum ConvertType {
   html = 'html',
@@ -65,6 +66,10 @@ export class Converter {
       base,
       lang,
       readyScript,
+      notifyWS:
+        this.options.watch && file && file.type === FileType.File
+          ? await notifier.register(file.absolutePath)
+          : undefined,
       renderer: tplOpts =>
         this.generateEngine(tplOpts).render(`${markdown}${additionals}`),
     })

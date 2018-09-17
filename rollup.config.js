@@ -12,6 +12,7 @@ import { dependencies } from './package.json'
 
 const external = [
   ...Object.keys(dependencies),
+  'crypto',
   'fs',
   'path',
   'chrome-launcher/dist/chrome-finder',
