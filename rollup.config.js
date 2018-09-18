@@ -12,6 +12,7 @@ import { dependencies } from './package.json'
 
 const external = [
   ...Object.keys(dependencies),
+  'crypto',
   'fs',
   'path',
   'chrome-launcher/dist/chrome-finder',
@@ -40,6 +41,12 @@ export default [
     plugins,
     input: 'src/templates/bespoke.js',
     output: { file: 'lib/bespoke.js', format: 'iife' },
+  },
+  {
+    external,
+    plugins,
+    input: 'src/templates/watch.js',
+    output: { file: 'lib/watch.js', format: 'iife' },
   },
   {
     external,

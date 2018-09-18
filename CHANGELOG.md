@@ -5,6 +5,7 @@
 ### Added
 
 - Add `--watch` (`-w`) option to support watch mode ([#18](https://github.com/marp-team/marp-cli/pull/18))
+- Support HTML auto reloading on watch mode ([#20](https://github.com/marp-team/marp-cli/pull/20))
 
 ### Fixed
 

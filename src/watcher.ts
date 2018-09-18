@@ -1,9 +1,12 @@
 import chalk from 'chalk'
 import chokidar from 'chokidar'
+import crypto from 'crypto'
 import path from 'path'
+import portfinder from 'portfinder'
+import { Server as WSServer, ServerOptions } from 'ws'
 import * as cli from './cli'
 import { Converter, ConvertedCallback } from './converter'
-import { File } from './file'
+import { File, FileType } from './file'
 
 export class Watcher {
   chokidar: chokidar.FSWatcher
@@ -22,6 +25,8 @@ export class Watcher {
       .on('change', f => this.convert(f))
       .on('add', f => this.convert(f))
 
+    notifier.start()
+
     cli.info(chalk.green('[Watch mode] Start watching...'))
   }
 
@@ -31,7 +36,12 @@ export class Watcher {
     )
 
     try {
-      await this.converter.convertFiles(files, this.events.onConverted)
+      await this.converter.convertFiles(files, ret => {
+        this.events.onConverted(ret)
+
+        if (ret.file.type === FileType.File)
+          notifier.sendTo(ret.file.absolutePath, 'reload')
+      })
     } catch (e) {
       this.events.onError(e)
     }
@@ -41,6 +51,74 @@ export class Watcher {
     return new Watcher(watchPath, opts)
   }
 }
+
+export class WatchNotifier {
+  listeners: Map<string, Set<any>> = new Map()
+
+  private wss?: WSServer
+  private portNumber?: number
+
+  async port() {
+    if (this.portNumber === undefined)
+      this.portNumber = await portfinder.getPortPromise({ port: 52000 })
+
+    return this.portNumber
+  }
+
+  async register(fn: string) {
+    const identifier = WatchNotifier.sha256(fn)
+
+    if (!this.listeners.has(identifier))
+      this.listeners.set(identifier, new Set())
+
+    return `ws://localhost:${await this.port()}/${identifier}`
+  }
+
+  sendTo(fn: string, command: string) {
+    if (!this.wss) return false
+
+    const sockets = this.listeners.get(WatchNotifier.sha256(fn))
+    if (!sockets) return false
+
+    sockets.forEach(ws => ws.send(command))
+    return true
+  }
+
+  async start(opts: ServerOptions = {}) {
+    this.wss = new WSServer({ ...opts, port: await this.port() })
+    this.wss.on('connection', (ws, sock) => {
+      if (sock.url) {
+        const [, identifier] = sock.url.split('/')
+        const wsSet = this.listeners.get(identifier)
+
+        if (wsSet !== undefined) {
+          this.listeners.set(identifier, wsSet.add(ws))
+          ws.on('close', () => this.listeners.get(identifier)!.delete(ws))
+
+          ws.send('ready')
+          return
+        }
+      }
+      ws.close()
+    })
+  }
+
+  stop() {
+    if (this.wss !== undefined) {
+      this.wss.close()
+      this.wss = undefined
+    }
+  }
+
+  static sha256(fn: string) {
+    const hmac = crypto.createHash('sha256')
+    hmac.update(fn)
+
+    return hmac.digest('hex').toString()
+  }
+}
+
+export const notifier = new WatchNotifier()
 
 export default Watcher.watch
 
