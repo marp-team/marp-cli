@@ -7,6 +7,7 @@ import { Engine } from './engine'
 import { error } from './error'
 import { File, FileType } from './file'
 import templates, { TemplateResult } from './templates/'
+import { Theme } from './theme'
 import { notifier } from './watcher'
 
 export enum ConvertType {
@@ -25,6 +26,7 @@ export interface ConverterOption {
   readyScript?: string
   template: string
   theme?: string
+  themeSet?: Theme[]
   type: ConvertType
   watch: boolean
 }
@@ -159,6 +161,10 @@ export class Converter {
 
     // for Marpit engine
     if (!(engine instanceof Marp)) engine.markdown.set({ html: !!html })
+
+    // Additional themes
+    if (this.options.themeSet)
+      this.options.themeSet.forEach(theme => engine.themeSet.add(theme.css))
 
     return engine
   }

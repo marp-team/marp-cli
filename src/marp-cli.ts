@@ -98,6 +98,12 @@ export default async function(argv: string[] = []): Promise<number> {
           group: OptionGroup.Marp,
           type: 'string',
         },
+        'theme-set': {
+          array: true,
+          describe: 'Path to additional theme CSS file(s)',
+          group: OptionGroup.Marp,
+          type: 'string',
+        },
       })
 
     const args = program.argv

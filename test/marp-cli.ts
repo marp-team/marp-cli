@@ -167,6 +167,81 @@ describe('Marp CLI', () => {
     })
   })
 
+  context('with --theme-set option', () => {
+    const filePath = assetFn('_files/1.md')
+    const themes = assetFn('_files/themes')
+    const themeA = assetFn('_files/themes/a.css')
+    const themeB = assetFn('_files/themes/b.css')
+    const themeC = assetFn('_files/themes/nested/c.css')
+
+    let convert: jest.SpyInstance
+
+    beforeEach(() => {
+      convert = jest.spyOn(Converter.prototype, 'convert')
+
+      jest.spyOn(cli, 'info').mockImplementation()
+      ;(<any>fs).__mockWriteFile()
+    })
+
+    context('with specified single file', () => {
+      it('becomes to be able to use specified additional theme', async () => {
+        expect(
+          await marpCli(['--theme-set', themeA, '--theme', 'a', filePath])
+        ).toBe(0)
+        expect(convert).toBeCalledTimes(1)
+
+        const { css } = (await convert.mock.results[0].value).rendered
+        expect(css).toContain('@theme a')
+      })
+    })
+
+    context('with specified multiple files', () => {
+      const baseArgs = [filePath, '--theme-set', themeB, themeC]
+
+      it('becomes to be able to use multiple additional themes', async () => {
+        for (const name of ['b', 'c']) {
+          convert.mockClear()
+
+          expect(await marpCli([...baseArgs, '--theme', name])).toBe(0)
+          expect(convert).toBeCalledTimes(1)
+          expect((await convert.mock.results[0].value).rendered.css).toContain(
+            `@theme ${name}`
+          )
+        }
+      })
+    })
+
+    context('with specified directory', () => {
+      const baseArgs = theme => [filePath, '--theme-set', theme]
+
+      it('becomes to be able to use the all css files in directory', async () => {
+        for (const name of ['a', 'b', 'c']) {
+          convert.mockClear()
+
+          expect(await marpCli([...baseArgs(themes), '--theme', name])).toBe(0)
+          expect(convert).toBeCalledTimes(1)
+          expect((await convert.mock.results[0].value).rendered.css).toContain(
+            `@theme ${name}`
+          )
+        }
+      })
+
+      context('when CSS file is not found from directory', () => {
+        const dir = assetFn('_files/subfolder')
+
+        it('outputs warning and continue conversion', async () => {
+          const warn = jest.spyOn(console, 'warn').mockImplementation()
+
+          expect(await marpCli(baseArgs(dir))).toBe(0)
+          expect(convert).toBeCalledTimes(1)
+          expect(warn).toHaveBeenCalledWith(
+            expect.stringContaining('Not found additional theme CSS files')
+          )
+        })
+      })
+    })
+  })
+
   context('with passing a file', () => {
     const onePath = assetFn('_files/1.md')
 

@@ -124,11 +124,11 @@
     reflect-metadata "^0.1.12"
     tslib "^1.8.1"
 
-"@marp-team/marp-core@^0.0.7":
-  version "0.0.7"
-  resolved "https://registry.yarnpkg.com/@marp-team/marp-core/-/marp-core-0.0.7.tgz#e29370cc5297f8eaaf627ef4208c02cb05e1cca9"
+"@marp-team/marp-core@^0.0.8":
+  version "0.0.8"
+  resolved "https://registry.yarnpkg.com/@marp-team/marp-core/-/marp-core-0.0.8.tgz#9272ecd33e4ba7fbb5aa886ecae0619c17112071"
   dependencies:
-    "@marp-team/marpit" "^0.1.0"
+    "@marp-team/marpit" "^0.1.1"
     emoji-regex "^7.0.1"
     highlight.js "^9.12.0"
     katex "^0.10.0-rc.1"
@@ -139,9 +139,9 @@
     twemoji "^11.0.1"
     xss "^1.0.3"
 
-"@marp-team/marpit@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@marp-team/marpit/-/marpit-0.1.0.tgz#8aeeea13f8630adda61ee61b1baf875375333861"
+"@marp-team/marpit@^0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@marp-team/marpit/-/marpit-0.1.1.tgz#82c2868eb3aca3eec32c3fcddcc412d760deef51"
   dependencies:
     js-yaml "^3.12.0"
     lodash.kebabcase "^4.1.1"

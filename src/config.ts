@@ -3,9 +3,11 @@ import cosmiconfig from 'cosmiconfig'
 import path from 'path'
 import fs from 'fs'
 import osLocale from 'os-locale'
+import { warn } from './cli'
 import { ConverterOption, ConvertType } from './converter'
 import resolveEngine, { ResolvableEngine } from './engine'
 import { CLIError } from './error'
+import { Theme } from './theme'
 
 type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 type Overwrite<T, U> = Omit<T, Extract<keyof T, keyof U>> & U
@@ -20,6 +22,7 @@ export interface IMarpCLIArguments {
   pdf?: boolean
   template?: string
   theme?: string
+  themeSet?: string[]
   watch?: boolean
 }
 
@@ -30,6 +33,7 @@ export type IMarpCLIConfig = Overwrite<
     html?: ConverterOption['html']
     lang?: string
     options?: ConverterOption['options']
+    themeSet?: string | string[]
   }
 >
 
@@ -83,6 +87,7 @@ export class MarpCLIConfig {
         : undefined,
       template: this.args.template || this.conf.template || 'bespoke',
       theme: this.args.theme || this.conf.theme,
+      themeSet: await this.themeSet(this.args.themeSet || this.conf.themeSet),
       type:
         this.args.pdf ||
         this.conf.pdf ||
@@ -117,10 +122,6 @@ export class MarpCLIConfig {
     return dir
   }
 
-  private pickDefined<T>(...args: T[]): T | undefined {
-    return args.find(v => v !== undefined)
-  }
-
   private async loadConf(confPath?: string) {
     const explorer = cosmiconfig(MarpCLIConfig.moduleName)
 
@@ -144,6 +145,19 @@ export class MarpCLIConfig {
           .join(' ')
       )
     }
+  }
+
+  private pickDefined<T>(...args: T[]): T | undefined {
+    return args.find(v => v !== undefined)
+  }
+
+  private async themeSet(path?: string | string[]) {
+    if (path === undefined) return undefined
+
+    const found = await Theme.find(path)
+    if (found.length === 0) warn('Not found additional theme CSS files.')
+
+    return found
   }
 }
 
