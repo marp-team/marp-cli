@@ -25,6 +25,9 @@ npx @marp-team/marp-cli slide-deck.md -o output.html
 # Convert slide deck into PDF
 npx @marp-team/marp-cli slide-deck.md --pdf
 npx @marp-team/marp-cli slide-deck.md -o output.pdf
+
+# Watch mode
+npx @marp-team/marp-cli -w slide-deck.md
 ```
 
 > :information_source: You have to install [Google Chrome](https://www.google.com/chrome/) (or [Chromium](https://www.chromium.org/)) to convert slide deck into PDF.
@@ -39,6 +42,9 @@ docker run --rm -v $PWD:/home/marp/app/ marpteam/marp-cli slide-deck.md
 
 # Convert slide deck into PDF by using Chromium in Docker
 docker run --rm -v $PWD:/home/marp/app/ marpteam/marp-cli slide-deck.md --pdf
+
+# Watch mode
+docker run --rm --init -v $PWD:/home/marp/app/ -p 52000:52000 marpteam/marp-cli -w slide-deck.md
 ```
 
 ## Install
@@ -75,7 +81,7 @@ Under construction.
 - [x] Select theme by option
 - [x] Support configuration file (like `.marprc`)
 - [x] Watch mode
-  - [ ] Auto-reload
+  - [x] Auto-reload
 - [ ] Server mode
 - [x] HTML templates
   - [x] Template that has ready to actual presentation powered by [Bespoke](https://github.com/bespokejs/bespoke)
