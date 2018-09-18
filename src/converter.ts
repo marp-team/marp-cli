@@ -75,8 +75,19 @@ export class Converter {
         type === ConvertType.html
           ? await notifier.register(file.absolutePath)
           : undefined,
-      renderer: tplOpts =>
-        this.generateEngine(tplOpts).render(`${markdown}${additionals}`),
+      renderer: tplOpts => {
+        const engine = this.generateEngine(tplOpts)
+        const ret = engine.render(`${markdown}${additionals}`)
+        const themeDirective = ((<any>engine).lastGlobalDirectives || {}).theme
+
+        return {
+          ...ret,
+          theme:
+            themeDirective !== undefined
+              ? themeDirective
+              : (engine.themeSet.default! || {}).name,
+        }
+      },
     })
   }
 

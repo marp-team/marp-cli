@@ -3,6 +3,8 @@ class CustomEngine {
     this.markdown = {
       set: jest.fn(),
     }
+
+    this.themeSet = {}
   }
 
   render() {

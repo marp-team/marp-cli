@@ -72,6 +72,7 @@ describe('Converter', () => {
       expect(result.result).toContain(readyScript)
       expect(result.result).not.toContain('<base')
       expect(result.rendered.css).toContain('@theme default')
+      expect(result.rendered.theme).toBe('default')
     })
 
     it('throws CLIError when selected engine is not implemented render() method', () => {
@@ -92,6 +93,7 @@ describe('Converter', () => {
     it("overrides theme by converter's theme option", async () => {
       const { rendered } = await instance({ theme: 'gaia' }).convert(md)
       expect(rendered.css).toContain('@theme gaia')
+      expect(rendered.theme).toBe('gaia')
     })
 
     it("overrides html option by converter's html option", async () => {
