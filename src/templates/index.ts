@@ -21,7 +21,7 @@ export interface TemplateResult {
 }
 
 export interface TemplateRenderResult extends MarpitRenderResult {
-  theme?: string
+  theme: string | undefined
 }
 
 export type Template = (locals: TemplateOptions) => Promise<TemplateResult>
