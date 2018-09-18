@@ -1,10 +1,11 @@
 import chokidar from 'chokidar'
 import http from 'http'
 import portfinder from 'portfinder'
-import WebSocket, { Server as WSServer } from 'ws'
 import * as cli from '../src/cli'
 import { File, FileType } from '../src/file'
 import { Watcher, WatchNotifier, notifier } from '../src/watcher'
+
+const mockWsOn = jest.fn()
 
 jest
   .mock('chokidar', () => ({
@@ -14,9 +15,18 @@ jest
       }),
     })),
   }))
+  .mock('ws', () => ({
+    Server: jest.fn(() => ({
+      close: jest.fn(),
+      on: mockWsOn,
+    })),
+  }))
   .mock('../src/watcher')
 
-afterEach(() => jest.restoreAllMocks())
+afterEach(() => {
+  jest.restoreAllMocks()
+  mockWsOn.mockReset()
+})
 
 describe('Watcher', () => {
   describe('.watch', () => {
@@ -179,14 +189,13 @@ describe('WatchNotifier', () => {
       beforeEach(() => instance.register('test'))
 
       it('adds socket to registered set and sends "ready" command', async () => {
-        const eventSpy = jest.spyOn(WSServer.prototype, 'on')
         await instance.start()
 
-        expect(eventSpy).toBeCalledTimes(1)
-        expect(eventSpy).toBeCalledWith('connection', expect.any(Function))
+        expect(mockWsOn).toBeCalledTimes(1)
+        expect(mockWsOn).toBeCalledWith('connection', expect.any(Function))
         expect(instance.listeners.get(testIdentifier).size).toBe(0)
 
-        const [, connection] = eventSpy.mock.calls[0]
+        const [, connection] = mockWsOn.mock.calls[0]
         connection(ws, { url: `/${testIdentifier}` })
         expect(ws.send).toHaveBeenCalledWith('ready')
         expect(instance.listeners.get(testIdentifier).has(ws)).toBe(true)
@@ -201,10 +210,9 @@ describe('WatchNotifier', () => {
       })
 
       it('closes client socket immediately when passed invalid URL', async () => {
-        const eventSpy = jest.spyOn(WSServer.prototype, 'on')
         await instance.start()
 
-        const [, connection] = eventSpy.mock.calls[0]
+        const [, connection] = mockWsOn.mock.calls[0]
         connection(ws, { url: '/invalid' })
 
         expect(ws.send).not.toHaveBeenCalled()
