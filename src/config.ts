@@ -7,7 +7,7 @@ import { warn } from './cli'
 import { ConverterOption, ConvertType } from './converter'
 import resolveEngine, { ResolvableEngine } from './engine'
 import { CLIError } from './error'
-import { Theme } from './theme'
+import { ThemeSet } from './theme'
 
 type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 type Overwrite<T, U> = Omit<T, Extract<keyof T, keyof U>> & U
@@ -70,8 +70,22 @@ export class MarpCLIConfig {
           })()
         : undefined)
 
+    const themeSetPathes =
+      this.args.themeSet ||
+      (this.conf.themeSet
+        ? Array.isArray(this.conf.themeSet)
+          ? this.conf.themeSet
+          : [this.conf.themeSet]
+        : undefined) ||
+      []
+
+    const themeSet = await ThemeSet.initialize(themeSetPathes)
+    if (themeSet.themes.size === 0 && themeSetPathes.length > 0)
+      warn('Not found additional theme CSS files.')
+
     return {
       output,
+      themeSet,
       allowLocalFiles:
         this.pickDefined(
           this.args.allowLocalFiles,
@@ -87,7 +101,6 @@ export class MarpCLIConfig {
         : undefined,
       template: this.args.template || this.conf.template || 'bespoke',
       theme: this.args.theme || this.conf.theme,
-      themeSet: await this.themeSet(this.args.themeSet || this.conf.themeSet),
       type:
         this.args.pdf ||
         this.conf.pdf ||
@@ -149,15 +162,6 @@ export class MarpCLIConfig {
 
   private pickDefined<T>(...args: T[]): T | undefined {
     return args.find(v => v !== undefined)
-  }
-
-  private async themeSet(path?: string | string[]) {
-    if (path === undefined) return undefined
-
-    const found = await Theme.find(path)
-    if (found.length === 0) warn('Not found additional theme CSS files.')
-
-    return found
   }
 }
 

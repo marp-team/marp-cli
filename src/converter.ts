@@ -7,7 +7,7 @@ import { Engine } from './engine'
 import { error } from './error'
 import { File, FileType } from './file'
 import templates, { TemplateResult } from './templates/'
-import { Theme } from './theme'
+import { ThemeSet } from './theme'
 import { notifier } from './watcher'
 
 export enum ConvertType {
@@ -26,7 +26,7 @@ export interface ConverterOption {
   readyScript?: string
   template: string
   theme?: string
-  themeSet?: Theme[]
+  themeSet: ThemeSet
   type: ConvertType
   watch: boolean
 }
@@ -102,6 +102,8 @@ export class Converter {
       await this.convertFileToPDF(newFile)
 
     await newFile.save()
+    this.options.themeSet.observe(file.absolutePath, template.rendered.theme)
+
     return { file, newFile, template }
   }
 
@@ -174,8 +176,7 @@ export class Converter {
     if (!(engine instanceof Marp)) engine.markdown.set({ html: !!html })
 
     // Additional themes
-    if (this.options.themeSet)
-      this.options.themeSet.forEach(theme => engine.themeSet.add(theme.css))
+    this.options.themeSet.registerTo(engine)
 
     return engine
   }

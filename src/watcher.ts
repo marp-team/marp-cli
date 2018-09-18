@@ -15,15 +15,24 @@ export class Watcher {
   readonly events: Watcher.Events
   readonly finder: Watcher.Options['finder']
 
-  private constructor(watchPath: string | string[], opts: Watcher.Options) {
+  private constructor(watchPath: string[], opts: Watcher.Options) {
     this.converter = opts.converter
     this.finder = opts.finder
     this.events = opts.events
 
-    this.chokidar = chokidar.watch(watchPath, { ignoreInitial: true })
-    this.chokidar
+    this.chokidar = chokidar
+      .watch(watchPath, { disableGlobbing: true, ignoreInitial: true })
       .on('change', f => this.convert(f))
       .on('add', f => this.convert(f))
+      .on('unlink', f => {
+        const fn = path.resolve(f)
+        const { themeSet } = this.converter.options
+
+        themeSet.unobserve(fn)
+        themeSet.themes.delete(fn)
+      })
+
+    this.converter.options.themeSet.onThemeUpdated = f => this.convert(f)
 
     notifier.start()
 
@@ -31,12 +40,17 @@ export class Watcher {
   }
 
   private async convert(fn) {
-    const files = (await this.finder()).filter(
-      f => path.resolve(f.path) === path.resolve(fn)
+    const resolvedFn = path.resolve(fn)
+    const mdFiles = (await this.finder()).filter(
+      f => path.resolve(f.path) === resolvedFn
+    )
+    const cssFile = (await this.converter.options.themeSet.findPath()).find(
+      f => path.resolve(f) === resolvedFn
     )
 
+    // Update markdown
     try {
-      await this.converter.convertFiles(files, ret => {
+      await this.converter.convertFiles(mdFiles, ret => {
         this.events.onConverted(ret)
 
         if (ret.file.type === FileType.File)
@@ -45,9 +59,12 @@ export class Watcher {
     } catch (e) {
       this.events.onError(e)
     }
+
+    // Reload Theme CSS
+    if (cssFile !== undefined) this.converter.options.themeSet.load(resolvedFn)
   }
 
-  static watch(watchPath: string | string[], opts: Watcher.Options) {
+  static watch(watchPath: string[], opts: Watcher.Options) {
     return new Watcher(watchPath, opts)
   }
 }
