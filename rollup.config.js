@@ -6,8 +6,7 @@ import nodeResolve from 'rollup-plugin-node-resolve'
 import postcss from 'rollup-plugin-postcss'
 import pugPlugin from 'rollup-plugin-pug'
 import { terser } from 'rollup-plugin-terser'
-import typescriptPlugin from 'rollup-plugin-typescript'
-import typescript from 'typescript'
+import typescript from 'rollup-plugin-typescript'
 import { dependencies } from './package.json'
 
 const external = [
@@ -23,10 +22,7 @@ const plugins = [
   json({ preferConst: true }),
   nodeResolve({ jsnext: true }),
   commonjs(),
-  typescriptPlugin({
-    resolveJsonModule: false, // JSON has already resolved by rollup-plugin-json
-    typescript,
-  }),
+  typescript({ resolveJsonModule: false }),
   postcss({
     inject: false,
     plugins: [autoprefixer(), cssnano({ preset: 'default' })],
