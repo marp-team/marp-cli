@@ -27,7 +27,7 @@ const plugins = [
     inject: false,
     plugins: [autoprefixer(), cssnano({ preset: 'default' })],
   }),
-  pugPlugin(),
+  pugPlugin({ pugRuntime: 'pug-runtime' }),
   !process.env.ROLLUP_WATCH && terser(),
 ]
 
