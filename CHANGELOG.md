@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Added
+
+- Add `--theme-set` option to use additional theme CSS files ([#21](https://github.com/marp-team/marp-cli/pull/21))
+
+### Changed
+
+- Upgrade [Marpit v0.1.1](https://github.com/marp-team/marpit/releases/tag/v0.1.1) and [marp-team/marp-core v0.0.8](https://github.com/marp-team/marp-core/releases/tag/v0.0.8) ([#21](https://github.com/marp-team/marp-cli/pull/21))
+
 ## v0.0.9 - 2018-09-18
 
 ### Added
