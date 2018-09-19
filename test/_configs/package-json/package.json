@@ -1,6 +1,7 @@
 {
   "private": true,
   "marp": {
-    "theme": "gaia"
+    "theme": "b",
+    "themeSet": ["../../_files/themes"]
   }
 }

@@ -331,7 +331,7 @@ describe('Marp CLI', () => {
         expect(await marpCli(['md.md', '-o', '-'])).toBe(0)
 
         const html = stdout.mock.calls[0][0].toString()
-        expect(html).toContain('@theme gaia')
+        expect(html).toContain('@theme b')
       })
 
       context('when --config-file / -c option is passed', () => {
@@ -359,7 +359,7 @@ describe('Marp CLI', () => {
           expect(await marpCli(['-c', conf, onePath, '-o', '-'])).toBe(0)
 
           const html = stdout.mock.calls[0][0].toString()
-          expect(html).toContain('@theme a') // override to user theme
+          expect(html).toContain('@theme a')
         })
 
         it('allows custom engine specified in js config', async () => {
