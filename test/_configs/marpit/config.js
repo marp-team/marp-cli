@@ -1,4 +1,5 @@
 module.exports = {
   engine: '@marp-team/marpit',
-  theme: 'default',
+  theme: 'a',
+  themeSet: '../../_files/themes/a.css',
 }

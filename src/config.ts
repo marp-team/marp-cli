@@ -73,11 +73,11 @@ export class MarpCLIConfig {
     const themeSetPathes =
       this.args.themeSet ||
       (this.conf.themeSet
-        ? Array.isArray(this.conf.themeSet)
-          ? this.conf.themeSet
-          : [this.conf.themeSet]
-        : undefined) ||
-      []
+        ? (Array.isArray(this.conf.themeSet)
+            ? this.conf.themeSet
+            : [this.conf.themeSet]
+          ).map(f => path.resolve(path.dirname(this.confPath!), f))
+        : [])
 
     const themeSet = await ThemeSet.initialize(themeSetPathes)
     if (themeSet.themes.size === 0 && themeSetPathes.length > 0)
