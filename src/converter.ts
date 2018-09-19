@@ -7,7 +7,7 @@ import { Engine } from './engine'
 import { error } from './error'
 import { File, FileType } from './file'
 import templates, { TemplateResult } from './templates/'
-import { Theme } from './theme'
+import { ThemeSet } from './theme'
 import { notifier } from './watcher'
 
 export enum ConvertType {
@@ -26,7 +26,7 @@ export interface ConverterOption {
   readyScript?: string
   template: string
   theme?: string
-  themeSet?: Theme[]
+  themeSet: ThemeSet
   type: ConvertType
   watch: boolean
 }
@@ -56,27 +56,33 @@ export class Converter {
   async convert(markdown: string, file?: File): Promise<TemplateResult> {
     const { lang, readyScript, theme, type } = this.options
 
-    let additionals = ''
-    let base
-
-    if (theme) additionals += `\n<!-- theme: ${JSON.stringify(theme)} -->`
-
-    if (type === ConvertType.pdf && file && file.type === FileType.File)
-      base = file.absolutePath
+    const isFile = file && file.type === FileType.File
+    const additionals = theme
+      ? `\n<!-- theme: ${JSON.stringify(theme)} -->`
+      : ''
 
     return await this.template({
-      base,
       lang,
       readyScript,
+      base: isFile && type === ConvertType.pdf ? file!.absolutePath : undefined,
       notifyWS:
-        this.options.watch &&
-        file &&
-        file.type === FileType.File &&
-        type === ConvertType.html
-          ? await notifier.register(file.absolutePath)
+        isFile && this.options.watch && type === ConvertType.html
+          ? await notifier.register(file!.absolutePath)
           : undefined,
-      renderer: tplOpts =>
-        this.generateEngine(tplOpts).render(`${markdown}${additionals}`),
+      renderer: tplOpts => {
+        const engine = this.generateEngine(tplOpts)
+        const ret = engine.render(`${markdown}${additionals}`)
+
+        if (isFile) {
+          const themeDir: string | undefined =
+            ((<any>engine).lastGlobalDirectives || {}).theme ||
+            (engine.themeSet.default! || {}).name
+
+          this.options.themeSet.observe(file!.absolutePath, themeDir)
+        }
+
+        return ret
+      },
     })
   }
 
@@ -163,8 +169,7 @@ export class Converter {
     if (!(engine instanceof Marp)) engine.markdown.set({ html: !!html })
 
     // Additional themes
-    if (this.options.themeSet)
-      this.options.themeSet.forEach(theme => engine.themeSet.add(theme.css))
+    this.options.themeSet.registerTo(engine)
 
     return engine
   }

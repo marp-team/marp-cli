@@ -3,6 +3,7 @@ import http from 'http'
 import portfinder from 'portfinder'
 import * as cli from '../src/cli'
 import { File, FileType } from '../src/file'
+import { ThemeSet, Theme } from '../src/theme'
 import { Watcher, WatchNotifier, notifier } from '../src/watcher'
 
 const mockWsOn = jest.fn()
@@ -22,6 +23,7 @@ jest
     })),
   }))
   .mock('../src/watcher')
+  .mock('../src/theme')
 
 afterEach(() => {
   jest.restoreAllMocks()
@@ -29,56 +31,118 @@ afterEach(() => {
 })
 
 describe('Watcher', () => {
+  const file = new File('test.md')
+
+  const createThemeSet = () => {
+    const instance = new (<any>ThemeSet)()
+
+    instance.findPath.mockResolvedValue(['test.css'])
+    instance.themes = { delete: jest.fn() }
+
+    return instance
+  }
+
+  const createWatcher = () =>
+    Watcher.watch(['test.md'], <any>{
+      finder: async () => [file],
+      converter: {
+        convertFiles: jest.fn(),
+        options: { themeSet: createThemeSet() },
+      },
+      events: {
+        onConverted: jest.fn(),
+        onError: jest.fn(),
+      },
+    })
+
+  beforeEach(() => jest.spyOn(cli, 'info').mockImplementation())
+
   describe('.watch', () => {
-    const { watch } = Watcher
-    const convertFiles = jest.fn()
-    const converterStub = { convertFiles: convertFiles.mockResolvedValue(0) }
-
-    beforeEach(() => jest.spyOn(cli, 'info').mockImplementation())
-
     it('starts chokidar watcher and WebSocket notifier', async () => {
-      const events = { onConverted: jest.fn(), onError: jest.fn() }
-      const file = new File('test.md')
-      const watcher = watch('test.md', <any>{
-        events,
-        converter: converterStub,
-        finder: async () => [file],
-      })
+      const watcher = createWatcher()
 
       expect(watcher).toBeInstanceOf(Watcher)
-      expect(chokidar.watch).toHaveBeenCalledWith('test.md', expect.anything())
+      expect(chokidar.watch).toHaveBeenCalledWith(
+        ['test.md'],
+        expect.anything()
+      )
       expect(notifier.start).toHaveBeenCalled()
 
-      const { on } = watcher.chokidar
+      // Chokidar events
+      const on = <jest.Mock>watcher.chokidar.on
+
       expect(on).toHaveBeenCalledWith('change', expect.any(Function))
       expect(on).toHaveBeenCalledWith('add', expect.any(Function))
+      expect(on).toHaveBeenCalledWith('unlink', expect.any(Function))
 
-      // Trigger converter and notifier if filepath is matched to finder files
-      for (const [, convertFunc] of (<jest.Mock>on).mock.calls) {
-        convertFiles.mockClear()
-        await convertFunc('test.md')
-        expect(convertFiles).toHaveBeenCalledTimes(1)
+      const onChange = on.mock.calls.find(([e]) => e === 'change')[1]
+      const onAdd = on.mock.calls.find(([e]) => e === 'add')[1]
+      const onUnlink = on.mock.calls.find(([e]) => e === 'unlink')[1]
 
-        const [files, onConverted] = convertFiles.mock.calls[0]
+      // Callbacks
+      const conv = jest.spyOn(<any>watcher, 'convert').mockImplementation()
+      const del = jest.spyOn(<any>watcher, 'delete').mockImplementation()
+
+      onChange('change')
+      expect(conv).toBeCalledWith('change')
+
+      onAdd('add')
+      expect(conv).toBeCalledWith('add')
+
+      onUnlink('unlink')
+      expect(del).toBeCalledWith('unlink')
+
+      watcher.converter.options.themeSet.onThemeUpdated('theme-update')
+      expect(conv).toBeCalledWith('theme-update')
+    })
+  })
+
+  describe('#convert', () => {
+    context('when passed filename is found from file finder', () => {
+      it('converts markdown', async () => {
+        const watcher: any = createWatcher()
+
+        await watcher.convert('test.md')
+        expect(watcher.converter.convertFiles).toHaveBeenCalledTimes(1)
+
+        const [files, onCvted] = watcher.converter.convertFiles.mock.calls[0]
         expect(files).toContain(file)
 
         // Trigger events
-        events.onConverted.mockClear()
-        ;(<jest.Mock>notifier.sendTo).mockClear()
-
-        onConverted({ file: { absolutePath: 'path', type: FileType.File } })
-        expect(events.onConverted).toHaveBeenCalled()
-        expect(notifier.sendTo).toHaveBeenCalledWith('path', 'reload')
+        onCvted({ file: { absolutePath: 'test.md', type: FileType.File } })
+        expect(watcher.events.onConverted).toHaveBeenCalled()
+        expect(notifier.sendTo).toHaveBeenCalledWith('test.md', 'reload')
 
         // Error handling
-        events.onError.mockClear()
-        convertFiles.mockImplementationOnce(() => {
+        watcher.converter.convertFiles.mockImplementationOnce(() => {
           throw new Error('Error occurred')
         })
 
-        await convertFunc('test.md')
-        expect(events.onError).toHaveBeenCalledTimes(1)
-      }
+        await watcher.convert('test.md')
+        expect(watcher.events.onError).toHaveBeenCalledTimes(1)
+      })
+    })
+
+    context('when passed filename is found from theme finder', () => {
+      it('reloads theme CSS', async () => {
+        const watcher: any = createWatcher()
+        const { load } = watcher.converter.options.themeSet
+
+        await watcher.convert('test.css')
+        expect(load).toHaveBeenCalledWith(expect.stringContaining('test.css'))
+      })
+    })
+  })
+
+  describe('#delete', () => {
+    it('removes file from observer and theme collection', () => {
+      const watcher: any = createWatcher()
+      const { themeSet } = watcher.converter.options
+      const fn = expect.stringContaining('test.md')
+
+      watcher.delete('test.md')
+      expect(themeSet.unobserve).toHaveBeenCalledWith(fn)
+      expect(themeSet.themes.delete).toHaveBeenCalledWith(fn)
     })
   })
 })

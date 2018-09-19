@@ -166,14 +166,21 @@ export default async function(argv: string[] = []): Promise<number> {
 
     // Watch mode
     if (cvtOpts.watch) {
-      watcher(cvtOpts.inputDir || args._, {
-        converter,
-        finder,
-        events: {
-          onConverted,
-          onError: e => cli.error(`Failed converting Markdown. (${e.message})`),
-        },
-      })
+      watcher(
+        [
+          ...(cvtOpts.inputDir ? [cvtOpts.inputDir] : args._),
+          ...cvtOpts.themeSet.fnForWatch,
+        ],
+        {
+          converter,
+          finder,
+          events: {
+            onConverted,
+            onError: e =>
+              cli.error(`Failed converting Markdown. (${e.message})`),
+          },
+        }
+      )
     }
 
     return 0
