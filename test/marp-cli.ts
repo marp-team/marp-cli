@@ -189,10 +189,9 @@ describe('Marp CLI', () => {
           await marpCli(['--theme-set', themeA, '--theme', 'a', filePath])
         ).toBe(0)
         expect(convert).toBeCalledTimes(1)
-
-        const { css, theme } = (await convert.mock.results[0].value).rendered
-        expect(css).toContain('@theme a')
-        expect(theme).toBe('a')
+        expect((await convert.mock.results[0].value).rendered.css).toContain(
+          '@theme a'
+        )
       })
     })
 
@@ -205,10 +204,9 @@ describe('Marp CLI', () => {
 
           expect(await marpCli([...baseArgs, '--theme', name])).toBe(0)
           expect(convert).toBeCalledTimes(1)
-
-          const { css, theme } = (await convert.mock.results[0].value).rendered
-          expect(css).toContain(`@theme ${name}`)
-          expect(theme).toBe(name)
+          expect((await convert.mock.results[0].value).rendered.css).toContain(
+            `@theme ${name}`
+          )
         }
       })
     })
@@ -222,10 +220,9 @@ describe('Marp CLI', () => {
 
           expect(await marpCli([...baseArgs(themes), '--theme', name])).toBe(0)
           expect(convert).toBeCalledTimes(1)
-
-          const { css, theme } = (await convert.mock.results[0].value).rendered
-          expect(css).toContain(`@theme ${name}`)
-          expect(theme).toBe(name)
+          expect((await convert.mock.results[0].value).rendered.css).toContain(
+            `@theme ${name}`
+          )
         }
       })
 

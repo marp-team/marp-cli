@@ -56,37 +56,32 @@ export class Converter {
   async convert(markdown: string, file?: File): Promise<TemplateResult> {
     const { lang, readyScript, theme, type } = this.options
 
-    let additionals = ''
-    let base
-
-    if (theme) additionals += `\n<!-- theme: ${JSON.stringify(theme)} -->`
-
-    if (type === ConvertType.pdf && file && file.type === FileType.File)
-      base = file.absolutePath
+    const isFile = file && file.type === FileType.File
+    const additionals = theme
+      ? `\n<!-- theme: ${JSON.stringify(theme)} -->`
+      : ''
 
     return await this.template({
-      base,
       lang,
       readyScript,
+      base: isFile && type === ConvertType.pdf ? file!.absolutePath : undefined,
       notifyWS:
-        this.options.watch &&
-        file &&
-        file.type === FileType.File &&
-        type === ConvertType.html
-          ? await notifier.register(file.absolutePath)
+        isFile && this.options.watch && type === ConvertType.html
+          ? await notifier.register(file!.absolutePath)
           : undefined,
       renderer: tplOpts => {
         const engine = this.generateEngine(tplOpts)
         const ret = engine.render(`${markdown}${additionals}`)
-        const themeDirective = ((<any>engine).lastGlobalDirectives || {}).theme
 
-        return {
-          ...ret,
-          theme:
-            themeDirective !== undefined
-              ? themeDirective
-              : (engine.themeSet.default! || {}).name,
+        if (isFile) {
+          const themeDir: string | undefined =
+            ((<any>engine).lastGlobalDirectives || {}).theme ||
+            (engine.themeSet.default! || {}).name
+
+          this.options.themeSet.observe(file!.absolutePath, themeDir)
         }
+
+        return ret
       },
     })
   }
@@ -102,8 +97,6 @@ export class Converter {
       await this.convertFileToPDF(newFile)
 
     await newFile.save()
-    this.options.themeSet.observe(file.absolutePath, template.rendered.theme)
-
     return { file, newFile, template }
   }
 

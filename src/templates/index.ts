@@ -11,17 +11,13 @@ export interface TemplateOptions {
   lang: string
   notifyWS?: string
   readyScript?: string
-  renderer: (tplOpts: MarpitOptions) => TemplateRenderResult
+  renderer: (tplOpts: MarpitOptions) => MarpitRenderResult
   [prop: string]: any
 }
 
 export interface TemplateResult {
-  rendered: TemplateRenderResult
+  rendered: MarpitRenderResult
   result: string
-}
-
-export interface TemplateRenderResult extends MarpitRenderResult {
-  theme: string | undefined
 }
 
 export type Template = (locals: TemplateOptions) => Promise<TemplateResult>
