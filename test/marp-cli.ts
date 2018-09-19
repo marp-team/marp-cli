@@ -189,9 +189,9 @@ describe('Marp CLI', () => {
           await marpCli(['--theme-set', themeA, '--theme', 'a', filePath])
         ).toBe(0)
         expect(convert).toBeCalledTimes(1)
-        expect((await convert.mock.results[0].value).rendered.css).toContain(
-          '@theme a'
-        )
+
+        const { css } = (await convert.mock.results[0].value).rendered
+        expect(css).toContain('@theme a')
       })
     })
 

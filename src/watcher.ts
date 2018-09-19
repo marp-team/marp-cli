@@ -24,13 +24,7 @@ export class Watcher {
       .watch(watchPath, { disableGlobbing: true, ignoreInitial: true })
       .on('change', f => this.convert(f))
       .on('add', f => this.convert(f))
-      .on('unlink', f => {
-        const fn = path.resolve(f)
-        const { themeSet } = this.converter.options
-
-        themeSet.unobserve(fn)
-        themeSet.themes.delete(fn)
-      })
+      .on('unlink', f => this.delete(f))
 
     this.converter.options.themeSet.onThemeUpdated = f => this.convert(f)
 
@@ -39,8 +33,8 @@ export class Watcher {
     cli.info(chalk.green('[Watch mode] Start watching...'))
   }
 
-  private async convert(fn) {
-    const resolvedFn = path.resolve(fn)
+  private async convert(filename: string) {
+    const resolvedFn = path.resolve(filename)
     const mdFiles = (await this.finder()).filter(
       f => path.resolve(f.path) === resolvedFn
     )
@@ -62,6 +56,14 @@ export class Watcher {
 
     // Reload Theme CSS
     if (cssFile !== undefined) this.converter.options.themeSet.load(resolvedFn)
+  }
+
+  private delete(filename: string) {
+    const fn = path.resolve(filename)
+    const { themeSet } = this.converter.options
+
+    themeSet.unobserve(fn)
+    themeSet.themes.delete(fn)
   }
 
   static watch(watchPath: string[], opts: Watcher.Options) {

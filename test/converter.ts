@@ -4,9 +4,10 @@ import fs from 'fs'
 import os from 'os'
 import path from 'path'
 import { Converter, ConvertType } from '../src/converter'
+import { CLIError } from '../src/error'
 import { File, FileType } from '../src/file'
 import { bare as bareTpl } from '../src/templates'
-import { CLIError } from '../src/error'
+import { ThemeSet } from '../src/theme'
 import { WatchNotifier } from '../src/watcher'
 
 jest.mock('fs')
@@ -19,8 +20,12 @@ describe('Converter', () => {
   const twoPath = path.resolve(__dirname, '_files/2.mdown')
   const threePath = path.resolve(__dirname, '_files/3.markdown')
 
+  let themeSet: ThemeSet
+  beforeEach(async () => (themeSet = await ThemeSet.initialize([])))
+
   const instance = (opts = {}) =>
     new Converter({
+      themeSet,
       allowLocalFiles: false,
       lang: 'en',
       engine: Marp,
@@ -34,6 +39,7 @@ describe('Converter', () => {
   describe('#constructor', () => {
     it('assigns initial options to options member', () => {
       const options = {
+        themeSet,
         allowLocalFiles: true,
         lang: 'fr',
         engine: Marp,
@@ -60,6 +66,7 @@ describe('Converter', () => {
 
   describe('#convert', () => {
     const md = '# <i>Hello!</i>'
+    const dummyFile = new File(process.cwd())
 
     it('returns the result of template', async () => {
       const options = { html: true }
@@ -103,21 +110,19 @@ describe('Converter', () => {
     })
 
     context('with PDF convert type', () => {
-      const converter = instance({ type: ConvertType.pdf })
-      const dummyFile = new File(process.cwd())
-
       it('adds <base> element with specified base path from passed file', async () => {
+        const converter = instance({ type: ConvertType.pdf })
+
         const { result } = await converter.convert(md, dummyFile)
         expect(result).toContain(`<base href="${process.cwd()}">`)
       })
     })
 
     context('with watch mode', () => {
-      const converter = instance({ watch: true })
-      const dummyFile = new File(process.cwd())
-      const hash = WatchNotifier.sha256(process.cwd())
-
       it('adds script for auto-reload', async () => {
+        const converter = instance({ watch: true })
+        const hash = WatchNotifier.sha256(process.cwd())
+
         const { result } = await converter.convert(md, dummyFile)
         expect(result).toContain(
           `<script>window\.__marpCliWatchWS="ws://localhost:52000/${hash}";`
