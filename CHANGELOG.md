@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v0.0.10 - 2018-09-20
+
 ### Added
 
 - Add `--theme-set` option to use additional theme CSS files ([#21](https://github.com/marp-team/marp-cli/pull/21))
