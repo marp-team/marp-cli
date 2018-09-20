@@ -17,7 +17,7 @@ describe("Bespoke template's browser context", () => {
 
   const render = (md = defaultMarkdown): HTMLElement => {
     document.body.innerHTML = marp.render(md).html
-    return document.getElementById('presentation')
+    return document.getElementById('presentation')!
   }
 
   describe('Classes', () => {
