@@ -7,12 +7,17 @@ const themeExtensions = ['*.css']
 
 export class Theme {
   readonly filename: string
+  readonly overridenName?: string
   name?: string
 
   private readBuffer?: Buffer
 
-  private constructor(filename: string) {
+  private constructor(filename: string, opts: Theme.Options) {
     this.filename = filename
+    this.overridenName =
+      opts.overrideName === true ? this.genUniqName() : opts.overrideName
+
+    this.name = this.overridenName
   }
 
   get buffer() {
@@ -20,7 +25,11 @@ export class Theme {
   }
 
   get css() {
-    return this.buffer.toString()
+    const buf = this.buffer.toString()
+
+    return this.overridenName
+      ? `${buf}\n/* @theme ${this.overridenName} */`
+      : buf
   }
 
   async load() {
@@ -29,8 +38,17 @@ export class Theme {
     )
   }
 
-  static async initialize(filename: string) {
-    const instance = new Theme(filename)
+  private genUniqName() {
+    const uniq = () =>
+      Math.random()
+        .toString(36)
+        .slice(2)
+
+    return `${uniq()}${uniq()}${uniq()}${uniq()}`
+  }
+
+  static async initialize(filename: string, opts: Theme.Options = {}) {
+    const instance = new Theme(filename, opts)
     await instance.load()
 
     return instance
@@ -65,7 +83,7 @@ export class ThemeSet {
       await theme.load()
     } else {
       theme = await Theme.initialize(filename)
-      this.themes.set(filename, theme)
+      this.add(theme)
     }
 
     if (theme.name !== undefined) this.notify(theme.name)
@@ -86,13 +104,18 @@ export class ThemeSet {
     this.observedMarkdowns.delete(markdownPath)
   }
 
+  private add(theme: Theme) {
+    this.themes.set(theme.filename, theme)
+  }
+
   private notify(theme: string) {
     this.observedMarkdowns.forEach((v, path) => {
       if (v === theme) this.onThemeUpdated(path)
     })
   }
 
-  static async initialize(fn: string[]) {
+  static async initialize(baseFn: string[], themes: Theme[] = []) {
+    const fn = [...baseFn, ...themes.map(t => t.filename)]
     const found = await ThemeSet.findPath(fn)
     const fnForWatch: Set<string> = new Set(found.map(f => path.resolve(f)))
 
@@ -112,6 +135,8 @@ export class ThemeSet {
     const instance = new ThemeSet({ fn, fnForWatch: [...fnForWatch] })
     for (const f of found) await instance.load(f)
 
+    themes.forEach(t => instance.add(t))
+
     return instance
   }
 
@@ -120,5 +145,11 @@ export class ThemeSet {
       absolute: true,
       expandDirectories: { files: themeExtensions },
     })
+  }
+}
+
+export namespace Theme {
+  export interface Options {
+    overrideName?: true | string
   }
 }

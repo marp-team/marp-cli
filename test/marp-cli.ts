@@ -168,6 +168,47 @@ describe('Marp CLI', () => {
     })
   })
 
+  context('with --theme option', () => {
+    let convert: jest.SpyInstance
+
+    beforeEach(() => {
+      jest.spyOn(cli, 'info').mockImplementation()
+      ;(<any>fs).__mockWriteFile()
+
+      convert = jest.spyOn(Converter.prototype, 'convert')
+    })
+
+    context('when passed value is theme name', () => {
+      it('overrides theme to specified', async () => {
+        const args = [assetFn('_files/1.md'), '--theme', 'gaia']
+        expect(await marpCli(args)).toBe(0)
+
+        const { css } = (await convert.mock.results[0].value).rendered
+        expect(css).toContain('@theme gaia')
+      })
+    })
+
+    context('when passed value is file path to theme CSS', () => {
+      const cssFile = assetFn('_files/themes/a.css')
+
+      it('overrides theme to specified CSS', async () => {
+        const args = [assetFn('_files/1.md'), '--theme', cssFile]
+        expect(await marpCli(args)).toBe(0)
+
+        const { css } = (await convert.mock.results[0].value).rendered
+        expect(css).toContain('/* @theme a */')
+
+        const converter = <Converter>convert.mock.instances[0]
+        const { themeSet } = converter.options
+        const theme = themeSet.themes.get(cssFile)
+
+        expect(theme.overridenName).not.toBeUndefined()
+        expect(converter.options.theme).toBe(theme.overridenName)
+        expect(themeSet.fnForWatch).toContain(cssFile)
+      })
+    })
+  })
+
   context('with --theme-set option', () => {
     const filePath = assetFn('_files/1.md')
     const themes = assetFn('_files/themes')
