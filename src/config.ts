@@ -1,9 +1,10 @@
 import { Marp } from '@marp-team/marp-core'
+import chalk from 'chalk'
 import cosmiconfig from 'cosmiconfig'
 import path from 'path'
 import fs from 'fs'
 import osLocale from 'os-locale'
-import { warn } from './cli'
+import { info, warn } from './cli'
 import { ConverterOption, ConvertType } from './converter'
 import resolveEngine, { ResolvableEngine } from './engine'
 import { CLIError } from './error'
@@ -170,10 +171,15 @@ export class MarpCLIConfig {
   private async loadTheme(): Promise<string | Theme | undefined> {
     const theme = (() => {
       if (this.args.theme)
-        return { name: this.args.theme, path: path.resolve(this.args.theme) }
+        return {
+          advice: { use: '--theme-set', insteadOf: '--theme' },
+          name: this.args.theme,
+          path: path.resolve(this.args.theme),
+        }
 
       if (this.conf.theme)
         return {
+          advice: { use: 'themeSet', insteadOf: 'theme' },
           name: this.conf.theme,
           path: path.resolve(path.dirname(this.confPath!), this.conf.theme),
         }
@@ -183,6 +189,17 @@ export class MarpCLIConfig {
     try {
       return await Theme.initialize(theme.path, { overrideName: true })
     } catch (e) {
+      if (e.code === 'EISDIR') {
+        info(
+          `Please use ${chalk.yellow(theme.advice.use)} option instead of ${
+            theme.advice.insteadOf
+          } to make theme CSS available from directory.`
+        )
+        throw new CLIError(
+          `Directory cannot pass to theme option. (${theme.path})`
+        )
+      }
+
       if (e.code !== 'ENOENT') throw e
     }
 
