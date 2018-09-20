@@ -44,7 +44,6 @@
     "watch": "rollup -w -c"
   },
   "devDependencies": {
-    "@babel/core": "^7.1.0",
     "@types/chokidar": "^1.7.5",
     "@types/cosmiconfig": "^5.0.3",
     "@types/get-stdin": "^5.0.1",
