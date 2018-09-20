@@ -6,11 +6,10 @@ module.exports = {
   coverageThreshold: { global: { lines: 95 } },
   moduleFileExtensions: ['ts', 'js', 'json', 'node'],
   setupFiles: ['jest-plugin-context/setup'],
-  transform: {
-    ...jestPreset.transform,
+  transform: Object.assign({}, jestPreset.transform, {
     '^.*\\.s?css$': '<rootDir>/test/_transformers/css.js',
     '^.*\\.pug$': '<rootDir>/test/_transformers/pug.js',
-  },
+  }),
   testEnvironment: 'node',
   testRegex: '(/(test|__tests__)/(?!_).*|(\\.|/)(test|spec))\\.[jt]s$',
 }
