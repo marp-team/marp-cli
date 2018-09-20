@@ -1,13 +1,14 @@
 import { Marp } from '@marp-team/marp-core'
+import chalk from 'chalk'
 import cosmiconfig from 'cosmiconfig'
 import path from 'path'
 import fs from 'fs'
 import osLocale from 'os-locale'
-import { warn } from './cli'
+import { info, warn } from './cli'
 import { ConverterOption, ConvertType } from './converter'
 import resolveEngine, { ResolvableEngine } from './engine'
 import { CLIError } from './error'
-import { Theme } from './theme'
+import { Theme, ThemeSet } from './theme'
 
 type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 type Overwrite<T, U> = Omit<T, Extract<keyof T, keyof U>> & U
@@ -70,8 +71,29 @@ export class MarpCLIConfig {
           })()
         : undefined)
 
+    const theme = await this.loadTheme()
+    const initialThemes = theme instanceof Theme ? [theme] : []
+
+    const themeSetPathes =
+      this.args.themeSet ||
+      (this.conf.themeSet
+        ? (Array.isArray(this.conf.themeSet)
+            ? this.conf.themeSet
+            : [this.conf.themeSet]
+          ).map(f => path.resolve(path.dirname(this.confPath!), f))
+        : [])
+
+    const themeSet = await ThemeSet.initialize(themeSetPathes, initialThemes)
+
+    if (
+      themeSet.themes.size <= initialThemes.length &&
+      themeSetPathes.length > 0
+    )
+      warn('Not found additional theme CSS files.')
+
     return {
       output,
+      themeSet,
       allowLocalFiles:
         this.pickDefined(
           this.args.allowLocalFiles,
@@ -86,8 +108,7 @@ export class MarpCLIConfig {
         ? `<script defer>${engine.browserScript}</script>`
         : undefined,
       template: this.args.template || this.conf.template || 'bespoke',
-      theme: this.args.theme || this.conf.theme,
-      themeSet: await this.themeSet(this.args.themeSet || this.conf.themeSet),
+      theme: theme instanceof Theme ? theme.name : theme,
       type:
         this.args.pdf ||
         this.conf.pdf ||
@@ -147,17 +168,46 @@ export class MarpCLIConfig {
     }
   }
 
-  private pickDefined<T>(...args: T[]): T | undefined {
-    return args.find(v => v !== undefined)
+  private async loadTheme(): Promise<string | Theme | undefined> {
+    const theme = (() => {
+      if (this.args.theme)
+        return {
+          advice: { use: '--theme-set', insteadOf: '--theme' },
+          name: this.args.theme,
+          path: path.resolve(this.args.theme),
+        }
+
+      if (this.conf.theme)
+        return {
+          advice: { use: 'themeSet', insteadOf: 'theme' },
+          name: this.conf.theme,
+          path: path.resolve(path.dirname(this.confPath!), this.conf.theme),
+        }
+    })()
+    if (!theme) return undefined
+
+    try {
+      return await Theme.initialize(theme.path, { overrideName: true })
+    } catch (e) {
+      if (e.code === 'EISDIR') {
+        info(
+          `Please use ${chalk.yellow(theme.advice.use)} option instead of ${
+            theme.advice.insteadOf
+          } to make theme CSS available from directory.`
+        )
+        throw new CLIError(
+          `Directory cannot pass to theme option. (${theme.path})`
+        )
+      }
+
+      if (e.code !== 'ENOENT') throw e
+    }
+
+    return theme.name
   }
 
-  private async themeSet(path?: string | string[]) {
-    if (path === undefined) return undefined
-
-    const found = await Theme.find(path)
-    if (found.length === 0) warn('Not found additional theme CSS files.')
-
-    return found
+  private pickDefined<T>(...args: T[]): T | undefined {
+    return args.find(v => v !== undefined)
   }
 }
 

@@ -1,11 +1,13 @@
 import fs from 'fs'
 import getStdin from 'get-stdin'
 import path from 'path'
+import stripAnsi from 'strip-ansi'
 import marpCli from '../src/marp-cli'
 import * as cli from '../src/cli'
 import { File } from '../src/file'
 import { Converter, ConvertType } from '../src/converter'
 import { CLIError } from '../src/error'
+import { ThemeSet } from '../src/theme'
 import { Watcher } from '../src/watcher'
 
 const { version } = require('../package.json')
@@ -167,6 +169,67 @@ describe('Marp CLI', () => {
     })
   })
 
+  context('with --theme option', () => {
+    let convert: jest.SpyInstance
+    let info: jest.SpyInstance
+
+    beforeEach(() => {
+      convert = jest.spyOn(Converter.prototype, 'convert')
+      info = jest.spyOn(cli, 'info')
+
+      info.mockImplementation()
+      ;(<any>fs).__mockWriteFile()
+    })
+
+    context('when passed value is theme name', () => {
+      it('overrides theme to specified', async () => {
+        const args = [assetFn('_files/1.md'), '--theme', 'gaia']
+        expect(await marpCli(args)).toBe(0)
+
+        const { css } = (await convert.mock.results[0].value).rendered
+        expect(css).toContain('@theme gaia')
+      })
+    })
+
+    context('when passed value is a file path to theme CSS', () => {
+      const cssFile = assetFn('_files/themes/a.css')
+
+      it('overrides theme to specified CSS', async () => {
+        const args = [assetFn('_files/1.md'), '--theme', cssFile]
+        expect(await marpCli(args)).toBe(0)
+
+        const { css } = (await convert.mock.results[0].value).rendered
+        expect(css).toContain('/* @theme a */')
+
+        const converter = <Converter>convert.mock.instances[0]
+        const { themeSet } = converter.options
+        const theme = themeSet.themes.get(cssFile)
+
+        expect(theme.overridenName).not.toBeUndefined()
+        expect(converter.options.theme).toBe(theme.overridenName)
+        expect(themeSet.fnForWatch).toContain(cssFile)
+      })
+    })
+
+    context('when passed value is a path to directory', () => {
+      const themesPath = assetFn('_files/themes')
+
+      it('prints error with advice and return error code', async () => {
+        const cliError = jest.spyOn(cli, 'error').mockImplementation()
+        const args = [assetFn('_files/1.md'), '--theme', themesPath]
+
+        expect(await marpCli(args)).toBe(1)
+        expect(cliError).toHaveBeenCalledWith(
+          expect.stringContaining('Directory cannot pass to theme option')
+        )
+        expect(info).toHaveBeenCalledTimes(1)
+
+        const advice = stripAnsi(info.mock.calls[0][0])
+        expect(advice).toContain('use --theme-set option')
+      })
+    })
+  })
+
   context('with --theme-set option', () => {
     const filePath = assetFn('_files/1.md')
     const themes = assetFn('_files/themes')
@@ -175,9 +238,11 @@ describe('Marp CLI', () => {
     const themeC = assetFn('_files/themes/nested/c.css')
 
     let convert: jest.SpyInstance
+    let observeSpy: jest.SpyInstance
 
     beforeEach(() => {
       convert = jest.spyOn(Converter.prototype, 'convert')
+      observeSpy = jest.spyOn(ThemeSet.prototype, 'observe')
 
       jest.spyOn(cli, 'info').mockImplementation()
       ;(<any>fs).__mockWriteFile()
@@ -192,6 +257,7 @@ describe('Marp CLI', () => {
 
         const { css } = (await convert.mock.results[0].value).rendered
         expect(css).toContain('@theme a')
+        expect(observeSpy).toHaveBeenCalledWith(filePath, 'a')
       })
     })
 
@@ -201,12 +267,14 @@ describe('Marp CLI', () => {
       it('becomes to be able to use multiple additional themes', async () => {
         for (const name of ['b', 'c']) {
           convert.mockClear()
+          observeSpy.mockClear()
 
           expect(await marpCli([...baseArgs, '--theme', name])).toBe(0)
           expect(convert).toBeCalledTimes(1)
           expect((await convert.mock.results[0].value).rendered.css).toContain(
             `@theme ${name}`
           )
+          expect(observeSpy).toHaveBeenCalledWith(filePath, name)
         }
       })
     })
@@ -217,12 +285,14 @@ describe('Marp CLI', () => {
       it('becomes to be able to use the all css files in directory', async () => {
         for (const name of ['a', 'b', 'c']) {
           convert.mockClear()
+          observeSpy.mockClear()
 
           expect(await marpCli([...baseArgs(themes), '--theme', name])).toBe(0)
           expect(convert).toBeCalledTimes(1)
           expect((await convert.mock.results[0].value).rendered.css).toContain(
             `@theme ${name}`
           )
+          expect(observeSpy).toHaveBeenCalledWith(filePath, name)
         }
       })
 
@@ -323,7 +393,7 @@ describe('Marp CLI', () => {
         expect(await marpCli(['md.md', '-o', '-'])).toBe(0)
 
         const html = stdout.mock.calls[0][0].toString()
-        expect(html).toContain('@theme gaia')
+        expect(html).toContain('@theme b')
       })
 
       context('when --config-file / -c option is passed', () => {
@@ -351,7 +421,7 @@ describe('Marp CLI', () => {
           expect(await marpCli(['-c', conf, onePath, '-o', '-'])).toBe(0)
 
           const html = stdout.mock.calls[0][0].toString()
-          expect(html).not.toContain('@theme default') // Marpit engine has not default theme
+          expect(html).toContain('@theme a')
         })
 
         it('allows custom engine specified in js config', async () => {

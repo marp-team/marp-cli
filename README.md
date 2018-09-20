@@ -77,7 +77,7 @@ Under construction.
 
 - [x] Add `marp` bin
 - [x] Convert to plain HTML (includes style)
-- [ ] Import external theme file(s)
+- [x] Use external theme file(s)
 - [x] Select theme by option
 - [x] Support configuration file (like `.marprc`)
 - [x] Watch mode

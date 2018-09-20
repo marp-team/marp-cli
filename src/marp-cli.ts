@@ -94,13 +94,13 @@ export default async function(argv: string[] = []): Promise<number> {
           type: 'boolean',
         },
         theme: {
-          describe: 'Override theme',
+          describe: 'Override theme by name or CSS file',
           group: OptionGroup.Marp,
           type: 'string',
         },
         'theme-set': {
           array: true,
-          describe: 'Path to additional theme CSS file(s)',
+          describe: 'Path to additional theme CSS files',
           group: OptionGroup.Marp,
           type: 'string',
         },
@@ -166,14 +166,21 @@ export default async function(argv: string[] = []): Promise<number> {
 
     // Watch mode
     if (cvtOpts.watch) {
-      watcher(cvtOpts.inputDir || args._, {
-        converter,
-        finder,
-        events: {
-          onConverted,
-          onError: e => cli.error(`Failed converting Markdown. (${e.message})`),
-        },
-      })
+      watcher(
+        [
+          ...(cvtOpts.inputDir ? [cvtOpts.inputDir] : args._),
+          ...cvtOpts.themeSet.fnForWatch,
+        ],
+        {
+          converter,
+          finder,
+          events: {
+            onConverted,
+            onError: e =>
+              cli.error(`Failed converting Markdown. (${e.message})`),
+          },
+        }
+      )
     }
 
     return 0

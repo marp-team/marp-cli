@@ -76,6 +76,7 @@
     "rollup-plugin-pug": "^0.1.6",
     "rollup-plugin-terser": "^3.0.0",
     "rollup-plugin-typescript": "^1.0.0",
+    "strip-ansi": "^4.0.0",
     "stylelint": "^9.5.0",
     "stylelint-config-prettier": "^4.0.0",
     "stylelint-config-standard": "^18.2.0",
