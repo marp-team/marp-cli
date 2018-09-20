@@ -6331,7 +6331,7 @@ trough@^1.0.0:
   dependencies:
     glob "^7.1.2"
 
-ts-jest@^23.10.0:
+ts-jest@23.10.0:
   version "23.10.0"
   resolved "https://registry.yarnpkg.com/ts-jest/-/ts-jest-23.10.0.tgz#1b1ce1d795791dedf0229b7577b35eaed8565bbd"
   dependencies:

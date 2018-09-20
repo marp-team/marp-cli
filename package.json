@@ -80,7 +80,7 @@
     "stylelint-config-prettier": "^4.0.0",
     "stylelint-config-standard": "^18.2.0",
     "stylelint-scss": "^3.3.0",
-    "ts-jest": "^23.10.0",
+    "ts-jest": "23.10.0",
     "ts-keycode-enum": "^1.0.6",
     "tslib": "^1.9.3",
     "tslint": "^5.11.0",
