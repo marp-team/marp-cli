@@ -10,7 +10,8 @@
 
 ### Changed
 
-- Upgrade [Marpit v0.1.1](https://github.com/marp-team/marpit/releases/tag/v0.1.1) and [marp-team/marp-core v0.0.8](https://github.com/marp-team/marp-core/releases/tag/v0.0.8) ([#21](https://github.com/marp-team/marp-cli/pull/21))
+- Upgrade [Marpit v0.1.2](https://github.com/marp-team/marpit/releases/tag/v0.1.2) and [marp-team/marp-core v0.0.9](https://github.com/marp-team/marp-core/releases/tag/v0.0.9) ([#25](https://github.com/marp-team/marp-cli/pull/25))
+- Upgrade dependent packages to latest version with many update of settings ([#25](https://github.com/marp-team/marp-cli/pull/25))
 
 ## v0.0.9 - 2018-09-18
 
