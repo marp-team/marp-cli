@@ -13,10 +13,9 @@ import { Watcher } from '../src/watcher'
 const { version } = require('../package.json')
 const coreVersion = require('@marp-team/marp-core/package.json').version
 
-jest
-  .mock('fs')
-  .mock('mkdirp')
-  .mock('../src/watcher', () => jest.genMockFromModule('../src/watcher'))
+jest.mock('fs')
+jest.mock('mkdirp')
+jest.mock('../src/watcher', () => jest.genMockFromModule('../src/watcher'))
 
 afterEach(() => jest.restoreAllMocks())
 
@@ -203,7 +202,7 @@ describe('Marp CLI', () => {
 
         const converter = <Converter>convert.mock.instances[0]
         const { themeSet } = converter.options
-        const theme = themeSet.themes.get(cssFile)
+        const theme = themeSet.themes.get(cssFile)!
 
         expect(theme.overridenName).not.toBeUndefined()
         expect(converter.options.theme).toBe(theme.overridenName)

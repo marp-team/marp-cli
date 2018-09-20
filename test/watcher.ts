@@ -8,22 +8,21 @@ import { Watcher, WatchNotifier, notifier } from '../src/watcher'
 
 const mockWsOn = jest.fn()
 
-jest
-  .mock('chokidar', () => ({
-    watch: jest.fn(() => ({
-      on: jest.fn(function() {
-        return this
-      }),
-    })),
-  }))
-  .mock('ws', () => ({
-    Server: jest.fn(() => ({
-      close: jest.fn(),
-      on: mockWsOn,
-    })),
-  }))
-  .mock('../src/watcher')
-  .mock('../src/theme')
+jest.mock('chokidar', () => ({
+  watch: jest.fn(() => ({
+    on: jest.fn(function(this: any) {
+      return this
+    }),
+  })),
+}))
+jest.mock('ws', () => ({
+  Server: jest.fn(() => ({
+    close: jest.fn(),
+    on: mockWsOn,
+  })),
+}))
+jest.mock('../src/watcher')
+jest.mock('../src/theme')
 
 afterEach(() => {
   jest.restoreAllMocks()
@@ -75,9 +74,9 @@ describe('Watcher', () => {
       expect(on).toHaveBeenCalledWith('add', expect.any(Function))
       expect(on).toHaveBeenCalledWith('unlink', expect.any(Function))
 
-      const onChange = on.mock.calls.find(([e]) => e === 'change')[1]
-      const onAdd = on.mock.calls.find(([e]) => e === 'add')[1]
-      const onUnlink = on.mock.calls.find(([e]) => e === 'unlink')[1]
+      const onChange = on.mock.calls.find(([e]) => e === 'change')![1]
+      const onAdd = on.mock.calls.find(([e]) => e === 'add')![1]
+      const onUnlink = on.mock.calls.find(([e]) => e === 'unlink')![1]
 
       // Callbacks
       const conv = jest.spyOn(<any>watcher, 'convert').mockImplementation()
@@ -187,12 +186,12 @@ describe('WatchNotifier', () => {
 
       const listenerSet = instance.listeners.get(testIdentifier)
       expect(listenerSet).toBeInstanceOf(Set)
-      expect(listenerSet.size).toBe(0)
+      expect(listenerSet!.size).toBe(0)
 
       // Keep the content of set even if called twice
-      listenerSet.add('test')
+      listenerSet!.add('test')
       await instance.register('test')
-      expect(listenerSet.size).toBe(1)
+      expect(listenerSet!.size).toBe(1)
     })
   })
 
@@ -257,12 +256,12 @@ describe('WatchNotifier', () => {
 
         expect(mockWsOn).toBeCalledTimes(1)
         expect(mockWsOn).toBeCalledWith('connection', expect.any(Function))
-        expect(instance.listeners.get(testIdentifier).size).toBe(0)
+        expect(instance.listeners.get(testIdentifier)!.size).toBe(0)
 
         const [, connection] = mockWsOn.mock.calls[0]
         connection(ws, { url: `/${testIdentifier}` })
         expect(ws.send).toHaveBeenCalledWith('ready')
-        expect(instance.listeners.get(testIdentifier).has(ws)).toBe(true)
+        expect(instance.listeners.get(testIdentifier)!.has(ws)).toBe(true)
 
         // Remove listener by closing connection
         expect(ws.on).toHaveBeenCalledTimes(1)
@@ -270,7 +269,7 @@ describe('WatchNotifier', () => {
 
         const [, onclose] = ws.on.mock.calls[0]
         onclose()
-        expect(instance.listeners.get(testIdentifier).has(ws)).toBe(false)
+        expect(instance.listeners.get(testIdentifier)!.has(ws)).toBe(false)
       })
 
       it('closes client socket immediately when passed invalid URL', async () => {
