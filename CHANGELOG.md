@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Add fonts for internationalization to Docker image ([#26](https://github.com/marp-team/marp-cli/pull/26))
+
 ## v0.0.10 - 2018-09-20
 
 ### Added
