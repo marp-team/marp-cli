@@ -177,12 +177,14 @@ export class Converter {
   private static async runBrowser() {
     if (!Converter.browser) {
       const args: string[] = []
-      const finder: () => string[] = require('is-wsl')
+      let finder: () => string[] = require('is-wsl')
         ? chromeFinder.wsl
         : chromeFinder[process.platform]
 
-      if (process.env.IS_DOCKER)
+      if (process.env.IS_DOCKER) {
         args.push('--no-sandbox', '--disable-dev-shm-usage')
+        finder = () => ['/usr/bin/chromium-browser']
+      }
 
       Converter.browser = await puppeteer.launch({
         args,
