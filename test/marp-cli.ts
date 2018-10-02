@@ -162,7 +162,12 @@ describe('Marp CLI', () => {
           expect.stringContaining('http://localhost:8080/')
         )
         expect(serverStart).toBeCalledTimes(1)
-        expect(Watcher.watch).toHaveBeenCalledWith([files], expect.anything())
+        expect(Watcher.watch).toHaveBeenCalledWith(
+          [files],
+          expect.objectContaining({
+            mode: Watcher.WatchMode.Notify,
+          })
+        )
       })
     })
 
