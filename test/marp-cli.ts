@@ -7,6 +7,7 @@ import * as cli from '../src/cli'
 import { File } from '../src/file'
 import { Converter, ConvertType } from '../src/converter'
 import { CLIError } from '../src/error'
+import { Server } from '../src/server'
 import { ThemeSet } from '../src/theme'
 import { Watcher } from '../src/watcher'
 
@@ -145,6 +146,23 @@ describe('Marp CLI', () => {
         expect(outputFiles).toContain(assetFn('dist/2.html'))
         expect(outputFiles).toContain(assetFn('dist/3.html'))
         expect(outputFiles).toContain(assetFn('dist/subfolder/5.html'))
+      })
+    })
+
+    context('with --server option', () => {
+      it('starts listening server and watcher for passed directory', async () => {
+        const info = jest.spyOn(cli, 'info')
+        info.mockImplementation()
+
+        const serverStart = jest.spyOn(Server.prototype, 'start')
+        serverStart.mockResolvedValue(0)
+
+        await marpCli(['--input-dir', files, '--server'])
+        expect(info).toBeCalledWith(
+          expect.stringContaining('http://localhost:8080/')
+        )
+        expect(serverStart).toBeCalledTimes(1)
+        expect(Watcher.watch).toHaveBeenCalledWith([files], expect.anything())
       })
     })
 
@@ -455,6 +473,23 @@ describe('Marp CLI', () => {
       expect(cliInfo).toHaveBeenCalledWith(
         expect.stringContaining('4 markdowns')
       )
+    })
+
+    context('with --server option', () => {
+      it('treats passed directory as an input directory of the server', async () => {
+        jest.spyOn(cli, 'info').mockImplementation()
+
+        const serverStart = jest.spyOn(Server.prototype, 'start')
+        serverStart.mockResolvedValue(0)
+
+        await marpCli(['--server', assetFn('_files')])
+        expect(serverStart).toBeCalledTimes(1)
+
+        const server: any = serverStart.mock.instances[0]
+        const converter: Converter = server.converter
+
+        expect(converter.options.inputDir).toBe(assetFn('_files'))
+      })
     })
   })
 
