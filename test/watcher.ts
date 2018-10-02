@@ -1,7 +1,6 @@
 import chokidar from 'chokidar'
 import http from 'http'
 import portfinder from 'portfinder'
-import * as cli from '../src/cli'
 import { File, FileType } from '../src/file'
 import { ThemeSet, Theme } from '../src/theme'
 import { Watcher, WatchNotifier, notifier } from '../src/watcher'
@@ -41,7 +40,7 @@ describe('Watcher', () => {
     return instance
   }
 
-  const createWatcher = () =>
+  const createWatcher = (opts: Partial<Watcher.Options> = {}) =>
     Watcher.watch(['test.md'], <any>{
       finder: async () => [file],
       converter: {
@@ -52,9 +51,9 @@ describe('Watcher', () => {
         onConverted: jest.fn(),
         onError: jest.fn(),
       },
+      mode: Watcher.WatchMode.Convert,
+      ...opts,
     })
-
-  beforeEach(() => jest.spyOn(cli, 'info').mockImplementation())
 
   describe('.watch', () => {
     it('starts chokidar watcher and WebSocket notifier', async () => {
@@ -104,11 +103,14 @@ describe('Watcher', () => {
         await watcher.convert('test.md')
         expect(watcher.converter.convertFiles).toHaveBeenCalledTimes(1)
 
-        const [files, onCvted] = watcher.converter.convertFiles.mock.calls[0]
+        const [
+          files,
+          { onConverted },
+        ] = watcher.converter.convertFiles.mock.calls[0]
         expect(files).toContain(file)
 
         // Trigger events
-        onCvted({ file: { absolutePath: 'test.md', type: FileType.File } })
+        onConverted({ file: { absolutePath: 'test.md', type: FileType.File } })
         expect(watcher.events.onConverted).toHaveBeenCalled()
         expect(notifier.sendTo).toHaveBeenCalledWith('test.md', 'reload')
 
@@ -119,6 +121,16 @@ describe('Watcher', () => {
 
         await watcher.convert('test.md')
         expect(watcher.events.onError).toHaveBeenCalledTimes(1)
+      })
+
+      context('with notify mode', () => {
+        it('does not convert markdown but triggers notifier', async () => {
+          const watcher: any = createWatcher({ mode: Watcher.WatchMode.Notify })
+
+          await watcher.convert('test.md')
+          expect(watcher.converter.convertFiles).toHaveBeenCalledTimes(0)
+          expect(notifier.sendTo).toHaveBeenCalledWith('test.md', 'reload')
+        })
       })
     })
 

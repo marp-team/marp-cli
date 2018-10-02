@@ -1,4 +1,5 @@
 import { version as coreVersion } from '@marp-team/marp-core/package.json'
+import chalk from 'chalk'
 import { Argv } from 'yargs'
 import yargs from 'yargs/yargs'
 import * as cli from './cli'
@@ -6,8 +7,9 @@ import fromArguments, { IMarpCLIArguments } from './config'
 import { Converter, ConvertedCallback } from './converter'
 import { CLIError, error } from './error'
 import { File, FileType } from './file'
+import { Server } from './server'
 import templates from './templates'
-import watcher from './watcher'
+import watcher, { Watcher } from './watcher'
 import { name, version } from '../package.json'
 
 enum OptionGroup {
@@ -66,6 +68,12 @@ export default async function(argv: string[] = []): Promise<number> {
           group: OptionGroup.Basic,
           type: 'boolean',
         },
+        server: {
+          alias: 's',
+          describe: 'Enable server mode',
+          group: OptionGroup.Basic,
+          type: 'boolean',
+        },
         pdf: {
           describe: 'Convert slide deck into PDF',
           group: OptionGroup.Converter,
@@ -114,14 +122,14 @@ export default async function(argv: string[] = []): Promise<number> {
     }
 
     // Initialize converter
-    const config = await fromArguments(<IMarpCLIArguments>args)
+    const config = await fromArguments(args)
     const converter = new Converter(await config.converterOption())
     const cvtOpts = converter.options
 
     // Find target markdown files
     const finder = async () => {
       if (cvtOpts.inputDir) {
-        if (args._.length > 0) {
+        if (config.files.length > 0) {
           cli.error('Cannot pass files together with input directory.')
           return []
         }
@@ -132,22 +140,25 @@ export default async function(argv: string[] = []): Promise<number> {
 
       // Regular file finding powered by globby
       return <File[]>(
-        [await File.stdin(), ...(await File.find(...args._))].filter(f => f)
+        [await File.stdin(), ...(await File.find(...config.files))].filter(
+          f => f
+        )
       )
     }
 
-    const files = await finder()
-    const { length } = files
+    const foundFiles = await finder()
+    const { length } = foundFiles
 
     if (length === 0) {
-      if (args._.length > 0)
+      if (config.files.length > 0)
         cli.warn('Not found processable Markdown file(s).\n')
 
       program.showHelp()
-      return args._.length > 0 ? 1 : 0
+      return config.files.length > 0 ? 1 : 0
     }
 
-    cli.info(`Converting ${length} markdown${length > 1 ? 's' : ''}...`)
+    if (!cvtOpts.server)
+      cli.info(`Converting ${length} markdown${length > 1 ? 's' : ''}...`)
 
     // Convert markdown into HTML
     const onConverted: ConvertedCallback = ret => {
@@ -159,16 +170,16 @@ export default async function(argv: string[] = []): Promise<number> {
     }
 
     try {
-      await converter.convertFiles(files, onConverted)
+      await converter.convertFiles(foundFiles, { onConverted, initial: true })
     } catch (e) {
       error(`Failed converting Markdown. (${e.message})`, e.errorCode)
     }
 
-    // Watch mode
+    // Watch mode / Server mode
     if (cvtOpts.watch) {
       watcher(
         [
-          ...(cvtOpts.inputDir ? [cvtOpts.inputDir] : args._),
+          ...(cvtOpts.inputDir ? [cvtOpts.inputDir] : config.files),
           ...cvtOpts.themeSet.fnForWatch,
         ],
         {
@@ -179,8 +190,26 @@ export default async function(argv: string[] = []): Promise<number> {
             onError: e =>
               cli.error(`Failed converting Markdown. (${e.message})`),
           },
+          mode: cvtOpts.server
+            ? Watcher.WatchMode.Notify
+            : Watcher.WatchMode.Convert,
         }
       )
+
+      if (cvtOpts.server) {
+        const server = new Server(converter, { onConverted })
+        await server.start()
+
+        cli.info(
+          chalk.green(
+            `[Server mode] Start server listened at http://localhost:${
+              server.port
+            }/ ...`
+          )
+        )
+      } else {
+        cli.info(chalk.green('[Watch mode] Start watching...'))
+      }
     }
 
     return 0

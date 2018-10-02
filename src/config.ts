@@ -14,6 +14,7 @@ type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 type Overwrite<T, U> = Omit<T, Extract<keyof T, keyof U>> & U
 
 export interface IMarpCLIArguments {
+  _?: string[]
   allowLocalFiles?: boolean
   configFile?: string
   engine?: string
@@ -21,6 +22,7 @@ export interface IMarpCLIArguments {
   inputDir?: string
   output?: string
   pdf?: boolean
+  server?: boolean
   template?: string
   theme?: string
   themeSet?: string[]
@@ -28,7 +30,7 @@ export interface IMarpCLIArguments {
 }
 
 export type IMarpCLIConfig = Overwrite<
-  Omit<IMarpCLIArguments, 'configFile'>,
+  Omit<IMarpCLIArguments, 'configFile' | '_'>,
   {
     engine?: ResolvableEngine | ResolvableEngine[]
     html?: ConverterOption['html']
@@ -71,6 +73,8 @@ export class MarpCLIConfig {
           })()
         : undefined)
 
+    const server = this.pickDefined(this.args.server, this.conf.server) || false
+
     const theme = await this.loadTheme()
     const initialThemes = theme instanceof Theme ? [theme] : []
 
@@ -93,6 +97,7 @@ export class MarpCLIConfig {
 
     return {
       output,
+      server,
       themeSet,
       allowLocalFiles:
         this.pickDefined(
@@ -115,8 +120,13 @@ export class MarpCLIConfig {
         `${output}`.toLowerCase().endsWith('.pdf')
           ? ConvertType.pdf
           : ConvertType.html,
-      watch: this.pickDefined(this.args.watch || this.conf.watch) || false,
+      watch:
+        this.pickDefined(this.args.watch, this.conf.watch) || server || false,
     }
+  }
+
+  get files() {
+    return this.args.server || this.conf.server ? [] : this.args._ || []
   }
 
   private async inputDir(): Promise<string | undefined> {
@@ -124,6 +134,17 @@ export class MarpCLIConfig {
       if (this.args.inputDir) return path.resolve(this.args.inputDir)
       if (this.conf.inputDir)
         return path.resolve(path.dirname(this.confPath!), this.conf.inputDir)
+
+      // Fallback to input arguments in server mode
+      if (this.args.server || this.conf.server) {
+        if (Array.isArray(this.args._)) {
+          if (this.args._.length > 1)
+            throw new CLIError(
+              'Server mode have to specify just one directory.'
+            )
+          if (this.args._.length === 1) return path.resolve(this.args._[0])
+        }
+      }
     })()
     if (dir === undefined) return undefined
 
