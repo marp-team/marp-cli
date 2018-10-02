@@ -64,6 +64,7 @@ export class MarpCLIConfig {
       return resolveEngine(['@marp-team/marp-core', Marp])
     })()
 
+    const inputDir = await this.inputDir()
     const output =
       this.args.output ||
       (this.conf.output
@@ -87,7 +88,10 @@ export class MarpCLIConfig {
           ).map(f => path.resolve(path.dirname(this.confPath!), f))
         : [])
 
-    const themeSet = await ThemeSet.initialize(themeSetPathes, initialThemes)
+    const themeSet = await ThemeSet.initialize(
+      (inputDir ? [inputDir] : []).concat(themeSetPathes),
+      initialThemes
+    )
 
     if (
       themeSet.themes.size <= initialThemes.length &&
@@ -96,6 +100,7 @@ export class MarpCLIConfig {
       warn('Not found additional theme CSS files.')
 
     return {
+      inputDir,
       output,
       server,
       themeSet,
@@ -106,7 +111,6 @@ export class MarpCLIConfig {
         ) || false,
       engine: engine.klass,
       html: this.pickDefined(this.args.html, this.conf.html),
-      inputDir: await this.inputDir(),
       lang: this.conf.lang || (await osLocale()).replace(/[_@]/g, '-'),
       options: this.conf.options || {},
       readyScript: engine.browserScript

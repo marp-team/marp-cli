@@ -107,6 +107,14 @@ describe('Marp CLI', () => {
       writeFile.mock.calls.forEach(([fn]) => expect(fn).toMatch(/\.html$/))
     })
 
+    it('allows using theme css in specified dir', async () => {
+      jest.spyOn(cli, 'info').mockImplementation()
+      expect(await marpCli(['--input-dir', files, '--theme', 'a'])).toBe(0)
+
+      for (const [, buffer] of writeFile.mock.calls)
+        expect(buffer.toString()).toContain('/* @theme a */')
+    })
+
     it('prints error and return error code with invalid option(s)', async () => {
       const err = jest.spyOn(console, 'error').mockImplementation()
       jest.spyOn(console, 'warn').mockImplementation()
@@ -163,7 +171,7 @@ describe('Marp CLI', () => {
         )
         expect(serverStart).toBeCalledTimes(1)
         expect(Watcher.watch).toHaveBeenCalledWith(
-          [files],
+          expect.arrayContaining([files]),
           expect.objectContaining({
             mode: Watcher.WatchMode.Notify,
           })
