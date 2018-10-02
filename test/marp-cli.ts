@@ -493,6 +493,21 @@ describe('Marp CLI', () => {
     })
   })
 
+  context('with passing multiple files', () => {
+    const baseArgs = [assetFn('_files/1.md'), assetFn('_files/2.mdown')]
+
+    context('with --server option', () => {
+      it('prints error and return error code', async () => {
+        const error = jest.spyOn(console, 'error').mockImplementation()
+
+        expect(await marpCli([...baseArgs, '--server'])).toBe(1)
+        expect(error).toHaveBeenCalledWith(
+          expect.stringContaining('specify just one directory')
+        )
+      })
+    })
+  })
+
   context('with passing from stdin', () => {
     it('converts markdown came from stdin and outputs to stdout', async () => {
       const cliInfo = jest.spyOn(cli, 'info').mockImplementation()
