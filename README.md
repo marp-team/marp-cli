@@ -82,7 +82,7 @@ Under construction.
 - [x] Support configuration file (like `.marprc`)
 - [x] Watch mode
   - [x] Auto-reload
-- [ ] Server mode
+- [x] Server mode
 - [x] HTML templates
   - [x] Template that has ready to actual presentation powered by [Bespoke](https://github.com/bespokejs/bespoke)
 - [x] Select engine to use any Marpit based module
