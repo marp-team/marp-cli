@@ -15,20 +15,18 @@ export class Server {
   server?: Express
 
   constructor(converter: Converter, opts: Server.Options = {}) {
-    this.converter = converter
-    this.options = opts
-    this.port = Number.parseInt(process.env.PORT!, 10) || 8080
-
     if (!converter.options.inputDir)
       error('Converter have to specify an input directory.')
 
+    this.converter = converter
     this.inputDir = converter.options.inputDir!
+    this.options = opts
+    this.port = Number.parseInt(process.env.PORT!, 10) || 8080
   }
 
   async start() {
     this.setup()
-
-    return new Promise<void>(res => this.server!.listen(this.port, res))
+    new Promise<void>(res => this.server!.listen(this.port, res))
   }
 
   private async preprocess(req: express.Request, res: express.Response) {
@@ -72,11 +70,8 @@ export class Server {
   }
 
   private setup() {
-    if (this.server) return
-
     this.server = express()
     this.server.set('env', 'development')
-
     this.server
       .get('*', (req, res, next) =>
         this.preprocess(req, res).then(() => {

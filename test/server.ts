@@ -74,15 +74,16 @@ describe('Server', () => {
   })
 
   describe('Routing', () => {
-    let server: Server
-
-    beforeEach(async () => {
-      server = new Server(converter())
+    const startServer = async (opts: Server.Options = {}) => {
+      const server = new Server(converter(), opts)
       await server.start()
-    })
+
+      return server
+    }
 
     context('when there is request to a served/converted markdown file', () => {
       it('triggers conversion and returns the content of converted HTML', async () => {
+        const server = await startServer()
         const convertFile = jest.spyOn(server.converter, 'convertFile')
 
         for (const path of ['/1.md', '/1.html']) {
@@ -99,10 +100,26 @@ describe('Server', () => {
           expect(response.text).toBe(ret.newFile.buffer!.toString())
         }
       })
+
+      context('with onConverted option', () => {
+        it('runs onConverted callback after conversion', async () => {
+          const onConverted = jest.fn()
+          const server = await startServer({ onConverted })
+          const convertFile = jest.spyOn(server.converter, 'convertFile')
+
+          await request(server.server).get('/1.md')
+
+          const ret = await (<Promise<ConvertResult>>(
+            convertFile.mock.results[0].value
+          ))
+          expect(onConverted).toBeCalledWith(ret)
+        })
+      })
     })
 
     context('when there is request to a static file', () => {
       it('returns the content of static file', async () => {
+        const server = await startServer()
         const response = await request(server.server).get('/4.txt')
 
         expect(response.status).toBe(200)
@@ -112,14 +129,18 @@ describe('Server', () => {
 
     context('when the requested file is not found', () => {
       it('returns 404', async () => {
+        const server = await startServer()
         const response = await request(server.server).get('/__NOT_FOUND__')
+
         expect(response.status).toBe(404)
       })
     })
 
     context('when the directory traversal attack is detected', () => {
       it('returns 404', async () => {
+        const server = await startServer()
         const response = await request(server.server).get('/../../README.md')
+
         expect(response.status).toBe(404)
       })
     })
