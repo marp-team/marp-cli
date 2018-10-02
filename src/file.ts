@@ -5,7 +5,7 @@ import mkdirp from 'mkdirp'
 import path from 'path'
 import { tmpName } from 'tmp'
 
-const markdownExtensions = ['*.md', '*.mdown', '*.markdown', '*.markdn']
+export const markdownExtensions = ['md', 'mdown', 'markdown', 'markdn']
 
 export enum FileType {
   File,
@@ -121,7 +121,7 @@ export class File {
   static async find(...pathes: string[]): Promise<File[]> {
     return (await globby(pathes, {
       absolute: true,
-      expandDirectories: { files: markdownExtensions },
+      expandDirectories: { files: markdownExtensions.map(ext => `*.${ext}`) },
     })).map(p => new File(p))
   }
 

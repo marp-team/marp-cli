@@ -24,11 +24,17 @@ export interface ConverterOption {
   options: MarpitOptions
   output?: string
   readyScript?: string
+  server?: boolean
   template: string
   theme?: string
   themeSet: ThemeSet
   type: ConvertType
   watch: boolean
+}
+
+export interface ConvertFileOption {
+  initial?: boolean
+  onConverted?: ConvertedCallback
 }
 
 export interface ConvertResult {
@@ -86,30 +92,31 @@ export class Converter {
     })
   }
 
-  async convertFile(file: File): Promise<ConvertResult> {
+  async convertFile(file: File, opts: ConvertFileOption = {}) {
     const buffer = await file.load()
     const template = await this.convert(buffer.toString(), file)
     const newFile = file.convert(this.options.output, this.options.type)
-
     newFile.buffer = new Buffer(template.result)
+
+    const result: ConvertResult = { file, newFile, template }
+    if (this.options.server && opts.initial) return result
 
     if (this.options.type === ConvertType.pdf)
       await this.convertFileToPDF(newFile)
 
-    await newFile.save()
-    return { file, newFile, template }
+    if (!this.options.server) await newFile.save()
+    if (opts.onConverted) opts.onConverted(result)
+
+    return result
   }
 
-  async convertFiles(
-    files: File[],
-    onConverted: ConvertedCallback = () => {}
-  ): Promise<void> {
+  async convertFiles(files: File[], opts: ConvertFileOption = {}) {
     const { inputDir, output } = this.options
 
     if (!inputDir && output && output !== '-' && files.length > 1)
       error('Output path cannot specify with processing multiple files.')
 
-    for (const file of files) onConverted(await this.convertFile(file))
+    for (const file of files) await this.convertFile(file, opts)
   }
 
   private async convertFileToPDF(file: File) {

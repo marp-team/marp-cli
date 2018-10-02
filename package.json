@@ -46,6 +46,7 @@
   "devDependencies": {
     "@types/chokidar": "^1.7.5",
     "@types/cosmiconfig": "^5.0.3",
+    "@types/express": "^4.16.0",
     "@types/get-stdin": "^5.0.1",
     "@types/jest": "^23.3.2",
     "@types/jest-plugin-context": "^2.9.0",
@@ -95,6 +96,7 @@
     "chokidar": "^2.0.4",
     "chrome-launcher": "^0.10.4",
     "cosmiconfig": "^5.0.6",
+    "express": "^4.16.3",
     "get-stdin": "^6.0.0",
     "globby": "^8.0.1",
     "import-from": "^2.1.0",

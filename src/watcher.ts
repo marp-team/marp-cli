@@ -1,10 +1,8 @@
-import chalk from 'chalk'
 import chokidar from 'chokidar'
 import crypto from 'crypto'
 import path from 'path'
 import portfinder from 'portfinder'
 import { Server as WSServer, ServerOptions } from 'ws'
-import * as cli from './cli'
 import { Converter, ConvertedCallback } from './converter'
 import { File, FileType } from './file'
 
@@ -14,11 +12,13 @@ export class Watcher {
   readonly converter: Converter
   readonly events: Watcher.Events
   readonly finder: Watcher.Options['finder']
+  readonly mode: Watcher.WatchMode
 
   private constructor(watchPath: string[], opts: Watcher.Options) {
     this.converter = opts.converter
-    this.finder = opts.finder
     this.events = opts.events
+    this.finder = opts.finder
+    this.mode = opts.mode
 
     this.chokidar = chokidar
       .watch(watchPath, { disableGlobbing: true, ignoreInitial: true })
@@ -29,8 +29,6 @@ export class Watcher {
     this.converter.options.themeSet.onThemeUpdated = f => this.convert(f)
 
     notifier.start()
-
-    cli.info(chalk.green('[Watch mode] Start watching...'))
   }
 
   private async convert(filename: string) {
@@ -42,14 +40,23 @@ export class Watcher {
       f => path.resolve(f) === resolvedFn
     )
 
-    // Update markdown
-    try {
-      await this.converter.convertFiles(mdFiles, ret => {
-        this.events.onConverted(ret)
+    const notify = (f: File) => {
+      if (f.type === FileType.File) notifier.sendTo(f.absolutePath, 'reload')
+    }
 
-        if (ret.file.type === FileType.File)
-          notifier.sendTo(ret.file.absolutePath, 'reload')
-      })
+    try {
+      if (this.mode === Watcher.WatchMode.Convert) {
+        // Convert markdown
+        await this.converter.convertFiles(mdFiles, {
+          onConverted: ret => {
+            this.events.onConverted(ret)
+            notify(ret.file)
+          },
+        })
+      } else if (this.mode === Watcher.WatchMode.Notify) {
+        // Notification only
+        mdFiles.forEach(notify)
+      }
     } catch (e) {
       this.events.onError(e)
     }
@@ -142,10 +149,16 @@ export const notifier = new WatchNotifier()
 export default Watcher.watch
 
 export namespace Watcher {
+  export enum WatchMode {
+    Convert,
+    Notify,
+  }
+
   export interface Options {
     converter: Converter
     events: Watcher.Events
     finder: () => Promise<File[]>
+    mode: WatchMode
   }
 
   export interface Events {

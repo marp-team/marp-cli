@@ -30,6 +30,7 @@ describe('Converter', () => {
       lang: 'en',
       engine: Marp,
       options: {},
+      server: false,
       template: 'bare',
       type: ConvertType.html,
       watch: false,
@@ -44,6 +45,7 @@ describe('Converter', () => {
         lang: 'fr',
         engine: Marp,
         options: <MarpitOptions>{ html: true },
+        server: false,
         template: 'test-template',
         type: ConvertType.html,
         watch: false,
@@ -134,13 +136,13 @@ describe('Converter', () => {
   describe('#convertFile', () => {
     it('rejects Promise when specified file is not found', () => {
       expect(
-        instance().convertFile(new File('_NOT_FOUND_MARKDOWN_'))
+        (<any>instance()).convertFile(new File('_NOT_FOUND_MARKDOWN_'))
       ).rejects.toBeTruthy()
     })
 
-    it('converts markdown file and save as html file', async () => {
+    it('converts markdown file and save as html file by default', async () => {
       const write = (<any>fs).__mockWriteFile()
-      await instance().convertFile(new File(onePath))
+      await (<any>instance()).convertFile(new File(onePath))
 
       expect(write).toHaveBeenCalledWith(
         `${onePath.slice(0, -3)}.html`,
@@ -152,7 +154,7 @@ describe('Converter', () => {
     it('converts markdown file and save to specified path when output is defined', async () => {
       const write = (<any>fs).__mockWriteFile()
       const output = './specified.html'
-      await instance({ output }).convertFile(new File(twoPath))
+      await (<any>instance({ output })).convertFile(new File(twoPath))
 
       expect(write).toHaveBeenCalledWith(
         output,
@@ -166,7 +168,9 @@ describe('Converter', () => {
       const stdout = jest.spyOn(process.stdout, 'write').mockImplementation()
 
       const output = '-'
-      const ret = await instance({ output }).convertFile(new File(threePath))
+      const ret = await (<any>instance({ output })).convertFile(
+        new File(threePath)
+      )
 
       expect(write).not.toHaveBeenCalled()
       expect(stdout).toHaveBeenCalledTimes(1)
@@ -175,7 +179,7 @@ describe('Converter', () => {
     })
 
     context('when convert type is PDF', () => {
-      const pdfInstance = (opts = {}) =>
+      const pdfInstance = (opts = {}): any =>
         instance({ ...opts, type: ConvertType.pdf })
 
       it(
@@ -256,9 +260,9 @@ describe('Converter', () => {
         const stdout = jest.spyOn(process.stdout, 'write').mockImplementation()
         const files = [new File(onePath), new File(twoPath)]
 
-        await instance({ output: '-' }).convertFiles(files, result =>
-          expect(files.includes(result.file)).toBe(true)
-        )
+        await instance({ output: '-' }).convertFiles(files, {
+          onConverted: result => expect(files.includes(result.file)).toBe(true),
+        })
 
         expect(write).not.toHaveBeenCalled()
         expect(stdout).toHaveBeenCalledTimes(2)
