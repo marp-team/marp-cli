@@ -197,7 +197,7 @@ export default async function(argv: string[] = []): Promise<number> {
       )
 
       if (cvtOpts.server) {
-        const server = new Server(converter)
+        const server = new Server(converter, { onConverted })
         await server.start()
 
         cli.info(

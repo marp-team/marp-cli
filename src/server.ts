@@ -2,19 +2,21 @@ import express, { Express } from 'express'
 import fs from 'fs'
 import path from 'path'
 import url from 'url'
-import { Converter } from './converter'
+import { Converter, ConvertedCallback } from './converter'
 import { error } from './error'
 import { File, markdownExtensions } from './file'
 
 export class Server {
   readonly converter: Converter
-  readonly port: Number
   readonly inputDir: string
+  readonly options: Server.Options
+  readonly port: Number
 
   server?: Express
 
-  constructor(converter: Converter) {
+  constructor(converter: Converter, opts: Server.Options = {}) {
     this.converter = converter
+    this.options = opts
     this.port = Number.parseInt(process.env.PORT!, 10) || 8080
 
     if (!converter.options.inputDir)
@@ -64,6 +66,8 @@ export class Server {
       const file = new File(fn)
       const converted = await this.converter.convertFile(file)
       res.end(converted.newFile.buffer)
+
+      if (this.options.onConverted) this.options.onConverted(converted)
     }
   }
 
@@ -80,5 +84,11 @@ export class Server {
         })
       )
       .use(express.static(this.inputDir))
+  }
+}
+
+export namespace Server {
+  export interface Options {
+    onConverted?: ConvertedCallback
   }
 }
