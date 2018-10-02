@@ -52,7 +52,7 @@ export default async function(argv: string[] = []): Promise<number> {
         },
         'input-dir': {
           alias: 'I',
-          describe: 'The base input directory to find markdown',
+          describe: 'The base directory to find markdown and theme CSS',
           group: OptionGroup.Basic,
           type: 'string',
         },
