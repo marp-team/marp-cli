@@ -40,7 +40,7 @@ describe('Watcher', () => {
     return instance
   }
 
-  const createWatcher = () =>
+  const createWatcher = (opts: Partial<Watcher.Options> = {}) =>
     Watcher.watch(['test.md'], <any>{
       finder: async () => [file],
       converter: {
@@ -52,6 +52,7 @@ describe('Watcher', () => {
         onError: jest.fn(),
       },
       mode: Watcher.WatchMode.Convert,
+      ...opts,
     })
 
   describe('.watch', () => {
@@ -120,6 +121,16 @@ describe('Watcher', () => {
 
         await watcher.convert('test.md')
         expect(watcher.events.onError).toHaveBeenCalledTimes(1)
+      })
+
+      context('with notify mode', () => {
+        it('does not convert markdown but triggers notifier', async () => {
+          const watcher: any = createWatcher({ mode: Watcher.WatchMode.Notify })
+
+          await watcher.convert('test.md')
+          expect(watcher.converter.convertFiles).toHaveBeenCalledTimes(0)
+          expect(notifier.sendTo).toHaveBeenCalledWith('test.md', 'reload')
+        })
       })
     })
 
