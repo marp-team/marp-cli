@@ -7,6 +7,10 @@
 - Add server mode provided by `--server` (`-s`) option ([#27](https://github.com/marp-team/marp-cli/pull/27))
 - Add fonts for internationalization to Docker image ([#26](https://github.com/marp-team/marp-cli/pull/26))
 
+### Changed
+
+- Recognize theme CSS in input directory specified by `--input-dir` (`-I`) option ([#28](https://github.com/marp-team/marp-cli/pull/28))
+
 ## v0.0.10 - 2018-09-20
 
 ### Added
