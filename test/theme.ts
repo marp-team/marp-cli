@@ -101,5 +101,22 @@ describe('ThemeSet', () => {
       expect(names).toContain('b')
       expect(names).toContain('c')
     })
+
+    context('when registered theme is not compatible to Marpit engine', () => {
+      const emptyCSS = path.resolve(__dirname, '_files/themes/empty')
+
+      it('outputs warning and ignores registration', async () => {
+        const warn = jest.spyOn(console, 'warn').mockImplementation()
+        const themeSet = await ThemeSet.initialize([emptyCSS])
+        const marpit = new Marpit()
+
+        themeSet.registerTo(marpit)
+
+        expect(marpit.themeSet.size).toBe(0)
+        expect(warn).toBeCalledWith(
+          expect.stringContaining('Cannot register theme CSS')
+        )
+      })
+    })
   })
 })

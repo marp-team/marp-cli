@@ -2,6 +2,7 @@ import { Marpit } from '@marp-team/marpit'
 import fs from 'fs'
 import globby from 'globby'
 import path from 'path'
+import { warn } from './cli'
 
 const themeExtensions = ['*.css']
 
@@ -95,8 +96,13 @@ export class ThemeSet {
 
   registerTo(engine: Marpit) {
     for (const theme of this.themes.values()) {
-      const engineTheme = engine.themeSet.add(theme.css)
-      theme.name = engineTheme.name
+      try {
+        const engineTheme = engine.themeSet.add(theme.css)
+        theme.name = engineTheme.name
+      } catch (e) {
+        const fn = path.relative(process.cwd(), theme.filename)
+        warn(`Cannot register theme CSS: ${fn} (${e.message})`)
+      }
     }
   }
 
