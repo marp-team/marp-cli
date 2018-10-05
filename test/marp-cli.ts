@@ -200,8 +200,8 @@ describe('Marp CLI', () => {
   })
 
   context('with --theme option', () => {
-    let convert: jest.SpyInstance
-    let info: jest.SpyInstance
+    let convert: jest.MockInstance<any>
+    let info: jest.MockInstance<any>
 
     beforeEach(() => {
       convert = jest.spyOn(Converter.prototype, 'convert')
@@ -267,8 +267,8 @@ describe('Marp CLI', () => {
     const themeB = assetFn('_files/themes/b.css')
     const themeC = assetFn('_files/themes/nested/c.css')
 
-    let convert: jest.SpyInstance
-    let observeSpy: jest.SpyInstance
+    let convert: jest.MockInstance<Converter['convert']>
+    let observeSpy: jest.MockInstance<ThemeSet['observe']>
 
     beforeEach(() => {
       convert = jest.spyOn(Converter.prototype, 'convert')
