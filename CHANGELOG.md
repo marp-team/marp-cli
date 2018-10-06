@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v0.0.11 - 2018-10-06
+
 ### Added
 
 - Add server mode provided by `--server` (`-s`) option ([#27](https://github.com/marp-team/marp-cli/pull/27))
