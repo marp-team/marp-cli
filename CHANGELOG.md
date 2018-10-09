@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Upgrade marp-core to [v0.0.11](https://github.com/marp-team/marp-core/releases/tag/v0.0.11) to fix fitting header regression ([#30](https://github.com/marp-team/marp-cli/pull/30))
+
 ## v0.0.11 - 2018-10-06
 
 ### Added
