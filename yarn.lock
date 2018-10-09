@@ -138,10 +138,10 @@
     reflect-metadata "^0.1.12"
     tslib "^1.8.1"
 
-"@marp-team/marp-core@^0.0.10":
-  version "0.0.10"
-  resolved "https://registry.yarnpkg.com/@marp-team/marp-core/-/marp-core-0.0.10.tgz#61ae67e78680400a438a968cb5d9cf6b1d85d489"
-  integrity sha512-wyOIHfOtmCXjuMnfeH4t6yAHk+DwSctxshzWu4/nOddol/vV8A09RvG/BKQ1iLw/BwTxkOIe3N4WJ++ZOt/Dxw==
+"@marp-team/marp-core@^0.0.11":
+  version "0.0.11"
+  resolved "https://registry.yarnpkg.com/@marp-team/marp-core/-/marp-core-0.0.11.tgz#1d0d6f7a6fd522363c8a44ad324f48ccb4b92f63"
+  integrity sha512-cb27UZ1Py2yzAN/sgvzwkF2/DkdZTAS+8bsW8Y6ASbtsaYTLCtx9De7etMAkfCGQLjlEF8FVKoE3/TWIbkmJrg==
   dependencies:
     "@marp-team/marpit" "^0.1.3"
     emoji-regex "^7.0.1"
