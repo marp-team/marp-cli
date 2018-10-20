@@ -342,11 +342,6 @@
   dependencies:
     "@types/superagent" "*"
 
-"@types/util.promisify@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@types/util.promisify/-/util.promisify-1.0.0.tgz#26a77d9b210e937430fa549b922d34f8e51185a0"
-  integrity sha512-JK7Ecs9ETHfYSoG5ZILe30Ar9fmMT7vZTirfZQQ9OAZDB8TfPVV6aQkYPtfx2MFfB+yrSY4jCfrvMdemv/9VHw==
-
 "@types/ws@^6.0.1":
   version "6.0.1"
   resolved "https://registry.yarnpkg.com/@types/ws/-/ws-6.0.1.tgz#ca7a3f3756aa12f62a0a62145ed14c6db25d5a28"
