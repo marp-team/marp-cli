@@ -94,7 +94,7 @@ export class Converter {
 
   async convertFile(file: File, opts: ConvertFileOption = {}) {
     const buffer = await file.load()
-    const template = await this.convert(buffer.toString(), file)
+    const template = await this.convert(buffer!.toString(), file)
     const newFile = file.convert(this.options.output, this.options.type)
     newFile.buffer = new Buffer(template.result)
 
