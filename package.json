@@ -54,7 +54,6 @@
     "@types/pug": "^2.0.4",
     "@types/puppeteer": "^1.9.0",
     "@types/supertest": "^2.0.6",
-    "@types/util.promisify": "^1.0.0",
     "@types/ws": "^6.0.1",
     "@types/yargs": "^12.0.1",
     "autoprefixer": "^9.1.5",
