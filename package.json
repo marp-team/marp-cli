@@ -90,8 +90,7 @@
     "tslint": "^5.11.0",
     "tslint-config-airbnb": "^5.11.0",
     "tslint-config-prettier": "^1.15.0",
-    "typescript": "^3.1.1",
-    "util.promisify": "^1.0.0"
+    "typescript": "^3.1.1"
   },
   "dependencies": {
     "@marp-team/marp-core": "^0.0.11",
@@ -111,6 +110,7 @@
     "portfinder": "^1.0.17",
     "puppeteer-core": "^1.9.0",
     "tmp": "^0.0.33",
+    "util.promisify": "^1.0.0",
     "ws": "^6.1.0",
     "yargs": "^12.0.2"
   }
