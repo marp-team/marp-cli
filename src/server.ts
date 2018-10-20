@@ -2,9 +2,12 @@ import express, { Express } from 'express'
 import fs from 'fs'
 import path from 'path'
 import url from 'url'
+import promisify from 'util.promisify'
 import { Converter, ConvertedCallback } from './converter'
 import { error } from './error'
 import { File, markdownExtensions } from './file'
+
+const lstat = promisify(fs.lstat)
 
 export class Server {
   readonly converter: Converter
@@ -49,9 +52,7 @@ export class Server {
       )
 
       try {
-        const stat = await new Promise<fs.Stats>((resolve, reject) =>
-          fs.lstat(targetPath, (e, stats) => (e ? reject(e) : resolve(stats)))
-        )
+        const stat: fs.Stats = await lstat(targetPath)
 
         if (stat.isFile()) {
           fn = targetPath

@@ -2,8 +2,11 @@ import { Marpit } from '@marp-team/marpit'
 import fs from 'fs'
 import path from 'path'
 import pkgUp from 'pkg-up'
+import promisify from 'util.promisify'
 import importFrom from 'import-from'
 import { CLIError } from './error'
+
+const readFile = promisify(fs.readFile)
 
 export type Engine = typeof Marpit
 export type ResolvableEngine = Engine | string
@@ -62,12 +65,9 @@ export class ResolvedEngine {
     const scriptPath = require(pkgPath)[ResolvedEngine.browserScriptKey]
     if (!scriptPath) return undefined
 
-    this.browserScript = await new Promise<string>((res, rej) =>
-      fs.readFile(
-        path.resolve(path.dirname(pkgPath), scriptPath),
-        (e, buf) => (e ? rej(e) : res(buf.toString()))
-      )
-    )
+    this.browserScript = (await readFile(
+      path.resolve(path.dirname(pkgPath), scriptPath)
+    )).toString()
   }
 
   // NOTE: It cannot test because of overriding `require` in Jest context.
