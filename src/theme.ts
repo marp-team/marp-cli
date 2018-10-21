@@ -2,7 +2,11 @@ import { Marpit } from '@marp-team/marpit'
 import fs from 'fs'
 import globby from 'globby'
 import path from 'path'
+import promisify from 'util.promisify'
 import { warn } from './cli'
+
+const lstat = promisify(fs.lstat)
+const readFile = promisify(fs.readFile)
 
 const themeExtensions = ['*.css']
 
@@ -34,9 +38,7 @@ export class Theme {
   }
 
   async load() {
-    this.readBuffer = await new Promise<Buffer>((resolve, reject) =>
-      fs.readFile(this.filename, (e, buf) => (e ? reject(e) : resolve(buf)))
-    )
+    this.readBuffer = await readFile(this.filename)
   }
 
   private genUniqName() {
@@ -128,9 +130,7 @@ export class ThemeSet {
     for (const f of fn) {
       if (!globby.hasMagic(f)) {
         try {
-          const stat = await new Promise<fs.Stats>((resolve, reject) =>
-            fs.lstat(f, (e, stats) => (e ? reject(e) : resolve(stats)))
-          )
+          const stat: fs.Stats = await lstat(f)
 
           if (stat.isFile() || stat.isDirectory() || stat.isSymbolicLink())
             fnForWatch.add(path.resolve(f))

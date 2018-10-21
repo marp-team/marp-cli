@@ -1,10 +1,13 @@
 import { MarpitOptions, MarpitRenderResult, Element } from '@marp-team/marpit'
 import fs from 'fs'
 import path from 'path'
+import promisify from 'util.promisify'
 import barePug from './bare/bare.pug'
 import bareScss from './bare/bare.scss'
 import bespokePug from './bespoke/bespoke.pug'
 import bespokeScss from './bespoke/bespoke.scss'
+
+const readFile = promisify(fs.readFile)
 
 export interface TemplateOptions {
   base?: string
@@ -62,13 +65,8 @@ export const bespoke: Template = async opts => {
   }
 }
 
-export function libJs(fn: string) {
-  return new Promise<string>((resolve, reject) =>
-    fs.readFile(
-      path.resolve(__dirname, fn), // __dirname is "lib" after bundle
-      (e, data) => (e ? reject(e) : resolve(data.toString()))
-    )
-  )
+export async function libJs(fn: string) {
+  return (await readFile(path.resolve(__dirname, fn))).toString()
 }
 
 export async function watchJs(notifyWS?: string) {

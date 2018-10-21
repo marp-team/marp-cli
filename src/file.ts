@@ -4,6 +4,13 @@ import globby from 'globby'
 import mkdirp from 'mkdirp'
 import path from 'path'
 import { tmpName } from 'tmp'
+import promisify from 'util.promisify'
+
+const mkdirpPromise = promisify(mkdirp)
+const readFile = promisify(fs.readFile)
+const tmpNamePromise = promisify(tmpName)
+const unlink = promisify(fs.unlink)
+const writeFile = promisify(fs.writeFile)
 
 export const markdownExtensions = ['md', 'mdown', 'markdown', 'markdn']
 
@@ -48,12 +55,7 @@ export class File {
   }
 
   async load() {
-    this.buffer =
-      this.buffer ||
-      (await new Promise<Buffer>((resolve, reject) =>
-        fs.readFile(this.path, (e, buf) => (e ? reject(e) : resolve(buf)))
-      ))
-
+    this.buffer = this.buffer || (await readFile(this.path))
     return this.buffer
   }
 
@@ -72,13 +74,7 @@ export class File {
   }
 
   async saveTmpFile(ext?: string): Promise<File.TmpFileInterface> {
-    const tmp: string = await new Promise<string>((resolve, reject) => {
-      tmpName(
-        { postfix: ext },
-        (e, tmpPath) => (e ? reject(e) : resolve(tmpPath))
-      )
-    })
-
+    const tmp: string = await tmpNamePromise({ postfix: ext })
     await this.saveToFile(tmp)
 
     return {
@@ -91,10 +87,8 @@ export class File {
     }
   }
 
-  private async cleanup(tmpPath: string) {
-    return new Promise<void>((resolve, reject) =>
-      fs.unlink(tmpPath, e => (e ? reject(e) : resolve()))
-    )
+  private cleanup(tmpPath: string) {
+    return unlink(tmpPath)
   }
 
   private convertExtension(extension: string, basePath = this.path): string {
@@ -105,15 +99,8 @@ export class File {
   }
 
   private async saveToFile(savePath: string = this.path) {
-    await new Promise<void>((resolve, reject) =>
-      mkdirp(
-        path.dirname(path.resolve(savePath)),
-        e => (e ? reject(e) : resolve())
-      )
-    )
-    return new Promise<void>((resolve, reject) =>
-      fs.writeFile(savePath, this.buffer, e => (e ? reject(e) : resolve()))
-    )
+    await mkdirpPromise(path.dirname(path.resolve(savePath)))
+    await writeFile(savePath, this.buffer)
   }
 
   private static stdinBuffer?: Buffer

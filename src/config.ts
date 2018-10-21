@@ -4,11 +4,14 @@ import cosmiconfig from 'cosmiconfig'
 import path from 'path'
 import fs from 'fs'
 import osLocale from 'os-locale'
+import promisify from 'util.promisify'
 import { info, warn } from './cli'
 import { ConverterOption, ConvertType } from './converter'
 import resolveEngine, { ResolvableEngine } from './engine'
 import { CLIError } from './error'
 import { Theme, ThemeSet } from './theme'
+
+const lstat = promisify(fs.lstat)
 
 type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 type Overwrite<T, U> = Omit<T, Extract<keyof T, keyof U>> & U
@@ -155,9 +158,7 @@ export class MarpCLIConfig {
     let stat: fs.Stats
 
     try {
-      stat = await new Promise<fs.Stats>((resolve, reject) =>
-        fs.lstat(dir, (e, stats) => (e ? reject(e) : resolve(stats)))
-      )
+      stat = await lstat(dir)
     } catch (e) {
       if (e.code !== 'ENOENT') throw e
       throw new CLIError(`Input directory "${dir}" is not found.`)

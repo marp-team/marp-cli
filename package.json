@@ -109,6 +109,7 @@
     "portfinder": "^1.0.17",
     "puppeteer-core": "^1.9.0",
     "tmp": "^0.0.33",
+    "util.promisify": "^1.0.0",
     "ws": "^6.1.0",
     "yargs": "^12.0.2"
   }
