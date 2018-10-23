@@ -183,7 +183,10 @@ export class Converter {
 
   private static async runBrowser() {
     if (!Converter.browser) {
-      const args: string[] = []
+      // Fix the rendered position of elements in <foreignObject>
+      // See: https://bugs.chromium.org/p/chromium/issues/detail?id=467484
+      const args = ['--enable-blink-gen-property-trees']
+
       let finder: () => string[] = require('is-wsl')
         ? chromeFinder.wsl
         : chromeFinder[process.platform]
