@@ -5,6 +5,7 @@
 ### Changed
 
 - Use `util.promisify` to wrap callback-based funcs ([#32](https://github.com/marp-team/marp-cli/pull/32))
+- Enable `--enable-blink-gen-property-trees` chromium flag to prevent incorrect rendering while PDF conversion ([#33](https://github.com/marp-team/marp-cli/pull/33))
 
 ## v0.0.12 - 2018-10-09
 
