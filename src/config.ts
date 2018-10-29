@@ -117,7 +117,7 @@ export class MarpCLIConfig {
       lang: this.conf.lang || (await osLocale()).replace(/[_@]/g, '-'),
       options: this.conf.options || {},
       readyScript: engine.browserScript
-        ? `<script defer>${engine.browserScript}</script>`
+        ? `<script>${engine.browserScript}</script>`
         : undefined,
       template: this.args.template || this.conf.template || 'bespoke',
       theme: theme instanceof Theme ? theme.name : theme,
