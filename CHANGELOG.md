@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Support Node 10 ([#35](https://github.com/marp-team/marp-cli/pull/35))
+
 ### Removed
 
 - Remove `defer` attribute from inline `<script>` tag ([#34](https://github.com/marp-team/marp-cli/pull/34))
