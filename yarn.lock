@@ -138,26 +138,26 @@
     reflect-metadata "^0.1.12"
     tslib "^1.8.1"
 
-"@marp-team/marp-core@^0.0.11":
-  version "0.0.11"
-  resolved "https://registry.yarnpkg.com/@marp-team/marp-core/-/marp-core-0.0.11.tgz#1d0d6f7a6fd522363c8a44ad324f48ccb4b92f63"
-  integrity sha512-cb27UZ1Py2yzAN/sgvzwkF2/DkdZTAS+8bsW8Y6ASbtsaYTLCtx9De7etMAkfCGQLjlEF8FVKoE3/TWIbkmJrg==
+"@marp-team/marp-core@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@marp-team/marp-core/-/marp-core-0.1.0.tgz#2c23177797334101076b2da12b13b21dcea6ef01"
+  integrity sha512-E0zrRpvZ+EbotHD+yKrTMUqj8wZ3Pg9XP2jlCYUaqov7cvvr5bGBvXtcFgbhRAbtQ1oGAbXIxaQP9DLyXW201A==
   dependencies:
-    "@marp-team/marpit" "^0.1.3"
+    "@marp-team/marpit" "^0.2.1"
     emoji-regex "^7.0.1"
-    highlight.js "^9.12.0"
-    katex "^0.10.0-rc.1"
+    highlight.js "^9.13.1"
+    katex "^0.10.0"
     markdown-it "^8.4.2"
     markdown-it-emoji "^1.4.0"
     markdown-it-katex "^2.0.3"
     postcss "^7.0.5"
-    twemoji "^11.0.1"
+    twemoji "^11.2.0"
     xss "^1.0.3"
 
-"@marp-team/marpit@^0.1.3":
-  version "0.1.3"
-  resolved "https://registry.yarnpkg.com/@marp-team/marpit/-/marpit-0.1.3.tgz#223356c3c813f0a6fc4b1fe60a17d1e14378640b"
-  integrity sha512-u6Q9yb6xkAbFFsaDG34ghMuNfPdEdKxcsnE24HLR5uf7Tm8kNLRw9T8cZmjSrjUvtmlIC3Fxuip6rRIt59fd7w==
+"@marp-team/marpit@^0.2.1":
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/@marp-team/marpit/-/marpit-0.2.1.tgz#146f2f25c24441e4f9aa6e233eba127cc0799a85"
+  integrity sha512-V5EbtChqeNW1TdMVyyreID2lD7TTJup/WpNpkvBZpfYBzvo8z6oBnxdXFIWgWxhfHCGs51E4hkym8Ia6ZUACTg==
   dependencies:
     js-yaml "^3.12.0"
     lodash.kebabcase "^4.1.1"
@@ -2966,10 +2966,10 @@ hex-color-regex@^1.1.0:
   resolved "https://registry.yarnpkg.com/hex-color-regex/-/hex-color-regex-1.1.0.tgz#4c06fccb4602fe2602b3c93df82d7e7dbf1a8a8e"
   integrity sha512-l9sfDFsuqtOqKDsQdqrMRk0U85RZc0RtOR9yPI7mRVOa4FsR/BVnZ0shmQRM96Ji99kYZP/7hn1cedc1+ApsTQ==
 
-highlight.js@^9.12.0:
-  version "9.12.0"
-  resolved "https://registry.yarnpkg.com/highlight.js/-/highlight.js-9.12.0.tgz#e6d9dbe57cbefe60751f02af336195870c90c01e"
-  integrity sha1-5tnb5Xy+/mB1HwKvM2GVhwyQwB4=
+highlight.js@^9.13.1:
+  version "9.13.1"
+  resolved "https://registry.yarnpkg.com/highlight.js/-/highlight.js-9.13.1.tgz#054586d53a6863311168488a0f58d6c505ce641e"
+  integrity sha512-Sc28JNQNDzaH6PORtRLMvif9RSn1mYuOoX3omVjnb0+HbpPygU2ALBI0R/wsiqCb4/fcp07Gdo8g+fhtFrQl6A==
 
 home-or-tmp@^2.0.0:
   version "2.0.0"
@@ -4165,10 +4165,10 @@ jstransformer@1.0.0:
     is-promise "^2.0.0"
     promise "^7.0.1"
 
-katex@^0.10.0-rc.1:
-  version "0.10.0-rc.1"
-  resolved "https://registry.yarnpkg.com/katex/-/katex-0.10.0-rc.1.tgz#bd46155281f61c4855a064e2b7a89d137ee04b41"
-  integrity sha512-JmnreLp0lWPA1z1krzO5drN1qBrkhqzMg5qv0l5y+Fr97sqgOuh37k9ky7VD1k/Ec+yvOe2BptiYSR9OoShkFg==
+katex@^0.10.0:
+  version "0.10.0"
+  resolved "https://registry.yarnpkg.com/katex/-/katex-0.10.0.tgz#da562e5d0d5cc3aa602e27af8a9b8710bfbce765"
+  integrity sha512-/WRvx+L1eVBrLwX7QzKU1dQuaGnE7E8hDvx3VWfZh9HbMiCfsKWJNnYZ0S8ZMDAfAyDSofdyXIrH/hujF1fYXg==
   dependencies:
     commander "^2.16.0"
 
@@ -7864,10 +7864,10 @@ tweetnacl@^0.14.3, tweetnacl@~0.14.0:
   resolved "https://registry.yarnpkg.com/tweetnacl/-/tweetnacl-0.14.5.tgz#5ae68177f192d4456269d108afa93ff8743f4f64"
   integrity sha1-WuaBd/GS1EViadEIr6k/+HQ/T2Q=
 
-twemoji@^11.0.1:
-  version "11.0.1"
-  resolved "https://registry.yarnpkg.com/twemoji/-/twemoji-11.0.1.tgz#e3c115a9795bb26cab6ea48d22821b0a4be08e5b"
-  integrity sha512-Z0bRyZ1yO7cqa69oRhLZWmaLM0e9eeTugUXbnNQY3XPgRHJcSF8PKfp/dx3vHWtz9Y6o8fi3Ryjfpq4vBCeXjA==
+twemoji@^11.2.0:
+  version "11.2.0"
+  resolved "https://registry.yarnpkg.com/twemoji/-/twemoji-11.2.0.tgz#3627c3607321bb784bcfb5b65b3b21309c031fa3"
+  integrity sha512-DgTadXkRHugun6mjUf1k3ni04WC4jHOX1bN5MjuCM3nwRyIMdXIr8FmWzW5mEIZjht5jD3NaEyXC4j3POdQwyQ==
 
 type-check@~0.3.2:
   version "0.3.2"

@@ -92,8 +92,8 @@
     "typescript": "^3.1.1"
   },
   "dependencies": {
-    "@marp-team/marp-core": "^0.0.11",
-    "@marp-team/marpit": "^0.1.3",
+    "@marp-team/marp-core": "^0.1.0",
+    "@marp-team/marpit": "^0.2.1",
     "chalk": "^2.4.1",
     "chokidar": "^2.0.4",
     "chrome-launcher": "^0.10.5",
