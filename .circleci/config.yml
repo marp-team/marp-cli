@@ -47,15 +47,20 @@ references:
 
 version: 2
 jobs:
+  '10.13.0':
+    <<: *base
+    docker:
+      - image: circleci/node:10.13.0-browsers
+
   '8.12.0':
     <<: *base
     docker:
       - image: circleci/node:8.12.0-browsers
 
-  '6.14.2':
+  '6.14.4':
     <<: *base
     docker:
-      - image: circleci/node:6.14.2-browsers
+      - image: circleci/node:6.14.4-browsers
 
   docker-image:
     docker:
@@ -79,12 +84,14 @@ workflows:
   version: 2
   build:
     jobs:
+      - 10.13.0
       - 8.12.0
-      - 6.14.2
+      - 6.14.4
       - docker-image:
           requires:
+            - 10.13.0
             - 8.12.0
-            - 6.14.2
+            - 6.14.4
           filters:
             branches:
               only: master
