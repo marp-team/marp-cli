@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Use `Buffer.from()` instead of deprecated constructor ([#37](https://github.com/marp-team/marp-cli/pull/37))
+
 ## v0.0.13 - 2018-11-10
 
 ### Added

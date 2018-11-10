@@ -96,7 +96,7 @@ export class Converter {
     const buffer = await file.load()
     const template = await this.convert(buffer!.toString(), file)
     const newFile = file.convert(this.options.output, this.options.type)
-    newFile.buffer = new Buffer(template.result)
+    newFile.buffer = Buffer.from(template.result)
 
     const result: ConvertResult = { file, newFile, template }
     if (this.options.server && opts.initial) return result

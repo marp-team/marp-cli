@@ -526,7 +526,9 @@ describe('Marp CLI', () => {
       const cliInfo = jest.spyOn(cli, 'info').mockImplementation()
       const stdout = jest.spyOn(process.stdout, 'write').mockImplementation()
 
-      jest.spyOn(getStdin, 'buffer').mockResolvedValue(new Buffer('# markdown'))
+      jest
+        .spyOn(getStdin, 'buffer')
+        .mockResolvedValue(Buffer.from('# markdown'))
 
       // @ts-ignore: reset cached stdin buffer
       File.stdinBuffer = undefined
