@@ -21,8 +21,9 @@ describe('Watch mode notifier on browser context', () => {
   })
 
   context('when window.__marpCliWatchWS is not defined', () => {
-    beforeEach(() =>
-      ((<any>window).__marpCliWatchWS = 'ws://localhost:52000/test'))
+    beforeEach(
+      () => ((<any>window).__marpCliWatchWS = 'ws://localhost:52000/test')
+    )
 
     afterEach(() => delete (<any>window).__marpCliWatchWS)
 

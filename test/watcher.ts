@@ -180,8 +180,9 @@ describe('WatchNotifier', () => {
     context('when 52000 port is using for the other purpose', () => {
       let server: http.Server
 
-      beforeEach(() =>
-        (server = http.createServer((_, res) => res.end()).listen(52000)))
+      beforeEach(
+        () => (server = http.createServer((_, res) => res.end()).listen(52000))
+      )
       afterEach(() => server.close())
 
       it('returns port number 52001', async () =>

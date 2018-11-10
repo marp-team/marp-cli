@@ -182,56 +182,46 @@ describe('Converter', () => {
       const pdfInstance = (opts = {}): any =>
         instance({ ...opts, type: ConvertType.pdf })
 
-      it(
-        'converts markdown file into PDF',
-        async () => {
-          const write = (<any>fs).__mockWriteFile()
-          const opts = { output: 'test.pdf' }
-          const ret = await pdfInstance(opts).convertFile(new File(onePath))
-          const pdf: Buffer = write.mock.calls[0][1]
+      it('converts markdown file into PDF', async () => {
+        const write = (<any>fs).__mockWriteFile()
+        const opts = { output: 'test.pdf' }
+        const ret = await pdfInstance(opts).convertFile(new File(onePath))
+        const pdf: Buffer = write.mock.calls[0][1]
 
-          expect(write).toHaveBeenCalled()
-          expect(write.mock.calls[0][0]).toBe('test.pdf')
-          expect(pdf.toString('ascii', 0, 5)).toBe('%PDF-')
-          expect(ret.newFile.path).toBe('test.pdf')
-          expect(ret.newFile.buffer).toBe(pdf)
-        },
-        10000
-      )
+        expect(write).toHaveBeenCalled()
+        expect(write.mock.calls[0][0]).toBe('test.pdf')
+        expect(pdf.toString('ascii', 0, 5)).toBe('%PDF-')
+        expect(ret.newFile.path).toBe('test.pdf')
+        expect(ret.newFile.buffer).toBe(pdf)
+      }, 10000)
 
       context('with allowLocalFiles option as true', () => {
-        it(
-          'converts into PDF by using temporally file',
-          async () => {
-            const file = new File(onePath)
+        it('converts into PDF by using temporally file', async () => {
+          const file = new File(onePath)
 
-            // @ts-ignore to check cleanup tmpfile
-            const fileCleanup = jest.spyOn(File.prototype, 'cleanup')
-            const fileSave = jest
-              .spyOn(File.prototype, 'save')
-              .mockImplementation()
+          // @ts-ignore to check cleanup tmpfile
+          const fileCleanup = jest.spyOn(File.prototype, 'cleanup')
+          const fileSave = jest
+            .spyOn(File.prototype, 'save')
+            .mockImplementation()
 
-            const fileTmp = jest.spyOn(File.prototype, 'saveTmpFile')
-            const warn = jest.spyOn(console, 'warn').mockImplementation()
+          const fileTmp = jest.spyOn(File.prototype, 'saveTmpFile')
+          const warn = jest.spyOn(console, 'warn').mockImplementation()
 
-            await pdfInstance({
-              allowLocalFiles: true,
-              output: '-',
-            }).convertFile(file)
+          await pdfInstance({
+            allowLocalFiles: true,
+            output: '-',
+          }).convertFile(file)
 
-            expect(warn).toBeCalledWith(
-              expect.stringContaining(
-                'Insecure local file accessing is enabled'
-              )
-            )
-            expect(fileTmp).toBeCalledWith('.html')
-            expect(fileCleanup).toBeCalledWith(
-              expect.stringContaining(os.tmpdir())
-            )
-            expect(fileSave).toBeCalled()
-          },
-          10000
-        )
+          expect(warn).toBeCalledWith(
+            expect.stringContaining('Insecure local file accessing is enabled')
+          )
+          expect(fileTmp).toBeCalledWith('.html')
+          expect(fileCleanup).toBeCalledWith(
+            expect.stringContaining(os.tmpdir())
+          )
+          expect(fileSave).toBeCalled()
+        }, 10000)
       })
     })
   })
