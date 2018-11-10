@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v0.0.13 - 2018-11-10
+
 ### Added
 
 - Support Node 10 ([#35](https://github.com/marp-team/marp-cli/pull/35))
