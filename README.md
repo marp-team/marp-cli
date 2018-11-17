@@ -81,7 +81,7 @@ You can choose a built-in HTML template from `bare` and `bespoke`. Default templ
 
 ##### `bare`
 
-The `bare` template has the minimum assets to present deck with your browser.
+The `bare` template only has the minimum asset to give your presentation with browser. There is no extra features.
 
 When the convert engine is changed to [Marpit framework](https://github.com/marp-team/marpit) by setting `engine` option, it would not use any JavaScript.
 
