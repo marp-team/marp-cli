@@ -1,13 +1,15 @@
 import express, { Express } from 'express'
 import fs from 'fs'
 import path from 'path'
+import serveIndex from 'serve-index'
 import url from 'url'
 import promisify from 'util.promisify'
 import { Converter, ConvertedCallback } from './converter'
 import { error } from './error'
 import { File, markdownExtensions } from './file'
 
-const lstat = promisify(fs.lstat)
+const extensions = [...markdownExtensions]
+const stat = promisify(fs.stat)
 
 export class Server {
   readonly converter: Converter
@@ -34,7 +36,6 @@ export class Server {
 
   private async preprocess(req: express.Request, res: express.Response) {
     // Check file path
-    const extensions = [...markdownExtensions, this.converter.options.type]
     const pathname = url.parse(req.url).pathname || ''
     if (!extensions.includes(path.extname(pathname).slice(1))) return
 
@@ -52,9 +53,9 @@ export class Server {
       )
 
       try {
-        const stat: fs.Stats = await lstat(targetPath)
+        const ret: fs.Stats = await stat(targetPath)
 
-        if (stat.isFile()) {
+        if (ret.isFile()) {
           fn = targetPath
           break
         }
@@ -80,6 +81,7 @@ export class Server {
         })
       )
       .use(express.static(this.inputDir))
+      .use(serveIndex(this.inputDir, { icons: true }))
   }
 }
 

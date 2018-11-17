@@ -108,6 +108,7 @@
     "pkg-up": "^2.0.0",
     "portfinder": "^1.0.19",
     "puppeteer-core": "^1.10.0",
+    "serve-index": "^1.9.1",
     "tmp": "^0.0.33",
     "util.promisify": "^1.0.0",
     "ws": "^6.1.0",
