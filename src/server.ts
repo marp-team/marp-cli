@@ -37,8 +37,6 @@ export class Server {
     new Promise<void>(res => this.server!.listen(this.port, res))
   }
 
-  private
-
   private async preprocess(req: express.Request, res: express.Response) {
     // Check file path
     const pathname = url.parse(req.url).pathname || ''
