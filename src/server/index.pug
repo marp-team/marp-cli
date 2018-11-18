@@ -1,0 +1,12 @@
+doctype
+html
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    meta(http-equiv="X-UA-Compatible", content="ie=edge")
+  body
+    h1= directory
+    ul
+      each file in files
+        li
+          a(href=file.name)= file.name

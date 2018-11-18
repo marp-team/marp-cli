@@ -7,9 +7,12 @@ import promisify from 'util.promisify'
 import { Converter, ConvertedCallback } from './converter'
 import { error } from './error'
 import { File, markdownExtensions } from './file'
+import serverIndex from './server/index.pug'
 
-const extensions = [...markdownExtensions]
 const stat = promisify(fs.stat)
+
+const checkMarkdownExtension = (pathname: string) =>
+  markdownExtensions.includes(path.extname(pathname).slice(1))
 
 export class Server {
   readonly converter: Converter
@@ -34,36 +37,26 @@ export class Server {
     new Promise<void>(res => this.server!.listen(this.port, res))
   }
 
+  private
+
   private async preprocess(req: express.Request, res: express.Response) {
     // Check file path
     const pathname = url.parse(req.url).pathname || ''
-    if (!extensions.includes(path.extname(pathname).slice(1))) return
+    if (!checkMarkdownExtension(pathname)) return
 
     const baseDir = path.resolve(this.inputDir)
     const basePath = path.join(baseDir, decodeURIComponent(pathname))
     if (!basePath.startsWith(baseDir)) return
 
-    let fn: string | undefined
+    let ret: fs.Stats | undefined
 
     // Find markdown file
-    for (const extension of markdownExtensions) {
-      const targetPath = path.join(
-        path.dirname(basePath),
-        `${path.basename(basePath, path.extname(basePath))}.${extension}`
-      )
+    try {
+      ret = await stat(basePath)
+    } catch (e) {}
 
-      try {
-        const ret: fs.Stats = await stat(targetPath)
-
-        if (ret.isFile()) {
-          fn = targetPath
-          break
-        }
-      } catch (e) {}
-    }
-
-    if (fn) {
-      const file = new File(fn)
+    if (ret && ret.isFile()) {
+      const file = new File(basePath)
       const converted = await this.converter.convertFile(file)
       res.end(converted.newFile.buffer)
 
@@ -81,7 +74,22 @@ export class Server {
         })
       )
       .use(express.static(this.inputDir))
-      .use(serveIndex(this.inputDir, { icons: true }))
+      .use(serveIndex(this.inputDir, { icons: true, template: this.template }))
+  }
+
+  private template(locals, callback) {
+    const { directory, path, fileList } = locals
+    const files: any[] = []
+
+    for (const f of fileList)
+      files.push({
+        convertible: checkMarkdownExtension(f.name),
+        directory: f.stat && f.stat.isDirectory(),
+        name: f.name,
+        stat: f.stat,
+      })
+
+    callback(null, serverIndex({ directory, path, files }))
   }
 }
 
