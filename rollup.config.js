@@ -14,6 +14,7 @@ const external = [
   'crypto',
   'fs',
   'path',
+  'querystring',
   'url',
   'chrome-launcher/dist/chrome-finder',
   'yargs/yargs',

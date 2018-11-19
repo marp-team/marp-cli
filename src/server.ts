@@ -1,18 +1,16 @@
 import express, { Express } from 'express'
 import fs from 'fs'
 import path from 'path'
+import querystring from 'querystring'
 import serveIndex from 'serve-index'
 import url from 'url'
 import promisify from 'util.promisify'
-import { Converter, ConvertedCallback } from './converter'
+import { Converter, ConvertedCallback, ConvertType } from './converter'
 import { error } from './error'
 import { File, markdownExtensions } from './file'
 import serverIndex from './server/index.pug'
 
 const stat = promisify(fs.stat)
-
-const checkMarkdownExtension = (pathname: string) =>
-  markdownExtensions.includes(path.extname(pathname).slice(1))
 
 export class Server {
   readonly converter: Converter
@@ -37,24 +35,37 @@ export class Server {
     new Promise<void>(res => this.server!.listen(this.port, res))
   }
 
-  private async preprocess(req: express.Request, res: express.Response) {
-    // Check file path
-    const pathname = url.parse(req.url).pathname || ''
-    if (!checkMarkdownExtension(pathname)) return
+  private async validateMarkdown(relativePath: string, cachedStats?: fs.Stats) {
+    // Check extension
+    const extension = path.extname(relativePath).slice(1)
+    if (!markdownExtensions.includes(extension)) return false
 
+    // Prevent directory traversal
     const baseDir = path.resolve(this.inputDir)
-    const basePath = path.join(baseDir, decodeURIComponent(pathname))
-    if (!basePath.startsWith(baseDir)) return
+    const targetPath = path.join(baseDir, decodeURIComponent(relativePath))
+    if (!targetPath.startsWith(baseDir)) return false
 
-    let ret: fs.Stats | undefined
-
-    // Find markdown file
+    // Check file stat
     try {
-      ret = await stat(basePath)
-    } catch (e) {}
+      const fsStats: fs.Stats = cachedStats || (await stat(targetPath))
+      return fsStats.isFile() ? targetPath : false
+    } catch (e) {
+      return false
+    }
+  }
 
-    if (ret && ret.isFile()) {
-      const file = new File(basePath)
+  private async preprocess(req: express.Request, res: express.Response) {
+    const { pathname, query } = url.parse(req.url)
+    if (!pathname) return
+
+    const validatedPath = await this.validateMarkdown(pathname)
+    if (validatedPath) {
+      const qs = querystring.parse(query || '')
+      const pdf = Object.keys(qs).includes('pdf')
+      const file = new File(validatedPath)
+
+      this.converter.options.type = pdf ? ConvertType.pdf : ConvertType.html
+
       const converted = await this.converter.convertFile(file)
       res.end(converted.newFile.buffer)
 
@@ -72,22 +83,23 @@ export class Server {
         })
       )
       .use(express.static(this.inputDir))
-      .use(serveIndex(this.inputDir, { icons: true, template: this.template }))
+      .use(serveIndex(this.inputDir, { template: this.template.bind(this) }))
   }
 
   private template(locals, callback) {
     const { directory, path, fileList } = locals
     const files: any[] = []
+    ;(async () => {
+      for (const f of fileList)
+        files.push({
+          convertible: !!(await this.validateMarkdown(f.name, f.stat)),
+          directory: f.stat && f.stat.isDirectory(),
+          name: f.name,
+          stat: f.stat,
+        })
 
-    for (const f of fileList)
-      files.push({
-        convertible: checkMarkdownExtension(f.name),
-        directory: f.stat && f.stat.isDirectory(),
-        name: f.name,
-        stat: f.stat,
-      })
-
-    callback(null, serverIndex({ directory, path, files }))
+      callback(null, serverIndex({ directory, path, files }))
+    })()
   }
 }
 
