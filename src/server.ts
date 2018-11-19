@@ -9,6 +9,7 @@ import { Converter, ConvertedCallback, ConvertType } from './converter'
 import { error } from './error'
 import { File, markdownExtensions } from './file'
 import serverIndex from './server/index.pug'
+import style from './server/index.scss'
 
 const stat = promisify(fs.stat)
 
@@ -90,15 +91,17 @@ export class Server {
     const { directory, path, fileList } = locals
     const files: any[] = []
     ;(async () => {
-      for (const f of fileList)
-        files.push({
-          convertible: !!(await this.validateMarkdown(f.name, f.stat)),
-          directory: f.stat && f.stat.isDirectory(),
-          name: f.name,
-          stat: f.stat,
-        })
+      for (const f of fileList) {
+        const { name, stat } = f
+        const directory = stat && stat.isDirectory()
+        const parent = name === '..' && directory
+        const convertible =
+          !parent && !!(await this.validateMarkdown(name, stat))
 
-      callback(null, serverIndex({ directory, path, files }))
+        files.push({ convertible, directory, name, parent, stat })
+      }
+
+      callback(null, serverIndex({ directory, files, path, style }))
     })()
   }
 }

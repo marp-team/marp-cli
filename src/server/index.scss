@@ -1,0 +1,3 @@
+ul.index li:not(.convertible):not(.directory) {
+  display: none;
+}
