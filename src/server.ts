@@ -19,6 +19,7 @@ export class Server {
   readonly options: Server.Options
   readonly port: Number
 
+  directoryIndex: string[]
   server?: Express
 
   constructor(converter: Converter, opts: Server.Options = {}) {
@@ -26,6 +27,7 @@ export class Server {
       error('Converter have to specify an input directory.')
 
     this.converter = converter
+    this.directoryIndex = opts.directoryIndex || []
     this.inputDir = converter.options.inputDir!
     this.options = opts
     this.port = Number.parseInt(process.env.PORT!, 10) || 8080
@@ -36,41 +38,47 @@ export class Server {
     new Promise<void>(res => this.server!.listen(this.port, res))
   }
 
-  private async validateMarkdown(relativePath: string, cachedStats?: fs.Stats) {
-    // Check extension
-    const extension = path.extname(relativePath).slice(1)
-    if (!markdownExtensions.includes(extension)) return false
+  private async convertMarkdown(
+    filename: string,
+    query: querystring.ParsedUrlQuery = {}
+  ) {
+    const pdf = Object.keys(query).includes('pdf')
+    const file = new File(filename)
 
-    // Prevent directory traversal
-    const baseDir = path.resolve(this.inputDir)
-    const targetPath = path.join(baseDir, decodeURIComponent(relativePath))
-    if (!targetPath.startsWith(baseDir)) return false
+    this.converter.options.type = pdf ? ConvertType.pdf : ConvertType.html
 
-    // Check file stat
-    try {
-      const fsStats: fs.Stats = cachedStats || (await stat(targetPath))
-      return fsStats.isFile() ? targetPath : false
-    } catch (e) {
-      return false
-    }
+    const converted = await this.converter.convertFile(file)
+    if (this.options.onConverted) this.options.onConverted(converted)
+
+    return converted
   }
 
   private async preprocess(req: express.Request, res: express.Response) {
     const { pathname, query } = url.parse(req.url)
     if (!pathname) return
 
-    const validatedPath = await this.validateMarkdown(pathname)
-    if (validatedPath) {
-      const qs = querystring.parse(query || '')
-      const pdf = Object.keys(qs).includes('pdf')
-      const file = new File(validatedPath)
+    const qs = querystring.parse(query || '')
+    const response = async fn =>
+      res.end((await this.convertMarkdown(fn, qs)).newFile.buffer)
 
-      this.converter.options.type = pdf ? ConvertType.pdf : ConvertType.html
+    const validated = await this.validateMarkdown(pathname)
 
-      const converted = await this.converter.convertFile(file)
-      res.end(converted.newFile.buffer)
+    if (validated.valid) {
+      await response(validated.path)
+    } else {
+      // Find default files from current directory
+      if (validated.stats && validated.stats.isDirectory()) {
+        for (const dirIdxFn of this.directoryIndex) {
+          const dirIdxValidated = await this.validateMarkdown(
+            path.join(path.relative(this.inputDir, validated.path), dirIdxFn)
+          )
 
-      if (this.options.onConverted) this.options.onConverted(converted)
+          if (dirIdxValidated.valid) {
+            await response(dirIdxValidated.path)
+            break
+          }
+        }
+      }
     }
   }
 
@@ -96,7 +104,7 @@ export class Server {
         const directory = stat && stat.isDirectory()
         const parent = name === '..' && directory
         const convertible =
-          !parent && !!(await this.validateMarkdown(name, stat))
+          !parent && (await this.validateMarkdown(name, stat)).valid
 
         files.push({ convertible, directory, name, parent, stat })
       }
@@ -104,10 +112,46 @@ export class Server {
       callback(null, serverIndex({ directory, files, path, style }))
     })()
   }
+
+  private async validateMarkdown(
+    relativePath: string,
+    fetchedStats?: fs.Stats
+  ): Promise<Server.ValidateResult> {
+    // Check extension
+    const extension = path.extname(relativePath).slice(1)
+    let valid = markdownExtensions.includes(extension)
+
+    // Prevent directory traversal
+    const baseDir = path.resolve(this.inputDir)
+    const targetPath = path.join(baseDir, decodeURIComponent(relativePath))
+
+    if (!targetPath.startsWith(baseDir)) {
+      // Skip remaining process to prevent check for unexpected file and directory
+      return { valid: false, path: targetPath }
+    }
+
+    // Check file stat
+    let stats: fs.Stats | undefined
+    try {
+      stats = fetchedStats || (await stat(targetPath))
+      valid = valid && !!(stats && stats.isFile())
+    } catch (e) {
+      valid = false
+    }
+
+    return { valid, stats, path: targetPath }
+  }
 }
 
 export namespace Server {
-  export interface Options {
+  export declare interface Options {
+    directoryIndex?: string[]
     onConverted?: ConvertedCallback
+  }
+
+  export declare interface ValidateResult {
+    path: string
+    stats?: fs.Stats
+    valid: boolean
   }
 }
