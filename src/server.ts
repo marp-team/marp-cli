@@ -84,7 +84,6 @@ export class Server {
 
   private setup() {
     this.server = express()
-    this.server.set('env', 'development')
     this.server
       .get('*', (req, res, next) =>
         this.preprocess(req, res).then(() => {

@@ -81,24 +81,20 @@ describe('Server', () => {
       return server
     }
 
-    context('when there is request to a served/converted markdown file', () => {
+    context('when there is request to a served markdown file', () => {
       it('triggers conversion and returns the content of converted HTML', async () => {
         const server = await startServer()
         const convertFile = jest.spyOn(server.converter, 'convertFile')
+        const response = await request(server.server).get('/1.md')
 
-        for (const path of ['/1.md', '/1.html']) {
-          convertFile.mockClear()
-          const response = await request(server.server).get(path)
+        expect(response.status).toBe(200)
+        expect(convertFile).toBeCalledTimes(1)
 
-          expect(response.status).toBe(200)
-          expect(convertFile).toBeCalledTimes(1)
+        const ret = await (<Promise<ConvertResult>>(
+          convertFile.mock.results[0].value
+        ))
 
-          const ret = await (<Promise<ConvertResult>>(
-            convertFile.mock.results[0].value
-          ))
-
-          expect(response.text).toBe(ret.newFile.buffer!.toString())
-        }
+        expect(response.text).toBe(ret.newFile.buffer!.toString())
       })
 
       context('with onConverted option', () => {
@@ -137,11 +133,11 @@ describe('Server', () => {
     })
 
     context('when the directory traversal attack is detected', () => {
-      it('returns 404', async () => {
+      it('returns 403', async () => {
         const server = await startServer()
         const response = await request(server.server).get('/../../README.md')
 
-        expect(response.status).toBe(404)
+        expect(response.status).toBe(403)
       })
     })
   })
