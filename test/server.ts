@@ -141,6 +141,9 @@ describe('Server', () => {
         expect($('ul.index li')).toHaveLength(6) // Actual file count
         expect($('ul.index li.directory')).toHaveLength(2) // Directories
         expect($('ul.index li.convertible')).toHaveLength(3) // Markdown files
+
+        // PDF query parameter
+        expect($('li a[href*="?pdf"]')).toHaveLength(3)
       })
 
       context('with specified directoryIndex costructor option', () => {
