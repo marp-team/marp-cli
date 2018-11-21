@@ -4,6 +4,7 @@ import commonjs from 'rollup-plugin-commonjs'
 import json from 'rollup-plugin-json'
 import nodeResolve from 'rollup-plugin-node-resolve'
 import postcss from 'rollup-plugin-postcss'
+import postcssUrl from 'postcss-url'
 import pugPlugin from 'rollup-plugin-pug'
 import { terser } from 'rollup-plugin-terser'
 import typescript from 'rollup-plugin-typescript'
@@ -14,6 +15,7 @@ const external = [
   'crypto',
   'fs',
   'path',
+  'querystring',
   'url',
   'chrome-launcher/dist/chrome-finder',
   'yargs/yargs',
@@ -26,7 +28,15 @@ const plugins = [
   typescript({ resolveJsonModule: false }),
   postcss({
     inject: false,
-    plugins: [autoprefixer(), cssnano({ preset: 'default' })],
+    plugins: [
+      postcssUrl({
+        filter: '**/assets/**/*.svg',
+        encodeType: 'base64',
+        url: 'inline',
+      }),
+      autoprefixer(),
+      cssnano({ preset: 'default' }),
+    ],
   }),
   pugPlugin({ pugRuntime: 'pug-runtime' }),
   !process.env.ROLLUP_WATCH && terser(),
