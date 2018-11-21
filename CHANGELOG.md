@@ -9,6 +9,7 @@
 ### Fixed
 
 - Use `Buffer.from()` instead of deprecated constructor ([#37](https://github.com/marp-team/marp-cli/pull/37))
+- Remove `@ts-ignore` magic comment from test ([#39](https://github.com/marp-team/marp-cli/pull/39))
 
 ## v0.0.13 - 2018-11-10
 
