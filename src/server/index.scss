@@ -58,6 +58,10 @@ ul.index {
         text-decoration: underline;
       }
 
+      &:hover:active {
+        background: #f0f0f0;
+      }
+
       &.file {
         flex: 1;
         overflow: hidden;
