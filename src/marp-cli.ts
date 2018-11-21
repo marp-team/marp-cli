@@ -197,7 +197,10 @@ export default async function(argv: string[] = []): Promise<number> {
       )
 
       if (cvtOpts.server) {
-        const server = new Server(converter, { onConverted })
+        const server = new Server(converter, {
+          onConverted,
+          directoryIndex: ['index.md', 'PITCHME.md'], // GitPitch compatible
+        })
         await server.start()
 
         cli.info(

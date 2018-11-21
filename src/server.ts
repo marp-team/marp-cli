@@ -1,13 +1,17 @@
 import express, { Express } from 'express'
 import fs from 'fs'
 import path from 'path'
+import querystring from 'querystring'
+import serveIndex from 'serve-index'
 import url from 'url'
 import promisify from 'util.promisify'
-import { Converter, ConvertedCallback } from './converter'
+import { Converter, ConvertedCallback, ConvertType } from './converter'
 import { error } from './error'
 import { File, markdownExtensions } from './file'
+import serverIndex from './server/index.pug'
+import style from './server/index.scss'
 
-const lstat = promisify(fs.lstat)
+const stat = promisify(fs.stat)
 
 export class Server {
   readonly converter: Converter
@@ -15,6 +19,7 @@ export class Server {
   readonly options: Server.Options
   readonly port: Number
 
+  directoryIndex: string[]
   server?: Express
 
   constructor(converter: Converter, opts: Server.Options = {}) {
@@ -22,6 +27,7 @@ export class Server {
       error('Converter have to specify an input directory.')
 
     this.converter = converter
+    this.directoryIndex = opts.directoryIndex || []
     this.inputDir = converter.options.inputDir!
     this.options = opts
     this.port = Number.parseInt(process.env.PORT!, 10) || 8080
@@ -32,47 +38,52 @@ export class Server {
     new Promise<void>(res => this.server!.listen(this.port, res))
   }
 
+  private async convertMarkdown(
+    filename: string,
+    query: querystring.ParsedUrlQuery = {}
+  ) {
+    const pdf = Object.keys(query).includes('pdf')
+    const file = new File(filename)
+
+    this.converter.options.type = pdf ? ConvertType.pdf : ConvertType.html
+
+    const converted = await this.converter.convertFile(file)
+    if (this.options.onConverted) this.options.onConverted(converted)
+
+    return converted
+  }
+
   private async preprocess(req: express.Request, res: express.Response) {
-    // Check file path
-    const extensions = [...markdownExtensions, this.converter.options.type]
-    const pathname = url.parse(req.url).pathname || ''
-    if (!extensions.includes(path.extname(pathname).slice(1))) return
+    const { pathname, query } = url.parse(req.url)
+    if (!pathname) return
 
-    const baseDir = path.resolve(this.inputDir)
-    const basePath = path.join(baseDir, decodeURIComponent(pathname))
-    if (!basePath.startsWith(baseDir)) return
+    const qs = querystring.parse(query || '')
+    const response = async fn =>
+      res.end((await this.convertMarkdown(fn, qs)).newFile.buffer)
 
-    let fn: string | undefined
+    const validated = await this.validateMarkdown(pathname)
 
-    // Find markdown file
-    for (const extension of markdownExtensions) {
-      const targetPath = path.join(
-        path.dirname(basePath),
-        `${path.basename(basePath, path.extname(basePath))}.${extension}`
-      )
+    if (validated.valid) {
+      await response(validated.path)
+    } else {
+      // Find default files from current directory
+      if (validated.stats && validated.stats.isDirectory()) {
+        for (const dirIdxFn of this.directoryIndex) {
+          const dirIdxValidated = await this.validateMarkdown(
+            path.join(path.relative(this.inputDir, validated.path), dirIdxFn)
+          )
 
-      try {
-        const stat: fs.Stats = await lstat(targetPath)
-
-        if (stat.isFile()) {
-          fn = targetPath
-          break
+          if (dirIdxValidated.valid) {
+            await response(dirIdxValidated.path)
+            break
+          }
         }
-      } catch (e) {}
-    }
-
-    if (fn) {
-      const file = new File(fn)
-      const converted = await this.converter.convertFile(file)
-      res.end(converted.newFile.buffer)
-
-      if (this.options.onConverted) this.options.onConverted(converted)
+      }
     }
   }
 
   private setup() {
     this.server = express()
-    this.server.set('env', 'development')
     this.server
       .get('*', (req, res, next) =>
         this.preprocess(req, res).then(() => {
@@ -80,11 +91,66 @@ export class Server {
         })
       )
       .use(express.static(this.inputDir))
+      .use(serveIndex(this.inputDir, { template: this.template.bind(this) }))
+  }
+
+  private template(locals, callback) {
+    const { directory, path, fileList } = locals
+    const files: any[] = []
+    ;(async () => {
+      for (const f of fileList) {
+        const { name, stat } = f
+        const directory = stat && stat.isDirectory()
+        const parent = name === '..' && directory
+        const convertible =
+          !parent && (await this.validateMarkdown(name, stat)).valid
+
+        files.push({ convertible, directory, name, parent, stat })
+      }
+
+      callback(null, serverIndex({ directory, files, path, style }))
+    })()
+  }
+
+  private async validateMarkdown(
+    relativePath: string,
+    fetchedStats?: fs.Stats
+  ): Promise<Server.ValidateResult> {
+    // Check extension
+    const extension = path.extname(relativePath).slice(1)
+    let valid = markdownExtensions.includes(extension)
+
+    // Prevent directory traversal
+    const baseDir = path.resolve(this.inputDir)
+    const targetPath = path.join(baseDir, decodeURIComponent(relativePath))
+
+    if (!targetPath.startsWith(baseDir)) {
+      // Skip remaining process to prevent check for unexpected file and directory
+      return { valid: false, path: targetPath }
+    }
+
+    // Check file stat
+    let stats: fs.Stats | undefined
+    try {
+      stats = fetchedStats || (await stat(targetPath))
+      valid = valid && !!(stats && stats.isFile())
+    } catch (e) {
+      valid = false
+    }
+
+    return { valid, stats, path: targetPath }
   }
 }
 
 export namespace Server {
-  export interface Options {
+  export declare interface Options {
+    directoryIndex?: string[]
     onConverted?: ConvertedCallback
+  }
+
+  export declare interface ValidateResult {
+    path: string
+    stats?: fs.Stats
+    valid: boolean
   }
 }

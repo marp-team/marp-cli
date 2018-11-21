@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Serve directory index and default markdown `index.md` or `PITCHME.md` in server mode ([#38](https://github.com/marp-team/marp-cli/pull/38))
+
 ### Fixed
 
 - Use `Buffer.from()` instead of deprecated constructor ([#37](https://github.com/marp-team/marp-cli/pull/37))

@@ -1,4 +1,5 @@
 import Marp from '@marp-team/marp-core'
+import cheerio from 'cheerio'
 import path from 'path'
 import request from 'supertest'
 import {
@@ -81,24 +82,20 @@ describe('Server', () => {
       return server
     }
 
-    context('when there is request to a served/converted markdown file', () => {
+    context('when there is request to a served markdown file', () => {
       it('triggers conversion and returns the content of converted HTML', async () => {
         const server = await startServer()
         const convertFile = jest.spyOn(server.converter, 'convertFile')
+        const response = await request(server.server).get('/1.md')
 
-        for (const path of ['/1.md', '/1.html']) {
-          convertFile.mockClear()
-          const response = await request(server.server).get(path)
+        expect(response.status).toBe(200)
+        expect(convertFile).toBeCalledTimes(1)
 
-          expect(response.status).toBe(200)
-          expect(convertFile).toBeCalledTimes(1)
+        const ret = await (<Promise<ConvertResult>>(
+          convertFile.mock.results[0].value
+        ))
 
-          const ret = await (<Promise<ConvertResult>>(
-            convertFile.mock.results[0].value
-          ))
-
-          expect(response.text).toBe(ret.newFile.buffer!.toString())
-        }
+        expect(response.text).toBe(ret.newFile.buffer!.toString())
       })
 
       context('with onConverted option', () => {
@@ -113,6 +110,51 @@ describe('Server', () => {
             convertFile.mock.results[0].value
           ))
           expect(onConverted).toBeCalledWith(ret)
+        })
+      })
+
+      context('with query parameter', () => {
+        it('triggers conversion with corresponded type option', async () => {
+          const server = await startServer()
+
+          jest
+            .spyOn(server.converter, 'convertFile')
+            .mockResolvedValue({ newFile: { buffer: 'converted' } })
+
+          await request(server.server).get('/1.md')
+          expect(server.converter.options.type).toBe(ConvertType.html)
+
+          await request(server.server).get('/1.md?pdf')
+          expect(server.converter.options.type).toBe(ConvertType.pdf)
+        })
+      })
+    })
+
+    context('when there is request to served directory', () => {
+      it('shows the directory index with assigned class by kind', async () => {
+        const server = await startServer()
+        const response = await request(server.server).get('/')
+        expect(response.status).toBe(200)
+
+        const $ = cheerio.load(response.text)
+        expect($('h1').text()).toBe('/')
+        expect($('ul.index li')).toHaveLength(6) // Actual file count
+        expect($('ul.index li.directory')).toHaveLength(2) // Directories
+        expect($('ul.index li.convertible')).toHaveLength(3) // Markdown files
+
+        // PDF query parameter
+        expect($('li a[href*="?pdf"]')).toHaveLength(3)
+      })
+
+      context('with specified directoryIndex costructor option', () => {
+        it('serves the found convertible markdown', async () => {
+          const server = await startServer({ directoryIndex: ['1.md'] })
+          const response = await request(server.server).get('/')
+
+          expect(response.status).toBe(200)
+
+          const $ = cheerio.load(response.text)
+          expect($('h1').text()).toBe('one')
         })
       })
     })
@@ -137,11 +179,11 @@ describe('Server', () => {
     })
 
     context('when the directory traversal attack is detected', () => {
-      it('returns 404', async () => {
+      it('returns 403', async () => {
         const server = await startServer()
         const response = await request(server.server).get('/../../README.md')
 
-        expect(response.status).toBe(404)
+        expect(response.status).toBe(403)
       })
     })
   })
