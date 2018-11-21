@@ -199,8 +199,7 @@ describe('Converter', () => {
         it('converts into PDF by using temporally file', async () => {
           const file = new File(onePath)
 
-          // @ts-ignore to check cleanup tmpfile
-          const fileCleanup = jest.spyOn(File.prototype, 'cleanup')
+          const fileCleanup = jest.spyOn(<any>File.prototype, 'cleanup')
           const fileSave = jest
             .spyOn(File.prototype, 'save')
             .mockImplementation()
