@@ -4,16 +4,13 @@ html
     meta(charset="UTF-8")
     meta(name="viewport", content="width=device-width, initial-scale=1.0")
     meta(http-equiv="X-UA-Compatible", content="ie=edge")
-    style= style
+    style!= style
   body
     h1= directory
     ul.index
       each file in files
         li(class={ convertible: file.convertible, directory: file.directory })
-          a(href=encodeURIComponent(file.name))= file.name
+          a.link.file(href=encodeURIComponent(file.name))= file.name
 
           if file.convertible
-            |
-            | (
-            a(href=`${encodeURIComponent(file.name)}?pdf`) PDF
-            | )
+            a.link.pdf(href=`${encodeURIComponent(file.name)}?pdf`) PDF
