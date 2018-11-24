@@ -31,6 +31,10 @@ references:
           command: yarn lint:ts
 
       - run:
+          name: stylelint
+          command: yarn lint:css
+
+      - run:
           name: Jest
           command: yarn test:coverage --ci --runInBand --reporters=default --reporters=jest-junit
           environment:
