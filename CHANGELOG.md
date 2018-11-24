@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Security
+
+- Get rid of a malicious package `flatmap-stream` from deep dependency ([#40](https://github.com/marp-team/marp-cli/pull/40))
+
 ### Added
 
 - Serve directory index and default markdown `index.md` or `PITCHME.md` in server mode ([#38](https://github.com/marp-team/marp-cli/pull/38))
@@ -10,6 +14,10 @@
 
 - Use `Buffer.from()` instead of deprecated constructor ([#37](https://github.com/marp-team/marp-cli/pull/37))
 - Remove `@ts-ignore` magic comment from test ([#39](https://github.com/marp-team/marp-cli/pull/39))
+
+### Changed
+
+- Upgrade dependent packages to latest version ([#40](https://github.com/marp-team/marp-cli/pull/40))
 
 ## v0.0.13 - 2018-11-10
 
