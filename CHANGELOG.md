@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v0.0.14 - 2018-11-24
+
 ### Security
 
 - Get rid of a malicious package `flatmap-stream` from deep dependency ([#40](https://github.com/marp-team/marp-cli/pull/40))
