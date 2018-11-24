@@ -14,6 +14,7 @@
 
 - Use `Buffer.from()` instead of deprecated constructor ([#37](https://github.com/marp-team/marp-cli/pull/37))
 - Remove `@ts-ignore` magic comment from test ([#39](https://github.com/marp-team/marp-cli/pull/39))
+- Better lint and format while running CI ([#41](https://github.com/marp-team/marp-cli/pull/41))
 
 ### Changed
 
