@@ -167,7 +167,12 @@ export class Converter {
     // for marp-core
     if (html !== undefined) opts.html = html
 
-    const engine = new this.options.engine(opts)
+    const { prototype } = this.options.engine
+
+    const engine =
+      prototype && prototype.hasOwnProperty('constructor')
+        ? new this.options.engine(opts)
+        : (<any>this.options.engine)(opts)
 
     if (typeof engine.render !== 'function')
       error('Specified engine has not implemented render() method.')
