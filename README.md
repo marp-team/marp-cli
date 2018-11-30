@@ -38,13 +38,13 @@ Do you hate to install node/chrome locally? We have [an official Docker image](h
 
 ```bash
 # Convert slide deck into HTML
-docker run --rm -v $PWD:/home/marp/app/ marpteam/marp-cli slide-deck.md
+docker run --rm -v $PWD:/home/marp/app/ -e LANG=$LANG marpteam/marp-cli slide-deck.md
 
 # Convert slide deck into PDF by using Chromium in Docker
-docker run --rm -v $PWD:/home/marp/app/ marpteam/marp-cli slide-deck.md --pdf
+docker run --rm -v $PWD:/home/marp/app/ -e LANG=$LANG marpteam/marp-cli slide-deck.md --pdf
 
 # Watch mode
-docker run --rm --init -v $PWD:/home/marp/app/ -p 52000:52000 marpteam/marp-cli -w slide-deck.md
+docker run --rm --init -v $PWD:/home/marp/app/ -e LANG=$LANG -p 52000:52000 marpteam/marp-cli -w slide-deck.md
 ```
 
 ## Install
