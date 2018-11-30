@@ -530,8 +530,8 @@ describe('Marp CLI', () => {
         .spyOn(getStdin, 'buffer')
         .mockResolvedValue(Buffer.from('# markdown'))
 
-      // @ts-ignore: reset cached stdin buffer
-      File.stdinBuffer = undefined
+      // reset cached stdin buffer
+      ;(<any>File).stdinBuffer = undefined
 
       expect(await marpCli()).toBe(0)
       expect(cliInfo).toHaveBeenCalledWith(

@@ -17,8 +17,7 @@ describe('Engine', () => {
     })
 
     it("loads browser script from defined in module's marpBrowser section", async () => {
-      // @ts-ignore: #findClassPath is mocked
-      const finder = <jest.Mock>ResolvedEngine.prototype.findClassPath
+      const finder = <jest.Mock>(<any>ResolvedEngine.prototype).findClassPath
 
       // Core (defined marpBrowser)
       finder.mockImplementation(() => require.resolve(coreModule))
