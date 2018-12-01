@@ -454,7 +454,7 @@ describe('Marp CLI', () => {
           expect(html).toContain('@theme a')
         })
 
-        it('allows custom engine specified in js config', async () => {
+        it('allows custom engine class specified in js config', async () => {
           const stdout = jest
             .spyOn(process.stdout, 'write')
             .mockImplementation()
@@ -469,6 +469,20 @@ describe('Marp CLI', () => {
           const html = stdout.mock.calls[0][0].toString()
           expect(html).toContain('<b>custom</b>')
           expect(html).toContain('/* custom */')
+        })
+
+        it('allows custom engine function specified in js config', async () => {
+          jest.spyOn(process.stdout, 'write').mockImplementation()
+          jest.spyOn(console, 'warn').mockImplementation()
+
+          const conf = assetFn('_configs/custom-engine/anonymous.js')
+          const md = assetFn('_configs/custom-engine/md.md')
+          const { engine } = require(conf)
+
+          expect(await marpCli(['-c', conf, md, '-o', '-'])).toBe(0)
+          expect(engine).toBeCalledWith(
+            expect.objectContaining({ customOption: true })
+          )
         })
       })
     })
