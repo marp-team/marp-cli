@@ -14,6 +14,7 @@ export type ResolvableEngine = Engine | string
 export class ResolvedEngine {
   browserScript?: string
   klass: Engine
+  package?: { [key: string]: any }
 
   private static browserScriptKey = 'marpBrowser'
 
@@ -62,7 +63,8 @@ export class ResolvedEngine {
     const pkgPath = await pkgUp(path.dirname(classPath))
     if (!pkgPath) return
 
-    const scriptPath = require(pkgPath)[ResolvedEngine.browserScriptKey]
+    this.package = require(pkgPath)
+    const scriptPath = this.package![ResolvedEngine.browserScriptKey]
     if (!scriptPath) return undefined
 
     this.browserScript = (await readFile(
