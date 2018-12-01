@@ -4,7 +4,7 @@
 
 ### Added
 
-- Support functional engine [#42](https://github.com/marp-team/marp-cli/pull/42)
+- Support functional engine ([#42](https://github.com/marp-team/marp-cli/pull/42))
 
 ## v0.0.14 - 2018-11-24
 
