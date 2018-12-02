@@ -1,4 +1,3 @@
-import { version as coreVersion } from '@marp-team/marp-core/package.json'
 import chalk from 'chalk'
 import { Argv } from 'yargs'
 import yargs from 'yargs/yargs'
@@ -9,8 +8,8 @@ import { CLIError, error } from './error'
 import { File, FileType } from './file'
 import { Server } from './server'
 import templates from './templates'
+import version from './version'
 import watcher, { Watcher } from './watcher'
-import { name, version } from '../package.json'
 
 enum OptionGroup {
   Basic = 'Basic Options:',
@@ -30,14 +29,14 @@ export default async function(argv: string[] = []): Promise<number> {
     const program = base
       .usage(usage)
       .help(false)
-      .version(
-        'version',
-        'Show package versions',
-        `${name} v${version} (/w @marp-team/marp-core v${coreVersion})`
-      )
-      .alias('version', 'v')
-      .group('version', OptionGroup.Basic)
+      .version(false)
       .options({
+        version: {
+          alias: 'v',
+          describe: 'Show versions',
+          group: OptionGroup.Basic,
+          type: 'boolean',
+        },
         help: {
           alias: 'h',
           describe: 'Show help',
@@ -121,8 +120,10 @@ export default async function(argv: string[] = []): Promise<number> {
       return 0
     }
 
-    // Initialize converter
     const config = await fromArguments(args)
+    if (args.version) return await version(config)
+
+    // Initialize converter
     const converter = new Converter(await config.converterOption())
     const cvtOpts = converter.options
 

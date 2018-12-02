@@ -1,8 +1,6 @@
 import Marp from '@marp-team/marp-core'
 import resolve, { ResolvedEngine } from '../src/engine'
 
-jest.mock('../src/engine')
-
 describe('Engine', () => {
   const coreModule = '@marp-team/marp-core'
   const marpitModule = '@marp-team/marpit'
@@ -17,7 +15,7 @@ describe('Engine', () => {
     })
 
     it("loads browser script from defined in module's marpBrowser section", async () => {
-      const finder = <jest.Mock>(<any>ResolvedEngine.prototype).findClassPath
+      const finder = jest.spyOn(<any>ResolvedEngine.prototype, 'findClassPath')
 
       // Core (defined marpBrowser)
       finder.mockImplementation(() => require.resolve(coreModule))

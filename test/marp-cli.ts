@@ -6,6 +6,7 @@ import marpCli from '../src/marp-cli'
 import * as cli from '../src/cli'
 import { File } from '../src/file'
 import { Converter, ConvertType } from '../src/converter'
+import { ResolvedEngine } from '../src/engine'
 import { CLIError } from '../src/error'
 import { Server } from '../src/server'
 import { ThemeSet } from '../src/theme'
@@ -13,6 +14,7 @@ import { Watcher } from '../src/watcher'
 
 const { version } = require('../package.json')
 const coreVersion = require('@marp-team/marp-core/package.json').version
+const marpitVersion = require('@marp-team/marpit/package.json').version
 
 jest.mock('fs')
 jest.mock('mkdirp')
@@ -23,37 +25,86 @@ afterEach(() => jest.restoreAllMocks())
 describe('Marp CLI', () => {
   const assetFn = fn => path.resolve(__dirname, fn)
 
-  const confirmVersion = (...cmd: string[]) => {
-    it('outputs package versions about cli and core', async () => {
-      const log = jest.spyOn(console, 'log').mockImplementation()
+  for (const cmd of ['--version', '-v'])
+    context(`with ${cmd} option`, () => {
+      let log: jest.SpyInstance<Console['log']>
+      let findClassPath: jest.SpyInstance<ResolvedEngine['findClassPath']>
 
-      jest.spyOn(console, 'error').mockImplementation()
-      jest.spyOn(process, 'exit').mockImplementationOnce(code => {
-        throw new CLIError('EXIT', code)
+      beforeEach(() => {
+        log = jest.spyOn(console, 'log').mockImplementation()
+        findClassPath = jest
+          .spyOn(<any>ResolvedEngine.prototype, 'findClassPath')
+          .mockImplementation()
       })
 
-      expect(await marpCli(cmd)).toBe(0)
+      const mockEnginePath = path =>
+        findClassPath.mockImplementation(() => path)
 
-      const [logged] = log.mock.calls[0]
-      expect(logged).toContain(`@marp-team/marp-cli v${version}`)
-      expect(logged).toContain(`@marp-team/marp-core v${coreVersion}`)
+      it('outputs package versions about cli and bundled core', async () => {
+        expect(await marpCli([cmd])).toBe(0)
+        expect(log).toBeCalledWith(
+          expect.stringContaining(`@marp-team/marp-cli v${version}`)
+        )
+        expect(log).toBeCalledWith(
+          expect.stringContaining(
+            `bundled @marp-team/marp-core v${coreVersion}`
+          )
+        )
+      })
+
+      context('with specified Marpit engine', () => {
+        const cmds = [cmd, '--engine', '@marp-team/marpit']
+
+        beforeEach(() =>
+          mockEnginePath(
+            assetFn('../node_modules/@marp-team/marpit/lib/index.js')
+          )
+        )
+
+        it('outputs using engine name and version', async () => {
+          expect(await marpCli(cmds)).toBe(0)
+          expect(log).toBeCalledWith(
+            expect.stringContaining(`@marp-team/marpit v${marpitVersion}`)
+          )
+        })
+      })
+
+      context('with custom engine in project', () => {
+        const cmds = [cmd, '-c', assetFn('_configs/custom-engine/file.js')]
+
+        beforeEach(() =>
+          mockEnginePath(assetFn('_configs/custom-engine/custom-engine.js'))
+        )
+
+        it('outputs project name and version', async () => {
+          expect(await marpCli(cmds)).toBe(0)
+          expect(log).toBeCalledWith(
+            expect.stringContaining('custom-project v0.1.2')
+          )
+        })
+      })
+
+      context('with functional engine in config file directly', () => {
+        const cmds = [cmd, '-c', assetFn('_configs/custom-engine/anonymous.js')]
+
+        it('outputs using the customized engine', async () => {
+          expect(await marpCli(cmds)).toBe(0)
+          expect(log).toBeCalledWith(
+            expect.stringContaining('customized engine')
+          )
+        })
+      })
     })
-  }
-  ;['--version', '-v'].forEach(cmd =>
-    context(`with ${cmd} option`, () => confirmVersion(cmd))
-  )
 
-  const confirmHelp = (...cmd: string[]) => {
-    it('outputs help to stderr', async () => {
-      const error = jest.spyOn(console, 'error').mockImplementation()
+  for (const cmd of [null, '--help', '-h'])
+    context(`with ${cmd || 'empty'} option`, () => {
+      it('outputs help to stderr', async () => {
+        const error = jest.spyOn(console, 'error').mockImplementation()
 
-      expect(await marpCli(cmd)).toBe(0)
-      expect(error).toHaveBeenCalledWith(expect.stringContaining('Usage'))
+        expect(await marpCli(cmd ? [cmd] : [])).toBe(0)
+        expect(error).toHaveBeenCalledWith(expect.stringContaining('Usage'))
+      })
     })
-  }
-  ;[null, ['--help'], ['-h']].forEach(cmd =>
-    context(`with ${cmd || 'empty'} option`, () => confirmHelp(...(cmd || [])))
-  )
 
   const confirmPDF = (...cmd: string[]) => {
     it('converts file by Converter with PDF type', async () => {
