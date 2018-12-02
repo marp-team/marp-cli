@@ -18,7 +18,6 @@ const marpitVersion = require('@marp-team/marpit/package.json').version
 
 jest.mock('fs')
 jest.mock('mkdirp')
-jest.mock('../src/engine')
 jest.mock('../src/watcher', () => jest.genMockFromModule('../src/watcher'))
 
 afterEach(() => jest.restoreAllMocks())
@@ -28,12 +27,14 @@ describe('Marp CLI', () => {
 
   for (const cmd of ['--version', '-v'])
     context(`with ${cmd} option`, () => {
-      const { findClassPath } = <any>ResolvedEngine.prototype
       let log: jest.SpyInstance<Console['log']>
+      let findClassPath: jest.SpyInstance<ResolvedEngine['findClassPath']>
 
       beforeEach(() => {
-        findClassPath.mockReset()
         log = jest.spyOn(console, 'log').mockImplementation()
+        findClassPath = jest
+          .spyOn(<any>ResolvedEngine.prototype, 'findClassPath')
+          .mockImplementation()
       })
 
       const mockEnginePath = path =>
