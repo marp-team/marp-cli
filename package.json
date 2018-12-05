@@ -97,6 +97,7 @@
   "dependencies": {
     "@marp-team/marp-core": "^0.2.1",
     "@marp-team/marpit": "^0.3.1",
+    "carlo": "^0.9.41",
     "chalk": "^2.4.1",
     "chokidar": "^2.0.4",
     "chrome-launcher": "^0.10.5",
