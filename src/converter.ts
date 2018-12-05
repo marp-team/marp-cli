@@ -23,6 +23,7 @@ export interface ConverterOption {
   lang: string
   options: MarpitOptions
   output?: string
+  preview?: boolean
   readyScript?: string
   server?: boolean
   template: string

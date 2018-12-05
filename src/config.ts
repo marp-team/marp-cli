@@ -25,6 +25,7 @@ export interface IMarpCLIArguments {
   inputDir?: string
   output?: string
   pdf?: boolean
+  preview?: boolean
   server?: boolean
   template?: string
   theme?: string
@@ -82,6 +83,8 @@ export class MarpCLIConfig {
         : undefined)
 
     const server = this.pickDefined(this.args.server, this.conf.server) || false
+    const preview =
+      this.pickDefined(this.args.preview, this.conf.preview) || false
 
     const theme = await this.loadTheme()
     const initialThemes = theme instanceof Theme ? [theme] : []
@@ -109,6 +112,7 @@ export class MarpCLIConfig {
     return {
       inputDir,
       output,
+      preview,
       server,
       themeSet,
       allowLocalFiles:
@@ -132,7 +136,10 @@ export class MarpCLIConfig {
           ? ConvertType.pdf
           : ConvertType.html,
       watch:
-        this.pickDefined(this.args.watch, this.conf.watch) || server || false,
+        this.pickDefined(this.args.watch, this.conf.watch) ||
+        preview ||
+        server ||
+        false,
     }
   }
 
