@@ -604,10 +604,13 @@ describe('Marp CLI', () => {
     })
 
     context('with --preview option', () => {
+      afterEach(() => previewMock.carloOriginal())
+
       it('outputs warning and starts watching', async () => {
         const warn = jest.spyOn(cli, 'warn').mockImplementation()
 
         jest.spyOn(cli, 'info').mockImplementation()
+        previewMock.carloMock()
         ;(<any>fs).__mockWriteFile()
 
         expect(await marpCli([onePath, '--preview'])).toBe(0)
