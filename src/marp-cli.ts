@@ -24,56 +24,52 @@ Usage:
   marp [options] -I <dir>
 `.trim()
 
-export default async function(argv: string[] = []): Promise<number> {
-  try {
-    const base: Argv = yargs(argv)
-    const program = base
-      .usage(usage)
-      .help(false)
-      .version(false)
-      .options({
-        version: {
-          alias: 'v',
-          describe: 'Show versions',
-          group: OptionGroup.Basic,
-          type: 'boolean',
-        },
-        help: {
-          alias: 'h',
-          describe: 'Show help',
-          group: OptionGroup.Basic,
-          type: 'boolean',
-        },
-        output: {
-          alias: 'o',
-          describe: 'Output file path (or directory when input-dir is passed)',
-          group: OptionGroup.Basic,
-          type: 'string',
-        },
-        'input-dir': {
-          alias: 'I',
-          describe: 'The base directory to find markdown and theme CSS',
-          group: OptionGroup.Basic,
-          type: 'string',
-        },
-        'config-file': {
-          alias: 'c',
-          describe: 'Specify path to configuration file',
-          group: OptionGroup.Basic,
-          type: 'string',
-        },
-        watch: {
-          alias: 'w',
-          describe: 'Watch input markdowns for changes',
-          group: OptionGroup.Basic,
-          type: 'boolean',
-        },
-        server: {
-          alias: 's',
-          describe: 'Enable server mode',
-          group: OptionGroup.Basic,
-          type: 'boolean',
-        },
+const options: { [k: string]: any } = {
+  version: {
+    alias: 'v',
+    describe: 'Show versions',
+    group: OptionGroup.Basic,
+    type: 'boolean',
+  },
+  help: {
+    alias: 'h',
+    describe: 'Show help',
+    group: OptionGroup.Basic,
+    type: 'boolean',
+  },
+  output: {
+    alias: 'o',
+    describe: 'Output file path (or directory when input-dir is passed)',
+    group: OptionGroup.Basic,
+    type: 'string',
+  },
+  'input-dir': {
+    alias: 'I',
+    describe: 'The base directory to find markdown and theme CSS',
+    group: OptionGroup.Basic,
+    type: 'string',
+  },
+  'config-file': {
+    alias: 'c',
+    describe: 'Specify path to configuration file',
+    group: OptionGroup.Basic,
+    type: 'string',
+  },
+  watch: {
+    alias: 'w',
+    describe: 'Watch input markdowns for changes',
+    group: OptionGroup.Basic,
+    type: 'boolean',
+  },
+  server: {
+    alias: 's',
+    describe: 'Enable server mode',
+    group: OptionGroup.Basic,
+    type: 'boolean',
+  },
+  ...(process.env.IS_DOCKER
+    ? {}
+    : {
         preview: {
           describe: `Open preview window (EXPERIMENTAL)${
             carlo ? '' : ` ${chalk.red('[Requires Node >= 7.6]')}`
@@ -81,45 +77,55 @@ export default async function(argv: string[] = []): Promise<number> {
           group: OptionGroup.Basic,
           type: 'boolean',
         },
-        pdf: {
-          describe: 'Convert slide deck into PDF',
-          group: OptionGroup.Converter,
-          type: 'boolean',
-        },
-        template: {
-          describe: 'Choose template',
-          group: OptionGroup.Converter,
-          choices: Object.keys(templates),
-          type: 'string',
-        },
-        'allow-local-files': {
-          describe:
-            'Allow to access local files from Markdown while converting PDF (NOT SECURE)',
-          group: OptionGroup.Converter,
-          type: 'boolean',
-        },
-        engine: {
-          describe: 'Select Marpit based engine by module name or path',
-          group: OptionGroup.Marp,
-          type: 'string',
-        },
-        html: {
-          describe: 'Enable or disable HTML tag',
-          group: OptionGroup.Marp,
-          type: 'boolean',
-        },
-        theme: {
-          describe: 'Override theme by name or CSS file',
-          group: OptionGroup.Marp,
-          type: 'string',
-        },
-        'theme-set': {
-          array: true,
-          describe: 'Path to additional theme CSS files',
-          group: OptionGroup.Marp,
-          type: 'string',
-        },
-      })
+      }),
+  pdf: {
+    describe: 'Convert slide deck into PDF',
+    group: OptionGroup.Converter,
+    type: 'boolean',
+  },
+  template: {
+    describe: 'Choose template',
+    group: OptionGroup.Converter,
+    choices: Object.keys(templates),
+    type: 'string',
+  },
+  'allow-local-files': {
+    describe:
+      'Allow to access local files from Markdown while converting PDF (NOT SECURE)',
+    group: OptionGroup.Converter,
+    type: 'boolean',
+  },
+  engine: {
+    describe: 'Select Marpit based engine by module name or path',
+    group: OptionGroup.Marp,
+    type: 'string',
+  },
+  html: {
+    describe: 'Enable or disable HTML tag',
+    group: OptionGroup.Marp,
+    type: 'boolean',
+  },
+  theme: {
+    describe: 'Override theme by name or CSS file',
+    group: OptionGroup.Marp,
+    type: 'string',
+  },
+  'theme-set': {
+    array: true,
+    describe: 'Path to additional theme CSS files',
+    group: OptionGroup.Marp,
+    type: 'string',
+  },
+}
+
+export default async function(argv: string[] = []): Promise<number> {
+  try {
+    const base: Argv = yargs(argv)
+    const program = base
+      .usage(usage)
+      .help(false)
+      .version(false)
+      .options(options)
 
     const args = program.argv
 

@@ -84,8 +84,6 @@ export class MarpCLIConfig {
         : undefined)
 
     const server = this.pickDefined(this.args.server, this.conf.server) || false
-    const preview =
-      this.pickDefined(this.args.preview, this.conf.preview) || false
 
     const theme = await this.loadTheme()
     const initialThemes = theme instanceof Theme ? [theme] : []
@@ -104,10 +102,22 @@ export class MarpCLIConfig {
       initialThemes
     )
 
-    if (!carlo && preview)
-      warn(
-        'Preview window is available only in Node >= 7.6. preview option was ignored.'
-      )
+    const preview = (() => {
+      const p = this.pickDefined(this.args.preview, this.conf.preview) || false
+      let warnMes: string | undefined
+
+      if (p) {
+        if (!carlo) warnMes = 'Preview window is available only in Node >= 7.6.'
+        if (process.env.IS_DOCKER)
+          warnMes = 'Preview window cannot show in an official docker image.'
+      }
+      if (warnMes) {
+        warn(`${warnMes} preview option was ignored.`)
+        return false
+      }
+
+      return p
+    })()
 
     if (
       themeSet.themes.size <= initialThemes.length &&
