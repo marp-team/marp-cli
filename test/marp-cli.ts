@@ -277,6 +277,22 @@ describe('Marp CLI', () => {
           })
         )
       })
+
+      context('with --preview option', () => {
+        afterEach(() => previewMock.carloOriginal())
+
+        it('opens preview window through ServerPreview.open()', async () => {
+          jest.spyOn(cli, 'info').mockImplementation()
+          jest.spyOn(Server.prototype, 'start').mockResolvedValue(0)
+
+          const open = jest.spyOn(preview.ServerPreview.prototype, 'open')
+          const { app } = previewMock.carloMock()
+
+          await marpCli(['--input-dir', files, '--server', '--preview'])
+          expect(open).toBeCalledTimes(1)
+          expect(app.load).toBeCalledTimes(1)
+        })
+      })
     })
 
     context('with specified by configuration file', () => {
@@ -584,6 +600,21 @@ describe('Marp CLI', () => {
             expect.objectContaining({ customOption: true })
           )
         })
+      })
+    })
+
+    context('with --preview option', () => {
+      it('outputs warning and starts watching', async () => {
+        const warn = jest.spyOn(cli, 'warn').mockImplementation()
+
+        jest.spyOn(cli, 'info').mockImplementation()
+        ;(<any>fs).__mockWriteFile()
+
+        expect(await marpCli([onePath, '--preview'])).toBe(0)
+        expect(warn).toBeCalledWith(
+          expect.stringContaining('only in server mode')
+        )
+        expect(Watcher.watch).toBeCalledWith([onePath], expect.anything())
       })
     })
   })
