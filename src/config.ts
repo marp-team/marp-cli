@@ -85,7 +85,7 @@ export class MarpCLIConfig {
 
     const server = this.pickDefined(this.args.server, this.conf.server) || false
     const preview =
-      carlo && (this.pickDefined(this.args.preview, this.conf.preview) || false)
+      this.pickDefined(this.args.preview, this.conf.preview) || false
 
     const theme = await this.loadTheme()
     const initialThemes = theme instanceof Theme ? [theme] : []
@@ -104,6 +104,11 @@ export class MarpCLIConfig {
       initialThemes
     )
 
+    if (!carlo && preview)
+      warn(
+        'Preview window is available only in Node >= 7.6. preview option was ignored.'
+      )
+
     if (
       themeSet.themes.size <= initialThemes.length &&
       themeSetPathes.length > 0
@@ -113,7 +118,6 @@ export class MarpCLIConfig {
     return {
       inputDir,
       output,
-      preview,
       server,
       themeSet,
       allowLocalFiles:
@@ -125,6 +129,7 @@ export class MarpCLIConfig {
       html: this.pickDefined(this.args.html, this.conf.html),
       lang: this.conf.lang || (await osLocale()).replace(/[_@]/g, '-'),
       options: this.conf.options || {},
+      preview: carlo && preview,
       readyScript: this.engine.browserScript
         ? `<script>${this.engine.browserScript}</script>`
         : undefined,

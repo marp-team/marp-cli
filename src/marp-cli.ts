@@ -74,15 +74,13 @@ export default async function(argv: string[] = []): Promise<number> {
           group: OptionGroup.Basic,
           type: 'boolean',
         },
-        ...(carlo
-          ? {
-              preview: {
-                describe: 'Open preview window (EXPERIMENTAL)',
-                group: OptionGroup.Basic,
-                type: 'boolean',
-              },
-            }
-          : {}),
+        preview: {
+          describe: `Open preview window (EXPERIMENTAL)${
+            carlo ? '' : ` ${chalk.red('[Requires Node >= 7.6]')}`
+          }`,
+          group: OptionGroup.Basic,
+          type: 'boolean',
+        },
         pdf: {
           describe: 'Convert slide deck into PDF',
           group: OptionGroup.Converter,
