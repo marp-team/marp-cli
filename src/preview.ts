@@ -1,5 +1,13 @@
-import carlo from 'carlo'
 import { File } from './file'
+
+export const carlo = (() => {
+  try {
+    // tslint:disable-next-line:no-implicit-dependencies
+    return require('carlo')
+  } catch (e) {
+    return undefined
+  }
+})()
 
 export abstract class Preview {
   private carlo: any

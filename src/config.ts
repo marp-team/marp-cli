@@ -9,6 +9,7 @@ import { info, warn } from './cli'
 import { ConverterOption, ConvertType } from './converter'
 import resolveEngine, { ResolvableEngine, ResolvedEngine } from './engine'
 import { CLIError } from './error'
+import { carlo } from './preview'
 import { Theme, ThemeSet } from './theme'
 
 const lstat = promisify(fs.lstat)
@@ -84,7 +85,7 @@ export class MarpCLIConfig {
 
     const server = this.pickDefined(this.args.server, this.conf.server) || false
     const preview =
-      this.pickDefined(this.args.preview, this.conf.preview) || false
+      carlo && (this.pickDefined(this.args.preview, this.conf.preview) || false)
 
     const theme = await this.loadTheme()
     const initialThemes = theme instanceof Theme ? [theme] : []
