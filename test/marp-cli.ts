@@ -8,6 +8,7 @@ import { File } from '../src/file'
 import { Converter, ConvertType } from '../src/converter'
 import { ResolvedEngine } from '../src/engine'
 import { CLIError } from '../src/error'
+import * as preview from '../src/preview'
 import { Server } from '../src/server'
 import { ThemeSet } from '../src/theme'
 import { Watcher } from '../src/watcher'
@@ -15,9 +16,11 @@ import { Watcher } from '../src/watcher'
 const { version } = require('../package.json')
 const coreVersion = require('@marp-team/marp-core/package.json').version
 const marpitVersion = require('@marp-team/marpit/package.json').version
+const previewMock: any = preview
 
 jest.mock('fs')
 jest.mock('mkdirp')
+jest.mock('../src/preview')
 jest.mock('../src/watcher', () => jest.genMockFromModule('../src/watcher'))
 
 afterEach(() => jest.restoreAllMocks())
@@ -98,11 +101,57 @@ describe('Marp CLI', () => {
 
   for (const cmd of [null, '--help', '-h'])
     context(`with ${cmd || 'empty'} option`, () => {
-      it('outputs help to stderr', async () => {
-        const error = jest.spyOn(console, 'error').mockImplementation()
+      const run = () => marpCli(cmd ? [cmd] : [])
 
-        expect(await marpCli(cmd ? [cmd] : [])).toBe(0)
-        expect(error).toHaveBeenCalledWith(expect.stringContaining('Usage'))
+      let error: jest.SpyInstance<Console['error']>
+
+      beforeEach(() => {
+        error = jest.spyOn(console, 'error').mockImplementation()
+      })
+
+      it('outputs help to stderr', async () => {
+        expect(await run()).toBe(0)
+        expect(error).toBeCalledWith(expect.stringContaining('Usage'))
+      })
+
+      describe('Preview option', () => {
+        afterEach(() => previewMock.carloOriginal())
+
+        context('when carlo module is loaded (Node >= 7.6.x)', () =>
+          it('outputs help about --preview option', async () => {
+            previewMock.carloMock()
+
+            expect(await run()).toBe(0)
+            expect(error).toBeCalledWith(expect.stringContaining('--preview'))
+            expect(error).toBeCalledWith(
+              expect.not.stringContaining('Requires Node >= 7.6.x')
+            )
+          })
+        )
+
+        context('when carlo module cannot load (Node < 7.6.x)', () =>
+          it('outputs warning of Node version in --preview option', async () => {
+            previewMock.carloUndefined()
+
+            expect(await run()).toBe(0)
+            expect(error).toBeCalledWith(expect.stringContaining('--preview'))
+            expect(error).toBeCalledWith(
+              expect.stringContaining('Requires Node >= 7.6.x')
+            )
+          })
+        )
+
+        context('when CLI is running in an official Docker image', () => {
+          beforeEach(() => (process.env.IS_DOCKER = '1'))
+          afterEach(() => delete process.env.IS_DOCKER)
+
+          it('does not output help about --preview option', async () => {
+            expect(await run()).toBe(0)
+            expect(error).toBeCalledWith(
+              expect.not.stringContaining('--preview')
+            )
+          })
+        })
       })
     })
 
