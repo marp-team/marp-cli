@@ -37,7 +37,8 @@ ul.index {
       background-image: url('./assets/icon-directory.svg');
     }
 
-    &:not(.convertible):not(.directory) {
+    &:not(.convertible):not(.directory),
+    &.nodeModules {
       display: none;
     }
 

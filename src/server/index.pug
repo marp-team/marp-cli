@@ -9,7 +9,7 @@ html
     h1= directory
     ul.index
       each file in files
-        li(class={ convertible: file.convertible, directory: file.directory })
+        li(class={ convertible: file.convertible, directory: file.directory, nodeModules: file.nodeModules })
           a.link.file(href=encodeURIComponent(file.name))= file.name
 
           if file.convertible
