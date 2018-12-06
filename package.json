@@ -29,6 +29,7 @@
   ],
   "scripts": {
     "build": "yarn --silent clean && rollup -c",
+    "check-audit": "yarn audit",
     "check-ts": "tsc --noEmit",
     "clean": "rimraf lib",
     "format": "prettier \"**/*.{css,js,json,md,scss,ts,yaml,yml}\"",
@@ -36,8 +37,8 @@
     "format:write": "yarn --silent format --write",
     "lint:ts": "tslint \"{src,test}/**/*.ts\"",
     "lint:css": "stylelint \"src/**/*.{css,scss}\"",
-    "prepack": "npm-run-all --npm-path yarn --parallel check-ts format:check lint:* test:coverage --sequential build",
-    "preversion": "npm-run-all --npm-path yarn --parallel check-ts format:check lint:* test:coverage",
+    "prepack": "npm-run-all --npm-path yarn --parallel check-audit check-ts format:check lint:* test:coverage --sequential build",
+    "preversion": "npm-run-all --npm-path yarn --parallel check-audit check-ts format:check lint:* test:coverage",
     "test": "jest",
     "test:coverage": "jest --coverage",
     "version": "node version.js && git add -A CHANGELOG.md",
