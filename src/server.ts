@@ -102,10 +102,11 @@ export class Server {
         const { name, stat } = f
         const directory = stat && stat.isDirectory()
         const parent = name === '..' && directory
+        const nodeModules = name === 'node_modules' && directory
         const convertible =
           !parent && (await this.validateMarkdown(name, stat)).valid
 
-        files.push({ convertible, directory, name, parent, stat })
+        files.push({ convertible, directory, name, nodeModules, parent, stat })
       }
 
       callback(null, serverIndex({ directory, files, path, style }))
