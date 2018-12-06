@@ -13,6 +13,7 @@ import { dependencies } from './package.json'
 const external = [
   ...Object.keys(dependencies),
   'crypto',
+  'events',
   'fs',
   'path',
   'querystring',

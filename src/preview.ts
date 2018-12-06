@@ -1,4 +1,13 @@
+import { EventEmitter } from 'events'
+import puppeteer from 'puppeteer-core'
 import { File } from './file'
+
+// Patch for killing Chrome in Windows
+const { launch } = puppeteer
+puppeteer.launch = function(opts = {}) {
+  // Leave decision of data directory to puppeteer
+  return launch.call(this, { ...opts, userDataDir: null })
+}
 
 export const carlo = (() => {
   try {
@@ -8,6 +17,63 @@ export const carlo = (() => {
     return undefined
   }
 })()
+
+export class PreviewManager extends EventEmitter {
+  readonly options: PreviewManager.Options
+
+  private carlo: any
+
+  constructor(opts: Partial<PreviewManager.Options> = {}) {
+    super()
+    this.options = {
+      height: opts.height || 360,
+      width: opts.width || 640,
+    }
+  }
+
+  async open(path: string) {
+    const win = (await this.createWindow()) || (await this.launch())
+    win.on('close', () => this.emit('close', win))
+
+    await win.load(path)
+    this.emit('open', path)
+  }
+
+  private async createWindow() {
+    return (
+      !!this.carlo &&
+      (await this.carlo.createWindow({
+        height: this.options.height,
+        width: this.options.width,
+      }))
+    )
+  }
+
+  private async launch() {
+    this.carlo = await carlo.launch({
+      height: this.options.height,
+      width: this.options.width,
+      args: ['--enable-blink-gen-property-trees'],
+      channel: ['canary', 'stable'],
+      title: 'Marp CLI',
+    })
+
+    this.carlo.on('exit', () => {
+      this.emit('exit')
+      this.carlo = undefined
+    })
+
+    this.emit('launch')
+    return await this.carlo.mainWindow()
+  }
+}
+
+export namespace PreviewManager {
+  export interface Options {
+    height: number
+    width: number
+  }
+}
 
 export abstract class Preview {
   private carlo: any
