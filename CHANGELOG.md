@@ -6,6 +6,7 @@
 
 - Support functional engine ([#42](https://github.com/marp-team/marp-cli/pull/42))
 - Output the configured engine in `version` (`-v`) option ([#43](https://github.com/marp-team/marp-cli/pull/43))
+- Experimental support `--preview` option to open preview window provided by [Carlo](https://github.com/GoogleChromeLabs/carlo) ([#44](https://github.com/marp-team/marp-cli/pull/44))
 
 ## v0.0.14 - 2018-11-24
 
