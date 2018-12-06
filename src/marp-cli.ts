@@ -6,6 +6,7 @@ import fromArguments from './config'
 import { Converter, ConvertedCallback } from './converter'
 import { CLIError, error } from './error'
 import { File, FileType } from './file'
+import { carlo, Preview, ServerPreview } from './preview'
 import { Server } from './server'
 import templates from './templates'
 import version from './version'
@@ -73,6 +74,17 @@ export default async function(argv: string[] = []): Promise<number> {
           group: OptionGroup.Basic,
           type: 'boolean',
         },
+        ...(process.env.IS_DOCKER
+          ? {}
+          : {
+              preview: {
+                describe: `Open preview window (EXPERIMENTAL)${
+                  carlo ? '' : ` ${chalk.red('[Requires Node >= 7.6.x]')}`
+                }`,
+                group: OptionGroup.Basic,
+                type: 'boolean',
+              },
+            }),
         pdf: {
           describe: 'Convert slide deck into PDF',
           group: OptionGroup.Converter,
@@ -197,6 +209,8 @@ export default async function(argv: string[] = []): Promise<number> {
         }
       )
 
+      let preview: Preview | undefined = undefined
+
       if (cvtOpts.server) {
         const server = new Server(converter, {
           onConverted,
@@ -204,15 +218,30 @@ export default async function(argv: string[] = []): Promise<number> {
         })
         await server.start()
 
+        const url = `http://localhost:${server.port}`
+        const message = `[Server mode] Start server listened at ${url}/ ...`
+
+        cli.info(chalk.green(message))
+        if (cvtOpts.preview) preview = new ServerPreview(url)
+      } else {
+        if (cvtOpts.preview) {
+          cli.warn(
+            chalk.yellow(
+              'Currently a preview window can open only in server mode.'
+            )
+          )
+        }
+        cli.info(chalk.green('[Watch mode] Start watching...'))
+      }
+
+      if (preview) {
         cli.info(
-          chalk.green(
-            `[Server mode] Start server listened at http://localhost:${
-              server.port
-            }/ ...`
+          chalk.cyan(
+            '[Preview window] (EXPERIMENTAL) Opening preview window...'
           )
         )
-      } else {
-        cli.info(chalk.green('[Watch mode] Start watching...'))
+        await preview.open()
+        preview.on('exit', () => process.exit())
       }
     }
 

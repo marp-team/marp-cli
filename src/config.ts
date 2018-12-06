@@ -9,6 +9,7 @@ import { info, warn } from './cli'
 import { ConverterOption, ConvertType } from './converter'
 import resolveEngine, { ResolvableEngine, ResolvedEngine } from './engine'
 import { CLIError } from './error'
+import { carlo } from './preview'
 import { Theme, ThemeSet } from './theme'
 
 const lstat = promisify(fs.lstat)
@@ -25,6 +26,7 @@ export interface IMarpCLIArguments {
   inputDir?: string
   output?: string
   pdf?: boolean
+  preview?: boolean
   server?: boolean
   template?: string
   theme?: string
@@ -100,6 +102,23 @@ export class MarpCLIConfig {
       initialThemes
     )
 
+    const preview = (() => {
+      const p = this.pickDefined(this.args.preview, this.conf.preview) || false
+      let warnMes: string | undefined
+
+      if (p) {
+        if (!carlo) warnMes = 'Preview window is available only in Node >= 7.6.'
+        if (process.env.IS_DOCKER)
+          warnMes = 'Preview window cannot show in an official docker image.'
+      }
+      if (warnMes) {
+        warn(`${warnMes} preview option was ignored.`)
+        return false
+      }
+
+      return p
+    })()
+
     if (
       themeSet.themes.size <= initialThemes.length &&
       themeSetPathes.length > 0
@@ -120,6 +139,7 @@ export class MarpCLIConfig {
       html: this.pickDefined(this.args.html, this.conf.html),
       lang: this.conf.lang || (await osLocale()).replace(/[_@]/g, '-'),
       options: this.conf.options || {},
+      preview: carlo && preview,
       readyScript: this.engine.browserScript
         ? `<script>${this.engine.browserScript}</script>`
         : undefined,
@@ -132,7 +152,10 @@ export class MarpCLIConfig {
           ? ConvertType.pdf
           : ConvertType.html,
       watch:
-        this.pickDefined(this.args.watch, this.conf.watch) || server || false,
+        this.pickDefined(this.args.watch, this.conf.watch) ||
+        preview ||
+        server ||
+        false,
     }
   }
 
