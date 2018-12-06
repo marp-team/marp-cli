@@ -12,6 +12,12 @@
 
 - Ignore `node_modules` in globbing ([#45](https://github.com/marp-team/marp-cli/pull/45))
 
+### Changed
+
+- Include [Marpit v0.4.0](https://github.com/marp-team/marpit/releases/tag/v0.4.0) and [Marp Core v0.3.0](https://github.com/marp-team/marp-core/releases/tag/v0.3.0) ([#46](https://github.com/marp-team/marp-cli/pull/46))
+- Update Node environments and dependent packages to latest ([#46](https://github.com/marp-team/marp-cli/pull/46))
+- Run `yarn audit` while running CI / publish processes ([#46](https://github.com/marp-team/marp-cli/pull/46))
+
 ## v0.0.14 - 2018-11-24
 
 ### Security
