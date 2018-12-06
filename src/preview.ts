@@ -25,7 +25,8 @@ export abstract class Preview {
       title: 'Marp CLI',
       args: ['--enable-blink-gen-property-trees'],
     })
-    this.carlo.load(this.file.path)
+
+    await this.carlo.load(this.file.path)
   }
 
   async close() {
