@@ -1,3 +1,4 @@
+import { EventEmitter } from 'events'
 import fs from 'fs'
 import getStdin from 'get-stdin'
 import path from 'path'
@@ -101,7 +102,7 @@ describe('Marp CLI', () => {
 
   for (const cmd of [null, '--help', '-h'])
     context(`with ${cmd || 'empty'} option`, () => {
-      const run = () => marpCli(cmd ? [cmd] : [])
+      const run = (...args) => marpCli([...(cmd ? [cmd] : []), ...args])
 
       let error: jest.SpyInstance<Console['error']>
 
@@ -279,18 +280,62 @@ describe('Marp CLI', () => {
       })
 
       context('with --preview option', () => {
-        afterEach(() => previewMock.carloOriginal())
+        let open: jest.SpyInstance<preview.ServerPreview['open']>
 
-        it('opens preview window through ServerPreview.open()', async () => {
+        const run = () =>
+          marpCli(['--input-dir', files, '--server', '--preview'])
+
+        beforeEach(() => {
           jest.spyOn(cli, 'info').mockImplementation()
           jest.spyOn(Server.prototype, 'start').mockResolvedValue(0)
 
-          const open = jest.spyOn(preview.ServerPreview.prototype, 'open')
-          const { app } = previewMock.carloMock()
+          open = jest.spyOn(preview.ServerPreview.prototype, 'open')
+        })
 
-          await marpCli(['--input-dir', files, '--server', '--preview'])
-          expect(open).toBeCalledTimes(1)
-          expect(app.load).toBeCalledTimes(1)
+        afterEach(() => previewMock.carloOriginal())
+
+        context('when carlo module is loaded (Node >= 7.6.x)', () => {
+          let app: EventEmitter & { [func: string]: jest.Mock }
+
+          beforeEach(() => (app = previewMock.carloMock().app))
+
+          it('opens preview window through ServerPreview.open()', async () => {
+            await run()
+            expect(open).toBeCalledTimes(1)
+            expect(app.load).toBeCalledTimes(1)
+
+            const exit = jest.spyOn(process, 'exit').mockImplementation()
+            app.emit('exit')
+            expect(exit).toBeCalled()
+          })
+
+          context('when CLI is running in an official Docker image', () => {
+            beforeEach(() => (process.env.IS_DOCKER = '1'))
+            afterEach(() => delete process.env.IS_DOCKER)
+
+            it('ignores --preview option with warning', async () => {
+              const warn = jest.spyOn(cli, 'warn').mockImplementation()
+
+              await run()
+              expect(open).not.toBeCalled()
+              expect(warn).toBeCalledWith(
+                expect.stringContaining('preview option was ignored')
+              )
+            })
+          })
+        })
+
+        context('when carlo module cannot load (Node < 7.6)', () => {
+          it('ignores --preview option with warning', async () => {
+            previewMock.carloUndefined()
+            const warn = jest.spyOn(cli, 'warn').mockImplementation()
+
+            await run()
+            expect(open).not.toBeCalled()
+            expect(warn).toBeCalledWith(
+              expect.stringContaining('preview option was ignored')
+            )
+          })
         })
       })
     })
