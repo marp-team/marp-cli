@@ -1,6 +1,6 @@
-import { EventEmitter } from 'events'
 import puppeteer from 'puppeteer-core'
 import { File } from './file'
+import TypedEventEmitter from './utils/typed-event-emitter'
 
 // Patch for killing Chrome in Windows
 const { launch } = puppeteer
@@ -18,7 +18,7 @@ export const carlo = (() => {
   }
 })()
 
-export class PreviewManager extends EventEmitter {
+export class PreviewManager extends TypedEventEmitter<PreviewManager.Events> {
   readonly options: PreviewManager.Options
 
   private carlo: any
@@ -36,7 +36,7 @@ export class PreviewManager extends EventEmitter {
     win.on('close', () => this.emit('close', win))
 
     await win.load(path)
-    this.emit('open', path)
+    this.emit('open', win, path)
   }
 
   private async createWindow() {
@@ -72,6 +72,13 @@ export namespace PreviewManager {
   export interface Options {
     height: number
     width: number
+  }
+
+  export interface Events {
+    close(window: any): void
+    exit(): void
+    launch(): void
+    open(window: any, path: string): void
   }
 }
 
