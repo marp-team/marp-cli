@@ -180,8 +180,8 @@ export default async function(argv: string[] = []): Promise<number> {
       const output = (f: File, io: string) =>
         f.type === FileType.StandardIO ? `<${io}>` : f.relativePath()
 
+      convertedFiles.push(newFile)
       cli.info(`${output(file, 'stdin')} => ${output(newFile, 'stdout')}`)
-      if (newFile.type === FileType.File) convertedFiles.push(newFile)
     }
 
     try {
@@ -214,9 +214,11 @@ export default async function(argv: string[] = []): Promise<number> {
       const preview = new PreviewManager()
 
       preview.on('exit', () => process.exit())
-      preview.on('opening', location =>
-        cli.info(chalk.cyan(`[Preview] (EXPERIMENTAL) Opening ${location}...`))
-      )
+      preview.on('opening', (location: string) => {
+        const loc = location.substr(0, 50)
+        const msg = `[Preview] (EXPERIMENTAL) Opening ${loc}...`
+        cli.info(chalk.cyan(msg))
+      })
 
       if (cvtOpts.server) {
         const server = new Server(converter, {
@@ -233,9 +235,25 @@ export default async function(argv: string[] = []): Promise<number> {
       } else {
         cli.info(chalk.green('[Watch mode] Start watching...'))
 
-        if (cvtOpts.preview)
-          for (const file of convertedFiles)
-            await preview.open(fileURI(file.absolutePath))
+        if (cvtOpts.preview) {
+          for (const file of convertedFiles) {
+            if (file.type === FileType.File) {
+              await preview.open(fileURI(file.absolutePath))
+            } else if (file.type === FileType.StandardIO) {
+              if (cvtOpts.type === 'html') {
+                await preview.open(
+                  `data:text/html,${encodeURI(file.buffer!.toString())}`
+                )
+              } else if (cvtOpts.type === 'pdf') {
+                await preview.open(
+                  `data:application/pdf;base64,${file.buffer!.toString(
+                    'base64'
+                  )}`
+                )
+              }
+            }
+          }
+        }
       }
     }
 
