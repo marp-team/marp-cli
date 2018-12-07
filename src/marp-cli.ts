@@ -6,7 +6,7 @@ import fromArguments from './config'
 import { Converter, ConvertedCallback } from './converter'
 import { CLIError, error } from './error'
 import { File, FileType } from './file'
-import { carlo, Preview, ServerPreview } from './preview'
+import { carlo, fileURI, PreviewManager } from './preview'
 import { Server } from './server'
 import templates from './templates'
 import version from './version'
@@ -174,12 +174,14 @@ export default async function(argv: string[] = []): Promise<number> {
       cli.info(`Converting ${length} markdown${length > 1 ? 's' : ''}...`)
 
     // Convert markdown into HTML
+    const convertedFiles: File[] = []
     const onConverted: ConvertedCallback = ret => {
       const { file, newFile } = ret
       const output = (f: File, io: string) =>
         f.type === FileType.StandardIO ? `<${io}>` : f.relativePath()
 
       cli.info(`${output(file, 'stdin')} => ${output(newFile, 'stdout')}`)
+      if (newFile.type === FileType.File) convertedFiles.push(newFile)
     }
 
     try {
@@ -209,7 +211,12 @@ export default async function(argv: string[] = []): Promise<number> {
         }
       )
 
-      let preview: Preview | undefined = undefined
+      const preview = new PreviewManager()
+
+      preview.on('exit', () => process.exit())
+      preview.on('opening', location =>
+        cli.info(chalk.cyan(`[Preview] (EXPERIMENTAL) Opening ${location}...`))
+      )
 
       if (cvtOpts.server) {
         const server = new Server(converter, {
@@ -222,26 +229,13 @@ export default async function(argv: string[] = []): Promise<number> {
         const message = `[Server mode] Start server listened at ${url}/ ...`
 
         cli.info(chalk.green(message))
-        if (cvtOpts.preview) preview = new ServerPreview(url)
+        if (cvtOpts.preview) await preview.open(url)
       } else {
-        if (cvtOpts.preview) {
-          cli.warn(
-            chalk.yellow(
-              'Currently a preview window can open only in server mode.'
-            )
-          )
-        }
         cli.info(chalk.green('[Watch mode] Start watching...'))
-      }
 
-      if (preview) {
-        cli.info(
-          chalk.cyan(
-            '[Preview window] (EXPERIMENTAL) Opening preview window...'
-          )
-        )
-        await preview.open()
-        preview.on('exit', () => process.exit())
+        if (cvtOpts.preview)
+          for (const file of convertedFiles)
+            await preview.open(fileURI(file.absolutePath))
       }
     }
 

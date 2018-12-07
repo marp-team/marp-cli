@@ -1,5 +1,5 @@
+import path from 'path'
 import puppeteer from 'puppeteer-core'
-import { File } from './file'
 import TypedEventEmitter from './utils/typed-event-emitter'
 
 // Patch for killing Chrome in Windows
@@ -18,6 +18,11 @@ export const carlo = (() => {
   }
 })()
 
+export function fileURI(fn: string) {
+  const uri = path.resolve(fn).replace(/\\/g, '/')
+  return encodeURI(`file://${uri.startsWith('/') ? '' : '/'}${uri}`)
+}
+
 export class PreviewManager extends TypedEventEmitter<PreviewManager.Events> {
   readonly options: PreviewManager.Options
 
@@ -31,12 +36,14 @@ export class PreviewManager extends TypedEventEmitter<PreviewManager.Events> {
     }
   }
 
-  async open(path: string) {
+  async open(location: string) {
+    this.emit('opening', location)
+
     const win = (await this.createWindow()) || (await this.launch())
     win.on('close', () => this.emit('close', win))
 
-    await win.load(path)
-    this.emit('open', win, path)
+    await win.load(location)
+    this.emit('open', win, location)
   }
 
   private async createWindow() {
@@ -78,58 +85,7 @@ export namespace PreviewManager {
     close(window: any): void
     exit(): void
     launch(): void
-    open(window: any, path: string): void
-  }
-}
-
-export abstract class Preview {
-  private carlo: any
-  readonly file: File
-
-  constructor(file: File) {
-    this.file = file
-  }
-
-  async open() {
-    await this.close()
-
-    this.carlo = await carlo.launch({
-      channel: ['canary', 'stable'],
-      title: 'Marp CLI',
-      args: ['--enable-blink-gen-property-trees'],
-    })
-
-    await this.carlo.load(this.file.path)
-  }
-
-  async close() {
-    if (this.carlo) await this.carlo.exit()
-  }
-
-  on(event: string, callback: Function): void {
-    if (!this.carlo) throw new Error('Preview window is not yet initialized.')
-    this.carlo.on(event, callback)
-  }
-}
-
-export class FilePreview extends Preview {
-  // TODO: Support multiple windows through regular file conversions if Carlo
-  // could support to hide main window.
-  //
-  // @see https://github.com/GoogleChromeLabs/carlo/issues/53
-}
-
-export class ServerPreview extends Preview {
-  private static encodeURIComponentRFC3986 = url =>
-    encodeURIComponent(url).replace(
-      /[!'()*]/g,
-      c => `%${c.charCodeAt(0).toString(16)}`
-    )
-
-  constructor(url: string) {
-    const encodedUrl = ServerPreview.encodeURIComponentRFC3986(url)
-    const serverFile = `data:text/html,<html><head><meta http-equiv="refresh" content="0;URL='${encodedUrl}'" /></head></html>`
-
-    super(new File(serverFile))
+    open(window: any, location: string): void
+    opening(location: string): void
   }
 }
