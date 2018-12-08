@@ -1,6 +1,8 @@
-import path from 'path'
 import puppeteer from 'puppeteer-core'
+import { File, FileType } from './file'
 import TypedEventEmitter from './utils/typed-event-emitter'
+import { ConvertType } from './converter'
+import { CLIError } from './error'
 
 // Patch for killing Chrome in Windows
 const { launch } = puppeteer
@@ -18,17 +20,12 @@ export const carlo = (() => {
   }
 })()
 
-export function fileURI(fn: string) {
-  const uri = path.resolve(fn).replace(/\\/g, '/')
-  return encodeURI(`file://${uri.startsWith('/') ? '' : '/'}${uri}`)
-}
-
-export class PreviewManager extends TypedEventEmitter<PreviewManager.Events> {
-  readonly options: PreviewManager.Options
+export class Preview extends TypedEventEmitter<Preview.Events> {
+  readonly options: Preview.Options
 
   private carlo: any
 
-  constructor(opts: Partial<PreviewManager.Options> = {}) {
+  constructor(opts: Partial<Preview.Options> = {}) {
     super()
     this.options = {
       height: opts.height || 360,
@@ -75,7 +72,7 @@ export class PreviewManager extends TypedEventEmitter<PreviewManager.Events> {
   }
 }
 
-export namespace PreviewManager {
+export namespace Preview {
   export interface Options {
     height: number
     width: number
@@ -88,4 +85,24 @@ export namespace PreviewManager {
     open(window: any, location: string): void
     opening(location: string): void
   }
+}
+
+const mimeTypes = {
+  [ConvertType.html]: 'text/html',
+  [ConvertType.pdf]: 'application/pdf',
+}
+
+export function fileToURI(file: File, type: ConvertType = ConvertType.html) {
+  if (file.type === FileType.File) {
+    // Convert path to file URI
+    const uri = file.absolutePath.replace(/\\/g, '/')
+    return encodeURI(`file://${uri.startsWith('/') ? '' : '/'}${uri}`)
+  }
+
+  if (file.type === FileType.StandardIO && file.buffer) {
+    // Convert to data scheme URI
+    return `data:${mimeTypes[type]};base64,${file.buffer.toString('base64')}`
+  }
+
+  throw new CLIError('Processing file is not convertible to URI for preview.')
 }

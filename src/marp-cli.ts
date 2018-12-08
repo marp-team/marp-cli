@@ -6,7 +6,7 @@ import fromArguments from './config'
 import { Converter, ConvertedCallback } from './converter'
 import { CLIError, error } from './error'
 import { File, FileType } from './file'
-import { carlo, fileURI, PreviewManager } from './preview'
+import { carlo, Preview, fileToURI } from './preview'
 import { Server } from './server'
 import templates from './templates'
 import version from './version'
@@ -211,8 +211,8 @@ export default async function(argv: string[] = []): Promise<number> {
         }
       )
 
-      const preview = new PreviewManager()
-
+      // Preview window
+      const preview = new Preview()
       preview.on('exit', () => process.exit())
       preview.on('opening', (location: string) => {
         const loc = location.substr(0, 50)
@@ -235,25 +235,8 @@ export default async function(argv: string[] = []): Promise<number> {
       } else {
         cli.info(chalk.green('[Watch mode] Start watching...'))
 
-        if (cvtOpts.preview) {
-          for (const file of convertedFiles) {
-            if (file.type === FileType.File) {
-              await preview.open(fileURI(file.absolutePath))
-            } else if (file.type === FileType.StandardIO) {
-              if (cvtOpts.type === 'html') {
-                await preview.open(
-                  `data:text/html,${encodeURI(file.buffer!.toString())}`
-                )
-              } else if (cvtOpts.type === 'pdf') {
-                await preview.open(
-                  `data:application/pdf;base64,${file.buffer!.toString(
-                    'base64'
-                  )}`
-                )
-              }
-            }
-          }
-        }
+        if (cvtOpts.preview)
+          for (const file of convertedFiles) await preview.open(fileToURI(file))
       }
     }
 
