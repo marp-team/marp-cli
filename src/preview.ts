@@ -1,15 +1,7 @@
-import puppeteer from 'puppeteer-core'
 import { File, FileType } from './file'
 import TypedEventEmitter from './utils/typed-event-emitter'
 import { ConvertType } from './converter'
 import { CLIError } from './error'
-
-// Patch for killing Chrome in Windows
-const { launch } = puppeteer
-puppeteer.launch = function(opts = {}) {
-  // Leave decision of data directory to puppeteer
-  return launch.call(this, { ...opts, userDataDir: null })
-}
 
 export const carlo = (() => {
   try {
@@ -37,7 +29,18 @@ export class Preview extends TypedEventEmitter<Preview.Events> {
     this.emit('opening', location)
 
     const win = (await this.createWindow()) || (await this.launch())
-    win.on('close', () => this.emit('close', win))
+
+    win.on('close', () => {
+      this.emit('close', win)
+
+      // Workaround for unresolved close event in Windows
+      // @see https://github.com/GoogleChromeLabs/carlo/issues/108
+      if (this.carlo.windows().length === 0)
+        this.carlo
+          .browserForTest()
+          .process()
+          .kill()
+    })
 
     await win.load(location)
     this.emit('open', win, location)
