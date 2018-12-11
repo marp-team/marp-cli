@@ -1,7 +1,7 @@
 import { Marp, MarpOptions } from '@marp-team/marp-core'
 import { MarpitOptions } from '@marp-team/marpit'
 import * as chromeFinder from 'chrome-launcher/dist/chrome-finder'
-import puppeteer, { PDFOptions } from 'puppeteer-core'
+import puppeteer from 'puppeteer-core'
 import { warn } from './cli'
 import { Engine } from './engine'
 import { error } from './error'
@@ -143,7 +143,7 @@ export class Converter {
           waitUntil: ['domcontentloaded', 'networkidle0'],
         })
 
-        file.buffer = await page.pdf(<PDFOptions>{
+        file.buffer = await page.pdf({
           printBackground: true,
           preferCSSPageSize: true,
         })
