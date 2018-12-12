@@ -2,6 +2,7 @@ import { File, FileType } from './file'
 import TypedEventEmitter from './utils/typed-event-emitter'
 import { ConvertType } from './converter'
 import { CLIError } from './error'
+import favicon from './assets/favicon.png'
 
 export const carlo = (() => {
   try {
@@ -62,6 +63,7 @@ export class Preview extends TypedEventEmitter<Preview.Events> {
       width: this.options.width,
       args: ['--enable-blink-gen-property-trees'],
       channel: ['canary', 'stable'],
+      icon: Buffer.from(favicon.slice(22), 'base64'),
       title: 'Marp CLI',
     })
 

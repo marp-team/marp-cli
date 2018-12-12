@@ -81,6 +81,7 @@
     "rollup-plugin-pug": "~1.0",
     "rollup-plugin-terser": "^3.0.0",
     "rollup-plugin-typescript": "^1.0.0",
+    "rollup-plugin-url": "^2.1.0",
     "strip-ansi": "^5.0.0",
     "stylelint": "^9.9.0",
     "stylelint-config-prettier": "^4.0.0",

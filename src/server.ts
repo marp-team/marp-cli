@@ -8,6 +8,7 @@ import promisify from 'util.promisify'
 import { Converter, ConvertedCallback, ConvertType } from './converter'
 import { error } from './error'
 import { File, markdownExtensions } from './file'
+import favicon from './assets/favicon.png'
 import serverIndex from './server/index.pug'
 import style from './server/index.scss'
 
@@ -109,7 +110,7 @@ export class Server {
         files.push({ convertible, directory, name, nodeModules, parent, stat })
       }
 
-      callback(null, serverIndex({ directory, files, path, style }))
+      callback(null, serverIndex({ directory, favicon, files, path, style }))
     })()
   }
 
