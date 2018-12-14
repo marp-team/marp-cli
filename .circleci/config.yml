@@ -74,11 +74,6 @@ jobs:
     docker:
       - image: circleci/node:8.14.0-browsers
 
-  '6.15.1':
-    <<: *base
-    docker:
-      - image: circleci/node:6.15.1-browsers
-
   docker-image:
     docker:
       - image: docker:git
@@ -103,12 +98,10 @@ workflows:
     jobs:
       - 10.14.1
       - 8.14.0
-      - 6.15.1
       - docker-image:
           requires:
             - 10.14.1
             - 8.14.0
-            - 6.15.1
           filters:
             branches:
               only: master
