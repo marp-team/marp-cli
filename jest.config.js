@@ -8,6 +8,7 @@ module.exports = {
   setupFiles: ['jest-plugin-context/setup'],
   transform: Object.assign({}, jestPreset.transform, {
     '^.*\\.s?css$': '<rootDir>/test/_transformers/css.js',
+    '^.*\\.png$': '<rootDir>/test/_transformers/png.js',
     '^.*\\.pug$': '<rootDir>/test/_transformers/pug.js',
   }),
   testEnvironment: 'node',

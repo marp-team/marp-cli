@@ -280,7 +280,7 @@ describe('Marp CLI', () => {
       })
 
       context('with --preview option', () => {
-        let open: jest.SpyInstance<preview.ServerPreview['open']>
+        let open: jest.SpyInstance<preview.Preview['open']>
 
         const run = () =>
           marpCli(['--input-dir', files, '--server', '--preview'])
@@ -289,7 +289,7 @@ describe('Marp CLI', () => {
           jest.spyOn(cli, 'info').mockImplementation()
           jest.spyOn(Server.prototype, 'start').mockResolvedValue(0)
 
-          open = jest.spyOn(preview.ServerPreview.prototype, 'open')
+          open = jest.spyOn(preview.Preview.prototype, 'open')
         })
 
         afterEach(() => previewMock.carloOriginal())
@@ -299,7 +299,7 @@ describe('Marp CLI', () => {
 
           beforeEach(() => (app = previewMock.carloMock().app))
 
-          it('opens preview window through ServerPreview.open()', async () => {
+          it('opens preview window through Preview.open()', async () => {
             await run()
             expect(open).toBeCalledTimes(1)
             expect(app.load).toBeCalledTimes(1)
