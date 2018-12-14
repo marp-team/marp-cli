@@ -99,6 +99,7 @@
   "dependencies": {
     "@marp-team/marp-core": "^0.3.0",
     "@marp-team/marpit": "^0.4.0",
+    "carlo": "^0.9.41",
     "chalk": "^2.4.1",
     "chokidar": "^2.0.4",
     "chrome-launcher": "^0.10.5",
@@ -118,8 +119,5 @@
     "util.promisify": "^1.0.0",
     "ws": "^6.1.2",
     "yargs": "^12.0.5"
-  },
-  "optionalDependencies": {
-    "carlo": "^0.9.41"
   }
 }

@@ -6,7 +6,7 @@ import fromArguments from './config'
 import { Converter, ConvertedCallback } from './converter'
 import { CLIError, error } from './error'
 import { File, FileType } from './file'
-import { carlo, Preview, fileToURI } from './preview'
+import { Preview, fileToURI } from './preview'
 import { Server } from './server'
 import templates from './templates'
 import version from './version'
@@ -78,9 +78,7 @@ export default async function(argv: string[] = []): Promise<number> {
           ? {}
           : {
               preview: {
-                describe: `Open preview window (EXPERIMENTAL)${
-                  carlo ? '' : ` ${chalk.red('[Requires Node >= 7.6.x]')}`
-                }`,
+                describe: 'Open preview window (EXPERIMENTAL)',
                 group: OptionGroup.Basic,
                 type: 'boolean',
               },

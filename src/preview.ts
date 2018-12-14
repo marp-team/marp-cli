@@ -1,17 +1,9 @@
+import carlo from 'carlo'
 import { File, FileType } from './file'
 import TypedEventEmitter from './utils/typed-event-emitter'
 import { ConvertType } from './converter'
 import { CLIError } from './error'
 import favicon from './assets/favicon.png'
-
-export const carlo = (() => {
-  try {
-    // tslint:disable-next-line:no-implicit-dependencies
-    return require('carlo')
-  } catch (e) {
-    return undefined
-  }
-})()
 
 export class Preview extends TypedEventEmitter<Preview.Events> {
   readonly options: Preview.Options

@@ -9,7 +9,6 @@ import { info, warn } from './cli'
 import { ConverterOption, ConvertType } from './converter'
 import resolveEngine, { ResolvableEngine, ResolvedEngine } from './engine'
 import { CLIError } from './error'
-import { carlo } from './preview'
 import { Theme, ThemeSet } from './theme'
 
 const lstat = promisify(fs.lstat)
@@ -104,15 +103,11 @@ export class MarpCLIConfig {
 
     const preview = (() => {
       const p = this.pickDefined(this.args.preview, this.conf.preview) || false
-      let warnMes: string | undefined
 
-      if (p) {
-        if (!carlo) warnMes = 'Preview window is available only in Node >= 7.6.'
-        if (process.env.IS_DOCKER)
-          warnMes = 'Preview window cannot show in an official docker image.'
-      }
-      if (warnMes) {
-        warn(`${warnMes} preview option was ignored.`)
+      if (p && process.env.IS_DOCKER) {
+        warn(
+          `Preview window cannot show in an official docker image. Preview option was ignored.`
+        )
         return false
       }
 
@@ -128,6 +123,7 @@ export class MarpCLIConfig {
     return {
       inputDir,
       output,
+      preview,
       server,
       themeSet,
       allowLocalFiles:
@@ -139,7 +135,6 @@ export class MarpCLIConfig {
       html: this.pickDefined(this.args.html, this.conf.html),
       lang: this.conf.lang || (await osLocale()).replace(/[_@]/g, '-'),
       options: this.conf.options || {},
-      preview: carlo && preview,
       readyScript: this.engine.browserScript
         ? `<script>${this.engine.browserScript}</script>`
         : undefined,
