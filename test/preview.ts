@@ -21,10 +21,12 @@ describe('Preview', () => {
     for (const instance of previews) {
       if (instance.carlo) {
         const browser = instance.carlo.browserForTest()
-        await browser.close()
-
         const proc = await browser.process()
-        if (!proc.killed) proc.kill()
+
+        await browser.close()
+        try {
+          proc.kill()
+        } catch (e) {}
       }
     }
     previews.clear()
