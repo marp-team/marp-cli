@@ -49,7 +49,7 @@ references:
 
       - run:
           name: Jest
-          command: yarn test:coverage --ci --runInBand --reporters=default --reporters=jest-junit
+          command: yarn test:coverage --ci --reporters=default --reporters=jest-junit
           environment:
             JEST_JUNIT_OUTPUT: tmp/test-results/jest.xml
 

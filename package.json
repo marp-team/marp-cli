@@ -39,8 +39,8 @@
     "lint:css": "stylelint \"src/**/*.{css,scss}\"",
     "prepack": "npm-run-all --npm-path yarn --parallel check-audit check-ts format:check lint:* test:coverage --sequential build",
     "preversion": "npm-run-all --npm-path yarn --parallel check-audit check-ts format:check lint:* test:coverage",
-    "test": "jest",
-    "test:coverage": "jest --coverage",
+    "test": "jest -i",
+    "test:coverage": "jest -i --coverage",
     "version": "node version.js && git add -A CHANGELOG.md",
     "watch": "rollup -w -c"
   },
