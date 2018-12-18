@@ -1,5 +1,6 @@
 import { enterTestMode } from 'carlo'
 import path from 'path'
+import terminate from 'terminate'
 import { File, FileType } from '../src/file'
 import { Preview, fileToURI } from '../src/preview'
 import { CLIError } from '../src/error'
@@ -21,12 +22,10 @@ describe('Preview', () => {
     for (const instance of previews) {
       if (instance.carlo) {
         const browser = instance.carlo.browserForTest()
-        const proc = await browser.process()
+        const proc = browser.process()
 
-        await browser.close()
-        try {
-          proc.kill()
-        } catch (e) {}
+        await browser.disconnect()
+        await new Promise(resolve => terminate(proc.pid, resolve))
       }
     }
     previews.clear()

@@ -88,6 +88,7 @@
     "stylelint-config-standard": "^18.2.0",
     "stylelint-scss": "^3.4.1",
     "supertest": "^3.3.0",
+    "terminate": "^2.1.2",
     "ts-jest": "23.10.5",
     "ts-keycode-enum": "^1.0.6",
     "tslib": "^1.9.3",
