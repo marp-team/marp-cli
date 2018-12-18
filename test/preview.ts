@@ -1,7 +1,10 @@
 import { enterTestMode } from 'carlo'
+import path from 'path'
 import { File, FileType } from '../src/file'
 import { Preview, fileToURI } from '../src/preview'
 import { CLIError } from '../src/error'
+
+jest.mock('path')
 
 beforeAll(() => enterTestMode())
 
@@ -108,10 +111,23 @@ describe('Preview', () => {
 })
 
 describe('#fileToURI', () => {
-  context('with passing file', () =>
-    it('returns file schema URI', () =>
-      expect(fileToURI(new File('/a/b/c'))).toBe('file:///a/b/c'))
-  )
+  context('with passing file', () => {
+    const { posix, win32 } = <any>path
+
+    context('in posix file system', () =>
+      it('returns file schema URI', () => {
+        posix()
+        expect(fileToURI(new File('/a/b/c'))).toBe('file:///a/b/c')
+      })
+    )
+
+    context('in Windows file system', () =>
+      it('returns file schema URI', () => {
+        win32()
+        expect(fileToURI(new File('c:\\abc'))).toBe('file:///c:/abc')
+      })
+    )
+  })
 
   context('with passing standard IO buffer', () => {
     const file = () => {
