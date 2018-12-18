@@ -10,8 +10,8 @@ beforeAll(() => enterTestMode())
 
 describe('Preview', () => {
   const previews = new Set<Preview>()
-  const preview = (opts = {}) => {
-    const instance = new Preview(opts)
+  const preview = (...args) => {
+    const instance = new Preview(...args)
     previews.add(instance)
 
     return instance
