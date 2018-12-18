@@ -22,10 +22,10 @@ describe('Preview', () => {
     for (const instance of previews) {
       if (instance.carlo) {
         const browser = instance.carlo.browserForTest()
-        const proc = browser.process()
+        const { pid } = browser.process()
 
         await browser.disconnect()
-        await new Promise(resolve => terminate(proc.pid, resolve))
+        await new Promise(resolve => terminate(pid, resolve))
       }
     }
     previews.clear()
