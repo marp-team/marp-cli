@@ -18,9 +18,15 @@ describe('Preview', () => {
   }
 
   afterEach(async () => {
-    for (const instance of previews)
-      if (instance.carlo) await instance.carlo.browserForTest().close()
+    for (const instance of previews) {
+      if (instance.carlo) {
+        const browser = instance.carlo.browserForTest()
+        await browser.close()
 
+        const proc = await browser.process()
+        if (!proc.killed) proc.kill()
+      }
+    }
     previews.clear()
   })
 
