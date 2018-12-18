@@ -54,10 +54,13 @@ export class Preview extends TypedEventEmitter<Preview.Events> {
   }
 
   private async launch() {
+    const args = ['--enable-blink-gen-property-trees']
+    if (process.env.CI) args.push('--disable-dev-shm-usage')
+
     this.carloInternal = await carlo.launch({
+      args,
       height: this.options.height,
       width: this.options.width,
-      args: ['--enable-blink-gen-property-trees'],
       channel: ['canary', 'stable'],
       icon: Buffer.from(favicon.slice(22), 'base64'),
       title: 'Marp CLI',

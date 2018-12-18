@@ -197,8 +197,11 @@ export class Converter {
         ? chromeFinder.wsl
         : chromeFinder[process.platform]
 
+      if (process.env.IS_DOCKER || process.env.CI)
+        args.push('--disable-dev-shm-usage')
+
       if (process.env.IS_DOCKER) {
-        args.push('--no-sandbox', '--disable-dev-shm-usage')
+        args.push('--no-sandbox')
         finder = () => ['/usr/bin/chromium-browser']
       }
 
