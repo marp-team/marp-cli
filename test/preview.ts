@@ -16,7 +16,11 @@ describe('Preview', () => {
 
   afterEach(async () => {
     for (const instance of previews)
-      if (instance.carlo) await instance.carlo.browserForTest().close()
+      if (instance.carlo)
+        await instance.carlo
+          .browserForTest()
+          .process()
+          .kill()
 
     previews.clear()
   })
