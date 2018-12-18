@@ -8,7 +8,7 @@ import favicon from './assets/favicon.png'
 export class Preview extends TypedEventEmitter<Preview.Events> {
   readonly options: Preview.Options
 
-  private carlo: any
+  private carloInternal: any
 
   constructor(opts: Partial<Preview.Options> = {}) {
     super()
@@ -16,6 +16,10 @@ export class Preview extends TypedEventEmitter<Preview.Events> {
       height: opts.height || 360,
       width: opts.width || 640,
     }
+  }
+
+  get carlo() {
+    return this.carloInternal
   }
 
   async open(location: string) {
@@ -50,7 +54,7 @@ export class Preview extends TypedEventEmitter<Preview.Events> {
   }
 
   private async launch() {
-    this.carlo = await carlo.launch({
+    this.carloInternal = await carlo.launch({
       height: this.options.height,
       width: this.options.width,
       args: ['--enable-blink-gen-property-trees'],
@@ -61,7 +65,7 @@ export class Preview extends TypedEventEmitter<Preview.Events> {
 
     this.carlo.on('exit', () => {
       this.emit('exit')
-      this.carlo = undefined
+      this.carloInternal = undefined
     })
 
     this.emit('launch')
