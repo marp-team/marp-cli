@@ -1,4 +1,5 @@
 import carlo from 'carlo'
+import terminate from 'terminate'
 import { File, FileType } from './file'
 import TypedEventEmitter from './utils/typed-event-emitter'
 import { ConvertType } from './converter'
@@ -32,11 +33,10 @@ export class Preview extends TypedEventEmitter<Preview.Events> {
 
       // Workaround for unresolved close event in Windows
       // @see https://github.com/GoogleChromeLabs/carlo/issues/108
-      if (this.carlo.windows().length === 0)
-        this.carlo
-          .browserForTest()
-          .process()
-          .kill()
+      if (this.carlo.windows().length === 0) {
+        const browser = this.carlo.browserForTest()
+        terminate(browser.process().pid)
+      }
     })
 
     await win.load(location)
