@@ -615,7 +615,7 @@ describe('Marp CLI', () => {
         jest.spyOn(process.stdout, 'write').mockImplementation()
       })
 
-      it.only('opens preview window through Preview.open()', async () => {
+      it('opens preview window through Preview.open()', async () => {
         await marpCli([onePath, '--preview', '-o', '-'])
         expect(Preview.prototype.open).toBeCalledTimes(1)
 
