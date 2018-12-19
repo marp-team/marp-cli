@@ -78,6 +78,7 @@ export default async function(argv: string[] = []): Promise<number> {
           ? {}
           : {
               preview: {
+                alias: 'p',
                 describe: 'Open preview window (EXPERIMENTAL)',
                 group: OptionGroup.Basic,
                 type: 'boolean',
