@@ -599,18 +599,29 @@ describe('Marp CLI', () => {
     })
 
     context('with --preview option', () => {
-      // TODO: Add test case for preview in regular conversions
-      it.skip('outputs warning and starts watching', async () => {
-        const warn = jest.spyOn(cli, 'warn').mockImplementation()
+      beforeEach(() => {
+        jest.spyOn(console, 'warn').mockImplementation()
+        jest.spyOn(process.stdout, 'write').mockImplementation()
+      })
 
-        jest.spyOn(cli, 'info').mockImplementation()
-        ;(<any>fs).__mockWriteFile()
+      it('opens preview window through Preview.open()', async () => {
+        await marpCli([onePath, '--preview', '-o', '-'])
+        expect(Preview.prototype.open).toBeCalledTimes(1)
+      })
 
-        expect(await marpCli([onePath, '--preview'])).toBe(0)
-        expect(warn).toBeCalledWith(
-          expect.stringContaining('only in server mode')
-        )
-        expect(Watcher.watch).toBeCalledWith([onePath], expect.anything())
+      context('when CLI is running in an official Docker image', () => {
+        beforeEach(() => (process.env.IS_DOCKER = '1'))
+        afterEach(() => delete process.env.IS_DOCKER)
+
+        it('ignores --preview option with warning', async () => {
+          const warn = jest.spyOn(cli, 'warn')
+
+          await marpCli([onePath, '--preview', '-o', '-'])
+          expect(Preview.prototype.open).not.toBeCalled()
+          expect(warn).toBeCalledWith(
+            expect.stringContaining('Preview option was ignored')
+          )
+        })
       })
     })
   })
@@ -644,6 +655,18 @@ describe('Marp CLI', () => {
 
         expect(converter.options.inputDir).toBe(assetFn('_files'))
       })
+
+      context('with --preview option', () => {
+        it('opens served address through Preview.open()', async () => {
+          jest.spyOn(console, 'warn').mockImplementation()
+
+          await marpCli(['--server', assetFn('_files'), '--preview'])
+          expect(Preview.prototype.open).toBeCalledTimes(1)
+          expect(Preview.prototype.open).toBeCalledWith(
+            expect.stringMatching(/^http:\/\/localhost:/)
+          )
+        })
+      })
     })
   })
 
@@ -658,6 +681,16 @@ describe('Marp CLI', () => {
         expect(error).toHaveBeenCalledWith(
           expect.stringContaining('specify just one directory')
         )
+      })
+    })
+
+    context('with --preview option', () => {
+      it('opens 2 preview windows through Preview.open()', async () => {
+        jest.spyOn(console, 'warn').mockImplementation()
+        jest.spyOn(process.stdout, 'write').mockImplementation()
+
+        await marpCli([...baseArgs, '--preview', '-o', '-'])
+        expect(Preview.prototype.open).toBeCalledTimes(2)
       })
     })
   })

@@ -5,7 +5,7 @@ module.exports = {
   coveragePathIgnorePatterns: ['/node_modules/', '.*\\.d\\.ts'],
   coverageThreshold: { global: { lines: 95 } },
   moduleFileExtensions: ['ts', 'js', 'json', 'node'],
-  setupFiles: ['jest-plugin-context/setup'],
+  setupFiles: ['jest-plugin-context/setup', './jest.setup.js'],
   transform: Object.assign({}, jestPreset.transform, {
     '^.*\\.s?css$': '<rootDir>/test/_transformers/css.js',
     '^.*\\.png$': '<rootDir>/test/_transformers/png.js',

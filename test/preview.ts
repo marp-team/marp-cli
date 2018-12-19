@@ -1,4 +1,3 @@
-import { enterTestMode } from 'carlo'
 import path from 'path'
 import terminate from 'terminate'
 import { File, FileType } from '../src/file'
@@ -6,8 +5,6 @@ import { Preview, fileToURI } from '../src/preview'
 import { CLIError } from '../src/error'
 
 jest.mock('path')
-
-beforeAll(() => enterTestMode())
 
 describe('Preview', () => {
   const previews = new Set<Preview>()
