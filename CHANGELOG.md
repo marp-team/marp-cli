@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Breaking
+
+- Drop support for Node 6 and Node < 8.9 ([#47](https://github.com/marp-team/marp-cli/pull/47))
+
 ### Added
 
 - Support `--preview` option in regular conversion and multiple files ([#47](https://github.com/marp-team/marp-cli/pull/47))
