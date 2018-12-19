@@ -8,6 +8,9 @@ html
     style!= style
   body
     h1= directory
+    input#show-all(type="checkbox")
+    label(for="show-all")
+      span#show-all-text Show all files and directories
     ul.index
       each file in files
         li(class={ convertible: file.convertible, directory: file.directory, nodeModules: file.nodeModules })
