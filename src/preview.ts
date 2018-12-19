@@ -41,6 +41,8 @@ export class Preview extends TypedEventEmitter<Preview.Events> {
 
     await win.load(location)
     this.emit('open', win, location)
+
+    return win
   }
 
   private async createWindow() {

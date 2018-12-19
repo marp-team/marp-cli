@@ -34,11 +34,10 @@ describe('Preview', () => {
   describe('#open', () => {
     it('opens specified URL in new window', async () => {
       const instance = preview()
-      await instance.open('about:blank')
+      const win = await instance.open('about:blank')
 
-      const windows = instance.carlo.windows()
-      expect(windows).toHaveLength(1)
-      expect(windows[0].pageForTest().url()).toBe('about:blank')
+      expect(instance.carlo.windows()).toHaveLength(1)
+      expect(win.pageForTest().url()).toBe('about:blank')
     })
 
     it('emits launch event', async () => {
@@ -76,9 +75,7 @@ describe('Preview', () => {
     context('with constructor option about window size', () => {
       it('opens window that have specified window size', async () => {
         const instance = preview({ height: 400, width: 200 })
-        await instance.open('about:blank')
-
-        const [win] = instance.carlo.windows()
+        const win = await instance.open('about:blank')
         expect(await win.bounds()).toMatchObject({ height: 400, width: 200 })
       })
     })
@@ -108,6 +105,20 @@ describe('Preview', () => {
         expect(launchEvent).toBeCalledTimes(1)
         expect(openingEvent).toBeCalledTimes(2)
         expect(openEvent).toBeCalledTimes(2)
+      })
+
+      context('when opened window is closed', () => {
+        it('emits close event with closed window', async () => {
+          const instance = preview()
+          const closeEvent = jest.fn()
+          instance.on('close', closeEvent)
+
+          const win = await instance.open('about:blank')
+          await win.close()
+
+          expect(closeEvent).toBeCalledTimes(1)
+          expect(closeEvent).toBeCalledWith(win)
+        })
       })
     })
   })
