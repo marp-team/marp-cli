@@ -4,7 +4,7 @@
   "description": "A CLI interface for Marp and Marpit based converters",
   "repository": "https://github.com/marp-team/marp-cli",
   "engines": {
-    "node": ">=6.14.2"
+    "node": ">=8.9.0"
   },
   "author": {
     "name": "Marp team",
@@ -81,6 +81,7 @@
     "rollup-plugin-pug": "~1.0",
     "rollup-plugin-terser": "^3.0.0",
     "rollup-plugin-typescript": "^1.0.0",
+    "rollup-plugin-url": "^2.1.0",
     "strip-ansi": "^5.0.0",
     "stylelint": "^9.9.0",
     "stylelint-config-prettier": "^4.0.0",
@@ -98,6 +99,7 @@
   "dependencies": {
     "@marp-team/marp-core": "^0.3.0",
     "@marp-team/marpit": "^0.4.0",
+    "carlo": "^0.9.41",
     "chalk": "^2.4.1",
     "chokidar": "^2.0.4",
     "chrome-launcher": "^0.10.5",
@@ -113,12 +115,10 @@
     "portfinder": "^1.0.20",
     "puppeteer-core": "^1.11.0",
     "serve-index": "^1.9.1",
+    "terminate": "^2.1.2",
     "tmp": "^0.0.33",
     "util.promisify": "^1.0.0",
     "ws": "^6.1.2",
     "yargs": "^12.0.5"
-  },
-  "optionalDependencies": {
-    "carlo": "^0.9.41"
   }
 }

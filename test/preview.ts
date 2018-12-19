@@ -1,81 +1,163 @@
 import path from 'path'
-import { File } from '../src/file'
-import * as preview from '../src/preview'
+import terminate from 'terminate'
+import { File, FileType } from '../src/file'
+import { Preview, fileToURI } from '../src/preview'
+import { CLIError } from '../src/error'
 
-let carloMock
+jest.mock('path')
 
-const { FilePreview, ServerPreview } = preview
-const previewMock: any = preview
+describe('Preview', () => {
+  const previews = new Set<Preview>()
+  const preview = (...args) => {
+    const instance = new Preview(...args)
+    previews.add(instance)
 
-jest.mock('../src/preview')
+    return instance
+  }
 
-beforeEach(() => (carloMock = previewMock.carloMock()))
-afterEach(() => previewMock.carloOriginal())
+  afterEach(async () => {
+    for (const instance of previews) {
+      if (instance.carlo) {
+        const browser = instance.carlo.browserForTest()
+        const { pid } = browser.process()
 
-const assetFn = fn => path.resolve(__dirname, fn)
-const assetFile = fn => new File(assetFn(fn))
-
-const previewTestCase = (factory: () => preview.Preview) => {
-  it('extends Preview abstract class', () =>
-    expect(factory()).toBeInstanceOf(preview.Preview))
+        await browser.disconnect()
+        await new Promise(resolve => terminate(pid, resolve))
+      }
+    }
+    previews.clear()
+  })
 
   describe('#open', () => {
-    it('launches Chrome instance and load registered file', async () => {
-      const instance = factory()
-      await instance.open()
+    it('opens specified URL in new window', async () => {
+      const instance = preview()
+      const win = await instance.open('about:blank')
 
-      expect(carloMock.carlo.launch).toBeCalledWith(
-        expect.objectContaining({ title: 'Marp CLI' })
-      )
-      expect(carloMock.app.load).toBeCalledWith(instance.file.path)
+      expect(instance.carlo.windows()).toHaveLength(1)
+      expect(win.pageForTest().url()).toBe('about:blank')
+    })
+
+    it('emits launch event', async () => {
+      const instance = preview()
+      const launchEvent = jest.fn()
+      instance.on('launch', launchEvent)
+
+      await instance.open('about:blank')
+      expect(launchEvent).toBeCalledTimes(1)
+    })
+
+    it('emits opening event with location', async () => {
+      const instance = preview()
+      const openingEvent = jest.fn()
+      instance.on('opening', openingEvent)
+
+      await instance.open('about:blank')
+      expect(openingEvent).toBeCalledTimes(1)
+      expect(openingEvent).toBeCalledWith('about:blank')
+    })
+
+    it('emits open event with window instance and location', async () => {
+      const instance = preview()
+      const openEvent = jest.fn()
+      instance.on('open', openEvent)
+
+      await instance.open('about:blank')
+      expect(openEvent).toBeCalledTimes(1)
+
+      const [win, location] = openEvent.mock.calls[0]
+      expect(location).toBe('about:blank')
+      expect(win.pageForTest().url()).toBe('about:blank')
+    })
+
+    context('with constructor option about window size', () => {
+      it('opens window that have specified window size', async () => {
+        const instance = preview({ height: 400, width: 200 })
+        const win = await instance.open('about:blank')
+        expect(await win.bounds()).toMatchObject({ height: 400, width: 200 })
+      })
+    })
+
+    context('when calling twice', () => {
+      it('opens 2 windows', async () => {
+        const instance = preview()
+        await instance.open('about:blank')
+        await instance.open('about:blank')
+
+        expect(instance.carlo.windows()).toHaveLength(2)
+      })
+
+      it('emits launch event once and opening / open event twice', async () => {
+        const launchEvent = jest.fn()
+        const openingEvent = jest.fn()
+        const openEvent = jest.fn()
+        const instance = preview()
+
+        instance.on('launch', launchEvent)
+        instance.on('opening', openingEvent)
+        instance.on('open', openEvent)
+
+        await instance.open('about:blank')
+        await instance.open('about:blank')
+
+        expect(launchEvent).toBeCalledTimes(1)
+        expect(openingEvent).toBeCalledTimes(2)
+        expect(openEvent).toBeCalledTimes(2)
+      })
+
+      context('when opened window is closed', () => {
+        it('emits close event with closed window', async () => {
+          const instance = preview()
+          const closeEvent = jest.fn()
+          instance.on('close', closeEvent)
+
+          const win = await instance.open('about:blank')
+          await win.close()
+
+          expect(closeEvent).toBeCalledTimes(1)
+          expect(closeEvent).toBeCalledWith(win)
+        })
+      })
     })
   })
-
-  describe('#close', () => {
-    it("closes Chrome through Carlo's App.exit() while opening", async () => {
-      const instance = factory()
-      await instance.close()
-      expect(carloMock.app.exit).not.toBeCalled()
-
-      await instance.open()
-      await instance.close()
-      expect(carloMock.app.exit).toBeCalled()
-    })
-  })
-
-  describe('#on', () => {
-    it('adds callback to carlo app emitter while opening', async () => {
-      const instance = factory()
-      const callback = jest.fn()
-      expect(() => instance.on('exit', callback)).toThrow()
-
-      await instance.open()
-      expect(() => instance.on('exit', callback)).not.toThrow()
-
-      carloMock.app.emit('exit')
-      expect(callback).toBeCalled()
-    })
-  })
-}
-
-describe('FilePreview', () => {
-  const instance = (file = assetFile('_files/1.md')) => new FilePreview(file)
-  previewTestCase(instance)
 })
 
-describe('ServerPreview', () => {
-  const instance = (url = 'http://localhost:8080') => new ServerPreview(url)
-  previewTestCase(instance)
+describe('#fileToURI', () => {
+  context('with passing file', () => {
+    const { posix, win32 } = <any>path
 
-  it('registers file instance to redirect with data URI format', () => {
-    expect(instance().file.path).toMatch(/^data:text\/html/)
-    expect(instance().file.path).toContain('meta http-equiv="refresh"')
+    context('in posix file system', () =>
+      it('returns file schema URI', () => {
+        posix()
+        expect(fileToURI(new File('/a/b/c'))).toBe('file:///a/b/c')
+      })
+    )
+
+    context('in Windows file system', () =>
+      it('returns file schema URI', () => {
+        win32()
+        expect(fileToURI(new File('c:\\abc'))).toBe('file:///c:/abc')
+      })
+    )
   })
 
-  context('with passing malicious URL', () => {
-    const maliciousURL = '\'" /><leaked-tag /><meta data-x="'
+  context('with passing standard IO buffer', () => {
+    const file = () => {
+      const fileInstance = new File('')
 
-    it('encodes to formatted URI to prevent XSS', () =>
-      expect(instance(maliciousURL).file.path).not.toContain('<leaked-tag />'))
+      fileInstance.type = FileType.StandardIO
+      return fileInstance
+    }
+
+    it('returns data schema URI with encoded buffer by Base64', () => {
+      const instance = file()
+      instance.buffer = Buffer.from('buffer')
+
+      expect(fileToURI(instance)).toBe('data:text/html;base64,YnVmZmVy')
+    })
+
+    context('when buffer is not ready', () =>
+      it('throws CLIError', () =>
+        expect(() => fileToURI(file())).toThrow(CLIError))
+    )
   })
 })

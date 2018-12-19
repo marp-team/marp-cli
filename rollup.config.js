@@ -1,18 +1,21 @@
 import autoprefixer from 'autoprefixer'
 import cssnano from 'cssnano'
+import path from 'path'
+import postcssUrl from 'postcss-url'
 import commonjs from 'rollup-plugin-commonjs'
 import json from 'rollup-plugin-json'
 import nodeResolve from 'rollup-plugin-node-resolve'
 import postcss from 'rollup-plugin-postcss'
-import postcssUrl from 'postcss-url'
 import pugPlugin from 'rollup-plugin-pug'
 import { terser } from 'rollup-plugin-terser'
 import typescript from 'rollup-plugin-typescript'
+import url from 'rollup-plugin-url'
 import { dependencies } from './package.json'
 
 const external = [
   ...Object.keys(dependencies),
   'crypto',
+  'events',
   'fs',
   'path',
   'querystring',
@@ -39,6 +42,7 @@ const plugins = [
     ],
   }),
   pugPlugin({ pugRuntime: 'pug-runtime' }),
+  url({ sourceDir: path.join(__dirname, 'lib') }),
   !process.env.ROLLUP_WATCH && terser(),
 ]
 
