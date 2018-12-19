@@ -1,3 +1,4 @@
+import { EventEmitter } from 'events'
 import fs from 'fs'
 import getStdin from 'get-stdin'
 import path from 'path'
@@ -16,11 +17,19 @@ import { Watcher } from '../src/watcher'
 const { version } = require('../package.json')
 const coreVersion = require('@marp-team/marp-core/package.json').version
 const marpitVersion = require('@marp-team/marpit/package.json').version
+const previewEmitter = new EventEmitter()
 
 jest.mock('fs')
 jest.mock('mkdirp')
 jest.mock('../src/preview')
 jest.mock('../src/watcher', () => jest.genMockFromModule('../src/watcher'))
+
+beforeEach(() => {
+  previewEmitter.removeAllListeners()
+  jest
+    .spyOn(Preview.prototype, 'on')
+    .mockImplementation((e, func) => previewEmitter.on(e, func))
+})
 
 afterEach(() => {
   jest.restoreAllMocks()
@@ -599,14 +608,22 @@ describe('Marp CLI', () => {
     })
 
     context('with --preview option', () => {
+      let warn: jest.SpyInstance<Console['warn']>
+
       beforeEach(() => {
-        jest.spyOn(console, 'warn').mockImplementation()
+        warn = jest.spyOn(console, 'warn').mockImplementation()
         jest.spyOn(process.stdout, 'write').mockImplementation()
       })
 
-      it('opens preview window through Preview.open()', async () => {
+      it.only('opens preview window through Preview.open()', async () => {
         await marpCli([onePath, '--preview', '-o', '-'])
         expect(Preview.prototype.open).toBeCalledTimes(1)
+
+        // Simualte opening event
+        previewEmitter.emit('opening', '<location>')
+        expect(warn).toBeCalledWith(
+          expect.stringContaining('Opening <location>')
+        )
       })
 
       context('when CLI is running in an official Docker image', () => {
@@ -614,8 +631,6 @@ describe('Marp CLI', () => {
         afterEach(() => delete process.env.IS_DOCKER)
 
         it('ignores --preview option with warning', async () => {
-          const warn = jest.spyOn(cli, 'warn')
-
           await marpCli([onePath, '--preview', '-o', '-'])
           expect(Preview.prototype.open).not.toBeCalled()
           expect(warn).toBeCalledWith(
