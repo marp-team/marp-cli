@@ -1,4 +1,3 @@
-import { version as coreVersion } from '@marp-team/marp-core/package.json'
 import chalk from 'chalk'
 import { Argv } from 'yargs'
 import yargs from 'yargs/yargs'
@@ -7,10 +6,11 @@ import fromArguments from './config'
 import { Converter, ConvertedCallback } from './converter'
 import { CLIError, error } from './error'
 import { File, FileType } from './file'
+import { Preview, fileToURI } from './preview'
 import { Server } from './server'
 import templates from './templates'
+import version from './version'
 import watcher, { Watcher } from './watcher'
-import { name, version } from '../package.json'
 
 enum OptionGroup {
   Basic = 'Basic Options:',
@@ -30,14 +30,14 @@ export default async function(argv: string[] = []): Promise<number> {
     const program = base
       .usage(usage)
       .help(false)
-      .version(
-        'version',
-        'Show package versions',
-        `${name} v${version} (/w @marp-team/marp-core v${coreVersion})`
-      )
-      .alias('version', 'v')
-      .group('version', OptionGroup.Basic)
+      .version(false)
       .options({
+        version: {
+          alias: 'v',
+          describe: 'Show versions',
+          group: OptionGroup.Basic,
+          type: 'boolean',
+        },
         help: {
           alias: 'h',
           describe: 'Show help',
@@ -74,6 +74,16 @@ export default async function(argv: string[] = []): Promise<number> {
           group: OptionGroup.Basic,
           type: 'boolean',
         },
+        ...(process.env.IS_DOCKER
+          ? {}
+          : {
+              preview: {
+                alias: 'p',
+                describe: 'Open preview window (EXPERIMENTAL)',
+                group: OptionGroup.Basic,
+                type: 'boolean',
+              },
+            }),
         pdf: {
           describe: 'Convert slide deck into PDF',
           group: OptionGroup.Converter,
@@ -121,8 +131,10 @@ export default async function(argv: string[] = []): Promise<number> {
       return 0
     }
 
-    // Initialize converter
     const config = await fromArguments(args)
+    if (args.version) return await version(config)
+
+    // Initialize converter
     const converter = new Converter(await config.converterOption())
     const cvtOpts = converter.options
 
@@ -161,11 +173,13 @@ export default async function(argv: string[] = []): Promise<number> {
       cli.info(`Converting ${length} markdown${length > 1 ? 's' : ''}...`)
 
     // Convert markdown into HTML
+    const convertedFiles: File[] = []
     const onConverted: ConvertedCallback = ret => {
       const { file, newFile } = ret
       const output = (f: File, io: string) =>
         f.type === FileType.StandardIO ? `<${io}>` : f.relativePath()
 
+      convertedFiles.push(newFile)
       cli.info(`${output(file, 'stdin')} => ${output(newFile, 'stdout')}`)
     }
 
@@ -196,6 +210,15 @@ export default async function(argv: string[] = []): Promise<number> {
         }
       )
 
+      // Preview window
+      const preview = new Preview()
+      preview.on('exit', () => process.exit())
+      preview.on('opening', (location: string) => {
+        const loc = location.substr(0, 50)
+        const msg = `[Preview] (EXPERIMENTAL) Opening ${loc}...`
+        cli.info(chalk.cyan(msg))
+      })
+
       if (cvtOpts.server) {
         const server = new Server(converter, {
           onConverted,
@@ -203,15 +226,16 @@ export default async function(argv: string[] = []): Promise<number> {
         })
         await server.start()
 
-        cli.info(
-          chalk.green(
-            `[Server mode] Start server listened at http://localhost:${
-              server.port
-            }/ ...`
-          )
-        )
+        const url = `http://localhost:${server.port}`
+        const message = `[Server mode] Start server listened at ${url}/ ...`
+
+        cli.info(chalk.green(message))
+        if (cvtOpts.preview) await preview.open(url)
       } else {
         cli.info(chalk.green('[Watch mode] Start watching...'))
+
+        if (cvtOpts.preview)
+          for (const file of convertedFiles) await preview.open(fileToURI(file))
       }
     }
 

@@ -109,6 +109,7 @@ export class File {
     return (await globby(pathes, {
       absolute: true,
       expandDirectories: { files: markdownExtensions.map(ext => `*.${ext}`) },
+      ignore: ['**/node_modules'],
     })).map(p => new File(p))
   }
 

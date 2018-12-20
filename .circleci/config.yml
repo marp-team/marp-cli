@@ -2,6 +2,18 @@ references:
   base: &base
     working_directory: ~/marp-cli
     steps:
+      # https://github.com/nodejs/docker-node/blob/master/docs/BestPractices.md#upgradingdowngrading-yarn
+      - run:
+          name: Upgrade yarn
+          command: |
+            sudo -E sh -c 'curl -fSLO --compressed "https://yarnpkg.com/downloads/$YARN_VERSION/yarn-v$YARN_VERSION.tar.gz" \
+                           && tar -xzf yarn-v$YARN_VERSION.tar.gz -C /opt/ \
+                           && ln -snf /opt/yarn-v$YARN_VERSION/bin/yarn /usr/local/bin/yarn \
+                           && ln -snf /opt/yarn-v$YARN_VERSION/bin/yarnpkg /usr/local/bin/yarnpkg \
+                           && rm yarn-v$YARN_VERSION.tar.gz'
+          environment:
+            YARN_VERSION: 1.12.3
+
       - checkout
 
       - restore_cache:
@@ -11,6 +23,7 @@ references:
             - dependencies-{{ .Environment.CI_CACHE_KEY }}-{{ .Environment.CIRCLE_JOB }}-
 
       - run: yarn install
+      - run: yarn audit
 
       - save_cache:
           key: dependencies-{{ .Environment.CI_CACHE_KEY }}-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}-{{ .Branch }}
@@ -36,7 +49,7 @@ references:
 
       - run:
           name: Jest
-          command: yarn test:coverage --ci --runInBand --reporters=default --reporters=jest-junit
+          command: yarn test:coverage --ci -i --reporters=default --reporters=jest-junit
           environment:
             JEST_JUNIT_OUTPUT: tmp/test-results/jest.xml
 
@@ -51,20 +64,15 @@ references:
 
 version: 2
 jobs:
-  '10.13.0':
+  '10.14.1':
     <<: *base
     docker:
-      - image: circleci/node:10.13.0-browsers
+      - image: circleci/node:10.14.1-browsers
 
-  '8.12.0':
+  '8.14.0':
     <<: *base
     docker:
-      - image: circleci/node:8.12.0-browsers
-
-  '6.14.4':
-    <<: *base
-    docker:
-      - image: circleci/node:6.14.4-browsers
+      - image: circleci/node:8.14.0-browsers
 
   docker-image:
     docker:
@@ -88,14 +96,12 @@ workflows:
   version: 2
   build:
     jobs:
-      - 10.13.0
-      - 8.12.0
-      - 6.14.4
+      - 10.14.1
+      - 8.14.0
       - docker-image:
           requires:
-            - 10.13.0
-            - 8.12.0
-            - 6.14.4
+            - 10.14.1
+            - 8.14.0
           filters:
             branches:
               only: master

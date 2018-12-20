@@ -30,9 +30,6 @@ $progressHeight: 5px;
     width: 100%;
     z-index: -1;
 
-    /* Hack for incorrect rendering on Chrome */
-    transform: translateZ(0);
-
     &.bespoke-marp-active {
       pointer-events: auto;
       z-index: 0;

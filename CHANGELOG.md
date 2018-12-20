@@ -2,6 +2,33 @@
 
 ## [Unreleased]
 
+### Breaking
+
+- Drop support for Node 6 and Node < 8.9 ([#47](https://github.com/marp-team/marp-cli/pull/47))
+
+### Added
+
+- Support `--preview` option in regular conversion and multiple files ([#47](https://github.com/marp-team/marp-cli/pull/47))
+- Add `-p` alias to `--preview` option ([#48](https://github.com/marp-team/marp-cli/pull/48))
+
+## v0.0.15 - 2018-12-06
+
+### Added
+
+- Support functional engine ([#42](https://github.com/marp-team/marp-cli/pull/42))
+- Output the configured engine in `version` (`-v`) option ([#43](https://github.com/marp-team/marp-cli/pull/43))
+- Experimental support `--preview` option to open preview window provided by [Carlo](https://github.com/GoogleChromeLabs/carlo) ([#44](https://github.com/marp-team/marp-cli/pull/44))
+
+### Fixed
+
+- Ignore `node_modules` in globbing ([#45](https://github.com/marp-team/marp-cli/pull/45))
+
+### Changed
+
+- Include [Marpit v0.4.0](https://github.com/marp-team/marpit/releases/tag/v0.4.0) and [Marp Core v0.3.0](https://github.com/marp-team/marp-core/releases/tag/v0.3.0) ([#46](https://github.com/marp-team/marp-cli/pull/46))
+- Update Node environments and dependent packages to latest ([#46](https://github.com/marp-team/marp-cli/pull/46))
+- Run `yarn audit` while running CI / publish processes ([#46](https://github.com/marp-team/marp-cli/pull/46))
+
 ## v0.0.14 - 2018-11-24
 
 ### Security

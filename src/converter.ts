@@ -1,7 +1,7 @@
 import { Marp, MarpOptions } from '@marp-team/marp-core'
 import { MarpitOptions } from '@marp-team/marpit'
 import * as chromeFinder from 'chrome-launcher/dist/chrome-finder'
-import puppeteer, { PDFOptions } from 'puppeteer-core'
+import puppeteer from 'puppeteer-core'
 import { warn } from './cli'
 import { Engine } from './engine'
 import { error } from './error'
@@ -23,6 +23,7 @@ export interface ConverterOption {
   lang: string
   options: MarpitOptions
   output?: string
+  preview?: boolean
   readyScript?: string
   server?: boolean
   template: string
@@ -142,7 +143,7 @@ export class Converter {
           waitUntil: ['domcontentloaded', 'networkidle0'],
         })
 
-        file.buffer = await page.pdf(<PDFOptions>{
+        file.buffer = await page.pdf({
           printBackground: true,
           preferCSSPageSize: true,
         })
@@ -167,7 +168,12 @@ export class Converter {
     // for marp-core
     if (html !== undefined) opts.html = html
 
-    const engine = new this.options.engine(opts)
+    const { prototype } = this.options.engine
+
+    const engine =
+      prototype && prototype.hasOwnProperty('constructor')
+        ? new this.options.engine(opts)
+        : (<any>this.options.engine)(opts)
 
     if (typeof engine.render !== 'function')
       error('Specified engine has not implemented render() method.')
@@ -191,8 +197,11 @@ export class Converter {
         ? chromeFinder.wsl
         : chromeFinder[process.platform]
 
+      if (process.env.IS_DOCKER || process.env.CI)
+        args.push('--disable-dev-shm-usage')
+
       if (process.env.IS_DOCKER) {
-        args.push('--no-sandbox', '--disable-dev-shm-usage')
+        args.push('--no-sandbox')
         finder = () => ['/usr/bin/chromium-browser']
       }
 

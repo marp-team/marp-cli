@@ -20,7 +20,7 @@ ul.index {
   padding: 0;
 
   li {
-    background-image: url('./assets/icon-file.svg');
+    background-image: url('../assets/icon-file.svg');
     background-size: $list-icon-size $list-icon-size;
     background-repeat: no-repeat;
     background-position: left center;
@@ -30,14 +30,15 @@ ul.index {
     padding: 0 0 0 calc(#{$list-icon-size} + #{$list-icon-horizontal-gap});
 
     &.convertible {
-      background-image: url('./assets/icon-marp.svg');
+      background-image: url('../assets/icon-marp.svg');
     }
 
     &.directory {
-      background-image: url('./assets/icon-directory.svg');
+      background-image: url('../assets/icon-directory.svg');
     }
 
-    &:not(.convertible):not(.directory) {
+    &:not(.convertible):not(.directory),
+    &.nodeModules {
       display: none;
     }
 

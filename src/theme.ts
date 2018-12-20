@@ -150,6 +150,7 @@ export class ThemeSet {
     return await globby(fn, {
       absolute: true,
       expandDirectories: { files: themeExtensions },
+      ignore: ['**/node_modules'],
     })
   }
 }
