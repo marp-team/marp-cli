@@ -6,6 +6,8 @@ import barePug from './bare/bare.pug'
 import bareScss from './bare/bare.scss'
 import bespokePug from './bespoke/bespoke.pug'
 import bespokeScss from './bespoke/bespoke.scss'
+import notePug from './note/note.pug'
+import noteScss from './note/note.scss'
 
 const readFile = promisify(fs.readFile)
 
@@ -65,6 +67,20 @@ export const bespoke: Template = async opts => {
   }
 }
 
+export const note: Template = async opts => {
+  const rendered = opts.renderer({
+    container: [],
+    inlineSVG: true,
+    printable: false,
+    slideContainer: [],
+  })
+
+  return {
+    rendered,
+    result: notePug({ ...opts, ...rendered, note: { css: noteScss } }),
+  }
+}
+
 export async function libJs(fn: string) {
   return (await readFile(path.resolve(__dirname, fn))).toString()
 }
@@ -76,6 +92,6 @@ export async function watchJs(notifyWS?: string) {
   return `window.__marpCliWatchWS=${JSON.stringify(notifyWS)};${watchJs}`
 }
 
-const templates: { [name: string]: Template } = { bare, bespoke }
+const templates: { [name: string]: Template } = { bare, bespoke, note }
 
 export default templates
