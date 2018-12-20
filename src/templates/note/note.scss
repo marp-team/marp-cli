@@ -1,0 +1,53 @@
+@page {
+  size: 210mm 297mm;
+}
+
+html,
+body {
+  margin: 0;
+}
+
+.marp-cli-note {
+  display: inline-flex;
+  flex-direction: column;
+  height: 297mm;
+  page-break-before: always;
+  width: 210mm;
+
+  > * {
+    box-sizing: border-box;
+    margin: 10mm;
+    flex: 1;
+  }
+
+  &-slide {
+    box-sizing: border-box;
+    padding: 10mm;
+    width: 100%;
+    height: 100%;
+
+    &,
+    & * {
+      -webkit-print-color-adjust: exact !important;
+      color-adjust: exact !important;
+    }
+
+    > svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+      filter: drop-shadow(1px 0 0 #000) drop-shadow(0 1px 0 #000)
+        drop-shadow(-1px 0 0 #000) drop-shadow(0 -1px 0 #000);
+    }
+  }
+
+  &-text {
+    > p:first-child {
+      margin-top: 0;
+    }
+
+    > p:last-child {
+      margin-bottom: 0;
+    }
+  }
+}

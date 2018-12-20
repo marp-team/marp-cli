@@ -72,12 +72,24 @@ export const note: Template = async opts => {
     container: [],
     inlineSVG: true,
     printable: false,
-    slideContainer: [],
+    slideContainer: new Element('div', { class: 'marp-cli-note-slide' }),
   })
+
+  // Split slide HTML into array
+  const slides = rendered.html
+    .slice(33, -6)
+    .split('</div><div class="marp-cli-note-slide">')
+    .map(svg => `<div class="marp-cli-note-slide">${svg}</div>`)
 
   return {
     rendered,
-    result: notePug({ ...opts, ...rendered, note: { css: noteScss } }),
+    result: notePug({
+      ...opts,
+      ...rendered,
+      slides,
+      note: { css: noteScss },
+      watchJs: await watchJs(opts.notifyWS),
+    }),
   }
 }
 

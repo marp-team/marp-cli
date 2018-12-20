@@ -10,7 +10,14 @@ html(lang=lang)
     style!= note.css
     style!= css
   body
-    != html
+    each slide, slideIdx in slides
+      .marp-cli-note
+        div!= slide
+        div
+          .marp-cli-note-text
+            each comment in comments[slideIdx]
+              p= comment
+
     != readyScript
     if watchJs
       script!= watchJs
