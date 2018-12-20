@@ -5,7 +5,7 @@
 [![npm](https://img.shields.io/npm/v/@marp-team/marp-cli.svg?style=flat-square)](https://www.npmjs.com/package/@marp-team/marp-cli)
 [![LICENSE](https://img.shields.io/github/license/marp-team/marp-cli.svg?style=flat-square)](./LICENSE)
 
-**A CLI interface, for [Marp](https://github.com/marp-team/marp)** (using [@marp-team/marp-core](https://github.com/marp-team/marp-core)) and any slide deck converter based on [Marpit](https://github.com/marp-team/marpit) framework.
+**A CLI interface, for [Marp](https://github.com/marp-team/marp)** (using [@marp-team/marp-core](https://github.com/marp-team/marp-core)) and any slide deck converter based on [Marpit](https://marpit.marp.app/) framework.
 
 It can convert Marp / Marpit Markdown files into static HTML (and CSS).
 
@@ -28,6 +28,12 @@ npx @marp-team/marp-cli slide-deck.md -o output.pdf
 
 # Watch mode
 npx @marp-team/marp-cli -w slide-deck.md
+
+# Server mode (Pass directory to serve)
+npx @marp-team/marp-cli -s ./slides
+
+# Open converted HTML in preview window
+npx @marp-team/marp-cli -p slide-deck.md
 ```
 
 > :information_source: You have to install [Google Chrome](https://www.google.com/chrome/) (or [Chromium](https://www.chromium.org/)) to convert slide deck into PDF.
@@ -45,182 +51,228 @@ docker run --rm -v $PWD:/home/marp/app/ -e LANG=$LANG marpteam/marp-cli slide-de
 
 # Watch mode
 docker run --rm --init -v $PWD:/home/marp/app/ -e LANG=$LANG -p 52000:52000 marpteam/marp-cli -w slide-deck.md
+
+# Server mode (Serve current directory)
+docker run --rm --init -v $PWD:/home/marp/app -e LANG=$LANG -p 8080:8080 -p 52000:52000 marpteam/marp-cli -s .
 ```
 
 ## Install
 
-### Global install
+### Local installation
 
-You can install CLI interface globally if you want to use `marp` command.
+We recommend to install Marp CLI into your Node project. You may control the CLI (and engine) version exactly.
+
+```bash
+npm install --save-dev @marp-team/marp-cli
+```
+
+The installed `marp` command is available in [npm-scripts](https://docs.npmjs.com/misc/scripts) or `npx marp`.
+
+### Global installation
+
+You can install with `-g` option if you want to use `marp` command globally.
 
 ```bash
 npm install -g @marp-team/marp-cli
 ```
 
+## Basic usage
+
+```
 Usage:
+  marp [options] <files...>
+  marp [options] -I <dir>
 
-```bash
-marp slide-deck.md -o output.html
+Basic Options:
+  --version, -v      Show versions                                     [boolean]
+  --help, -h         Show help                                         [boolean]
+  --output, -o       Output file path (or directory when input-dir is passed)
+                                                                        [string]
+  --input-dir, -I    The base directory to find markdown and theme CSS  [string]
+  --config-file, -c  Specify path to configuration file                 [string]
+  --watch, -w        Watch input markdowns for changes                 [boolean]
+  --server, -s       Enable server mode                                [boolean]
+  --preview, -p      Open preview window (EXPERIMENTAL)                [boolean]
+
+Converter Options:
+  --pdf                Convert slide deck into PDF                     [boolean]
+  --template           Choose template     [string] [choices: "bare", "bespoke"]
+  --allow-local-files  Allow to access local files from Markdown while
+                       converting PDF (NOT SECURE)                     [boolean]
+
+Marp / Marpit Options:
+  --engine     Select Marpit based engine by module name or path        [string]
+  --html       Enable or disable HTML tag                              [boolean]
+  --theme      Override theme by name or CSS file                       [string]
+  --theme-set  Path to additional theme CSS files                        [array]
 ```
-
-### Local install
-
-```
-npm install --save-dev @marp-team/marp-cli
-```
-
-## Usage
 
 ### Convert to HTML
 
 The passed markdown will be converted to HTML file by default.
 
-#### HTML template
+```bash
+marp slide-deck.md
+```
 
-You can choose a built-in HTML template from `bare` and `bespoke`. Default template is `bespoke`.
-
-##### `bare`
-
-The `bare` template only has the minimum asset to give your presentation with browser. There is no extra features.
-
-When the convert engine is changed to [Marpit framework](https://github.com/marp-team/marpit) by setting `engine` option, it would not use any JavaScript.
-
-##### `bespoke`
-
-The `bespoke` is using [Bespoke.js](https://github.com/bespokejs/bespoke) as the name implies. Unlike a primitive `bare` template, it has several features to be useful in a real presentation.
-
-- **Navigation**: Navigate the deck through keyboard or swipe geasture.
-- ~~**Progress bar**~~: We cannot use progress bar at the top now.
+In this example, `slide-deck.html` would output to the same directory. You can change the output path by `--output` (`-o`) option.
 
 ### Convert to PDF
 
-If you passed `--pdf` option or the output filename specified by `--output` (`-o`) option ends with `.pdf`, Marp CLI would try to convert into PDF file by using the installed [Google Chrome](https://www.google.com/chrome/) or [Chromium](https://www.chromium.org/).
+If you passed `--pdf` option or the output filename specified by `--output` (`-o`) option ends with `.pdf`, Marp CLI will try to convert into PDF file by using the installed [Google Chrome](https://www.google.com/chrome/) or [Chromium](https://www.chromium.org/).
 
-```
+```bash
 marp --pdf slide-deck.md
 marp slide-deck.md -o converted.pdf
 ```
 
 #### Security about local files
 
-Because of the security reason, the converted PDF would not load local files by default. We recommend to upload your assets to online.
+Because of the security reason, **the converted PDF cannot load local files by default.** We recommend to upload your assets to online.
 
-But if you want to use local files in rendered PDF, `--alow-local-files` helps to find your local files. It would output warning about the insecure option in each conversions.
+But if you want to use local files in rendered PDF, `--alow-local-files` option helps to find your local files. It would output warning about the insecure option in each conversions.
 
-```
+```bash
 marp --pdf --allow-local-files slide-deck.md
 ```
 
 ## Watch mode
 
-Marp CLI will observe a change of markdown files when passed with `--watch` (`-w`) option. The conversion is triggered whenever the content of file is updated.
+Marp CLI will observe a change of Markdown / used Theme CSS when passed with `--watch` (`-w`) option. The conversion is triggered whenever the content of file is updated.
 
 While you are opening the converted HTML in browser, it would refresh the opened page automatically.
 
 ## Server mode
 
-Server mode supports on-demand conversion by HTTP request. We must pass `--server` (`-s`) option and a directory to serve.
+Server mode supports on-demand conversion by HTTP request. We require to pass `--server` (`-s`) option and a directory to serve.
 
-## Marp / Marpit options
+## Preview window _(Experimental)_
 
-You can confirm the bundled [marp-core](https://github.com/marp-team/marp-core) version by `--version` (`-v`) option.
+If conversions were executed together with `--preview` (`-p`) option, Marp CLI will open preview window(s) to check the converted result immediately.
 
-```console
-$ marp --version
-@marp-team/marp-cli v0.0.13 (/w @marp-team/marp-core v0.1.0)
+Unlike opening with browser, you may present deck with the immersive window. [Watch mode](#watch-mode) is enabled automatically.
+
+> :information_source: `--preview` option cannot use when you are using Marp CLI through official docker image.
+
+## Template
+
+You can choose a built-in HTML templates by `--template` option. Default template is `bespoke`.
+
+```bash
+marp --template bespoke slide-deck.md
 ```
 
-> :information_source: If you are installed @marp-team/marp-cli to your project, we will always use @marp-team/marp-core installed in your project.
+### `bespoke` template (default)
 
-### Allow HTML tags
+The `bespoke` template is using [Bespoke.js](https://github.com/bespokejs/bespoke) as the name implies. It has several features to be useful in a real presentation.
 
-Marp CLI can be enable HTML tags in Markdown by `--html` option.
+#### Features
 
-```sh
-marp --html included-html.md
+- **Navigation**: Navigate the deck through keyboard or swipe geasture.
+- Progress bar _(Not ready to use)_ <!-- It has already implemented but currently user cannot control to show progress bar. -->
+
+### `bare` template
+
+The `bare` template is a primitive template, and there is no extra features. It only has minimum assets to give your presentation with browser.
+
+#### Zero-JS slide deck
+
+When [the conversion engine is changed to Marpit framework by setting `engine` option](#use-marpit-framework), _it would not use any scripts._ Even then, it has enough to use for the browser-based presentation.
+
+```bash
+marp --template bare --engine @marp-team/marpit slide-deck.md
 ```
 
-### Custom theme
+## Theme
 
-You can override theme you want to use by `--theme` option. For example to use `gaia` built-in theme in Marp core:
+### Override theme
 
-```sh
+You can override theme you want to use by `--theme` option. For example to use [Gaia](https://github.com/marp-team/marp-core/tree/master/themes#gaia) built-in theme in Marp Core:
+
+```bash
 marp --theme gaia
 ```
 
-A custom theme also can use by passing CSS file.
+### Use custom theme
 
-```sh
+A custom theme created by user also can use easily by passing the path of CSS file.
+
+```bash
 marp --theme custom-theme.css
 ```
 
-We not need `@theme` CSS metadata in this case.
+> :information_source: Normally [Marpit theme CSS requires `@theme` meta comment](https://marpit.marp.app/theme-css?id=metadata), but it's not required in this usage.
 
 ### Theme set
 
-`--theme-set` option has to specify theme set composed by multiple theme CSS.
+`--theme-set` option has to specify theme set composed by multiple theme CSS files. The registed themes are usable in [Marpit's `theme` directive](https://marpit.marp.app/directives?id=theme).
 
-```sh
-marp --theme-set theme-a.css theme-b.css theme-c.css -- markdown-a.md markdown-b.md
+```bash
+# Multiple theme CSS files
+marp --theme-set theme-a.css theme-b.css theme-c.css -- deck-a.md deck-b.md
+
+# Theme directory
+marp --theme-set ./themes -- deck.md
 ```
 
-### Conversion engine
+## Engine
 
-`--engine` option can swap the conversion engine from [marp-core](https://github.com/marp-team/marp-core).
+Marp CLI is calling the [Marpit framework](https://marpit.marp.app/) based converter as "Engine". Normally we use the bundled [marp-core](https://github.com/marp-team/marp-core), but you may swap the conversion engine to another Marpit based engine through `--engine` option.
 
-#### Use Marpit framework
+### Use Marpit framework
 
-```sh
+For example, it can convert Markdown by using the pure Marpit framework.
+
+```bash
 # Install Marpit framework
-npm install @marp-team/marpit --save-dev
+npm i @marp-team/marpit
 
 # Specify engine to use Marpit
 marp --engine @marp-team/marpit marpit-deck.md
 ```
 
-#### Customize engine
+Notice that Marpit has not provided theme. It would be good to include inline style in Markdown, or pass CSS file by `--theme` option.
 
-JavaScript configuration file `marp.config.js` can override the engine by function.
+### Functional engine
 
-Let's try to add new container syntax `:::` through [markdown-it-container](https://github.com/markdown-it/markdown-it-container) plugin.
+When you specify the path to JavaScript file in `--engine` option, you may use more customized engine by JS.
 
-```sh
-npm install markdown-it-container --save-dev
-```
+It would be useful to convert with a customized engine for supporting the additional syntax that is out of Marp Markdown specification.
 
-```js
-// marp.config.js
+#### Example: [markdown-it-mark](https://github.com/markdown-it/markdown-it-mark)
+
+```javascript
+// engine.js
 const { Marp } = require('@marp-team/marp-core')
-const markdownItContainer = require('markdown-it-container')
+const markdownItMark = require('markdown-it-mark')
 
-module.exports = {
-  engine: opts => {
-    const core = new Marp(opts)
-    core.markdown.use(markdownItContainer)
-
-    return core
-  },
-}
+module.exports = opts => new Marp(opts).use(markdownItMark)
 ```
 
-```markdown
-<!-- markdown.md -->
-<style>
-.columns {
-  column-count: 3;
-}
-</style>
+```bash
+# Install Marp Core and markdown-it-mark
+npm install @marp-team/marp-core markdown-it-mark --save-dev
 
-::: columns
-Lorem ipsum dolor sit amet, nec ex illud viderer vivendo, mea semper deleniti cu. His in brute justo. Vim facilisis dissentiet ei. Per cu efficiendi theophrastus, te pro dicta mucius, ut sed adhuc ponderum. No iriure convenire pri, ius at possit appareat disputando, mei ei libris oportere.
-
-Mei an temporibus necessitatibus. Mea et possim conceptam rationibus. Ne eos inani quando, suas nulla vituperatoribus te vel. Officiis accusamus pertinacia ad nam, docendi recusabo definitiones vix ex. Ei pri voluptua moderatius, id porro laudem facete mea. Vix ad justo primis accusata, an ius dolores pertinax ocurreret, placerat intellegebat at has.
-
-Vix in vide admodum blandit. Posse elaboraret ex sit. Nusquam appetere definitionem cum no, et ornatus philosophia sit. Eu ferri mediocrem est, melius omnesque eum ad. Ut feugait molestie qualisque has, has ad soleat ridens mandamus. Ut eos sumo feugiat, civibus euripidis ex eam.
-
-Nam errem prompta in. Ea mel dicam aliquid impedit. Nibh utinam graeco vix et. Te munere euripidis quo. His tation prodesset ne, pro ex velit tantas noster.
-:::
+# Specify the path to functional engine
+marp --engine ./engine.js slide-deck.md
 ```
+
+The customized engine would convert `==marked==` to `<mark>marked</mark>`.
+
+### Confirm engine version
+
+You may confirm the bundled [marp-core](https://github.com/marp-team/marp-core) version by `--version` (`-v`) option.
+
+```console
+$ marp --version
+@marp-team/marp-cli v0.x.x (/w bundled @marp-team/marp-core v0.x.x)
+```
+
+Marp CLI prefers to use _an installed core_ than the bundled. If the current project has installed `@marp-team/marp-core` individually, it will show its version and the annotation "/w customized engine".
+
+## Configuration file
+
+Under construction.
 
 ## Author
 
