@@ -607,7 +607,7 @@ describe('Marp CLI', () => {
       })
     })
 
-    context('with --preview option', () => {
+    context('with --preview / -p option', () => {
       let warn: jest.SpyInstance<Console['warn']>
 
       beforeEach(() => {
@@ -616,7 +616,7 @@ describe('Marp CLI', () => {
       })
 
       it('opens preview window through Preview.open()', async () => {
-        await marpCli([onePath, '--preview', '-o', '-'])
+        await marpCli([onePath, '-p', '-o', '-'])
         expect(Preview.prototype.open).toBeCalledTimes(1)
 
         // Simualte opening event
