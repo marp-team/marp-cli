@@ -60,7 +60,7 @@ export class Server {
   private async loadScript() {
     if (Server.script === undefined) {
       Server.script = (await readFile(
-        path.resolve(__dirname, 'server-index.js')
+        path.resolve(__dirname, './server/server-index.js')
       )).toString()
     }
 

@@ -77,13 +77,17 @@ ul#index {
     }
   }
 
-  &.show-all li {
-    &:not(.convertible):not(.directory),
-    &.nodeModules {
-      opacity: 0.5;
-      display: flex;
+  /* stylelint-disable no-descending-specificity */
+  &.show-all {
+    li {
+      &:not(.convertible):not(.directory),
+      &.nodeModules {
+        opacity: 0.5;
+        display: flex;
+      }
     }
   }
+  /* stylelint-enable */
 }
 
 #show-all-container {

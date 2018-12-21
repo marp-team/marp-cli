@@ -63,7 +63,7 @@ export default [
     external,
     plugins,
     input: 'src/server/server-index.js',
-    output: { file: 'lib/server-index.js', format: 'iife' },
+    output: { file: 'lib/server/server-index.js', format: 'iife' },
   },
   {
     external,
