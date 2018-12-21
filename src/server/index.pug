@@ -2,16 +2,25 @@ doctype
 html
   head
     meta(charset="UTF-8")
-    meta(name="viewport", content="width=device-width, initial-scale=1.0")
-    meta(http-equiv="X-UA-Compatible", content="ie=edge")
+    meta(name="google" content="notranslate")
+    meta(name="viewport" content="width=device-width initial-scale=1.0")
+    meta(http-equiv="X-UA-Compatible" content="ie=edge")
     link(rel="icon" type="image/png" href=favicon)
     style!= style
   body
     h1= directory
-    ul.index
+
+    label#show-all-container
+      input.toggle#show-all(type="checkbox")
+      |
+      | Show all files and directories
+
+    ul#index
       each file in files
         li(class={ convertible: file.convertible, directory: file.directory, nodeModules: file.nodeModules })
           a.link.file(href=encodeURIComponent(file.name))= file.name
 
           if file.convertible
             a.link.pdf(href=`${encodeURIComponent(file.name)}?pdf`) PDF
+
+    script!= script
