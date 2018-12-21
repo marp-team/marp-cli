@@ -1,7 +1,7 @@
 import { MarpitOptions, MarpitRenderResult, Element } from '@marp-team/marpit'
 import fs from 'fs'
 import path from 'path'
-import promisify from 'util.promisify'
+import { promisify } from 'util'
 import barePug from './bare/bare.pug'
 import bareScss from './bare/bare.scss'
 import bespokePug from './bespoke/bespoke.pug'
