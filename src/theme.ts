@@ -2,7 +2,7 @@ import { Marpit } from '@marp-team/marpit'
 import fs from 'fs'
 import globby from 'globby'
 import path from 'path'
-import promisify from 'util.promisify'
+import { promisify } from 'util'
 import { warn } from './cli'
 
 const lstat = promisify(fs.lstat)

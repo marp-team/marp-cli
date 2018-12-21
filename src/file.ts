@@ -4,9 +4,9 @@ import globby from 'globby'
 import mkdirp from 'mkdirp'
 import path from 'path'
 import { tmpName } from 'tmp'
-import promisify from 'util.promisify'
+import { promisify } from 'util'
 
-const mkdirpPromise = promisify(mkdirp)
+const mkdirpPromise = promisify<string, any>(mkdirp)
 const readFile = promisify(fs.readFile)
 const tmpNamePromise = promisify(tmpName)
 const unlink = promisify(fs.unlink)
