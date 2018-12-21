@@ -1,8 +1,8 @@
-import { custom } from 'util.promisify'
+import { promisify } from 'util'
 
 const fs = require.requireActual('fs')
 
-fs.writeFile[custom] = (path, data) =>
+fs.writeFile[promisify.custom] = (path, data) =>
   new Promise((resolve, reject) =>
     fs.writeFile(path, data, e => (e ? reject(e) : resolve()))
   )
