@@ -15,8 +15,6 @@ describe('JavaScript for server index', () => {
 
     index = <HTMLUListElement>document.getElementById('index')
     showAll = <HTMLInputElement>document.getElementById('show-all')
-
-    serverIndex()
   })
 
   const checkShowAll = (state: boolean) => {
@@ -25,6 +23,8 @@ describe('JavaScript for server index', () => {
   }
 
   context('when check state of #show-all is changed', () => {
+    beforeEach(() => serverIndex())
+
     it('toggles .show-all class to #index list', () => {
       checkShowAll(true)
       expect(index.classList.contains('show-all')).toBe(true)
@@ -54,6 +54,16 @@ describe('JavaScript for server index', () => {
         expect(error).toBeCalledWith(exception)
         expect(index.classList.contains('show-all')).toBe(true)
       })
+    })
+  })
+
+  context('when sessionStorage has a stored state', () => {
+    it('applies checked state', () => {
+      sessionStorage.setItem(showAllKey, '1')
+      serverIndex()
+
+      expect(showAll.checked).toBe(true)
+      expect(index.classList.contains('show-all')).toBe(true)
     })
   })
 })
