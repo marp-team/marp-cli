@@ -94,3 +94,40 @@ ul#index {
   max-width: 720px;
   text-align: right;
 }
+
+input.toggle[type='checkbox'] {
+  appearance: none;
+  background-color: #666;
+  border-radius: 16px;
+  cursor: pointer;
+  display: inline-block;
+  height: 16px;
+  margin: 0;
+  outline: 0;
+  position: relative;
+  transition: background-color 0.2s ease-out;
+  vertical-align: middle;
+  width: 32px;
+
+  &::after {
+    background: #fff;
+    border-radius: 12px;
+    content: '';
+    display: inline-block;
+    height: 12px;
+    left: 2px;
+    margin: 0 auto 0 0;
+    position: absolute;
+    top: 2px;
+    transition: left 0.2s ease-out;
+    width: 12px;
+  }
+
+  &:checked {
+    background-color: #6c6;
+
+    &::after {
+      left: calc(100% - 14px);
+    }
+  }
+}
