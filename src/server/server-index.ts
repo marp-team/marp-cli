@@ -1,4 +1,4 @@
-const showAllKey = 'marp-cli-show-all'
+export const showAllKey = 'marp-cli-show-all'
 
 export default function serverIndex() {
   const showAll = <HTMLInputElement>document.getElementById('show-all')
