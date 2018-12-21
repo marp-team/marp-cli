@@ -13,6 +13,7 @@ import serverIndex from './server/index.pug'
 import style from './server/index.scss'
 
 const stat = promisify(fs.stat)
+const readFile = promisify(fs.readFile)
 
 export class Server {
   readonly converter: Converter
@@ -22,6 +23,8 @@ export class Server {
 
   directoryIndex: string[]
   server?: Express
+
+  private static script: string | undefined
 
   constructor(converter: Converter, opts: Server.Options = {}) {
     if (!converter.options.inputDir)
@@ -52,6 +55,16 @@ export class Server {
     if (this.options.onConverted) this.options.onConverted(converted)
 
     return converted
+  }
+
+  private async loadScript() {
+    if (Server.script === undefined) {
+      Server.script = (await readFile(
+        path.resolve(__dirname, './server/server-index.js')
+      )).toString()
+    }
+
+    return Server.script
   }
 
   private async preprocess(req: express.Request, res: express.Response) {
@@ -99,6 +112,8 @@ export class Server {
     const { directory, path, fileList } = locals
     const files: any[] = []
     ;(async () => {
+      const script = await this.loadScript()
+
       for (const f of fileList) {
         const { name, stat } = f
         const directory = stat && stat.isDirectory()
@@ -110,7 +125,10 @@ export class Server {
         files.push({ convertible, directory, name, nodeModules, parent, stat })
       }
 
-      callback(null, serverIndex({ directory, favicon, files, path, style }))
+      callback(
+        null,
+        serverIndex({ directory, favicon, files, path, script, style })
+      )
     })()
   }
 
