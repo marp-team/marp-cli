@@ -9,6 +9,8 @@
 ### Added
 
 - Support `--preview` option in regular conversion and multiple files ([#47](https://github.com/marp-team/marp-cli/pull/47))
+- Add `-p` alias to `--preview` option ([#48](https://github.com/marp-team/marp-cli/pull/48))
+- Toggle full screen by hitting <kbd>f</kbd> / <kbd>F11</kbd> in `bespoke` template ([#50](https://github.com/marp-team/marp-cli/pull/50))
 
 ## v0.0.15 - 2018-12-06
 

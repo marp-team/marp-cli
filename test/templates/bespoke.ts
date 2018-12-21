@@ -1,9 +1,11 @@
 /** @jest-environment jsdom */
 import Marp from '@marp-team/marp-core'
 import { Element as MarpitElement } from '@marp-team/marpit'
+import screenfull from 'screenfull'
 import { Key } from 'ts-keycode-enum'
 import bespoke from '../../src/templates/bespoke/bespoke'
 
+jest.mock('screenfull')
 jest.useFakeTimers()
 
 afterEach(() => jest.restoreAllMocks())
@@ -19,6 +21,9 @@ describe("Bespoke template's browser context", () => {
     document.body.innerHTML = marp.render(md).html
     return document.getElementById('presentation')!
   }
+
+  const keydown = (opts, target = document) =>
+    target.dispatchEvent(new KeyboardEvent('keydown', opts))
 
   describe('Classes', () => {
     it('adds bespoke classes to #presentation', () => {
@@ -82,6 +87,23 @@ describe("Bespoke template's browser context", () => {
     })
   })
 
+  describe('Fullscreen', () => {
+    beforeEach(() => {
+      render()
+      bespoke()
+    })
+
+    it('toggles fullscreen by hitting f key', () => {
+      keydown({ which: Key.F })
+      expect(screenfull.toggle).toBeCalled()
+    })
+
+    it('toggles fullscreen by hitting F11 key', () => {
+      keydown({ which: Key.F11 })
+      expect(screenfull.toggle).toBeCalled()
+    })
+  })
+
   describe('Hash', () => {
     it('activates initial page by hash index', () => {
       location.href = 'http://localhost/#2'
@@ -112,9 +134,6 @@ describe("Bespoke template's browser context", () => {
     })
 
     it('navigates page by keyboard', () => {
-      const keydown = opts =>
-        document.dispatchEvent(new KeyboardEvent('keydown', opts))
-
       // bespoke-keys
       keydown({ which: Key.RightArrow })
       expect(deck.slide()).toBe(1)
