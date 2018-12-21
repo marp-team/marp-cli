@@ -130,4 +130,13 @@ input.toggle[type='checkbox'] {
       left: calc(100% - 14px);
     }
   }
+
+  &:hover:active {
+    background-color: #555;
+    transition: none;
+
+    &:checked {
+      background-color: #5b5;
+    }
+  }
 }
