@@ -13,7 +13,7 @@ h1 {
   font-size: 26px;
 }
 
-ul.index {
+ul#index {
   list-style: none;
   margin: 1em 2em;
   max-width: 720px;
@@ -27,19 +27,20 @@ ul.index {
     display: flex;
     height: $list-height;
     margin: $list-icon-vertical-gap 0 0 0;
+    opacity: 0.5;
     padding: 0 0 0 calc(#{$list-icon-size} + #{$list-icon-horizontal-gap});
 
     &.convertible {
       background-image: url('../assets/icon-marp.svg');
+      opacity: 1;
     }
 
     &.directory {
       background-image: url('../assets/icon-directory.svg');
-    }
 
-    &:not(.convertible):not(.directory),
-    &.nodeModules {
-      display: none;
+      &:not(.nodeModules) {
+        opacity: 1;
+      }
     }
 
     a.link {
@@ -74,6 +75,93 @@ ul.index {
         flex: 0 1 auto;
         margin: 0 0 0 $list-icon-horizontal-gap;
       }
+    }
+  }
+
+  &:not(.show-all) li {
+    &:not(.convertible):not(.directory),
+    &.nodeModules {
+      display: none;
+    }
+  }
+}
+
+#show-all-container {
+  cursor: pointer;
+  display: block;
+  font-size: 0.85em;
+  margin: 1em 2em;
+  max-width: 720px;
+  text-align: right;
+}
+
+input.toggle[type='checkbox'] {
+  appearance: none;
+  background-color: #666;
+  border-radius: 16px;
+  cursor: pointer;
+  display: inline-block;
+  height: 16px;
+  margin: 0;
+  outline: 0;
+  position: relative;
+  transition: background-color 0.2s ease-out;
+  vertical-align: middle;
+  width: 32px;
+
+  &::before {
+    border-radius: 20px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: transparent;
+    bottom: -2px;
+    box-sizing: border-box;
+    content: '';
+    display: block;
+    left: -2px;
+    opacity: 0.75;
+    position: absolute;
+    right: -2px;
+    top: -2px;
+    transition: border-color 0.2s ease-out;
+  }
+
+  &::after {
+    background: #fff;
+    border-radius: 12px;
+    content: '';
+    display: inline-block;
+    height: 12px;
+    left: 2px;
+    margin: 0 auto 0 0;
+    position: absolute;
+    top: 2px;
+    transition: left 0.2s ease-out;
+    width: 12px;
+  }
+
+  &:focus::before {
+    border-color: #555;
+  }
+
+  &:checked {
+    background-color: #6c6;
+
+    &:focus::before {
+      border-color: #6c6;
+    }
+
+    &::after {
+      left: calc(100% - 14px);
+    }
+  }
+
+  &:hover:active {
+    background-color: #555;
+    transition: none;
+
+    &:checked {
+      background-color: #5b5;
     }
   }
 }
