@@ -20,6 +20,7 @@ const external = [
   'path',
   'querystring',
   'url',
+  'util',
   'chrome-launcher/dist/chrome-finder',
   'yargs/yargs',
 ]
