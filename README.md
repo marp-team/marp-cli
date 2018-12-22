@@ -78,46 +78,25 @@ npm install -g @marp-team/marp-cli
 
 ## Basic usage
 
-```
-Usage:
-  marp [options] <files...>
-  marp [options] -I <dir>
-
-Basic Options:
-  --version, -v      Show versions                                     [boolean]
-  --help, -h         Show help                                         [boolean]
-  --output, -o       Output file path (or directory when input-dir is passed)
-                                                                        [string]
-  --input-dir, -I    The base directory to find markdown and theme CSS  [string]
-  --config-file, -c  Specify path to configuration file                 [string]
-  --watch, -w        Watch input markdowns for changes                 [boolean]
-  --server, -s       Enable server mode                                [boolean]
-  --preview, -p      Open preview window (EXPERIMENTAL)                [boolean]
-
-Converter Options:
-  --pdf                Convert slide deck into PDF                     [boolean]
-  --template           Choose template     [string] [choices: "bare", "bespoke"]
-  --allow-local-files  Allow to access local files from Markdown while
-                       converting PDF (NOT SECURE)                     [boolean]
-
-Marp / Marpit Options:
-  --engine     Select Marpit based engine by module name or path        [string]
-  --html       Enable or disable HTML tag                              [boolean]
-  --theme      Override theme by name or CSS file                       [string]
-  --theme-set  Path to additional theme CSS files                        [array]
-```
-
 ### Convert to HTML
 
-The passed markdown will be converted to HTML file by default.
+The passed markdown will be converted to HTML file by default. In the below example, a converted `slide-deck.html` will output to the same directory.
 
 ```bash
 marp slide-deck.md
 ```
 
-In this example, `slide-deck.html` would output to the same directory. You can change the output path by `--output` (`-o`) option.
+You can change the output path by `--output` (`-o`) option.
 
-### Convert to PDF
+```bash
+marp slide-deck.md -o output.html
+```
+
+Marp CLI supports converting multiple files by passing multiple paths, directories, and glob patterns. In this case, `--output` option cannot use.
+
+When you want to output the converted result to another directory with keeping the origin directory structure, you can use `--inpur-dir` (`-I`) option. `--output` option would be available for specify the output directory.
+
+### Convert to PDF (`--pdf`)
 
 If you passed `--pdf` option or the output filename specified by `--output` (`-o`) option ends with `.pdf`, Marp CLI will try to convert into PDF file by using the installed [Google Chrome](https://www.google.com/chrome/) or [Chromium](https://www.chromium.org/).
 
@@ -128,25 +107,25 @@ marp slide-deck.md -o converted.pdf
 
 #### Security about local files
 
-Because of the security reason, **the converted PDF cannot load local files by default.** We recommend to upload your assets to online.
+Because of [the security reason](https://github.com/marp-team/marp-cli/issues/10), **the converted PDF cannot load local files by default.** We recommend to upload your assets to online.
 
-But if you want to use local files in rendered PDF, `--alow-local-files` option helps to find your local files. It would output warning about the insecure option in each conversions.
+But if you want to use local files in rendered PDF, `--alow-local-files` option helps to find your local files. Warnings about using the insecure option are outputed in each conversions.
 
 ```bash
 marp --pdf --allow-local-files slide-deck.md
 ```
 
-## Watch mode
+### Watch mode (`--watch` / `-w`)
 
 Marp CLI will observe a change of Markdown / used Theme CSS when passed with `--watch` (`-w`) option. The conversion is triggered whenever the content of file is updated.
 
 While you are opening the converted HTML in browser, it would refresh the opened page automatically.
 
-## Server mode
+### Server mode (`--server` / `-s`)
 
 Server mode supports on-demand conversion by HTTP request. We require to pass `--server` (`-s`) option and a directory to serve.
 
-## Preview window _(Experimental)_
+### Preview window (_Experimental:_ `--preview` / `-p`)
 
 If conversions were executed together with `--preview` (`-p`) option, Marp CLI will open preview window(s) to check the converted result immediately.
 
@@ -261,14 +240,14 @@ The customized engine would convert `==marked==` to `<mark>marked</mark>`.
 
 ### Confirm engine version
 
-You may confirm the bundled [marp-core](https://github.com/marp-team/marp-core) version by `--version` (`-v`) option.
+By using `--version` (`-v`) option, you may confirm the version of engine that is expected to use in current configuration.
 
 ```console
 $ marp --version
 @marp-team/marp-cli v0.x.x (/w bundled @marp-team/marp-core v0.x.x)
 ```
 
-Marp CLI prefers to use _an installed core_ than the bundled. If the current project has installed `@marp-team/marp-core` individually, it will show its version and the annotation "/w customized engine".
+Marp CLI prefers to use _an installed core by user_ than the bundled. If the current project has installed `@marp-team/marp-core` individually, it would show its version and the annotation "/w customized engine".
 
 ## Configuration file
 
