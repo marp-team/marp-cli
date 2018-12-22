@@ -2,7 +2,7 @@ import { Marpit } from '@marp-team/marpit'
 import fs from 'fs'
 import path from 'path'
 import pkgUp from 'pkg-up'
-import promisify from 'util.promisify'
+import { promisify } from 'util'
 import importFrom from 'import-from'
 import { CLIError } from './error'
 
