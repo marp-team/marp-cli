@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v0.1.0 - 2018-12-23
+
 ### Breaking
 
 - Drop support for Node 6 and Node < 8.9 ([#47](https://github.com/marp-team/marp-cli/pull/47))
