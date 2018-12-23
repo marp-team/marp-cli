@@ -18,6 +18,10 @@
 
 - Remove `util.promisify` polyfill for Node 6 ([#53](https://github.com/marp-team/marp-cli/pull/53))
 
+### Changed
+
+- Upgrade dependent packages to latest version, included [Marpit v0.4.1](https://github.com/marp-team/marpit/releases/tag/v0.4.1) and [Marp Core v0.3.1](https://github.com/marp-team/marp-core/releases/tag/v0.3.1) ([#54](https://github.com/marp-team/marp-cli/pull/54))
+
 ## v0.0.15 - 2018-12-06
 
 ### Added
