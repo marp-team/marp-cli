@@ -342,6 +342,10 @@ For example, this configuration disables Marp Core's line breaks conversion (`\n
 
 > :warning: Some options may be overridden by used template.
 
+## Contributing
+
+Are you interested in contributing? Please see [CONTRIBUTING.md](.github/CONTRIBUTING.md).
+
 ## Author
 
 Managed by [@marp-team](https://github.com/marp-team).
