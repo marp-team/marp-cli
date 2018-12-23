@@ -138,22 +138,22 @@
     reflect-metadata "^0.1.12"
     tslib "^1.8.1"
 
-"@marp-team/marp-core@^0.3.0":
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/@marp-team/marp-core/-/marp-core-0.3.0.tgz#a4f55cbea068ffa938817a8b0b88cec60205ce29"
-  integrity sha512-k5TeOCVP+P0XVCrR0atEOmz424FlYdwGzAtgYXREBali+n1c5Z9xj9dPt64ZhXtRsIqvTh7IptEkoKZy+kH6Ww==
+"@marp-team/marp-core@^0.3.1":
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/@marp-team/marp-core/-/marp-core-0.3.1.tgz#b9817cfbb25d1aa4fb89573fa6cf043cd24b95e2"
+  integrity sha512-LBfPSAo6sPm5Oumhe4ANLb4GKIxLvGBFvpFnevUSDHz8meXz/hzF3BL6dUK6fla8ZBkrzl8IqSRSNv0thPkhWQ==
   dependencies:
-    "@marp-team/marpit" "^0.4.0"
-    emoji-regex "^7.0.1"
+    "@marp-team/marpit" "^0.4.1"
+    emoji-regex "^7.0.3"
     highlight.js "^9.13.1"
     katex "^0.10.0"
     markdown-it "^8.4.2"
     markdown-it-emoji "^1.4.0"
-    postcss "^7.0.6"
+    postcss "^7.0.7"
     twemoji "^11.2.0"
     xss "^1.0.3"
 
-"@marp-team/marpit@^0.4.0", "@marp-team/marpit@^0.4.1":
+"@marp-team/marpit@^0.4.1":
   version "0.4.1"
   resolved "https://registry.yarnpkg.com/@marp-team/marpit/-/marpit-0.4.1.tgz#46d311ec3bebc799841c61b80a83be9e26ca3bf4"
   integrity sha512-AvlOADhRjoGezbumlt3RzX9Fh+DKWM8Wpp+CKa4/dmAgoyFVGqzthrP6ezLH3ZiY1Tt/308RkJgGYj6Ql/0mMw==
@@ -2145,7 +2145,7 @@ electron-to-chromium@^1.2.7, electron-to-chromium@^1.3.92:
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.96.tgz#25770ec99b8b07706dedf3a5f43fa50cb54c4f9a"
   integrity sha512-ZUXBUyGLeoJxp4Nt6G/GjBRLnyz8IKQGexZ2ndWaoegThgMGFO1tdDYID5gBV32/1S83osjJHyfzvanE/8HY4Q==
 
-emoji-regex@^7.0.1:
+emoji-regex@^7.0.3:
   version "7.0.3"
   resolved "https://registry.yarnpkg.com/emoji-regex/-/emoji-regex-7.0.3.tgz#933a04052860c85e83c122479c4748a8e4c72156"
   integrity sha512-CwBLREIQ7LvYFB0WyRvwhq5N5qPhc6PMjD6bYggFlI5YyDgl+0vxq5VHbMOFqLg7hfWzmu8T5Z1QofhmTIhItA==
