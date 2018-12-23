@@ -12,6 +12,7 @@
 - Add `-p` alias to `--preview` option ([#48](https://github.com/marp-team/marp-cli/pull/48))
 - Add toggle button for listing all served resources in server mode ([#49](https://github.com/marp-team/marp-cli/pull/49))
 - Toggle full screen by hitting <kbd>f</kbd> / <kbd>F11</kbd> in `bespoke` template ([#50](https://github.com/marp-team/marp-cli/pull/50))
+- Add documentation of usage ([#51](https://github.com/marp-team/marp-cli/pull/51))
 
 ### Removed
 
