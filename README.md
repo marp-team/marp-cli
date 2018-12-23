@@ -9,7 +9,7 @@
 
 It can convert Marp / Marpit Markdown files into static HTML / CSS and PDF.
 
-![](./docs/images/marp-cli.gif)
+![](https://raw.githubusercontent.com/marp-team/marp-cli/master/docs/images/marp-cli.gif)
 
 ## Try it now!
 
@@ -125,7 +125,7 @@ While you are opening the converted HTML in browser, it would refresh the opened
 
 Server mode supports on-demand conversion by HTTP request. We require to pass `--server` (`-s`) option and a directory to serve.
 
-![](./docs/images/server-mode.gif)
+![](https://raw.githubusercontent.com/marp-team/marp-cli/master/docs/images/server-mode.gif)
 
 In this mode, the converted file outputs as the result of accessing to server, and not to disk.
 
@@ -350,4 +350,4 @@ Managed by [@marp-team](https://github.com/marp-team).
 
 ## License
 
-[MIT License](LICENSE)
+This tool releases under the [MIT License](LICENSE).
