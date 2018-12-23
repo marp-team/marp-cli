@@ -7,9 +7,9 @@
 
 **A CLI interface, for [Marp](https://github.com/marp-team/marp)** (using [@marp-team/marp-core](https://github.com/marp-team/marp-core)) and any slide deck converter based on [Marpit](https://marpit.marp.app/) framework.
 
-It can convert Marp / Marpit Markdown files into static HTML (and CSS).
+It can convert Marp / Marpit Markdown files into static HTML / CSS and PDF.
 
-![](./marp-cli.gif)
+![](./docs/images/marp-cli.gif)
 
 ## Try it now!
 
@@ -107,7 +107,7 @@ marp slide-deck.md -o converted.pdf
 
 #### Security about local files
 
-Because of [the security reason](https://github.com/marp-team/marp-cli/issues/10), **the converted PDF cannot load local files by default.** We recommend to upload your assets to online.
+Because of [the security reason](https://github.com/marp-team/marp-cli/pull/10), **the converted PDF cannot load local files by default.** We recommend to upload your assets to online.
 
 But if you want to use local files in rendered PDF, `--alow-local-files` option helps to find your local files. Warnings about using the insecure option are outputed in each conversions.
 
@@ -125,9 +125,21 @@ While you are opening the converted HTML in browser, it would refresh the opened
 
 Server mode supports on-demand conversion by HTTP request. We require to pass `--server` (`-s`) option and a directory to serve.
 
+![](./docs/images/server-mode.gif)
+
+In this mode, the converted file outputs as the result of accessing to server, and not to disk.
+
+You would get the converted PDF by adding `?pdf` query string when requesting. e.g. `http://localhost:8080/deck-a.md?pdf`
+
+#### `index.md` / `PITCHME.md`
+
+Marp CLI server will provide the list of served files by default, but you can place the default Markdown deck like a common web server's `index.html`.
+
+Place Markdown named `index.md` or `PITCHME.md` ([GitPitch style](https://gitpitch.com/docs/getting-started/pitchme/)) to served directory. It would be redirected just accessing to `http://localhost:8080/`.
+
 ### Preview window (_Experimental:_ `--preview` / `-p`)
 
-If conversions were executed together with `--preview` (`-p`) option, Marp CLI will open preview window(s) to check the converted result immediately.
+When conversions were executed together with `--preview` (`-p`) option, Marp CLI will open preview window(s) to check the converted result immediately.
 
 Unlike opening with browser, you may present deck with the immersive window. [Watch mode](#watch-mode) is enabled automatically.
 
