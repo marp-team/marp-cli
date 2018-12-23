@@ -9,7 +9,7 @@
 
 It can convert Marp / Marpit Markdown files into static HTML (and CSS).
 
-### :warning: _marp-cli is under construction and not ready to use stable._
+![](./marp-cli.gif)
 
 ## Try it now!
 
