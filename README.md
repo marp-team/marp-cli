@@ -251,7 +251,84 @@ Marp CLI prefers to use _an installed core by user_ than the bundled. If the cur
 
 ## Configuration file
 
-Under construction.
+Marp CLI can be configured options with file, such as `marp.config.js`, `.marprc` (JSON / YAML), and `marp` section of `package.json`. It is useful to configure settings for the whole of project.
+
+```javascript
+// package.json
+{
+  "marp": {
+    "inputDir": "./slides",
+    "output":" ./public",
+    "themeSet": "./themes"
+  }
+}
+```
+
+```yaml
+# .marprc.yml
+allowLocalFiles: true
+options:
+  looseYAML: false
+  markdown:
+    breaks: false
+pdf: true
+```
+
+```javascript
+// marp.config.js
+const { Marp } = require('@marp-team/marp-core')
+const container = require('markdown-it-container')
+
+module.exports = {
+  // Customize engine on configuration file directly
+  engine: opts => new Marp(opts).use(container, 'custom'),
+}
+```
+
+By default we use configuration file that is placed on current directory, but you may also specify the for configuration file by `--config-file` option (`-c`).
+
+### Options
+
+|        Key        |            Type             |      CLI option       | Description                                                                                            |
+| :---------------: | :-------------------------: | :-------------------: | :----------------------------------------------------------------------------------------------------- |
+| `allowLocalFiles` |           boolean           | `--allow-local-files` | Allow to access local files from Markdown while converting PDF _(NOT SECURE)_                          |
+|     `engine`      | string \| Class \| Function |      `--engine`       | Specify Marpit based engine                                                                            |
+|      `html`       |      boolean \| object      |       `--html`        | Enable or disable HTML (Configuration file can pass [the whitelist object] if you are using Marp Core) |
+|    `inputDir`     |           string            |  `--input-dir` `-I`   | The base directory to find markdown and theme CSS                                                      |
+|      `lang`       |           string            |                       | Define the language of converted HTML                                                                  |
+|     `options`     |           object            |                       | The base options for the constructor of engine                                                         |
+|     `output`      |           string            |    `--output` `-o`    | Output file path (or directory when input-dir is passed)                                               |
+|       `pdf`       |           boolean           |        `--pdf`        | Convert slide deck into PDF                                                                            |
+|     `preview`     |           boolean           |   `--preview` `-p`    | Open preview window _(EXPERIMENTAL)_                                                                   |
+|     `server`      |           boolean           |    `--server` `-s`    | Enable server mode                                                                                     |
+|    `template`     |           string            |     `--template`      | Choose template                                                                                        |
+|      `theme`      |           string            |       `--theme`       | Override theme by name or CSS file                                                                     |
+|    `themeSet`     |     string \| string[]      |     `--theme-set`     | Path to additional theme CSS files                                                                     |
+|      `watch`      |           boolean           |    `--watch` `-w`     | Watch input markdowns for changes                                                                      |
+
+[the whitelist object]: https://github.com/marp-team/marp-core#html-boolean--object
+
+### Advanced
+
+The advanced options that cannot specify through CLI options can be configured by file.
+
+#### Base options for engine constructor
+
+`options` can specify the base options for the constructor of the used engine. You can fine-tune constructor options for [Marp Core](https://github.com/marp-team/marp-core#constructor-options) / [Marpit](https://marpit-api.marp.app/marpit).
+
+For example, this configuration disables Marp Core's line breaks conversion (`\n` to `<br />`) to match for CommonMark, by passing [markdown-it's `breaks` option](https://markdown-it.github.io/markdown-it/#MarkdownIt.new) as `false`.
+
+```json
+{
+  "options": {
+    "markdown": {
+      "breaks": false
+    }
+  }
+}
+```
+
+> :warning: Some options may be overridden by used template.
 
 ## Author
 
