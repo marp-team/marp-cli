@@ -138,13 +138,13 @@
     reflect-metadata "^0.1.12"
     tslib "^1.8.1"
 
-"@marp-team/marp-core@^0.4.0":
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/@marp-team/marp-core/-/marp-core-0.4.0.tgz#46f6e29d6bce01021b75342ffd6d39c6513646f2"
-  integrity sha512-O88XBnW4tSCnGX0xL91iguONprIA+KQELthmi5n/Fe+b2qj26ZK1H+Zmd6jYb7T37HxesxTLZwh1lSaWDz+rgQ==
+"@marp-team/marp-core@^0.4.1":
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/@marp-team/marp-core/-/marp-core-0.4.1.tgz#c731fc5ae279116738db134d49eef85094748260"
+  integrity sha512-TIJ9sbz9GzgM4NDNqz0j864uamHMJYS7qvMGhXt5lUWSUgkOSlDrmeqWfpuj4MZX55JcXnZE/3WuzUe2w1rHJA==
   dependencies:
     "@marp-team/marpit" "^0.5.0"
-    "@marp-team/marpit-svg-polyfill" "^0.1.0"
+    "@marp-team/marpit-svg-polyfill" "^0.2.0"
     emoji-regex "^7.0.3"
     highlight.js "^9.13.1"
     katex "^0.10.0"
@@ -154,10 +154,10 @@
     twemoji "^11.2.0"
     xss "^1.0.3"
 
-"@marp-team/marpit-svg-polyfill@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@marp-team/marpit-svg-polyfill/-/marpit-svg-polyfill-0.1.0.tgz#91a52bbbe1833520bf7727dd6828a7c5b43def4c"
-  integrity sha512-LL3v5jzKHk2bcVduGHFC80y9jyTXDpg0q78ZSvsrVVvfbYxVBAKGNcZ4UysJcNb6p6SiLsGf/uNHBYaU1A479g==
+"@marp-team/marpit-svg-polyfill@^0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@marp-team/marpit-svg-polyfill/-/marpit-svg-polyfill-0.2.0.tgz#e5bbf2ea9cc6ac21068019d88816fc5cd87410e4"
+  integrity sha512-OczYQQYUGPVuPPD/vQa0gS8UutIo5QOa1WiXgh80D8K8hBiSAJfKxViz0HKUUhwyURJRYiTioNYFcKQ1Ikjuww==
   dependencies:
     detect-browser "^3.0.1"
 
