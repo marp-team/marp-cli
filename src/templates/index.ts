@@ -58,7 +58,9 @@ export const bespoke: Template = async opts => {
       readyScript:
         opts.readyScript ||
         `<script>${await libJs(
-          '../node_modules/@marp-team/marpit-svg-polyfill/lib/polyfill.browser.js'
+          require.resolve(
+            '@marp-team/marpit-svg-polyfill/lib/polyfill.browser.js'
+          )
         )}</script>`,
       bespoke: {
         css: bespokeScss,
