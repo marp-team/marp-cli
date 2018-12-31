@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v0.2.0 - 2018-12-31
+
 ### Fixed
 
 - Improve WebKit browser support ([#55](https://github.com/marp-team/marp-cli/pull/55))
@@ -31,6 +33,10 @@
 ### Changed
 
 - Upgrade dependent packages to latest version, included [Marpit v0.4.1](https://github.com/marp-team/marpit/releases/tag/v0.4.1) and [Marp Core v0.3.1](https://github.com/marp-team/marp-core/releases/tag/v0.3.1) ([#54](https://github.com/marp-team/marp-cli/pull/54))
+
+---
+
+<details><summary>History of pre-release versions</summary>
 
 ## v0.0.15 - 2018-12-06
 
@@ -207,3 +213,5 @@
 ## v0.0.2 - 2018-08-21
 
 - Initial release. _Please notice that it is early alpha release._
+
+</details>
