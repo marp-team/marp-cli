@@ -6,6 +6,10 @@
 
 - Improve WebKit browser support ([#55](https://github.com/marp-team/marp-cli/pull/55))
 
+### Changed
+
+- Upgrade dependent packages to latest version, included [Marpit v0.5.0](https://github.com/marp-team/marpit/releases/tag/v0.5.0) and [Marp Core v0.4.1](https://github.com/marp-team/marp-core/releases/tag/v0.4.1) ([#56](https://github.com/marp-team/marp-cli/pull/56))
+
 ## v0.1.0 - 2018-12-23
 
 ### Breaking
