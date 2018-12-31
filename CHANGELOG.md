@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Improve WebKit browser support ([#55](https://github.com/marp-team/marp-cli/pull/55))
+
 ## v0.1.0 - 2018-12-23
 
 ### Breaking
