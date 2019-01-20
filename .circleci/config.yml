@@ -103,12 +103,13 @@ workflows:
     jobs:
       - 10.15.0
       - 8.15.0
-      - least-version
+      # NOTE: Node 8.9 in test environment cannot close Chrome correctly.
+      # - least-version
       - docker-image:
           requires:
             - 10.15.0
             - 8.15.0
-            - least-version
+            # - least-version
           filters:
             branches:
               only: master
