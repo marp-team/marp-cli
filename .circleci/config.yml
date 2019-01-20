@@ -12,7 +12,7 @@ references:
                            && ln -snf /opt/yarn-v$YARN_VERSION/bin/yarnpkg /usr/local/bin/yarnpkg \
                            && rm yarn-v$YARN_VERSION.tar.gz'
           environment:
-            YARN_VERSION: 1.12.3
+            YARN_VERSION: 1.13.0
 
       - checkout
 
@@ -64,15 +64,20 @@ references:
 
 version: 2
 jobs:
-  '10.14.1':
+  '10.15.0':
     <<: *base
     docker:
-      - image: circleci/node:10.14.1-browsers
+      - image: circleci/node:10.15.0-browsers
 
-  '8.14.0':
+  '8.15.0':
     <<: *base
     docker:
-      - image: circleci/node:8.14.0-browsers
+      - image: circleci/node:8.15.0-browsers
+
+  least-version:
+    <<: *base
+    docker:
+      - image: circleci/node:8.9.0-browsers
 
   docker-image:
     docker:
@@ -96,12 +101,15 @@ workflows:
   version: 2
   build:
     jobs:
-      - 10.14.1
-      - 8.14.0
+      - 10.15.0
+      - 8.15.0
+      # NOTE: Node 8.9 in test environment cannot close Chrome correctly.
+      # - least-version
       - docker-image:
           requires:
-            - 10.14.1
-            - 8.14.0
+            - 10.15.0
+            - 8.15.0
+            # - least-version
           filters:
             branches:
               only: master
