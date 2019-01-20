@@ -193,7 +193,7 @@ describe('Converter', () => {
         expect(pdf.toString('ascii', 0, 5)).toBe('%PDF-')
         expect(ret.newFile.path).toBe('test.pdf')
         expect(ret.newFile.buffer).toBe(pdf)
-      }, 10000)
+      }, 20000)
 
       context('with allowLocalFiles option as true', () => {
         it('converts into PDF by using temporally file', async () => {
@@ -220,7 +220,7 @@ describe('Converter', () => {
             expect.stringContaining(os.tmpdir())
           )
           expect(fileSave).toBeCalled()
-        }, 10000)
+        }, 20000)
       })
     })
   })
