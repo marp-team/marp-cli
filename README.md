@@ -1,8 +1,9 @@
 # @marp-team/marp-cli
 
-[![CircleCI](https://img.shields.io/circleci/project/github/marp-team/marp-cli/master.svg?style=flat-square)](https://circleci.com/gh/marp-team/marp-cli/)
-[![Codecov](https://img.shields.io/codecov/c/github/marp-team/marp-cli/master.svg?style=flat-square)](https://codecov.io/gh/marp-team/marp-cli)
-[![npm](https://img.shields.io/npm/v/@marp-team/marp-cli.svg?style=flat-square)](https://www.npmjs.com/package/@marp-team/marp-cli)
+[![CircleCI](https://img.shields.io/circleci/project/github/marp-team/marp-cli/master.svg?style=flat-square&logo=circleci)](https://circleci.com/gh/marp-team/marp-cli/)
+[![Codecov](https://img.shields.io/codecov/c/github/marp-team/marp-cli/master.svg?style=flat-square&logo=codecov)](https://codecov.io/gh/marp-team/marp-cli)
+[![npm](https://img.shields.io/npm/v/@marp-team/marp-cli.svg?style=flat-square&logo=npm)](https://www.npmjs.com/package/@marp-team/marp-cli)
+[![Docker](https://img.shields.io/docker/pulls/marpteam/marp-cli.svg?logo=docker&style=flat-square)](https://hub.docker.com/r/marpteam/marp-cli/)
 [![LICENSE](https://img.shields.io/github/license/marp-team/marp-cli.svg?style=flat-square)](./LICENSE)
 
 **A CLI interface, for [Marp](https://github.com/marp-team/marp)** (using [@marp-team/marp-core](https://github.com/marp-team/marp-core)) and any slide deck converter based on [Marpit](https://marpit.marp.app/) framework.
