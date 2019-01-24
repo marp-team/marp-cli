@@ -15,6 +15,11 @@ html(lang=lang)
       .bespoke-progress-parent
         .bespoke-progress-bar
 
+    .bespoke-marp-osd
+      button(data-bespoke-marp-osd="prev") &lt;
+      button(data-bespoke-marp-osd="next") &gt;
+      button(data-bespoke-marp-osd="fullscreen") Fullscreen
+
     != html
     != readyScript
     script!= bespoke.js

@@ -5,6 +5,7 @@ import bespokeCursor from './cursor'
 import bespokeFullscreen from './fullscreen'
 import bespokeHash from './hash'
 import bespokeNavigation from './navigation'
+import bespokeOSD from './osd'
 import bespokeProgress from './progress'
 import bespokeTouch from './touch'
 
@@ -18,5 +19,6 @@ export default function() {
     bespokeFullscreen,
     bespokeProgress,
     bespokeTouch(),
+    bespokeOSD(),
   ])
 }

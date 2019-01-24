@@ -9,6 +9,11 @@ $progressHeight: 5px;
     overflow: hidden;
   }
 
+  .bespoke-marp-osd {
+    display: none;
+    opacity: 0;
+  }
+
   .bespoke-marp-parent {
     bottom: 0;
     left: 0;
@@ -16,8 +21,35 @@ $progressHeight: 5px;
     right: 0;
     top: 0;
 
+    > .bespoke-marp-osd {
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 10px;
+      bottom: 50px;
+      color: #fff;
+      display: block;
+      left: 50%;
+      opacity: 0.75;
+      padding: 0.5em;
+      position: absolute;
+      transform: translateX(-50%);
+      transition: opacity 0.2s linear;
+      z-index: 1;
+
+      button {
+        appearance: none;
+        background: transparent;
+        border: 0;
+        color: inherit;
+      }
+    }
+
     &.bespoke-marp-cursor-inactive {
       cursor: none;
+
+      > .bespoke-marp-osd {
+        opacity: 0;
+        pointer-events: none;
+      }
     }
   }
 
@@ -55,8 +87,10 @@ $progressHeight: 5px;
 }
 
 @media print {
+  .bespoke-marp-osd,
   .bespoke-progress-parent {
-    display: none;
+    display: none !important;
+    transition: none !important;
   }
 
   .bespoke-marp-parent {
