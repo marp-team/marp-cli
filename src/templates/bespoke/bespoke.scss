@@ -22,17 +22,21 @@ $progressHeight: 5px;
     top: 0;
 
     > .bespoke-marp-osd {
-      background: rgba(0, 0, 0, 0.5);
-      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.65);
+      border-radius: 7px;
       bottom: 50px;
       color: #fff;
       display: block;
       left: 50%;
-      opacity: 0.75;
-      padding: 0.5em;
+      line-height: 0;
+      opacity: 1;
+      padding: 12px;
+      pointer-events: none;
       position: absolute;
+      touch-action: manipulation;
       transform: translateX(-50%);
       transition: opacity 0.2s linear;
+      user-select: none;
       z-index: 1;
 
       button {
@@ -41,6 +45,10 @@ $progressHeight: 5px;
         border: 0;
         color: inherit;
       }
+
+      [data-bespoke-marp-osd] {
+        pointer-events: auto;
+      }
     }
 
     &.bespoke-marp-inactive {
@@ -48,7 +56,10 @@ $progressHeight: 5px;
 
       > .bespoke-marp-osd {
         opacity: 0;
-        pointer-events: none;
+
+        [data-bespoke-marp-osd] {
+          pointer-events: none;
+        }
       }
     }
   }

@@ -14,6 +14,7 @@ export default function bespokeInactive(timeout = 2000) {
 
     document.addEventListener('mousedown', activate)
     document.addEventListener('mousemove', activate)
+    document.addEventListener('touchend', activate)
 
     setTimeout(activate, 0)
   }
