@@ -70,8 +70,12 @@ $progressHeight: 5px;
         outline: none;
         padding: 0;
         transition: opacity 0.2s linear;
-
         -webkit-tap-highlight-color: transparent;
+
+        &:disabled {
+          cursor: not-allowed;
+          opacity: 0.15 !important;
+        }
 
         &:hover {
           opacity: 1;
@@ -83,11 +87,6 @@ $progressHeight: 5px;
           &:not(:disabled) {
             transition: none;
           }
-        }
-
-        &:disabled {
-          cursor: not-allowed;
-          opacity: 0.15 !important;
         }
 
         @mixin icon-button($icon, $size: 32px) {
