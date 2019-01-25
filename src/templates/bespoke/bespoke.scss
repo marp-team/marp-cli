@@ -22,32 +22,100 @@ $progressHeight: 5px;
     top: 0;
 
     > .bespoke-marp-osd {
-      background: rgba(0, 0, 0, 0.65);
+      background: rgba(#000, 0.65);
       border-radius: 7px;
       bottom: 50px;
       color: #fff;
       display: block;
+      font-family: Helvetica, Arial, sans-serif;
+      font-size: 16px;
       left: 50%;
       line-height: 0;
       opacity: 1;
+      outline: none;
       padding: 12px;
-      pointer-events: none;
       position: absolute;
       touch-action: manipulation;
       transform: translateX(-50%);
       transition: opacity 0.2s linear;
       user-select: none;
+      white-space: nowrap;
       z-index: 1;
 
-      button {
-        appearance: none;
-        background: transparent;
-        border: 0;
-        color: inherit;
+      > * {
+        margin-left: 6px;
+
+        &:first-child {
+          margin-left: 0;
+        }
       }
 
-      [data-bespoke-marp-osd] {
-        pointer-events: auto;
+      > span {
+        opacity: 0.8;
+
+        &[data-bespoke-marp-osd='page'] {
+          display: inline-block;
+          min-width: 140px;
+          text-align: center;
+        }
+      }
+
+      > button {
+        appearance: none;
+        background-color: transparent;
+        border: 0;
+        color: inherit;
+        cursor: pointer;
+        font-size: inherit;
+        opacity: 0.8;
+        outline: none;
+        padding: 0;
+        transition: opacity 0.2s linear;
+
+        -webkit-tap-highlight-color: transparent;
+
+        &:hover {
+          opacity: 1;
+
+          &:active {
+            opacity: 0.6;
+          }
+
+          &:not(:disabled) {
+            transition: none;
+          }
+        }
+
+        &:disabled {
+          cursor: not-allowed;
+          opacity: 0.15 !important;
+        }
+
+        @mixin icon-button($icon, $size: 32px) {
+          background-size: contain;
+          background: transparent url($icon) no-repeat center center;
+          height: $size;
+          overflow: hidden;
+          text-indent: 100%;
+          white-space: nowrap;
+          width: $size;
+        }
+
+        &[data-bespoke-marp-osd='prev'] {
+          @include icon-button('../../assets/osd-prev.svg');
+        }
+
+        &[data-bespoke-marp-osd='next'] {
+          @include icon-button('../../assets/osd-next.svg');
+        }
+
+        &[data-bespoke-marp-osd='fullscreen'] {
+          @include icon-button('../../assets/osd-fullscreen.svg');
+
+          &.exit {
+            background-image: url('../../assets//osd-fullscreen-exit.svg');
+          }
+        }
       }
     }
 
@@ -56,10 +124,7 @@ $progressHeight: 5px;
 
       > .bespoke-marp-osd {
         opacity: 0;
-
-        [data-bespoke-marp-osd] {
-          pointer-events: none;
-        }
+        pointer-events: none;
       }
     }
   }

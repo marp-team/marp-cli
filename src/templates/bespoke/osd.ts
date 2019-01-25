@@ -10,13 +10,21 @@ export default function bespokeOSD(selector: string = '.bespoke-marp-osd') {
       )
   }
 
-  // Hide fullscreen button in not-supported browser (e.g. phone device)
-  if (!screenfull.enabled) {
+  const osdElements = <T extends HTMLElement = HTMLElement>(
+    type: string,
+    callback: (element: T) => void
+  ) => {
     Array.from(
-      osd.querySelectorAll<HTMLElement>('[data-bespoke-marp-osd="fullscreen"]'),
-      btn => (btn.style.display = 'none')
+      osd.querySelectorAll<T>(
+        `[data-bespoke-marp-osd=${JSON.stringify(type)}]`
+      ),
+      callback
     )
   }
+
+  // Hide fullscreen button in not-supported browser (e.g. phone device)
+  if (!screenfull.enabled)
+    osdElements('fullscreen', btn => (btn.style.display = 'none'))
 
   return deck => {
     osd.addEventListener('click', e => {
@@ -36,5 +44,26 @@ export default function bespokeOSD(selector: string = '.bespoke-marp-osd') {
     })
 
     deck.parent.appendChild(osd)
+
+    deck.on('activate', ({ index }) => {
+      osdElements(
+        'page',
+        page => (page.innerText = `Page ${index + 1} of ${deck.slides.length}`)
+      )
+
+      osdElements<HTMLButtonElement>(
+        'prev',
+        prev => (prev.disabled = index === 0)
+      )
+
+      osdElements<HTMLButtonElement>(
+        'next',
+        next => (next.disabled = index === deck.slides.length - 1)
+      )
+    })
+
+    deck.on('fullscreen', enabled =>
+      osdElements('fullscreen', fs => fs.classList.toggle('exit', enabled))
+    )
   }
 }
