@@ -33,7 +33,7 @@ export class Preview extends TypedEventEmitter<Preview.Events> {
 
       // Workaround for unresolved close event in Windows
       // @see https://github.com/GoogleChromeLabs/carlo/issues/108
-      if (this.carlo.windows().length === 0) {
+      if (process.platform === 'win32' && this.carlo.windows().length === 0) {
         const browser = this.carlo.browserForTest()
         terminate(browser.process().pid)
       }
