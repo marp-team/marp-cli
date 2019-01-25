@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v0.3.1 - 2019-01-25
+
 ### Fixed
 
 - Fix blank PDF generated in Chrome >= 73 ([#61](https://github.com/marp-team/marp-cli/pull/61) by [@kamijin-fanta](https://github.com/kamijin-fanta))
