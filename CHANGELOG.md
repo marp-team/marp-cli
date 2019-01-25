@@ -5,6 +5,7 @@
 ### Fixed
 
 - Fix blank PDF generated in Chrome >= 73 ([#61](https://github.com/marp-team/marp-cli/pull/61) by [@kamijin-fanta](https://github.com/kamijin-fanta))
+- Fix failed test in other platform by Windows workaround for Carlo ([#63](https://github.com/marp-team/marp-cli/pull/63))
 
 ## v0.3.0 - 2019-01-21
 
