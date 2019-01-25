@@ -8,6 +8,7 @@ import bespoke from '../../src/templates/bespoke/bespoke'
 jest.mock('screenfull')
 jest.useFakeTimers()
 
+beforeEach(() => jest.spyOn(console, 'error').mockImplementation())
 afterEach(() => jest.restoreAllMocks())
 
 describe("Bespoke template's browser context", () => {
@@ -42,17 +43,17 @@ describe("Bespoke template's browser context", () => {
     })
   })
 
-  describe('Cursor', () => {
-    it('adds bespoke-marp-cursor-inactive class after 2000ms', () => {
+  describe('Inactive', () => {
+    it('adds bespoke-marp-inactive class after 2000ms', () => {
       const parent = render()
       bespoke()
 
       // Add inactive class after 2000 ms
       jest.advanceTimersByTime(1999)
-      expect(parent.className).not.toContain('bespoke-marp-cursor-inactive')
+      expect(parent.className).not.toContain('bespoke-marp-inactive')
 
       jest.advanceTimersByTime(1)
-      expect(parent.className).toContain('bespoke-marp-cursor-inactive')
+      expect(parent.className).toContain('bespoke-marp-inactive')
     })
 
     it('resets timer when mouse is activated', () => {
@@ -67,23 +68,23 @@ describe("Bespoke template's browser context", () => {
       document.dispatchEvent(mousedown)
 
       jest.advanceTimersByTime(1999)
-      expect(parent.className).not.toContain('bespoke-marp-cursor-inactive')
+      expect(parent.className).not.toContain('bespoke-marp-inactive')
 
       jest.advanceTimersByTime(1)
-      expect(parent.className).toContain('bespoke-marp-cursor-inactive')
+      expect(parent.className).toContain('bespoke-marp-inactive')
 
       // Trigger mousemove
       const mousemove = document.createEvent('MouseEvents')
       mousemove.initEvent('mousemove', true, true)
       document.dispatchEvent(mousemove)
 
-      expect(parent.className).not.toContain('bespoke-marp-cursor-inactive')
+      expect(parent.className).not.toContain('bespoke-marp-inactive')
 
       jest.advanceTimersByTime(1999)
-      expect(parent.className).not.toContain('bespoke-marp-cursor-inactive')
+      expect(parent.className).not.toContain('bespoke-marp-inactive')
 
       jest.advanceTimersByTime(1)
-      expect(parent.className).toContain('bespoke-marp-cursor-inactive')
+      expect(parent.className).toContain('bespoke-marp-inactive')
     })
   })
 
@@ -333,6 +334,7 @@ describe("Bespoke template's browser context", () => {
       return parent[type]({
         touches: touches.map(t => ({ pageX: t[0], pageY: t[1] })),
         preventDefault: jest.fn(),
+        stopPropagation: jest.fn(),
       })
     }
 
