@@ -132,7 +132,7 @@ export class Converter {
 
     const uri = tmpFile
       ? `file://${tmpFile.path}`
-      : `data:text/html,${file.buffer!.toString()}`
+      : `data:text/html;base64,${file.buffer!.toString('base64')}`
 
     try {
       const browser = await Converter.runBrowser()
