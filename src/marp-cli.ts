@@ -92,6 +92,7 @@ export default async function(argv: string[] = []): Promise<number> {
         },
         template: {
           describe: 'Choose template',
+          defaultDescription: 'bespoke',
           group: OptionGroup.Converter,
           choices: Object.keys(templates),
           type: 'string',
@@ -103,12 +104,14 @@ export default async function(argv: string[] = []): Promise<number> {
           type: 'boolean',
         },
         'bespoke-osc': {
-          describe: 'Bespoke: Toggle on-screen control',
+          describe: '[Bespoke] Toggle on-screen controller',
+          defaultDescription: 'true',
           group: OptionGroup.Template,
           type: 'boolean',
         },
         'bespoke-progress': {
-          describe: 'Bespoke: Toggle progress bar',
+          describe: '[Bespoke] Toggle progress bar',
+          defaultDescription: 'false',
           group: OptionGroup.Template,
           type: 'boolean',
         },
