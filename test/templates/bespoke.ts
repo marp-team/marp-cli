@@ -42,6 +42,52 @@ describe("Bespoke template's browser context", () => {
     })
   })
 
+  describe('Fullscreen', () => {
+    let deck
+
+    beforeEach(() => {
+      render()
+      deck = bespoke()
+    })
+
+    it('injects deck.fullscreen() to toggle fullscreen and emit event', async () => {
+      const event = jest.fn()
+      deck.on('fullscreen', event)
+
+      await deck.fullscreen()
+      expect(screenfull.toggle).toBeCalled()
+      expect(event).toBeCalled()
+    })
+
+    it('toggles fullscreen by hitting f key', () => {
+      keydown({ which: Key.F })
+      expect(screenfull.toggle).toBeCalled()
+    })
+
+    it('toggles fullscreen by hitting F11 key', () => {
+      keydown({ which: Key.F11 })
+      expect(screenfull.toggle).toBeCalled()
+    })
+  })
+
+  describe('Hash', () => {
+    it('activates initial page by hash index', () => {
+      location.href = 'http://localhost/#2'
+
+      render()
+      const deck = bespoke()
+
+      jest.runAllTimers()
+      expect(deck.slide()).toBe(1)
+
+      // Navigate by anchor
+      location.hash = '#3'
+      window.dispatchEvent(new HashChangeEvent('hashchange'))
+
+      expect(deck.slide()).toBe(2)
+    })
+  })
+
   describe('Inactive', () => {
     it('adds bespoke-marp-inactive class after 2000ms', () => {
       const parent = render()
@@ -84,41 +130,6 @@ describe("Bespoke template's browser context", () => {
 
       jest.advanceTimersByTime(1)
       expect(parent.className).toContain('bespoke-marp-inactive')
-    })
-  })
-
-  describe('Fullscreen', () => {
-    beforeEach(() => {
-      render()
-      bespoke()
-    })
-
-    it('toggles fullscreen by hitting f key', () => {
-      keydown({ which: Key.F })
-      expect(screenfull.toggle).toBeCalled()
-    })
-
-    it('toggles fullscreen by hitting F11 key', () => {
-      keydown({ which: Key.F11 })
-      expect(screenfull.toggle).toBeCalled()
-    })
-  })
-
-  describe('Hash', () => {
-    it('activates initial page by hash index', () => {
-      location.href = 'http://localhost/#2'
-
-      render()
-      const deck = bespoke()
-
-      jest.runAllTimers()
-      expect(deck.slide()).toBe(1)
-
-      // Navigate by anchor
-      location.hash = '#3'
-      window.dispatchEvent(new HashChangeEvent('hashchange'))
-
-      expect(deck.slide()).toBe(2)
     })
   })
 
@@ -267,6 +278,96 @@ describe("Bespoke template's browser context", () => {
         })
       })
     })
+  })
+
+  describe('On-screen control', () => {
+    let osc: HTMLDivElement
+
+    beforeEach(() => render())
+
+    context(
+      'when document has an element that has bespoke-marp-osc class',
+      () => {
+        beforeEach(() => {
+          osc = document.createElement('div')
+          osc.className = 'bespoke-marp-osc'
+          osc.innerHTML = `
+            <span data-bespoke-marp-osc="page"></span>
+            <button data-bespoke-marp-osc="prev">Prev</button>
+            <button data-bespoke-marp-osc="next">Next</button>
+            <button data-bespoke-marp-osc="fullscreen">Toggle fullscreen</button>
+          `
+
+          document.body.appendChild(osc)
+        })
+
+        it('moves OSC container in parent element of bespoke', () => {
+          const deck = bespoke()
+          expect(osc.parentElement).toBe(deck.parent)
+        })
+
+        it('updates page number by navigation', () => {
+          const deck = bespoke()
+          const page = osc.querySelector('[data-bespoke-marp-osc="page"]')!
+          expect(page.textContent).toBe('Page 1 of 3')
+
+          deck.next()
+          expect(page.textContent).toBe('Page 2 of 3')
+        })
+
+        it('navigates slide deck when clicked next and prev button', () => {
+          const deck = bespoke()
+          const prev = osc.querySelector<HTMLButtonElement>(
+            'button[data-bespoke-marp-osc="prev"]'
+          )!
+          const next = osc.querySelector<HTMLButtonElement>(
+            'button[data-bespoke-marp-osc="next"]'
+          )!
+
+          expect(deck.slide()).toBe(0)
+          expect(prev.disabled).toBe(true)
+
+          next.click()
+          expect(deck.slide()).toBe(1)
+          expect(prev.disabled).toBe(false)
+
+          next.click()
+          expect(deck.slide()).toBe(2)
+          expect(next.disabled).toBe(true)
+
+          prev.click()
+          expect(deck.slide()).toBe(1)
+          expect(next.disabled).toBe(false)
+        })
+
+        it('calls deck.fullscreen() when clicked fullscreen button', () => {
+          const deck = bespoke()
+          const fullscreen = jest.spyOn(deck, 'fullscreen')
+          const button = osc.querySelector<HTMLButtonElement>(
+            'button[data-bespoke-marp-osc="fullscreen"]'
+          )!
+
+          button.click()
+          expect(fullscreen).toBeCalled()
+        })
+
+        context('when browser does not support fullscreen', () => {
+          it('hides fullscreen button', () => {
+            jest
+              .spyOn(screenfull, 'enabled', 'get')
+              .mockImplementation(() => false)
+
+            bespoke()
+
+            const button = osc.querySelector<HTMLButtonElement>(
+              'button[data-bespoke-marp-osc="fullscreen"]'
+            )!
+
+            expect(button.style.display).toBe('none')
+          })
+        })
+      }
+    )
   })
 
   describe('Progress', () => {

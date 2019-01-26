@@ -39,7 +39,8 @@ export default function bespokeOSC(selector: string = '.bespoke-marp-osc') {
     deck.on('activate', ({ index }) => {
       oscElements(
         'page',
-        page => (page.innerText = `Page ${index + 1} of ${deck.slides.length}`)
+        page =>
+          (page.textContent = `Page ${index + 1} of ${deck.slides.length}`)
       )
 
       oscElements<HTMLButtonElement>(
