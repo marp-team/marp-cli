@@ -20,6 +20,7 @@ const marpitVersion = require('@marp-team/marpit/package.json').version
 const previewEmitter = new EventEmitter()
 
 jest.mock('fs')
+jest.mock('get-stdin')
 jest.mock('mkdirp')
 jest.mock('../src/preview')
 jest.mock('../src/watcher', () => jest.genMockFromModule('../src/watcher'))
