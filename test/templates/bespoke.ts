@@ -8,7 +8,6 @@ import bespoke from '../../src/templates/bespoke/bespoke'
 jest.mock('screenfull')
 jest.useFakeTimers()
 
-beforeEach(() => jest.spyOn(console, 'error').mockImplementation())
 afterEach(() => jest.restoreAllMocks())
 
 describe("Bespoke template's browser context", () => {

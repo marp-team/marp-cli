@@ -1,22 +1,16 @@
 import screenfull from 'screenfull'
 
-export default function bespokeOSD(selector: string = '.bespoke-marp-osd') {
-  const osd = document.querySelector(selector)
+export default function bespokeOSC(selector: string = '.bespoke-marp-osc') {
+  const osc = document.querySelector(selector)
+  if (!osc) return () => {}
 
-  if (!osd) {
-    return () =>
-      console.error(
-        `Bespoke Marp OSD plugin cannot find target selector: ${selector}`
-      )
-  }
-
-  const osdElements = <T extends HTMLElement = HTMLElement>(
+  const oscElements = <T extends HTMLElement = HTMLElement>(
     type: string,
     callback: (element: T) => void
   ) => {
     Array.from(
-      osd.querySelectorAll<T>(
-        `[data-bespoke-marp-osd=${JSON.stringify(type)}]`
+      osc.querySelectorAll<T>(
+        `[data-bespoke-marp-osc=${JSON.stringify(type)}]`
       ),
       callback
     )
@@ -24,12 +18,12 @@ export default function bespokeOSD(selector: string = '.bespoke-marp-osd') {
 
   // Hide fullscreen button in not-supported browser (e.g. phone device)
   if (!screenfull.enabled)
-    osdElements('fullscreen', btn => (btn.style.display = 'none'))
+    oscElements('fullscreen', btn => (btn.style.display = 'none'))
 
   return deck => {
-    osd.addEventListener('click', e => {
+    osc.addEventListener('click', e => {
       if (e.target instanceof HTMLElement) {
-        switch (e.target.dataset.bespokeMarpOsd) {
+        switch (e.target.dataset.bespokeMarpOsc) {
           case 'next':
             deck.next()
             break
@@ -43,27 +37,27 @@ export default function bespokeOSD(selector: string = '.bespoke-marp-osd') {
       }
     })
 
-    deck.parent.appendChild(osd)
+    deck.parent.appendChild(osc)
 
     deck.on('activate', ({ index }) => {
-      osdElements(
+      oscElements(
         'page',
         page => (page.innerText = `Page ${index + 1} of ${deck.slides.length}`)
       )
 
-      osdElements<HTMLButtonElement>(
+      oscElements<HTMLButtonElement>(
         'prev',
         prev => (prev.disabled = index === 0)
       )
 
-      osdElements<HTMLButtonElement>(
+      oscElements<HTMLButtonElement>(
         'next',
         next => (next.disabled = index === deck.slides.length - 1)
       )
     })
 
     deck.on('fullscreen', enabled =>
-      osdElements('fullscreen', fs => fs.classList.toggle('exit', enabled))
+      oscElements('fullscreen', fs => fs.classList.toggle('exit', enabled))
     )
   }
 }

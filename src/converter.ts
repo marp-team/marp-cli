@@ -6,7 +6,7 @@ import { warn } from './cli'
 import { Engine } from './engine'
 import { error } from './error'
 import { File, FileType } from './file'
-import templates, { TemplateResult } from './templates/'
+import templates, { TemplateOption, TemplateResult } from './templates/'
 import { ThemeSet } from './theme'
 import { notifier } from './watcher'
 
@@ -27,6 +27,7 @@ export interface ConverterOption {
   readyScript?: string
   server?: boolean
   template: string
+  templateOption: TemplateOption
   theme?: string
   themeSet: ThemeSet
   type: ConvertType
@@ -69,6 +70,7 @@ export class Converter {
       : ''
 
     return await this.template({
+      ...this.options.templateOption,
       lang,
       readyScript,
       base: isFile && type === ConvertType.pdf ? file!.absolutePath : undefined,

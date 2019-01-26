@@ -10,13 +10,16 @@ import { ConverterOption, ConvertType } from './converter'
 import resolveEngine, { ResolvableEngine, ResolvedEngine } from './engine'
 import { CLIError } from './error'
 import { Theme, ThemeSet } from './theme'
+import { TemplateOption } from './templates'
 
 const lstat = promisify(fs.lstat)
 
 type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 type Overwrite<T, U> = Omit<T, Extract<keyof T, keyof U>> & U
 
-export interface IMarpCLIArguments {
+export type IMarpCLIArguments = IMarpCLIBaseArguments & IMarpCLIBespokeArguments
+
+interface IMarpCLIBaseArguments {
   _?: string[]
   allowLocalFiles?: boolean
   configFile?: string
@@ -33,9 +36,18 @@ export interface IMarpCLIArguments {
   watch?: boolean
 }
 
+interface IMarpCLIBespokeArguments {
+  bespokeOsc?: boolean
+  bespokeProgress?: boolean
+}
+
 export type IMarpCLIConfig = Overwrite<
-  Omit<IMarpCLIArguments, 'configFile' | '_'>,
+  Omit<IMarpCLIBaseArguments, 'configFile' | '_'>,
   {
+    bespoke?: {
+      osc?: boolean
+      progress?: boolean
+    }
     engine?: ResolvableEngine | ResolvableEngine[]
     html?: ConverterOption['html']
     lang?: string
@@ -84,6 +96,22 @@ export class MarpCLIConfig {
 
     const server = this.pickDefined(this.args.server, this.conf.server) || false
 
+    const template = this.args.template || this.conf.template || 'bespoke'
+    const templateOption: TemplateOption = (() => {
+      if (template === 'bespoke') {
+        const bespoke = this.conf.bespoke || {}
+
+        return {
+          osc: this.pickDefined(this.args.bespokeOsc, bespoke.osc),
+          progress: this.pickDefined(
+            this.args.bespokeProgress,
+            bespoke.progress
+          ),
+        }
+      }
+      return {}
+    })()
+
     const theme = await this.loadTheme()
     const initialThemes = theme instanceof Theme ? [theme] : []
 
@@ -125,6 +153,8 @@ export class MarpCLIConfig {
       output,
       preview,
       server,
+      template,
+      templateOption,
       themeSet,
       allowLocalFiles:
         this.pickDefined(
@@ -138,7 +168,6 @@ export class MarpCLIConfig {
       readyScript: this.engine.browserScript
         ? `<script>${this.engine.browserScript}</script>`
         : undefined,
-      template: this.args.template || this.conf.template || 'bespoke',
       theme: theme instanceof Theme ? theme.name : theme,
       type:
         this.args.pdf ||

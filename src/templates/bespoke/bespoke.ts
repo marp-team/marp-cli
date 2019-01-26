@@ -5,7 +5,7 @@ import bespokeInactive from './inactive'
 import bespokeFullscreen from './fullscreen'
 import bespokeHash from './hash'
 import bespokeNavigation from './navigation'
-import bespokeOSD from './osd'
+import bespokeOSC from './osc'
 import bespokeProgress from './progress'
 import bespokeTouch from './touch'
 
@@ -19,6 +19,6 @@ export default function() {
     bespokeFullscreen,
     bespokeProgress,
     bespokeTouch(),
-    bespokeOSD(),
+    bespokeOSC(),
   ])
 }

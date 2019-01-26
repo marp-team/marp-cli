@@ -15,6 +15,7 @@ import watcher, { Watcher } from './watcher'
 enum OptionGroup {
   Basic = 'Basic Options:',
   Converter = 'Converter Options:',
+  Template = 'Template Options:',
   Marp = 'Marp / Marpit Options:',
 }
 
@@ -99,6 +100,16 @@ export default async function(argv: string[] = []): Promise<number> {
           describe:
             'Allow to access local files from Markdown while converting PDF (NOT SECURE)',
           group: OptionGroup.Converter,
+          type: 'boolean',
+        },
+        'bespoke-osc': {
+          describe: 'Bespoke: Toggle on-screen control',
+          group: OptionGroup.Template,
+          type: 'boolean',
+        },
+        'bespoke-progress': {
+          describe: 'Bespoke: Toggle progress bar',
+          group: OptionGroup.Template,
           type: 'boolean',
         },
         engine: {

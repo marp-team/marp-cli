@@ -9,7 +9,7 @@ $progressHeight: 5px;
     overflow: hidden;
   }
 
-  .bespoke-marp-osd {
+  .bespoke-marp-osc {
     display: none;
     opacity: 0;
   }
@@ -21,7 +21,7 @@ $progressHeight: 5px;
     right: 0;
     top: 0;
 
-    > .bespoke-marp-osd {
+    > .bespoke-marp-osc {
       background: rgba(#000, 0.65);
       border-radius: 7px;
       bottom: 50px;
@@ -52,7 +52,7 @@ $progressHeight: 5px;
       > span {
         opacity: 0.8;
 
-        &[data-bespoke-marp-osd='page'] {
+        &[data-bespoke-marp-osc='page'] {
           display: inline-block;
           min-width: 140px;
           text-align: center;
@@ -99,19 +99,19 @@ $progressHeight: 5px;
           width: $size;
         }
 
-        &[data-bespoke-marp-osd='prev'] {
-          @include icon-button('../../assets/osd-prev.svg');
+        &[data-bespoke-marp-osc='prev'] {
+          @include icon-button('../../assets/osc-prev.svg');
         }
 
-        &[data-bespoke-marp-osd='next'] {
-          @include icon-button('../../assets/osd-next.svg');
+        &[data-bespoke-marp-osc='next'] {
+          @include icon-button('../../assets/osc-next.svg');
         }
 
-        &[data-bespoke-marp-osd='fullscreen'] {
-          @include icon-button('../../assets/osd-fullscreen.svg');
+        &[data-bespoke-marp-osc='fullscreen'] {
+          @include icon-button('../../assets/osc-fullscreen.svg');
 
           &.exit {
-            background-image: url('../../assets//osd-fullscreen-exit.svg');
+            background-image: url('../../assets//osc-fullscreen-exit.svg');
           }
         }
       }
@@ -120,7 +120,7 @@ $progressHeight: 5px;
     &.bespoke-marp-inactive {
       cursor: none;
 
-      > .bespoke-marp-osd {
+      > .bespoke-marp-osc {
         opacity: 0;
         pointer-events: none;
       }
@@ -161,7 +161,7 @@ $progressHeight: 5px;
 }
 
 @media print {
-  .bespoke-marp-osd,
+  .bespoke-marp-osc,
   .bespoke-progress-parent {
     display: none !important;
     transition: none !important;
