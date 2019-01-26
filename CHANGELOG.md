@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Reflect the correct fullscreen icon in bespoke template ([#65](https://github.com/marp-team/marp-cli/pull/65))
+
 ## v0.4.0 - 2019-01-26
 
 ### Added
