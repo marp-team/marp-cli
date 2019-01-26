@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v0.4.0 - 2019-01-26
+
 ### Added
 
 - Add a touch-friendly OSC (On-screen controller) to bespoke template ([#62](https://github.com/marp-team/marp-cli/pull/62))
