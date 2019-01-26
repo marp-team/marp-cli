@@ -50,13 +50,9 @@ describe("Bespoke template's browser context", () => {
       deck = bespoke()
     })
 
-    it('injects deck.fullscreen() to toggle fullscreen and emit event', async () => {
-      const event = jest.fn()
-      deck.on('fullscreen', event)
-
+    it('injects deck.fullscreen() to toggle fullscreen', async () => {
       await deck.fullscreen()
       expect(screenfull.toggle).toBeCalled()
-      expect(event).toBeCalled()
     })
 
     it('toggles fullscreen by hitting f key', () => {

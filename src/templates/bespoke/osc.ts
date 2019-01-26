@@ -54,8 +54,10 @@ export default function bespokeOSC(selector: string = '.bespoke-marp-osc') {
       )
     })
 
-    deck.on('fullscreen', enabled =>
-      oscElements('fullscreen', fs => fs.classList.toggle('exit', enabled))
+    screenfull.onchange(() =>
+      oscElements('fullscreen', fs =>
+        fs.classList.toggle('exit', screenfull.isFullscreen)
+      )
     )
   }
 }
