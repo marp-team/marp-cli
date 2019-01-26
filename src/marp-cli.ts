@@ -90,18 +90,18 @@ export default async function(argv: string[] = []): Promise<number> {
           group: OptionGroup.Converter,
           type: 'boolean',
         },
-        template: {
-          describe: 'Choose template',
-          defaultDescription: 'bespoke',
-          group: OptionGroup.Converter,
-          choices: Object.keys(templates),
-          type: 'string',
-        },
         'allow-local-files': {
           describe:
             'Allow to access local files from Markdown while converting PDF (NOT SECURE)',
           group: OptionGroup.Converter,
           type: 'boolean',
+        },
+        template: {
+          describe: 'Choose template',
+          defaultDescription: 'bespoke',
+          group: OptionGroup.Template,
+          choices: Object.keys(templates),
+          type: 'string',
         },
         'bespoke-osc': {
           describe: '[Bespoke] Toggle on-screen controller',
