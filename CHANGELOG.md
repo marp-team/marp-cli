@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Added
+
+- Add a touch-friendly OSC (On-screen controller) to bespoke template ([#62](https://github.com/marp-team/marp-cli/pull/62))
+- Make bespoke template's OSC and progress bar configurable ([#62](https://github.com/marp-team/marp-cli/pull/62))
+
 ## v0.3.1 - 2019-01-25
 
 ### Fixed
