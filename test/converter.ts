@@ -32,6 +32,7 @@ describe('Converter', () => {
       options: {},
       server: false,
       template: 'bare',
+      templateOption: {},
       type: ConvertType.html,
       watch: false,
       ...opts,
@@ -47,6 +48,7 @@ describe('Converter', () => {
         options: <MarpitOptions>{ html: true },
         server: false,
         template: 'test-template',
+        templateOption: {},
         type: ConvertType.html,
         watch: false,
       }

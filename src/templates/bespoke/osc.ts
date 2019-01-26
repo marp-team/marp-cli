@@ -6,14 +6,11 @@ export default function bespokeOSC(selector: string = '.bespoke-marp-osc') {
 
   const oscElements = <T extends HTMLElement = HTMLElement>(
     type: string,
-    callback: (element: T) => void
+    callback: (element: T, index?: number) => void
   ) => {
-    Array.from(
-      osc.querySelectorAll<T>(
-        `[data-bespoke-marp-osc=${JSON.stringify(type)}]`
-      ),
-      callback
-    )
+    osc
+      .querySelectorAll<T>(`[data-bespoke-marp-osc=${JSON.stringify(type)}]`)
+      .forEach(callback)
   }
 
   // Hide fullscreen button in not-supported browser (e.g. phone device)

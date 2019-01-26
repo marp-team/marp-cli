@@ -27,7 +27,7 @@ export interface ConverterOption {
   readyScript?: string
   server?: boolean
   template: string
-  templateOption: TemplateOption
+  templateOption?: TemplateOption
   theme?: string
   themeSet: ThemeSet
   type: ConvertType
@@ -70,7 +70,7 @@ export class Converter {
       : ''
 
     return await this.template({
-      ...this.options.templateOption,
+      ...(this.options.templateOption || {}),
       lang,
       readyScript,
       base: isFile && type === ConvertType.pdf ? file!.absolutePath : undefined,
