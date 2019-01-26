@@ -308,8 +308,8 @@ By default we use configuration file that is placed on current directory, but yo
 | :----------------: | :-------------------------: | :-------------------: | :----------------------------------------------------------------------------------------------------- |
 | `allowLocalFiles`  |           boolean           | `--allow-local-files` | Allow to access local files from Markdown while converting PDF _(NOT SECURE)_                          |
 |     `bespoke`      |           object            |                       | Setting options for `bespoke` template                                                                 |
-|   `bespoke.osc`    |           boolean           |    `--bespoke-osc`    | \[Bespoke\] Toggle on-screen control (`true` by default)                                               |
-| `bespoke.progress` |           boolean           | `--bespoke-progress`  | \[Bespoke\] Toggle progress bar (`false` by default)                                                   |
+|   `bespoke.osc`    |           boolean           |    `--bespoke-osc`    | \[Bespoke\] Use on-screen controller (`true` by default)                                               |
+| `bespoke.progress` |           boolean           | `--bespoke-progress`  | \[Bespoke\] Use progress bar (`false` by default)                                                      |
 |      `engine`      | string \| Class \| Function |      `--engine`       | Specify Marpit based engine                                                                            |
 |       `html`       |      boolean \| object      |       `--html`        | Enable or disable HTML (Configuration file can pass [the whitelist object] if you are using Marp Core) |
 |     `inputDir`     |           string            |  `--input-dir` `-I`   | The base directory to find markdown and theme CSS                                                      |

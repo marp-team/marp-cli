@@ -104,13 +104,13 @@ export default async function(argv: string[] = []): Promise<number> {
           type: 'string',
         },
         'bespoke-osc': {
-          describe: '[Bespoke] Toggle on-screen controller',
+          describe: '[Bespoke] Use on-screen controller',
           defaultDescription: 'true',
           group: OptionGroup.Template,
           type: 'boolean',
         },
         'bespoke-progress': {
-          describe: '[Bespoke] Toggle progress bar',
+          describe: '[Bespoke] Use progress bar',
           defaultDescription: 'false',
           group: OptionGroup.Template,
           type: 'boolean',
