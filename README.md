@@ -156,12 +156,14 @@ marp --template bespoke slide-deck.md
 
 ### `bespoke` template (default)
 
-The `bespoke` template is using [Bespoke.js](https://github.com/bespokejs/bespoke) as the name implies. It has several features to be useful in a real presentation.
+The `bespoke` template is using [Bespoke.js](https://github.com/bespokejs/bespoke) as the name implies. It has several features to be useful in a real presentation. A few features may control by CLI options.
 
 #### Features
 
-- **Navigation**: Navigate the deck through keyboard or swipe geasture.
-- Progress bar _(Not ready to use)_ <!-- It has already implemented but currently user cannot control to show progress bar. -->
+- **Navigation**: Navigate the deck through keyboard and swipe geasture.
+- **Fullscreen**: Toggle fullscreen by hitting <kbd>f</kbd> / <kbd>F11</kbd> key.
+- **On-screen controller**: There is a touch-friendly OSC. You may also disable by `--bespoke-osc=false` if unneccesary.
+- **Progress bar** (optional): By setting `--bespoke-progress` option, you can add a progress bar on the top of the deck.
 
 ### `bare` template
 
@@ -302,22 +304,25 @@ By default we use configuration file that is placed on current directory, but yo
 
 ### Options
 
-|        Key        |            Type             |      CLI option       | Description                                                                                            |
-| :---------------: | :-------------------------: | :-------------------: | :----------------------------------------------------------------------------------------------------- |
-| `allowLocalFiles` |           boolean           | `--allow-local-files` | Allow to access local files from Markdown while converting PDF _(NOT SECURE)_                          |
-|     `engine`      | string \| Class \| Function |      `--engine`       | Specify Marpit based engine                                                                            |
-|      `html`       |      boolean \| object      |       `--html`        | Enable or disable HTML (Configuration file can pass [the whitelist object] if you are using Marp Core) |
-|    `inputDir`     |           string            |  `--input-dir` `-I`   | The base directory to find markdown and theme CSS                                                      |
-|      `lang`       |           string            |                       | Define the language of converted HTML                                                                  |
-|     `options`     |           object            |                       | The base options for the constructor of engine                                                         |
-|     `output`      |           string            |    `--output` `-o`    | Output file path (or directory when input-dir is passed)                                               |
-|       `pdf`       |           boolean           |        `--pdf`        | Convert slide deck into PDF                                                                            |
-|     `preview`     |           boolean           |   `--preview` `-p`    | Open preview window _(EXPERIMENTAL)_                                                                   |
-|     `server`      |           boolean           |    `--server` `-s`    | Enable server mode                                                                                     |
-|    `template`     |           string            |     `--template`      | Choose template                                                                                        |
-|      `theme`      |           string            |       `--theme`       | Override theme by name or CSS file                                                                     |
-|    `themeSet`     |     string \| string[]      |     `--theme-set`     | Path to additional theme CSS files                                                                     |
-|      `watch`      |           boolean           |    `--watch` `-w`     | Watch input markdowns for changes                                                                      |
+|        Key         |            Type             |      CLI option       | Description                                                                                            |
+| :----------------: | :-------------------------: | :-------------------: | :----------------------------------------------------------------------------------------------------- |
+| `allowLocalFiles`  |           boolean           | `--allow-local-files` | Allow to access local files from Markdown while converting PDF _(NOT SECURE)_                          |
+|     `bespoke`      |           object            |                       | Setting options for `bespoke` template                                                                 |
+|   `bespoke.osc`    |           boolean           |    `--bespoke-osc`    | \[Bespoke\] Use on-screen controller (`true` by default)                                               |
+| `bespoke.progress` |           boolean           | `--bespoke-progress`  | \[Bespoke\] Use progress bar (`false` by default)                                                      |
+|      `engine`      | string \| Class \| Function |      `--engine`       | Specify Marpit based engine                                                                            |
+|       `html`       |      boolean \| object      |       `--html`        | Enable or disable HTML (Configuration file can pass [the whitelist object] if you are using Marp Core) |
+|     `inputDir`     |           string            |  `--input-dir` `-I`   | The base directory to find markdown and theme CSS                                                      |
+|       `lang`       |           string            |                       | Define the language of converted HTML                                                                  |
+|     `options`      |           object            |                       | The base options for the constructor of engine                                                         |
+|      `output`      |           string            |    `--output` `-o`    | Output file path (or directory when input-dir is passed)                                               |
+|       `pdf`        |           boolean           |        `--pdf`        | Convert slide deck into PDF                                                                            |
+|     `preview`      |           boolean           |   `--preview` `-p`    | Open preview window _(EXPERIMENTAL)_                                                                   |
+|      `server`      |           boolean           |    `--server` `-s`    | Enable server mode                                                                                     |
+|     `template`     |           string            |     `--template`      | Choose template                                                                                        |
+|      `theme`       |           string            |       `--theme`       | Override theme by name or CSS file                                                                     |
+|     `themeSet`     |     string \| string[]      |     `--theme-set`     | Path to additional theme CSS files                                                                     |
+|      `watch`       |           boolean           |    `--watch` `-w`     | Watch input markdowns for changes                                                                      |
 
 [the whitelist object]: https://github.com/marp-team/marp-core#html-boolean--object
 

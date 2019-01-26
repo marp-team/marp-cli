@@ -29,6 +29,7 @@ describe('Server', () => {
       inputDir: path.resolve(__dirname, '_files'),
       options: {},
       template: 'bare',
+      templateOption: {},
       type: ConvertType.html,
       server: true,
       watch: true,

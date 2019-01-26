@@ -1,4 +1,4 @@
-export default function bespokeCursor(timeout = 2000) {
+export default function bespokeInactive(timeout = 2000) {
   return deck => {
     let activeTimer
 
@@ -6,14 +6,15 @@ export default function bespokeCursor(timeout = 2000) {
       if (activeTimer) clearTimeout(activeTimer)
 
       activeTimer = setTimeout(() => {
-        deck.parent.classList.add('bespoke-marp-cursor-inactive')
+        deck.parent.classList.add('bespoke-marp-inactive')
       }, timeout)
 
-      deck.parent.classList.remove('bespoke-marp-cursor-inactive')
+      deck.parent.classList.remove('bespoke-marp-inactive')
     }
 
     document.addEventListener('mousedown', activate)
     document.addEventListener('mousemove', activate)
+    document.addEventListener('touchend', activate)
 
     setTimeout(activate, 0)
   }

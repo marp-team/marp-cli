@@ -1,4 +1,6 @@
 module.exports = {
-  enabled: true,
+  get enabled() {
+    return true
+  },
   toggle: jest.fn(() => Promise.resolve()),
 }

@@ -9,13 +9,21 @@ import bespokeScss from './bespoke/bespoke.scss'
 
 const readFile = promisify(fs.readFile)
 
-export interface TemplateOptions {
+interface TemplateCoreOption {
   base?: string
   lang: string
   notifyWS?: string
   readyScript?: string
   renderer: (tplOpts: MarpitOptions) => MarpitRenderResult
-  [prop: string]: any
+}
+
+export type TemplateOption = TemplateBareOption | TemplateBespokeOption
+
+interface TemplateBareOption {}
+
+interface TemplateBespokeOption {
+  osc?: boolean
+  progress?: boolean
 }
 
 export interface TemplateResult {
@@ -23,9 +31,9 @@ export interface TemplateResult {
   result: string
 }
 
-export type Template = (locals: TemplateOptions) => Promise<TemplateResult>
+type Template<T> = (locals: TemplateCoreOption & T) => Promise<TemplateResult>
 
-export const bare: Template = async opts => {
+export const bare: Template<TemplateBareOption> = async opts => {
   const rendered = opts.renderer({
     container: [],
     inlineSVG: true,
@@ -43,7 +51,7 @@ export const bare: Template = async opts => {
   }
 }
 
-export const bespoke: Template = async opts => {
+export const bespoke: Template<TemplateBespokeOption> = async opts => {
   const rendered = opts.renderer({
     container: new Element('article', { id: 'presentation' }),
     inlineSVG: true,
@@ -55,6 +63,12 @@ export const bespoke: Template = async opts => {
     result: bespokePug({
       ...opts,
       ...rendered,
+      bespoke: {
+        css: bespokeScss,
+        js: await libJs('bespoke.js'),
+        osc: opts.osc === undefined ? true : opts.osc,
+        progress: opts.progress,
+      },
       readyScript:
         opts.readyScript ||
         `<script>${await libJs(
@@ -62,27 +76,20 @@ export const bespoke: Template = async opts => {
             '@marp-team/marpit-svg-polyfill/lib/polyfill.browser.js'
           )
         )}</script>`,
-      bespoke: {
-        css: bespokeScss,
-        js: await libJs('bespoke.js'),
-        progress: false,
-      },
       watchJs: await watchJs(opts.notifyWS),
     }),
   }
 }
 
-export async function libJs(fn: string) {
+async function libJs(fn: string) {
   return (await readFile(path.resolve(__dirname, fn))).toString()
 }
 
-export async function watchJs(notifyWS?: string) {
+async function watchJs(notifyWS?: string) {
   if (notifyWS === undefined) return false
 
   const watchJs = await libJs('watch.js')
   return `window.__marpCliWatchWS=${JSON.stringify(notifyWS)};${watchJs}`
 }
 
-const templates: { [name: string]: Template } = { bare, bespoke }
-
-export default templates
+export default { bare, bespoke }

@@ -51,13 +51,14 @@ export default function bespokeTouch(opts: BespokeTouchOption = {}) {
       }
     })
 
-    parent.addEventListener('touchend', () => {
+    parent.addEventListener('touchend', e => {
       if (touchStart) {
         if (touchStart.delta && touchStart.delta >= options.swipeThreshold!) {
           let radian = touchStart.radian! - options.slope!
           radian = ((radian + Math.PI) % (Math.PI * 2)) - Math.PI
 
           deck[radian < 0 ? 'next' : 'prev']()
+          e.stopPropagation()
         }
         touchStart = undefined
       }

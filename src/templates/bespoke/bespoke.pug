@@ -15,6 +15,13 @@ html(lang=lang)
       .bespoke-progress-parent
         .bespoke-progress-bar
 
+    if bespoke.osc
+      .bespoke-marp-osc
+        button(data-bespoke-marp-osc="prev" tabindex=-1 title="Previous slide") Previous slide
+        span(data-bespoke-marp-osc="page")
+        button(data-bespoke-marp-osc="next" tabindex=-1 title="Next slide") Next slide
+        button(data-bespoke-marp-osc="fullscreen" tabindex=-1 title="Toggle fullscreen (f)") Toggle fullscreen
+
     != html
     != readyScript
     script!= bespoke.js
