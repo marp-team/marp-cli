@@ -156,7 +156,7 @@ marp --template bespoke slide-deck.md
 
 ### `bespoke` template (default)
 
-The `bespoke` template is using [Bespoke.js](https://github.com/bespokejs/bespoke) as the name implies. It has several features to be useful in a real presentation.
+The `bespoke` template is using [Bespoke.js](https://github.com/bespokejs/bespoke) as the name implies. It has several features to be useful in a real presentation. A few features may control by CLI options.
 
 #### Features
 
