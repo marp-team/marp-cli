@@ -2,9 +2,17 @@
 
 ## [Unreleased]
 
+### Added
+
+- Support setting HTML metadata via global directives and CLI options ([#66](https://github.com/marp-team/marp-cli/pull/66))
+
 ### Fixed
 
 - Reflect the correct fullscreen icon in bespoke template ([#65](https://github.com/marp-team/marp-cli/pull/65))
+
+### Changed
+
+- Upgrade to [Marpit v0.7.0](https://github.com/marp-team/marpit/releases/tag/v0.7.0) and [Marp Core v0.5.2](https://github.com/marp-team/marp-core/releases/tag/v0.5.2) ([#66](https://github.com/marp-team/marp-cli/pull/66))
 
 ## v0.4.0 - 2019-01-26
 
