@@ -10,7 +10,7 @@ export default function metaPlugin(_, marpit: Marpit) {
     url: v => {
       // URL validation
       try {
-        new URL(v)
+        if (v) new URL(v)
       } catch (e) {
         warn(`Specified canonical URL is ignored since invalid URL: ${v}`)
         return {}
