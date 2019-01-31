@@ -27,7 +27,7 @@ html(lang=lang)
     meta(name="apple-mobile-web-app-capable", content="yes")
     meta(http-equiv="X-UA-Compatible", content="ie=edge")
     meta(property="og:type", content="website")
-    meta(name="twitter:card", content=image ? "summary_large_image" : "summary")
+    meta(name="twitter:card", content=title && image ? "summary_large_image" : "summary")
 
     block head
       style!= css
