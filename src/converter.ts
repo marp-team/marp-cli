@@ -2,7 +2,7 @@ import { Marp, MarpOptions } from '@marp-team/marp-core'
 import { Marpit, MarpitOptions } from '@marp-team/marpit'
 import * as chromeFinder from 'chrome-launcher/dist/chrome-finder'
 import puppeteer from 'puppeteer-core'
-import { warn } from './cli'
+import { silence, warn } from './cli'
 import { Engine } from './engine'
 import metaPlugin from './engine/meta-plugin'
 import { error } from './error'
@@ -116,19 +116,32 @@ export class Converter {
   }
 
   async convertFile(file: File, opts: ConvertFileOption = {}) {
-    const buffer = await file.load()
-    const template = await this.convert(buffer!.toString(), file)
-    const newFile = file.convert(this.options.output, this.options.type)
-    newFile.buffer = Buffer.from(template.result)
+    const emit = !(this.options.server && opts.initial)
 
-    const result: ConvertResult = { file, newFile, template }
-    if (this.options.server && opts.initial) return result
+    const convert = async (): Promise<ConvertResult> => {
+      const template = await this.convert((await file.load()).toString(), file)
+      const newFile = file.convert(this.options.output, this.options.type)
+      newFile.buffer = Buffer.from(template.result)
 
-    if (this.options.type === ConvertType.pdf)
-      await this.convertFileToPDF(newFile)
+      return { file, newFile, template }
+    }
 
-    if (!this.options.server) await newFile.save()
-    if (opts.onConverted) opts.onConverted(result)
+    let result: ConvertResult
+
+    try {
+      silence(!emit)
+      result = await convert()
+    } finally {
+      silence(false)
+    }
+
+    if (emit) {
+      if (this.options.type === ConvertType.pdf)
+        await this.convertFileToPDF(result.newFile)
+
+      if (!this.options.server) await result.newFile.save()
+      if (opts.onConverted) opts.onConverted(result)
+    }
 
     return result
   }
