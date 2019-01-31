@@ -150,15 +150,15 @@
     reflect-metadata "^0.1.12"
     tslib "^1.8.1"
 
-"@marp-team/marp-core@^0.5.1":
-  version "0.5.1"
-  resolved "https://registry.yarnpkg.com/@marp-team/marp-core/-/marp-core-0.5.1.tgz#1654ad821196903c0834e7cf658a43390ef38bc1"
-  integrity sha512-kR4B4DS091IaXJ14jMu+saEKmv+9V63A52iA9Yown5oZSUcytIBVBUuhsQ0IdO6DZ03rkhp4djoHq+lXD0ScDQ==
+"@marp-team/marp-core@^0.5.2":
+  version "0.5.2"
+  resolved "https://registry.yarnpkg.com/@marp-team/marp-core/-/marp-core-0.5.2.tgz#3fff02d94f16c9142b2e0fe692de1d9f471c4fa3"
+  integrity sha512-SgPX9GcSFqdRzbUvmbiwjv1529RysUsni9iwxCVbhwQXGUFcLRzRxjpGgu0GP3QTh14gZuJjc+px5mouGEKiVg==
   dependencies:
-    "@marp-team/marpit" "^0.6.1"
+    "@marp-team/marpit" "^0.7.0"
     "@marp-team/marpit-svg-polyfill" "^0.2.0"
     emoji-regex "^7.0.3"
-    highlight.js "^9.13.1"
+    highlight.js "^9.14.1"
     katex "^0.10.0"
     markdown-it "^8.4.2"
     markdown-it-emoji "^1.4.0"
@@ -173,17 +173,17 @@
   dependencies:
     detect-browser "^3.0.1"
 
-"@marp-team/marpit@^0.6.1":
-  version "0.6.1"
-  resolved "https://registry.yarnpkg.com/@marp-team/marpit/-/marpit-0.6.1.tgz#8cf2b91ee27ba9fe401bced8dc142486ab851932"
-  integrity sha512-LeYb+18GjpXm0ffWcs6nuE5nxDESNR+dcUTVUcCxr+c8qCGIy/NupB+6j1jui3uEZqg4ZGqCm7qdbBnlySm0lw==
+"@marp-team/marpit@^0.7.0":
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/@marp-team/marpit/-/marpit-0.7.0.tgz#bd54a3b531fd1eebe9f243f96130f8593de3148b"
+  integrity sha512-j1kNhvyZjsdV4UpO+DtcHSPiVgtNx03BP+hiYXsiTbzFAL641FSBt70QngT1nvWXmglERbp/izVcC9excbkgZQ==
   dependencies:
     color-string "^1.5.3"
     js-yaml "^3.12.1"
     lodash.kebabcase "^4.1.1"
     markdown-it "^8.4.2"
     markdown-it-front-matter "^0.1.2"
-    postcss "^7.0.13"
+    postcss "^7.0.14"
 
 "@mrmlnc/readdir-enhanced@^2.2.1":
   version "2.2.1"
@@ -2902,10 +2902,10 @@ hex-color-regex@^1.1.0:
   resolved "https://registry.yarnpkg.com/hex-color-regex/-/hex-color-regex-1.1.0.tgz#4c06fccb4602fe2602b3c93df82d7e7dbf1a8a8e"
   integrity sha512-l9sfDFsuqtOqKDsQdqrMRk0U85RZc0RtOR9yPI7mRVOa4FsR/BVnZ0shmQRM96Ji99kYZP/7hn1cedc1+ApsTQ==
 
-highlight.js@^9.13.1:
-  version "9.13.1"
-  resolved "https://registry.yarnpkg.com/highlight.js/-/highlight.js-9.13.1.tgz#054586d53a6863311168488a0f58d6c505ce641e"
-  integrity sha512-Sc28JNQNDzaH6PORtRLMvif9RSn1mYuOoX3omVjnb0+HbpPygU2ALBI0R/wsiqCb4/fcp07Gdo8g+fhtFrQl6A==
+highlight.js@^9.14.1:
+  version "9.14.1"
+  resolved "https://registry.yarnpkg.com/highlight.js/-/highlight.js-9.14.1.tgz#62bc7945692a0feb2e2f0cf7c97b6a00411d7ba0"
+  integrity sha512-UpSrdhp5jHPbrf9+/bE1p8kxZlh9QHWD24zp2jMxCP1Po9be7XH7GiK5Q00OvCBlji1FVa+nTYOkZqrBE1pcHw==
 
 home-or-tmp@^2.0.0:
   version "2.0.0"
