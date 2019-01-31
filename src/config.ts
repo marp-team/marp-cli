@@ -23,9 +23,11 @@ interface IMarpCLIBaseArguments {
   _?: string[]
   allowLocalFiles?: boolean
   configFile?: string
+  description?: string
   engine?: string
   html?: boolean
   inputDir?: string
+  ogImage?: string
   output?: string
   pdf?: boolean
   preview?: boolean
@@ -33,6 +35,8 @@ interface IMarpCLIBaseArguments {
   template?: string
   theme?: string
   themeSet?: string[]
+  title?: string
+  url?: string
   watch?: boolean
 }
 
@@ -162,13 +166,22 @@ export class MarpCLIConfig {
           this.conf.allowLocalFiles
         ) || false,
       engine: this.engine.klass,
+      globalDirectives: {
+        description: this.pickDefined(
+          this.args.description,
+          this.conf.description
+        ),
+        image: this.pickDefined(this.args.ogImage, this.conf.ogImage),
+        theme: theme instanceof Theme ? theme.name : theme,
+        title: this.pickDefined(this.args.title, this.conf.title),
+        url: this.pickDefined(this.args.url, this.conf.url),
+      },
       html: this.pickDefined(this.args.html, this.conf.html),
       lang: this.conf.lang || (await osLocale()).replace(/[_@]/g, '-'),
       options: this.conf.options || {},
       readyScript: this.engine.browserScript
         ? `<script>${this.engine.browserScript}</script>`
         : undefined,
-      theme: theme instanceof Theme ? theme.name : theme,
       type:
         this.args.pdf ||
         this.conf.pdf ||

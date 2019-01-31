@@ -14,12 +14,10 @@ interface TemplateCoreOption {
   lang: string
   notifyWS?: string
   readyScript?: string
-  renderer: (
-    tplOpts: MarpitOptions
-  ) => MarpitRenderResult & TemplateExtraRenderResult
+  renderer: (tplOpts: MarpitOptions) => MarpitRenderResult & TemplateMeta
 }
 
-interface TemplateExtraRenderResult {
+export interface TemplateMeta {
   description: string | undefined
   image: string | undefined
   title: string | undefined

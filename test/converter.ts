@@ -27,8 +27,9 @@ describe('Converter', () => {
     new Converter({
       themeSet,
       allowLocalFiles: false,
-      lang: 'en',
       engine: Marp,
+      globalDirectives: {},
+      lang: 'en',
       options: {},
       server: false,
       template: 'bare',
@@ -43,8 +44,9 @@ describe('Converter', () => {
       const options = {
         themeSet,
         allowLocalFiles: true,
-        lang: 'fr',
         engine: Marp,
+        globalDirectives: { theme: 'default' },
+        lang: 'fr',
         options: <MarpitOptions>{ html: true },
         server: false,
         template: 'test-template',
@@ -100,8 +102,11 @@ describe('Converter', () => {
       expect(result).toContain('<html lang="zh">')
     })
 
-    it("overrides theme by converter's theme option", async () => {
-      const { rendered } = await instance({ theme: 'gaia' }).convert(md)
+    it("overrides global directive by converter's globalDirectives option", async () => {
+      const { rendered } = await instance({
+        globalDirectives: { theme: 'gaia' },
+      }).convert(md)
+
       expect(rendered.css).toContain('@theme gaia')
     })
 

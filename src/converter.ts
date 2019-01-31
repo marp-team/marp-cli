@@ -9,6 +9,7 @@ import { error } from './error'
 import { File, FileType } from './file'
 import templates, {
   Template,
+  TemplateMeta,
   TemplateOption,
   TemplateResult,
 } from './templates/'
@@ -23,6 +24,7 @@ export enum ConvertType {
 export interface ConverterOption {
   allowLocalFiles: boolean
   engine: Engine
+  globalDirectives: { theme?: string } & Partial<TemplateMeta>
   html?: MarpOptions['html']
   inputDir?: string
   lang: string
@@ -33,7 +35,6 @@ export interface ConverterOption {
   server?: boolean
   template: string
   templateOption?: TemplateOption
-  theme?: string
   themeSet: ThemeSet
   type: ConvertType
   watch: boolean
@@ -67,12 +68,18 @@ export class Converter {
   }
 
   async convert(markdown: string, file?: File): Promise<TemplateResult> {
-    const { lang, readyScript, theme, type } = this.options
-
+    const { lang, readyScript, globalDirectives, type } = this.options
     const isFile = file && file.type === FileType.File
-    const additionals = theme
-      ? `\n<!-- theme: ${JSON.stringify(theme)} -->`
-      : ''
+
+    let additionals = ''
+
+    for (const directive of Object.keys(globalDirectives)) {
+      if (globalDirectives[directive] !== undefined) {
+        additionals += `\n<!-- ${directive}: ${JSON.stringify(
+          globalDirectives[directive]
+        )} -->`
+      }
+    }
 
     return await this.template({
       ...(this.options.templateOption || {}),

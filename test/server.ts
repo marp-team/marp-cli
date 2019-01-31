@@ -24,14 +24,15 @@ describe('Server', () => {
     new Converter({
       themeSet,
       allowLocalFiles: false,
-      lang: 'en',
       engine: Marp,
+      globalDirectives: {},
       inputDir: path.resolve(__dirname, '_files'),
+      lang: 'en',
       options: {},
+      server: true,
       template: 'bare',
       templateOption: {},
       type: ConvertType.html,
-      server: true,
       watch: true,
       ...opts,
     })
