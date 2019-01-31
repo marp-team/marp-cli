@@ -1,29 +1,19 @@
-doctype
-html(lang=lang)
-  head
-    if base
-      base(href=base)
+extends ../layout.pug
 
-    meta(charset="UTF-8")
-    meta(name="viewport", content="width=device-width,height=device-height,initial-scale=1.0")
-    meta(name="apple-mobile-web-app-capable", content="yes")
-    meta(http-equiv="X-UA-Compatible", content="ie=edge")
-    style!= bespoke.css
-    style!= css
-  body
-    if bespoke.progress
-      .bespoke-progress-parent
-        .bespoke-progress-bar
+prepend head
+  style!= bespoke.css
 
-    if bespoke.osc
-      .bespoke-marp-osc
-        button(data-bespoke-marp-osc="prev" tabindex=-1 title="Previous slide") Previous slide
-        span(data-bespoke-marp-osc="page")
-        button(data-bespoke-marp-osc="next" tabindex=-1 title="Next slide") Next slide
-        button(data-bespoke-marp-osc="fullscreen" tabindex=-1 title="Toggle fullscreen (f)") Toggle fullscreen
+prepend deck
+  if bespoke.progress
+    .bespoke-progress-parent
+      .bespoke-progress-bar
 
-    != html
-    != readyScript
-    script!= bespoke.js
-    if watchJs
-      script!= watchJs
+  if bespoke.osc
+    .bespoke-marp-osc
+      button(data-bespoke-marp-osc="prev" tabindex=-1 title="Previous slide") Previous slide
+      span(data-bespoke-marp-osc="page")
+      button(data-bespoke-marp-osc="next" tabindex=-1 title="Next slide") Next slide
+      button(data-bespoke-marp-osc="fullscreen" tabindex=-1 title="Toggle fullscreen (f)") Toggle fullscreen
+
+block script
+  script!= bespoke.js

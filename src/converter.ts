@@ -1,12 +1,18 @@
 import { Marp, MarpOptions } from '@marp-team/marp-core'
-import { MarpitOptions } from '@marp-team/marpit'
+import { Marpit, MarpitOptions } from '@marp-team/marpit'
 import * as chromeFinder from 'chrome-launcher/dist/chrome-finder'
 import puppeteer from 'puppeteer-core'
-import { warn } from './cli'
+import { silence, warn } from './cli'
 import { Engine } from './engine'
+import metaPlugin from './engine/meta-plugin'
 import { error } from './error'
 import { File, FileType } from './file'
-import templates, { TemplateOption, TemplateResult } from './templates/'
+import templates, {
+  Template,
+  TemplateMeta,
+  TemplateOption,
+  TemplateResult,
+} from './templates/'
 import { ThemeSet } from './theme'
 import { notifier } from './watcher'
 
@@ -18,6 +24,7 @@ export enum ConvertType {
 export interface ConverterOption {
   allowLocalFiles: boolean
   engine: Engine
+  globalDirectives: { theme?: string } & Partial<TemplateMeta>
   html?: MarpOptions['html']
   inputDir?: string
   lang: string
@@ -28,7 +35,6 @@ export interface ConverterOption {
   server?: boolean
   template: string
   templateOption?: TemplateOption
-  theme?: string
   themeSet: ThemeSet
   type: ConvertType
   watch: boolean
@@ -54,7 +60,7 @@ export class Converter {
     this.options = opts
   }
 
-  get template() {
+  get template(): Template {
     const template = templates[this.options.template]
     if (!template) error(`Template "${this.options.template}" is not found.`)
 
@@ -62,12 +68,18 @@ export class Converter {
   }
 
   async convert(markdown: string, file?: File): Promise<TemplateResult> {
-    const { lang, readyScript, theme, type } = this.options
-
+    const { lang, readyScript, globalDirectives, type } = this.options
     const isFile = file && file.type === FileType.File
-    const additionals = theme
-      ? `\n<!-- theme: ${JSON.stringify(theme)} -->`
-      : ''
+
+    let additionals = ''
+
+    for (const directive of Object.keys(globalDirectives)) {
+      if (globalDirectives[directive] !== undefined) {
+        additionals += `\n<!-- ${directive}: ${JSON.stringify(
+          globalDirectives[directive]
+        )} -->`
+      }
+    }
 
     return await this.template({
       ...(this.options.templateOption || {}),
@@ -82,33 +94,54 @@ export class Converter {
         const engine = this.generateEngine(tplOpts)
         const ret = engine.render(`${markdown}${additionals}`)
 
+        const { themeSet, lastGlobalDirectives } = <any>engine
+        const globalDirectives = lastGlobalDirectives || {}
+
         if (isFile) {
           const themeDir: string | undefined =
-            ((<any>engine).lastGlobalDirectives || {}).theme ||
-            (engine.themeSet.default! || {}).name
+            globalDirectives.theme || (themeSet.default || {}).name
 
           this.options.themeSet.observe(file!.absolutePath, themeDir)
         }
 
-        return ret
+        return {
+          ...ret,
+          description: globalDirectives.marpCLIDescription,
+          image: globalDirectives.marpCLIImage,
+          title: globalDirectives.marpCLITitle,
+          url: globalDirectives.marpCLIURL,
+        }
       },
     })
   }
 
   async convertFile(file: File, opts: ConvertFileOption = {}) {
-    const buffer = await file.load()
-    const template = await this.convert(buffer!.toString(), file)
-    const newFile = file.convert(this.options.output, this.options.type)
-    newFile.buffer = Buffer.from(template.result)
+    const emit = !(this.options.server && opts.initial)
 
-    const result: ConvertResult = { file, newFile, template }
-    if (this.options.server && opts.initial) return result
+    const convert = async (): Promise<ConvertResult> => {
+      const template = await this.convert((await file.load()).toString(), file)
+      const newFile = file.convert(this.options.output, this.options.type)
+      newFile.buffer = Buffer.from(template.result)
 
-    if (this.options.type === ConvertType.pdf)
-      await this.convertFileToPDF(newFile)
+      return { file, newFile, template }
+    }
 
-    if (!this.options.server) await newFile.save()
-    if (opts.onConverted) opts.onConverted(result)
+    let result: ConvertResult
+
+    try {
+      silence(!emit)
+      result = await convert()
+    } finally {
+      silence(false)
+    }
+
+    if (emit) {
+      if (this.options.type === ConvertType.pdf)
+        await this.convertFileToPDF(result.newFile)
+
+      if (!this.options.server) await result.newFile.save()
+      if (opts.onConverted) opts.onConverted(result)
+    }
 
     return result
   }
@@ -163,7 +196,7 @@ export class Converter {
 
   private static browser?: puppeteer.Browser
 
-  private generateEngine(mergeOptions: MarpitOptions) {
+  private generateEngine(mergeOptions: MarpitOptions): Marpit {
     const { html, options } = this.options
     const opts: any = { ...options, ...mergeOptions }
 
@@ -182,6 +215,9 @@ export class Converter {
 
     // for Marpit engine
     if (!(engine instanceof Marp)) engine.markdown.set({ html: !!html })
+
+    // Plugins
+    engine.use(metaPlugin, engine)
 
     // Additional themes
     this.options.themeSet.registerTo(engine)

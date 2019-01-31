@@ -16,6 +16,7 @@ enum OptionGroup {
   Basic = 'Basic Options:',
   Converter = 'Converter Options:',
   Template = 'Template Options:',
+  Meta = 'Meta Options:',
   Marp = 'Marp / Marpit Options:',
 }
 
@@ -114,6 +115,26 @@ export default async function(argv: string[] = []): Promise<number> {
           defaultDescription: 'false',
           group: OptionGroup.Template,
           type: 'boolean',
+        },
+        title: {
+          describe: 'Define title of the slide deck',
+          group: OptionGroup.Meta,
+          type: 'string',
+        },
+        description: {
+          describe: 'Define description of the slide deck',
+          group: OptionGroup.Meta,
+          type: 'string',
+        },
+        url: {
+          describe: 'Define canonical URL',
+          group: OptionGroup.Meta,
+          type: 'string',
+        },
+        'og-image': {
+          describe: 'Define Open Graph image URL',
+          group: OptionGroup.Meta,
+          type: 'string',
         },
         engine: {
           describe: 'Select Marpit based engine by module name or path',

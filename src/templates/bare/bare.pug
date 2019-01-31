@@ -1,17 +1,4 @@
-doctype
-html(lang=lang)
-  head
-    if base
-      base(href=base)
+extends ../layout.pug
 
-    meta(charset="UTF-8")
-    meta(name="viewport", content="width=device-width,height=device-height,initial-scale=1.0")
-    meta(name="apple-mobile-web-app-capable", content="yes")
-    meta(http-equiv="X-UA-Compatible", content="ie=edge")
-    style(media="screen")!= bare.css
-    style!= css
-  body
-    != html
-    != readyScript
-    if watchJs
-      script!= watchJs
+prepend head
+  style(media="screen")!= bare.css

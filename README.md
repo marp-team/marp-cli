@@ -177,6 +177,43 @@ When [the conversion engine is changed to Marpit framework by setting `engine` o
 marp --template bare --engine @marp-team/marpit slide-deck.md
 ```
 
+## Metadata
+
+We recommend setting metadata of the slide deck if you want to host the outputted HTML on the web. To optimize the converted web page for SEO and social sharing, passed meta values will use in `<title>`, `<link>`, and `<meta>` tags.
+
+| [Global directives] |   CLI option    | Description                           | Metadata                                      |
+| :-----------------: | :-------------: | :------------------------------------ | :-------------------------------------------- |
+|       `title`       |    `--title`    | Define title of the slide deck.       | `<title>`, `og:title`                         |
+|    `description`    | `--description` | Define description of the slide deck. | `<meta name="description">`, `og:description` |
+|        `url`        |     `--url`     | Define [canonical URL].               | `<link rel="canonical">`, `og:url`            |
+|       `image`       |  `--og-image`   | Define [Open Graph] image URL.        | `og:image`                                    |
+
+[canonical url]: https://en.wikipedia.org/wiki/Canonical_link_element
+[open graph]: http://ogp.me/
+
+> :information_source: The passed canonical URL will be ignored when cannot parse as valid URL.
+
+### By [global directives]
+
+Marp CLI supports _additional [global directives]_ to specify metadata in Markdown. You can define meta values in Markdown front-matter.
+
+```markdown
+---
+title: Marp slide deck
+description: An example slide deck created by Marp CLI
+url: https://marp.app/
+image: https://marp.app/og-image.jpg
+---
+
+# Marp slide deck
+```
+
+[global directives]: https://marpit.marp.app/directives?id=global-directives-1
+
+### By CLI option
+
+Marp CLI prefers CLI option to global directives. You can override metadata values by `--title`, `--description`, `--url`, and `--og-image`.
+
 ## Theme
 
 ### Override theme
@@ -310,10 +347,12 @@ By default we use configuration file that is placed on current directory, but yo
 |     `bespoke`      |           object            |                       | Setting options for `bespoke` template                                                                 |
 |   `bespoke.osc`    |           boolean           |    `--bespoke-osc`    | \[Bespoke\] Use on-screen controller (`true` by default)                                               |
 | `bespoke.progress` |           boolean           | `--bespoke-progress`  | \[Bespoke\] Use progress bar (`false` by default)                                                      |
+|   `description`    |           string            |    `--description`    | Define description of the slide deck                                                                   |
 |      `engine`      | string \| Class \| Function |      `--engine`       | Specify Marpit based engine                                                                            |
 |       `html`       |      boolean \| object      |       `--html`        | Enable or disable HTML (Configuration file can pass [the whitelist object] if you are using Marp Core) |
 |     `inputDir`     |           string            |  `--input-dir` `-I`   | The base directory to find markdown and theme CSS                                                      |
 |       `lang`       |           string            |                       | Define the language of converted HTML                                                                  |
+|     `ogImage`      |           string            |     `--og-image`      | Define [Open Graph] image URL                                                                          |
 |     `options`      |           object            |                       | The base options for the constructor of engine                                                         |
 |      `output`      |           string            |    `--output` `-o`    | Output file path (or directory when input-dir is passed)                                               |
 |       `pdf`        |           boolean           |        `--pdf`        | Convert slide deck into PDF                                                                            |
@@ -322,6 +361,8 @@ By default we use configuration file that is placed on current directory, but yo
 |     `template`     |           string            |     `--template`      | Choose template                                                                                        |
 |      `theme`       |           string            |       `--theme`       | Override theme by name or CSS file                                                                     |
 |     `themeSet`     |     string \| string[]      |     `--theme-set`     | Path to additional theme CSS files                                                                     |
+|      `title`       |           string            |       `--title`       | Define title of the slide deck                                                                         |
+|       `url`        |           string            |        `--url`        | Define [canonical URL]                                                                                 |
 |      `watch`       |           boolean           |    `--watch` `-w`     | Watch input markdowns for changes                                                                      |
 
 [the whitelist object]: https://github.com/marp-team/marp-core#html-boolean--object

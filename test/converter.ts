@@ -3,7 +3,7 @@ import { MarpitOptions } from '@marp-team/marpit'
 import fs from 'fs'
 import os from 'os'
 import path from 'path'
-import { Converter, ConvertType } from '../src/converter'
+import { Converter, ConvertType, ConverterOption } from '../src/converter'
 import { CLIError } from '../src/error'
 import { File, FileType } from '../src/file'
 import { bare as bareTpl } from '../src/templates'
@@ -23,12 +23,13 @@ describe('Converter', () => {
   let themeSet: ThemeSet
   beforeEach(async () => (themeSet = await ThemeSet.initialize([])))
 
-  const instance = (opts = {}) =>
+  const instance = (opts: Partial<ConverterOption> = {}) =>
     new Converter({
       themeSet,
       allowLocalFiles: false,
-      lang: 'en',
       engine: Marp,
+      globalDirectives: {},
+      lang: 'en',
       options: {},
       server: false,
       template: 'bare',
@@ -43,8 +44,9 @@ describe('Converter', () => {
       const options = {
         themeSet,
         allowLocalFiles: true,
-        lang: 'fr',
         engine: Marp,
+        globalDirectives: { theme: 'default' },
+        lang: 'fr',
         options: <MarpitOptions>{ html: true },
         server: false,
         template: 'test-template',
@@ -73,20 +75,23 @@ describe('Converter', () => {
     const dummyFile = new File(process.cwd())
 
     it('returns the result of template', async () => {
-      const options = { html: true }
+      const options: any = { html: true }
       const readyScript = '<b>ready</b>'
-      const result = await instance({ options, readyScript }).convert(md)
+      const { result, rendered } = await instance({
+        options,
+        readyScript,
+      }).convert(md)
 
-      expect(result.result).toMatch(/^<!DOCTYPE html>[\s\S]+<\/html>$/)
-      expect(result.result).toContain(result.rendered.html)
-      expect(result.result).toContain(result.rendered.css)
-      expect(result.result).toContain(readyScript)
-      expect(result.result).not.toContain('<base')
-      expect(result.rendered.css).toContain('@theme default')
+      expect(result).toMatch(/^<!DOCTYPE html>[\s\S]+<\/html>$/)
+      expect(result).toContain(rendered.html)
+      expect(result).toContain(rendered.css)
+      expect(result).toContain(readyScript)
+      expect(result).not.toContain('<base')
+      expect(rendered.css).toContain('@theme default')
     })
 
     it('throws CLIError when selected engine is not implemented render() method', () => {
-      const subject = instance({ engine: function _() {} }).convert(md)
+      const subject = instance(<any>{ engine: function _() {} }).convert(md)
       expect(subject).rejects.toBeInstanceOf(CLIError)
     })
 
@@ -100,17 +105,72 @@ describe('Converter', () => {
       expect(result).toContain('<html lang="zh">')
     })
 
-    it("overrides theme by converter's theme option", async () => {
-      const { rendered } = await instance({ theme: 'gaia' }).convert(md)
-      expect(rendered.css).toContain('@theme gaia')
-    })
-
     it("overrides html option by converter's html option", async () => {
       const enabled = (await instance({ html: true }).convert(md)).rendered
       expect(enabled.html).toContain('<i>Hello!</i>')
 
       const disabled = (await instance({ html: false }).convert(md)).rendered
       expect(disabled.html).toContain('&lt;i&gt;Hello!&lt;/i&gt;')
+    })
+
+    context('with globalDirectives option', () => {
+      it('overrides theme directive', async () => {
+        const { rendered } = await instance({
+          globalDirectives: { theme: 'gaia' },
+        }).convert(md)
+
+        expect(rendered.css).toContain('@theme gaia')
+      })
+
+      it('overrides global directives for meta', async () => {
+        const { result } = await instance({
+          globalDirectives: {
+            title: 'Title',
+            description: 'Desc',
+            url: 'https://example.com/canonical',
+            image: 'https://example.com/image.jpg',
+          },
+        }).convert('---\ntitle: original\n---')
+
+        expect(result).toContain('<title>Title</title>')
+        expect(result).toContain('<meta name="description" content="Desc">')
+        expect(result).toContain(
+          '<link rel="canonical" href="https://example.com/canonical">'
+        )
+        expect(result).toContain(
+          '<meta property="og:image" content="https://example.com/image.jpg">'
+        )
+      })
+
+      it('allows reset meta values by empty string', async () => {
+        const { result } = await instance({
+          globalDirectives: { title: '', description: '', url: '', image: '' },
+        }).convert(
+          '---\ntitle: A\ndescription: B\nurl: https://example.com/\nimage: /hello.jpg\n---'
+        )
+
+        expect(result).not.toContain('<title>')
+        expect(result).not.toContain('<meta name="description"')
+        expect(result).not.toContain('<link rel="canonical"')
+        expect(result).not.toContain('<meta property="og:image"')
+      })
+
+      context('when given URL is invalid', () => {
+        it('outputs warning and does not override URL', async () => {
+          const warn = jest.spyOn(console, 'warn').mockImplementation()
+          const { result } = await instance({
+            globalDirectives: { url: '[INVALID]' },
+          }).convert('---\nurl: https://example.com/\n---')
+
+          expect(warn).toBeCalledWith(
+            expect.stringContaining('Specified canonical URL is ignored')
+          )
+          expect(warn).toBeCalledWith(expect.stringContaining('[INVALID]'))
+          expect(result).toContain(
+            '<link rel="canonical" href="https://example.com/">'
+          )
+        })
+      })
     })
 
     context('with PDF convert type', () => {
