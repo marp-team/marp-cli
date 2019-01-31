@@ -33,7 +33,7 @@
     "check-ts": "tsc --noEmit",
     "clean": "rimraf lib",
     "format": "prettier \"**/*.{css,js,json,md,scss,ts,yaml,yml}\"",
-    "format:check": "yarn --silent format -l",
+    "format:check": "yarn --silent format -c",
     "format:write": "yarn --silent format --write",
     "lint:ts": "tslint \"{src,test}/**/*.ts\"",
     "lint:css": "stylelint \"src/**/*.{css,scss}\"",
