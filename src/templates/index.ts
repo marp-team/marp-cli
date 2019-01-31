@@ -20,8 +20,10 @@ interface TemplateCoreOption {
 }
 
 interface TemplateExtraRenderResult {
-  title: string | undefined
   description: string | undefined
+  image: string | undefined
+  title: string | undefined
+  url: string | undefined
 }
 
 export type TemplateOption = TemplateBareOption | TemplateBespokeOption

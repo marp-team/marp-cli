@@ -97,8 +97,10 @@ export class Converter {
 
         return {
           ...ret,
-          title: lastGlobalDirectives.marpCLITitle,
           description: lastGlobalDirectives.marpCLIDescription,
+          image: lastGlobalDirectives.marpCLIImage,
+          title: lastGlobalDirectives.marpCLITitle,
+          url: lastGlobalDirectives.marpCLIURL,
         }
       },
     })
