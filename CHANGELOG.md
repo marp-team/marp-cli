@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v0.5.0 - 2019-01-31
+
 ### Added
 
 - Support setting HTML metadata via global directives and CLI options ([#66](https://github.com/marp-team/marp-cli/pull/66))
