@@ -14,7 +14,14 @@ interface TemplateCoreOption {
   lang: string
   notifyWS?: string
   readyScript?: string
-  renderer: (tplOpts: MarpitOptions) => MarpitRenderResult
+  renderer: (
+    tplOpts: MarpitOptions
+  ) => MarpitRenderResult & TemplateExtraRenderResult
+}
+
+interface TemplateExtraRenderResult {
+  title: string | undefined
+  description: string | undefined
 }
 
 export type TemplateOption = TemplateBareOption | TemplateBespokeOption
@@ -31,7 +38,9 @@ export interface TemplateResult {
   result: string
 }
 
-type Template<T> = (locals: TemplateCoreOption & T) => Promise<TemplateResult>
+export type Template<T = TemplateOption> = (
+  locals: TemplateCoreOption & T
+) => Promise<TemplateResult>
 
 export const bare: Template<TemplateBareOption> = async opts => {
   const rendered = opts.renderer({

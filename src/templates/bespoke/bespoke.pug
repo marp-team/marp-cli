@@ -4,10 +4,19 @@ html(lang=lang)
     if base
       base(href=base)
 
+    if title
+      title= title
+      meta(property="og:title", content=title)
+
+    if description
+      meta(name="description", content=description)
+      meta(property="og:description", content=description)
+
     meta(charset="UTF-8")
     meta(name="viewport", content="width=device-width,height=device-height,initial-scale=1.0")
     meta(name="apple-mobile-web-app-capable", content="yes")
     meta(http-equiv="X-UA-Compatible", content="ie=edge")
+    meta(property="og:type", content="website")
     style!= bespoke.css
     style!= css
   body

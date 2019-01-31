@@ -1,12 +1,17 @@
 import { Marp, MarpOptions } from '@marp-team/marp-core'
-import { MarpitOptions } from '@marp-team/marpit'
+import { Marpit, MarpitOptions } from '@marp-team/marpit'
 import * as chromeFinder from 'chrome-launcher/dist/chrome-finder'
 import puppeteer from 'puppeteer-core'
 import { warn } from './cli'
 import { Engine } from './engine'
+import metaPlugin from './engine/meta-plugin'
 import { error } from './error'
 import { File, FileType } from './file'
-import templates, { TemplateOption, TemplateResult } from './templates/'
+import templates, {
+  Template,
+  TemplateOption,
+  TemplateResult,
+} from './templates/'
 import { ThemeSet } from './theme'
 import { notifier } from './watcher'
 
@@ -54,7 +59,7 @@ export class Converter {
     this.options = opts
   }
 
-  get template() {
+  get template(): Template {
     const template = templates[this.options.template]
     if (!template) error(`Template "${this.options.template}" is not found.`)
 
@@ -81,16 +86,20 @@ export class Converter {
       renderer: tplOpts => {
         const engine = this.generateEngine(tplOpts)
         const ret = engine.render(`${markdown}${additionals}`)
+        const { themeSet, lastGlobalDirectives } = <any>engine
 
         if (isFile) {
           const themeDir: string | undefined =
-            ((<any>engine).lastGlobalDirectives || {}).theme ||
-            (engine.themeSet.default! || {}).name
+            (lastGlobalDirectives || {}).theme || (themeSet.default || {}).name
 
           this.options.themeSet.observe(file!.absolutePath, themeDir)
         }
 
-        return ret
+        return {
+          ...ret,
+          title: lastGlobalDirectives.marpCLITitle,
+          description: lastGlobalDirectives.marpCLIDescription,
+        }
       },
     })
   }
@@ -163,7 +172,7 @@ export class Converter {
 
   private static browser?: puppeteer.Browser
 
-  private generateEngine(mergeOptions: MarpitOptions) {
+  private generateEngine(mergeOptions: MarpitOptions): Marpit {
     const { html, options } = this.options
     const opts: any = { ...options, ...mergeOptions }
 
@@ -182,6 +191,9 @@ export class Converter {
 
     // for Marpit engine
     if (!(engine instanceof Marp)) engine.markdown.set({ html: !!html })
+
+    // Plugins
+    engine.use(metaPlugin, engine)
 
     // Additional themes
     this.options.themeSet.registerTo(engine)
