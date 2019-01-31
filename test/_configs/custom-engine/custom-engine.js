@@ -5,6 +5,7 @@ module.exports = class CustomEngine {
     }
 
     this.themeSet = {}
+    this.use = jest.fn()
   }
 
   render() {

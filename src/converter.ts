@@ -86,21 +86,23 @@ export class Converter {
       renderer: tplOpts => {
         const engine = this.generateEngine(tplOpts)
         const ret = engine.render(`${markdown}${additionals}`)
+
         const { themeSet, lastGlobalDirectives } = <any>engine
+        const globalDirectives = lastGlobalDirectives || {}
 
         if (isFile) {
           const themeDir: string | undefined =
-            (lastGlobalDirectives || {}).theme || (themeSet.default || {}).name
+            globalDirectives.theme || (themeSet.default || {}).name
 
           this.options.themeSet.observe(file!.absolutePath, themeDir)
         }
 
         return {
           ...ret,
-          description: lastGlobalDirectives.marpCLIDescription,
-          image: lastGlobalDirectives.marpCLIImage,
-          title: lastGlobalDirectives.marpCLITitle,
-          url: lastGlobalDirectives.marpCLIURL,
+          description: globalDirectives.marpCLIDescription,
+          image: globalDirectives.marpCLIImage,
+          title: globalDirectives.marpCLITitle,
+          url: globalDirectives.marpCLIURL,
         }
       },
     })
