@@ -198,7 +198,8 @@ export class MarpCLIConfig {
         url: this.pickDefined(this.args.url, this.conf.url),
       },
       html: this.pickDefined(this.args.html, this.conf.html),
-      jpegQuality: this.args.jpegQuality || this.conf.jpegQuality,
+      jpegQuality:
+        this.pickDefined(this.args.jpegQuality, this.conf.jpegQuality) || 85,
       lang: this.conf.lang || (await osLocale()).replace(/[_@]/g, '-'),
       options: this.conf.options || {},
       readyScript: this.engine.browserScript
