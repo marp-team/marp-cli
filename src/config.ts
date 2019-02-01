@@ -135,6 +135,30 @@ export class MarpCLIConfig {
       initialThemes
     )
 
+    if (
+      themeSet.themes.size <= initialThemes.length &&
+      themeSetPathes.length > 0
+    )
+      warn('Not found additional theme CSS files.')
+
+    const type = ((): ConvertType => {
+      // CLI options
+      if (this.args.pdf || this.conf.pdf) return ConvertType.pdf
+
+      const image = this.args.image || this.conf.image
+      if (image === 'png') return ConvertType.png
+      if (image === 'jpeg') return ConvertType.jpeg
+
+      // Detect from filename
+      const lowerOutput = (output || '').toLowerCase()
+      if (lowerOutput.endsWith('.pdf')) return ConvertType.pdf
+      if (lowerOutput.endsWith('.png')) return ConvertType.png
+      if (lowerOutput.endsWith('.jpg') || lowerOutput.endsWith('.jpeg'))
+        return ConvertType.jpeg
+
+      return ConvertType.html
+    })()
+
     const preview = (() => {
       const p = this.pickDefined(this.args.preview, this.conf.preview) || false
 
@@ -148,12 +172,6 @@ export class MarpCLIConfig {
       return p
     })()
 
-    if (
-      themeSet.themes.size <= initialThemes.length &&
-      themeSetPathes.length > 0
-    )
-      warn('Not found additional theme CSS files.')
-
     return {
       inputDir,
       output,
@@ -162,6 +180,7 @@ export class MarpCLIConfig {
       template,
       templateOption,
       themeSet,
+      type,
       allowLocalFiles:
         this.pickDefined(
           this.args.allowLocalFiles,
@@ -184,12 +203,6 @@ export class MarpCLIConfig {
       readyScript: this.engine.browserScript
         ? `<script>${this.engine.browserScript}</script>`
         : undefined,
-      type:
-        this.args.pdf ||
-        this.conf.pdf ||
-        `${output}`.toLowerCase().endsWith('.pdf')
-          ? ConvertType.pdf
-          : ConvertType.html,
       watch:
         this.pickDefined(this.args.watch, this.conf.watch) ||
         preview ||
