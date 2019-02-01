@@ -98,7 +98,6 @@ export default async function(argv: string[] = []): Promise<number> {
           type: 'string',
         },
         'jpeg-quality': {
-          implies: ['image'],
           default: 85,
           describe: 'Setting JPEG image quality',
           group: OptionGroup.Converter,
