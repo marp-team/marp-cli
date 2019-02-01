@@ -279,7 +279,6 @@ export class Converter {
 
       Converter.browser = await puppeteer.launch({
         args,
-        headless: false,
         executablePath: finder ? finder()[0] : undefined,
       })
 
