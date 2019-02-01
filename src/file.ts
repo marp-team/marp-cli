@@ -17,6 +17,7 @@ export const markdownExtensions = ['md', 'mdown', 'markdown', 'markdn']
 export enum FileType {
   File,
   StandardIO,
+  Null,
 }
 
 export class File {
@@ -33,15 +34,18 @@ export class File {
     return path.resolve(this.path)
   }
 
-  convert(output: string | undefined, extension: string): File {
-    if (output === undefined)
-      return File.initialize(
-        this.convertExtension(extension),
-        f => (f.type = this.type)
-      )
-
-    if (output === '-')
-      return File.initialize('-', f => (f.type = FileType.StandardIO))
+  convert(output: string | false | undefined, extension: string): File {
+    switch (output) {
+      case undefined:
+        return File.initialize(
+          this.convertExtension(extension),
+          f => (f.type = this.type)
+        )
+      case false:
+        return File.initialize(this.path, f => (f.type = FileType.Null))
+      case '-':
+        return File.initialize('-', f => (f.type = FileType.StandardIO))
+    }
 
     if (this.inputDir)
       return File.initialize(

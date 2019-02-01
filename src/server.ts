@@ -49,6 +49,7 @@ export class Server {
     const pdf = Object.keys(query).includes('pdf')
     const file = new File(filename)
 
+    this.converter.options.output = false
     this.converter.options.type = pdf ? ConvertType.pdf : ConvertType.html
 
     const converted = await this.converter.convertFile(file)

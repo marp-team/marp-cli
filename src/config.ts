@@ -28,7 +28,7 @@ interface IMarpCLIBaseArguments {
   html?: boolean
   inputDir?: string
   ogImage?: string
-  output?: string
+  output?: string | false
   pdf?: boolean
   preview?: boolean
   server?: boolean
@@ -89,16 +89,17 @@ export class MarpCLIConfig {
 
   async converterOption(): Promise<ConverterOption> {
     const inputDir = await this.inputDir()
-    const output =
-      this.args.output ||
-      (this.conf.output
-        ? (() => {
-            if (this.conf.output === '-') return '-'
-            return path.resolve(path.dirname(this.confPath!), this.conf.output)
-          })()
-        : undefined)
-
     const server = this.pickDefined(this.args.server, this.conf.server) || false
+    const output = (() => {
+      if (server) return false
+      if (this.args.output !== undefined) return this.args.output
+      if (this.conf.output !== undefined)
+        return this.conf.output === '-' || this.conf.output === false
+          ? this.conf.output
+          : path.resolve(path.dirname(this.confPath!), this.conf.output)
+
+      return undefined
+    })()
 
     const template = this.args.template || this.conf.template || 'bespoke'
     const templateOption: TemplateOption = (() => {

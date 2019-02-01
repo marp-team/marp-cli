@@ -29,7 +29,7 @@ export interface ConverterOption {
   inputDir?: string
   lang: string
   options: MarpitOptions
-  output?: string
+  output?: string | false
   preview?: boolean
   readyScript?: string
   server?: boolean
@@ -41,7 +41,7 @@ export interface ConverterOption {
 }
 
 export interface ConvertFileOption {
-  initial?: boolean
+  silence?: boolean
   onConverted?: ConvertedCallback
 }
 
@@ -116,32 +116,25 @@ export class Converter {
   }
 
   async convertFile(file: File, opts: ConvertFileOption = {}) {
-    const emit = !(this.options.server && opts.initial)
-
-    const convert = async (): Promise<ConvertResult> => {
-      const template = await this.convert((await file.load()).toString(), file)
-      const newFile = file.convert(this.options.output, this.options.type)
-      newFile.buffer = Buffer.from(template.result)
-
-      return { file, newFile, template }
-    }
-
     let result: ConvertResult
 
     try {
-      silence(!emit)
-      result = await convert()
+      silence(!!opts.silence)
+
+      const template = await this.convert((await file.load()).toString(), file)
+      const newFile = file.convert(this.options.output, this.options.type)
+
+      newFile.buffer = Buffer.from(template.result)
+      result = { file, newFile, template }
     } finally {
       silence(false)
     }
 
-    if (emit) {
-      if (this.options.type === ConvertType.pdf)
-        await this.convertFileToPDF(result.newFile)
+    if (this.options.type === ConvertType.pdf)
+      await this.convertFileToPDF(result.newFile)
 
-      if (!this.options.server) await result.newFile.save()
-      if (opts.onConverted) opts.onConverted(result)
-    }
+    await result.newFile.save()
+    if (opts.onConverted) opts.onConverted(result)
 
     return result
   }

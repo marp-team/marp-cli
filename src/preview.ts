@@ -105,7 +105,7 @@ export function fileToURI(file: File, type: ConvertType = ConvertType.html) {
     return encodeURI(`file://${uri.startsWith('/') ? '' : '/'}${uri}`)
   }
 
-  if (file.type === FileType.StandardIO && file.buffer) {
+  if (file.buffer) {
     // Convert to data scheme URI
     return `data:${mimeTypes[type]};base64,${file.buffer.toString('base64')}`
   }

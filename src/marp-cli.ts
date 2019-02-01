@@ -210,16 +210,26 @@ export default async function(argv: string[] = []): Promise<number> {
     // Convert markdown into HTML
     const convertedFiles: File[] = []
     const onConverted: ConvertedCallback = ret => {
-      const { file, newFile } = ret
-      const output = (f: File, io: string) =>
-        f.type === FileType.StandardIO ? `<${io}>` : f.relativePath()
+      const { file: i, newFile: o } = ret
+      const fn = (f: File, stdio: string) =>
+        f.type === FileType.StandardIO ? stdio : f.relativePath()
 
-      convertedFiles.push(newFile)
-      cli.info(`${output(file, 'stdin')} => ${output(newFile, 'stdout')}`)
+      convertedFiles.push(o)
+      cli.info(
+        [
+          fn(i, '<stdin>'),
+          ...(o.type === FileType.Null
+            ? ['processed.']
+            : ['=>', fn(o, '<stdout>')]),
+        ].join(' ')
+      )
     }
 
     try {
-      await converter.convertFiles(foundFiles, { onConverted, initial: true })
+      await converter.convertFiles(
+        foundFiles,
+        cvtOpts.server ? { silence: true } : { onConverted }
+      )
     } catch (e) {
       error(`Failed converting Markdown. (${e.message})`, e.errorCode)
     }
