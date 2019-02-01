@@ -46,10 +46,18 @@ export class Server {
     filename: string,
     query: querystring.ParsedUrlQuery = {}
   ) {
-    const pdf = Object.keys(query).includes('pdf')
     const file = new File(filename)
 
-    this.converter.options.type = pdf ? ConvertType.pdf : ConvertType.html
+    this.converter.options.type = ((): ConvertType => {
+      const queryKeys = Object.keys(query)
+
+      if (queryKeys.includes('pdf')) return ConvertType.pdf
+      if (queryKeys.includes('png')) return ConvertType.png
+      if (queryKeys.includes('jpg') || queryKeys.includes('jpeg'))
+        return ConvertType.jpeg
+
+      return ConvertType.html
+    })()
 
     const converted = await this.converter.convertFile(file)
     if (this.options.onConverted) this.options.onConverted(converted)
