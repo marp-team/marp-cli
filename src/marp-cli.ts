@@ -216,12 +216,9 @@ export default async function(argv: string[] = []): Promise<number> {
 
       convertedFiles.push(o)
       cli.info(
-        [
-          fn(i, '<stdin>'),
-          ...(o.type === FileType.Null
-            ? ['processed.']
-            : ['=>', fn(o, '<stdout>')]),
-        ].join(' ')
+        `${fn(i, '<stdin>')} ${
+          o.type === FileType.Null ? 'processed.' : `=> ${fn(o, '<stdout>')}`
+        }`
       )
     }
 
