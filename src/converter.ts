@@ -184,7 +184,7 @@ export class Converter {
     file: File,
     opts: { type: 'png' | 'jpeg'; size: { height: number; width: number } }
   ) {
-    file.buffer = await this.usePuppeteer(file, async (page, uri) => {
+    file.buffer = <Buffer>await this.usePuppeteer(file, async (page, uri) => {
       await page.setViewport({ ...opts.size })
       await page.goto(uri, { waitUntil: ['domcontentloaded', 'networkidle0'] })
       await page.emulateMedia('print')
@@ -279,6 +279,7 @@ export class Converter {
 
       Converter.browser = await puppeteer.launch({
         args,
+        headless: false,
         executablePath: finder ? finder()[0] : undefined,
       })
 
