@@ -26,7 +26,9 @@ interface IMarpCLIBaseArguments {
   description?: string
   engine?: string
   html?: boolean
+  image?: string
   inputDir?: string
+  jpegQuality?: number
   ogImage?: string
   output?: string
   pdf?: boolean
