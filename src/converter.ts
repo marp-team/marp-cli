@@ -33,6 +33,7 @@ export interface ConverterOption {
   options: MarpitOptions
   output?: string
   preview?: boolean
+  jpegQuality?: number
   readyScript?: string
   server?: boolean
   template: string
@@ -146,14 +147,15 @@ export class Converter {
           break
         case ConvertType.png:
           await this.convertFileToImage(result.newFile, {
-            type: 'png',
             size: result.template.size,
+            type: 'png',
           })
           break
         case ConvertType.jpeg:
           await this.convertFileToImage(result.newFile, {
-            type: 'jpeg',
+            quality: this.options.jpegQuality,
             size: result.template.size,
+            type: 'jpeg',
           })
       }
 
@@ -182,14 +184,18 @@ export class Converter {
 
   private async convertFileToImage(
     file: File,
-    opts: { type: 'png' | 'jpeg'; size: { height: number; width: number } }
+    opts: {
+      quality?: number
+      size: { height: number; width: number }
+      type: 'png' | 'jpeg'
+    }
   ) {
     file.buffer = <Buffer>await this.usePuppeteer(file, async (page, uri) => {
       await page.setViewport({ ...opts.size })
       await page.goto(uri, { waitUntil: ['domcontentloaded', 'networkidle0'] })
       await page.emulateMedia('print')
 
-      return await page.screenshot({ type: opts.type })
+      return await page.screenshot({ quality: opts.quality, type: opts.type })
     })
   }
 

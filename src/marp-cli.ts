@@ -99,11 +99,10 @@ export default async function(argv: string[] = []): Promise<number> {
         },
         'jpeg-quality': {
           implies: ['image'],
-          defaultDescription: '85',
+          default: 85,
           describe: 'Setting JPEG image quality',
-          hidden: true,
           group: OptionGroup.Converter,
-          type: 'string',
+          type: 'number',
         },
         'allow-local-files': {
           describe:
