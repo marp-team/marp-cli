@@ -106,11 +106,36 @@ marp --pdf slide-deck.md
 marp slide-deck.md -o converted.pdf
 ```
 
+[google chrome]: https://www.google.com/chrome/
+[chromium]: https://www.chromium.org/
+
+### Convert the first slide page to image (`--image`)
+
+You can convert _the first page_ of targeted slide deck into an image when specified `--image [png|jpeg]` option or the output path with PNG and JPEG extensions.
+
+```bash
+# Convert the first slide page into PNG image
+marp --image png slide-deck.md
+marp slide-deck.md -o output.png
+
+# Convert the first slide page into JPEG image
+marp --image jpeg slide-deck.md
+marp slide-deck.md -o output.jpg
+```
+
+It would be useful for creating [Open Graph] image that can specify with [`image` global directive and `--og-image` option](#metadata).
+
+> :information_source: PDF and image conversion require [Google Chrome] or [Chromium]. When any problem has occurred while converting, please update your Chrome/Chromium to the latest version or try using [Google Chrome Canary].
+>
+> About known issues while converting an image, refer to [#68 comment](https://github.com/marp-team/marp-cli/pull/68#issuecomment-459701753).
+
+[google chrome canary]: https://www.google.com/chrome/canary/
+
 #### Security about local files
 
-Because of [the security reason](https://github.com/marp-team/marp-cli/pull/10), **the converted PDF cannot load local files by default.** We recommend to upload your assets to online.
+Because of [the security reason](https://github.com/marp-team/marp-cli/pull/10), **the converted PDF and images cannot use local files by default.** We recommend uploading your assets to online.
 
-But if you want to use local files in rendered PDF, `--alow-local-files` option helps to find your local files. Warnings about using the insecure option are outputed in each conversions.
+But if you want to use local files in rendered PDF, `--alow-local-files` option helps to find your local files. Warnings about using the insecure option will be outputted in each conversion.
 
 ```bash
 marp --pdf --allow-local-files slide-deck.md
@@ -130,7 +155,7 @@ Server mode supports on-demand conversion by HTTP request. We require to pass `-
 
 In this mode, the converted file outputs as the result of accessing to server, and not to disk.
 
-You would get the converted PDF by adding `?pdf` query string when requesting. e.g. `http://localhost:8080/deck-a.md?pdf`
+You would get the converted PDF, PNG, and JPEG by adding corresponded query string when requesting. e.g. `http://localhost:8080/deck-a.md?pdf` returns converted PDF.
 
 #### `index.md` / `PITCHME.md`
 
@@ -350,7 +375,9 @@ By default we use configuration file that is placed on current directory, but yo
 |   `description`    |           string            |    `--description`    | Define description of the slide deck                                                                   |
 |      `engine`      | string \| Class \| Function |      `--engine`       | Specify Marpit based engine                                                                            |
 |       `html`       |      boolean \| object      |       `--html`        | Enable or disable HTML (Configuration file can pass [the whitelist object] if you are using Marp Core) |
+|      `image`       |       `png` \| `jpeg`       |       `--image`       | Convert slide into image file (first slide only)                                                       |
 |     `inputDir`     |           string            |  `--input-dir` `-I`   | The base directory to find markdown and theme CSS                                                      |
+|   `jpegQuality`    |           number            |   `--jpeg-quality`    | Setting JPEG image quality (`85` by default)                                                           |
 |       `lang`       |           string            |                       | Define the language of converted HTML                                                                  |
 |     `ogImage`      |           string            |     `--og-image`      | Define [Open Graph] image URL                                                                          |
 |     `options`      |           object            |                       | The base options for the constructor of engine                                                         |
@@ -358,7 +385,7 @@ By default we use configuration file that is placed on current directory, but yo
 |       `pdf`        |           boolean           |        `--pdf`        | Convert slide deck into PDF                                                                            |
 |     `preview`      |           boolean           |   `--preview` `-p`    | Open preview window _(EXPERIMENTAL)_                                                                   |
 |      `server`      |           boolean           |    `--server` `-s`    | Enable server mode                                                                                     |
-|     `template`     |           string            |     `--template`      | Choose template                                                                                        |
+|     `template`     |     `bare` \| `bespoke`     |     `--template`      | Choose template (`bespoke` by default)                                                                 |
 |      `theme`       |           string            |       `--theme`       | Override theme by name or CSS file                                                                     |
 |     `themeSet`     |     string \| string[]      |     `--theme-set`     | Path to additional theme CSS files                                                                     |
 |      `title`       |           string            |       `--title`       | Define title of the slide deck                                                                         |
