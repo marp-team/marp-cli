@@ -173,14 +173,16 @@ describe('Converter', () => {
       })
     })
 
-    context('with PDF convert type', () => {
-      it('adds <base> element with specified base path from passed file', async () => {
-        const converter = instance({ type: ConvertType.pdf })
+    for (const type of [ConvertType.pdf, ConvertType.png, ConvertType.jpeg]) {
+      context(`with ${type} convert type`, () => {
+        it('adds <base> element with specified base path from passed file', async () => {
+          const converter = instance({ type })
 
-        const { result } = await converter.convert(md, dummyFile)
-        expect(result).toContain(`<base href="${process.cwd()}">`)
+          const { result } = await converter.convert(md, dummyFile)
+          expect(result).toContain(`<base href="${process.cwd()}">`)
+        })
       })
-    })
+    }
 
     context('with watch mode', () => {
       it('adds script for auto-reload', async () => {
@@ -241,7 +243,7 @@ describe('Converter', () => {
     })
 
     context('when convert type is PDF', () => {
-      const pdfInstance = (opts = {}): any =>
+      const pdfInstance = (opts = {}) =>
         instance({ ...opts, type: ConvertType.pdf })
 
       it('converts markdown file into PDF', async () => {
@@ -258,7 +260,7 @@ describe('Converter', () => {
       }, 10000)
 
       context('with allowLocalFiles option as true', () => {
-        it('converts into PDF by using temporally file', async () => {
+        it('converts with using temporally file', async () => {
           const file = new File(onePath)
 
           const fileCleanup = jest.spyOn(<any>File.prototype, 'cleanup')
@@ -284,6 +286,35 @@ describe('Converter', () => {
           expect(fileSave).toBeCalled()
         }, 10000)
       })
+    })
+
+    context('when convert type is PNG', () => {
+      it('converts markdown file into PNG', async () => {
+        const write = (<any>fs).__mockWriteFile()
+        const converter = instance({ output: 'a.png', type: ConvertType.png })
+
+        await converter.convertFile(new File(onePath))
+        const png: Buffer = write.mock.calls[0][1]
+
+        expect(write).toHaveBeenCalled()
+        expect(write.mock.calls[0][0]).toBe('a.png')
+        expect(png.toString('ascii', 1, 4)).toBe('PNG')
+      }, 10000)
+    })
+
+    context('when convert type is JPEG', () => {
+      it('converts markdown file into JPEG', async () => {
+        const write = (<any>fs).__mockWriteFile()
+        const converter = instance({ output: 'b.jpg', type: ConvertType.jpeg })
+
+        await converter.convertFile(new File(onePath))
+        const jpeg: Buffer = write.mock.calls[0][1]
+
+        expect(write).toHaveBeenCalled()
+        expect(write.mock.calls[0][0]).toBe('b.jpg')
+        expect(jpeg[0]).toBe(0xff)
+        expect(jpeg[1]).toBe(0xd8)
+      }, 10000)
     })
   })
 
