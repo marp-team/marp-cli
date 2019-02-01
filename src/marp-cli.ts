@@ -281,8 +281,11 @@ export default async function(argv: string[] = []): Promise<number> {
       } else {
         cli.info(chalk.green('[Watch mode] Start watching...'))
 
-        if (cvtOpts.preview)
-          for (const file of convertedFiles) await preview.open(fileToURI(file))
+        if (cvtOpts.preview) {
+          for (const file of convertedFiles) {
+            await preview.open(fileToURI(file, cvtOpts.type))
+          }
+        }
       }
     }
 
