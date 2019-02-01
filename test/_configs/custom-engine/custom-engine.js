@@ -4,7 +4,7 @@ module.exports = class CustomEngine {
       set: jest.fn(),
     }
 
-    this.themeSet = {}
+    this.themeSet = { getThemeProp: jest.fn() }
     this.use = jest.fn()
   }
 
