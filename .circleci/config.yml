@@ -64,7 +64,7 @@ references:
 
 version: 2
 jobs:
-  '10.15.0':
+  '10.15.1':
     <<: *base
     docker:
       - image: circleci/node:10.15.0-browsers
@@ -101,13 +101,13 @@ workflows:
   version: 2
   build:
     jobs:
-      - 10.15.0
+      - 10.15.1
       - 8.15.0
       # NOTE: Node 8.9 in test environment cannot close Chrome correctly.
       # - least-version
       - docker-image:
           requires:
-            - 10.15.0
+            - 10.15.1
             - 8.15.0
             # - least-version
           filters:
