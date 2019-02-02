@@ -76,24 +76,36 @@ export default async function(argv: string[] = []): Promise<number> {
           group: OptionGroup.Basic,
           type: 'boolean',
         },
-        ...(process.env.IS_DOCKER
-          ? {}
-          : {
-              preview: {
-                alias: 'p',
-                describe: 'Open preview window (EXPERIMENTAL)',
-                group: OptionGroup.Basic,
-                type: 'boolean',
-              },
-            }),
+        preview: {
+          alias: 'p',
+          describe: 'Open preview window (EXPERIMENTAL)',
+          hidden: !!process.env.IS_DOCKER,
+          group: OptionGroup.Basic,
+          type: 'boolean',
+        },
         pdf: {
+          conflicts: ['image'],
           describe: 'Convert slide deck into PDF',
           group: OptionGroup.Converter,
           type: 'boolean',
         },
+        image: {
+          conflicts: ['pdf'],
+          describe: 'Convert slide into image file (first slide only)',
+          group: OptionGroup.Converter,
+          choices: ['png', 'jpeg'],
+          coerce: (type: string) => (type === 'jpg' ? 'jpeg' : type),
+          type: 'string',
+        },
+        'jpeg-quality': {
+          defaultDescription: '85',
+          describe: 'Setting JPEG image quality',
+          group: OptionGroup.Converter,
+          type: 'number',
+        },
         'allow-local-files': {
           describe:
-            'Allow to access local files from Markdown while converting PDF (NOT SECURE)',
+            'Allow to access local files from Markdown while converting PDF and image (NOT SECURE)',
           group: OptionGroup.Converter,
           type: 'boolean',
         },
@@ -269,8 +281,11 @@ export default async function(argv: string[] = []): Promise<number> {
       } else {
         cli.info(chalk.green('[Watch mode] Start watching...'))
 
-        if (cvtOpts.preview)
-          for (const file of convertedFiles) await preview.open(fileToURI(file))
+        if (cvtOpts.preview) {
+          for (const file of convertedFiles) {
+            await preview.open(fileToURI(file, cvtOpts.type))
+          }
+        }
       }
     }
 

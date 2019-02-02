@@ -1,5 +1,6 @@
 import path from 'path'
 import terminate from 'terminate'
+import { ConvertType } from '../src/converter'
 import { File, FileType } from '../src/file'
 import { Preview, fileToURI } from '../src/preview'
 import { CLIError } from '../src/error'
@@ -128,14 +129,18 @@ describe('#fileToURI', () => {
     context('in posix file system', () =>
       it('returns file schema URI', () => {
         posix()
-        expect(fileToURI(new File('/a/b/c'))).toBe('file:///a/b/c')
+        expect(fileToURI(new File('/a/b/c'), ConvertType.html)).toBe(
+          'file:///a/b/c'
+        )
       })
     )
 
     context('in Windows file system', () =>
       it('returns file schema URI', () => {
         win32()
-        expect(fileToURI(new File('c:\\abc'))).toBe('file:///c:/abc')
+        expect(fileToURI(new File('c:\\abc'), ConvertType.html)).toBe(
+          'file:///c:/abc'
+        )
       })
     )
   })
@@ -148,16 +153,27 @@ describe('#fileToURI', () => {
       return fileInstance
     }
 
-    it('returns data schema URI with encoded buffer by Base64', () => {
+    it('returns data schema URI with MIME type and encoded buffer by Base64', () => {
       const instance = file()
       instance.buffer = Buffer.from('buffer')
 
-      expect(fileToURI(instance)).toBe('data:text/html;base64,YnVmZmVy')
+      expect(fileToURI(instance, ConvertType.html)).toBe(
+        'data:text/html;base64,YnVmZmVy'
+      )
+      expect(fileToURI(instance, ConvertType.pdf)).toBe(
+        'data:application/pdf;base64,YnVmZmVy'
+      )
+      expect(fileToURI(instance, ConvertType.png)).toBe(
+        'data:image/png;base64,YnVmZmVy'
+      )
+      expect(fileToURI(instance, ConvertType.jpeg)).toBe(
+        'data:image/jpeg;base64,YnVmZmVy'
+      )
     })
 
     context('when buffer is not ready', () =>
       it('throws CLIError', () =>
-        expect(() => fileToURI(file())).toThrow(CLIError))
+        expect(() => fileToURI(file(), ConvertType.html)).toThrow(CLIError))
     )
   })
 })

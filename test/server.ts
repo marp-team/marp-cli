@@ -128,6 +128,15 @@ describe('Server', () => {
 
           await request(server.server).get('/1.md?pdf')
           expect(server.converter.options.type).toBe(ConvertType.pdf)
+
+          await request(server.server).get('/1.md?png')
+          expect(server.converter.options.type).toBe(ConvertType.png)
+
+          await request(server.server).get('/1.md?jpg')
+          expect(server.converter.options.type).toBe(ConvertType.jpeg)
+
+          await request(server.server).get('/1.md?jpeg')
+          expect(server.converter.options.type).toBe(ConvertType.jpeg)
         })
       })
     })
