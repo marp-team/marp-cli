@@ -326,6 +326,13 @@
   resolved "https://registry.yarnpkg.com/@types/pug/-/pug-2.0.4.tgz#8772fcd0418e3cd2cc171555d73007415051f4b2"
   integrity sha1-h3L80EGOPNLMFxVV1zAHQVBR9LI=
 
+"@types/puppeteer@^1.11.2":
+  version "1.12.0"
+  resolved "https://registry.yarnpkg.com/@types/puppeteer/-/puppeteer-1.12.0.tgz#0bd11f1aae4130b164d1759e69b8376a75d034fa"
+  integrity sha512-chymwff4/kbiHWkG/ZqkyLboFWMmbO5gz9AozDKqdv6T9ca1ScI1jsK5A7vM5hp2qoxfADN/UEOpMDXaA/L0VA==
+  dependencies:
+    "@types/node" "*"
+
 "@types/q@^1.5.1":
   version "1.5.1"
   resolved "https://registry.yarnpkg.com/@types/q/-/q-1.5.1.tgz#48fd98c1561fe718b61733daed46ff115b496e18"

@@ -185,7 +185,7 @@ export class Converter {
       type: 'png' | 'jpeg'
     }
   ) {
-    file.buffer = <Buffer>await this.usePuppeteer(file, async (page, uri) => {
+    file.buffer = await this.usePuppeteer(file, async (page, uri) => {
       await page.setViewport({ ...opts.size })
       await page.goto(uri, { waitUntil: ['domcontentloaded', 'networkidle0'] })
       await page.emulateMedia('print')
