@@ -19,6 +19,8 @@ import { notifier } from './watcher'
 export enum ConvertType {
   html = 'html',
   pdf = 'pdf',
+  png = 'png',
+  jpeg = 'jpg',
 }
 
 export interface ConverterOption {
@@ -31,6 +33,7 @@ export interface ConverterOption {
   options: MarpitOptions
   output?: string | false
   preview?: boolean
+  jpegQuality?: number
   readyScript?: string
   server?: boolean
   template: string
@@ -41,8 +44,8 @@ export interface ConverterOption {
 }
 
 export interface ConvertFileOption {
-  silence?: boolean
   onConverted?: ConvertedCallback
+  onlyScanning?: boolean
 }
 
 export interface ConvertResult {
@@ -85,7 +88,8 @@ export class Converter {
       ...(this.options.templateOption || {}),
       lang,
       readyScript,
-      base: isFile && type === ConvertType.pdf ? file!.absolutePath : undefined,
+      base:
+        isFile && type !== ConvertType.html ? file!.absolutePath : undefined,
       notifyWS:
         isFile && this.options.watch && type === ConvertType.html
           ? await notifier.register(file!.absolutePath)
@@ -96,13 +100,10 @@ export class Converter {
 
         const { themeSet, lastGlobalDirectives } = <any>engine
         const globalDirectives = lastGlobalDirectives || {}
+        const themeName: string | undefined =
+          globalDirectives.theme || (themeSet.default || {}).name
 
-        if (isFile) {
-          const themeDir: string | undefined =
-            globalDirectives.theme || (themeSet.default || {}).name
-
-          this.options.themeSet.observe(file!.absolutePath, themeDir)
-        }
+        if (isFile) this.options.themeSet.observe(file!.absolutePath, themeName)
 
         return {
           ...ret,
@@ -110,6 +111,10 @@ export class Converter {
           image: globalDirectives.marpCLIImage,
           title: globalDirectives.marpCLITitle,
           url: globalDirectives.marpCLIURL,
+          size: {
+            height: engine.themeSet.getThemeProp(themeName!, 'heightPixel'),
+            width: engine.themeSet.getThemeProp(themeName!, 'widthPixel'),
+          },
         }
       },
     })
@@ -119,7 +124,7 @@ export class Converter {
     let result: ConvertResult
 
     try {
-      silence(!!opts.silence)
+      silence(!!opts.onlyScanning)
 
       const template = await this.convert((await file.load()).toString(), file)
       const newFile = file.convert(this.options.output, this.options.type)
@@ -130,8 +135,25 @@ export class Converter {
       silence(false)
     }
 
-    if (this.options.type === ConvertType.pdf)
-      await this.convertFileToPDF(result.newFile)
+    if (opts.onlyScanning) return result
+
+    switch (this.options.type) {
+      case ConvertType.pdf:
+        await this.convertFileToPDF(result.newFile)
+        break
+      case ConvertType.png:
+        await this.convertFileToImage(result.newFile, {
+          size: result.template.size,
+          type: 'png',
+        })
+        break
+      case ConvertType.jpeg:
+        await this.convertFileToImage(result.newFile, {
+          quality: this.options.jpegQuality,
+          size: result.template.size,
+          type: 'jpeg',
+        })
+    }
 
     await result.newFile.save()
     if (opts.onConverted) opts.onConverted(result)
@@ -149,45 +171,28 @@ export class Converter {
   }
 
   private async convertFileToPDF(file: File) {
-    const tmpFile: File.TmpFileInterface | undefined = await (() => {
-      if (!this.options.allowLocalFiles) return undefined
+    file.buffer = await this.usePuppeteer(file, async (page, uri) => {
+      await page.goto(uri, { waitUntil: ['domcontentloaded', 'networkidle0'] })
+      return await page.pdf({ printBackground: true, preferCSSPageSize: true })
+    })
+  }
 
-      const warning = `Insecure local file accessing is enabled for conversion of ${file.relativePath()}.`
-      warn(warning)
-
-      return file.saveTmpFile('.html')
-    })()
-
-    const uri = tmpFile
-      ? `file://${tmpFile.path}`
-      : `data:text/html;base64,${file.buffer!.toString('base64')}`
-
-    try {
-      const browser = await Converter.runBrowser()
-      const page = await browser.newPage()
-
-      try {
-        await page.goto(uri, {
-          waitUntil: ['domcontentloaded', 'networkidle0'],
-        })
-
-        file.buffer = await page.pdf({
-          printBackground: true,
-          preferCSSPageSize: true,
-        })
-      } finally {
-        await page.close()
-      }
-    } finally {
-      if (tmpFile) await tmpFile.cleanup()
+  private async convertFileToImage(
+    file: File,
+    opts: {
+      quality?: number
+      size: { height: number; width: number }
+      type: 'png' | 'jpeg'
     }
-  }
+  ) {
+    file.buffer = <Buffer>await this.usePuppeteer(file, async (page, uri) => {
+      await page.setViewport({ ...opts.size })
+      await page.goto(uri, { waitUntil: ['domcontentloaded', 'networkidle0'] })
+      await page.emulateMedia('print')
 
-  static async closeBrowser() {
-    if (Converter.browser) await Converter.browser.close()
+      return await page.screenshot({ quality: opts.quality, type: opts.type })
+    })
   }
-
-  private static browser?: puppeteer.Browser
 
   private generateEngine(mergeOptions: MarpitOptions): Marpit {
     const { html, options } = this.options
@@ -217,6 +222,43 @@ export class Converter {
 
     return engine
   }
+
+  private async usePuppeteer<T>(
+    file: File,
+    process: (page: puppeteer.Page, uri: string) => Promise<T>
+  ) {
+    const tmpFile: File.TmpFileInterface | undefined = await (() => {
+      if (!this.options.allowLocalFiles) return undefined
+
+      const warning = `Insecure local file accessing is enabled for conversion of ${file.relativePath()}.`
+      warn(warning)
+
+      return file.saveTmpFile('.html')
+    })()
+
+    const uri = tmpFile
+      ? `file://${tmpFile.path}`
+      : `data:text/html;base64,${file.buffer!.toString('base64')}`
+
+    try {
+      const browser = await Converter.runBrowser()
+      const page = await browser.newPage()
+
+      try {
+        return await process(page, uri)
+      } finally {
+        await page.close()
+      }
+    } finally {
+      if (tmpFile) await tmpFile.cleanup()
+    }
+  }
+
+  static async closeBrowser() {
+    if (Converter.browser) await Converter.browser.close()
+  }
+
+  private static browser?: puppeteer.Browser
 
   private static async runBrowser() {
     if (!Converter.browser) {

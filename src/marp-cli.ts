@@ -76,24 +76,36 @@ export default async function(argv: string[] = []): Promise<number> {
           group: OptionGroup.Basic,
           type: 'boolean',
         },
-        ...(process.env.IS_DOCKER
-          ? {}
-          : {
-              preview: {
-                alias: 'p',
-                describe: 'Open preview window (EXPERIMENTAL)',
-                group: OptionGroup.Basic,
-                type: 'boolean',
-              },
-            }),
+        preview: {
+          alias: 'p',
+          describe: 'Open preview window (EXPERIMENTAL)',
+          hidden: !!process.env.IS_DOCKER,
+          group: OptionGroup.Basic,
+          type: 'boolean',
+        },
         pdf: {
+          conflicts: ['image'],
           describe: 'Convert slide deck into PDF',
           group: OptionGroup.Converter,
           type: 'boolean',
         },
+        image: {
+          conflicts: ['pdf'],
+          describe: 'Convert slide into image file (first slide only)',
+          group: OptionGroup.Converter,
+          choices: ['png', 'jpeg'],
+          coerce: (type: string) => (type === 'jpg' ? 'jpeg' : type),
+          type: 'string',
+        },
+        'jpeg-quality': {
+          defaultDescription: '85',
+          describe: 'Setting JPEG image quality',
+          group: OptionGroup.Converter,
+          type: 'number',
+        },
         'allow-local-files': {
           describe:
-            'Allow to access local files from Markdown while converting PDF (NOT SECURE)',
+            'Allow to access local files from Markdown while converting PDF and image (NOT SECURE)',
           group: OptionGroup.Converter,
           type: 'boolean',
         },
@@ -204,9 +216,6 @@ export default async function(argv: string[] = []): Promise<number> {
       return config.files.length > 0 ? 1 : 0
     }
 
-    if (!cvtOpts.server)
-      cli.info(`Converting ${length} markdown${length > 1 ? 's' : ''}...`)
-
     // Convert markdown into HTML
     const convertedFiles: File[] = []
     const onConverted: ConvertedCallback = ret => {
@@ -223,10 +232,12 @@ export default async function(argv: string[] = []): Promise<number> {
     }
 
     try {
-      await converter.convertFiles(
-        foundFiles,
-        cvtOpts.server ? { silence: true } : { onConverted }
-      )
+      if (cvtOpts.server) {
+        await converter.convertFiles(foundFiles, { onlyScanning: true })
+      } else {
+        cli.info(`Converting ${length} markdown${length > 1 ? 's' : ''}...`)
+        await converter.convertFiles(foundFiles, { onConverted })
+      }
     } catch (e) {
       error(`Failed converting Markdown. (${e.message})`, e.errorCode)
     }
@@ -277,7 +288,8 @@ export default async function(argv: string[] = []): Promise<number> {
         cli.info(chalk.green('[Watch mode] Start watching...'))
 
         if (cvtOpts.preview)
-          for (const file of convertedFiles) await preview.open(fileToURI(file))
+          for (const file of convertedFiles)
+            await preview.open(fileToURI(file, cvtOpts.type))
       }
     }
 

@@ -14,7 +14,12 @@ interface TemplateCoreOption {
   lang: string
   notifyWS?: string
   readyScript?: string
-  renderer: (tplOpts: MarpitOptions) => MarpitRenderResult & TemplateMeta
+  renderer: (
+    tplOpts: MarpitOptions
+  ) => MarpitRenderResult &
+    TemplateMeta & {
+      size: RenderedSize
+    }
 }
 
 export interface TemplateMeta {
@@ -22,6 +27,11 @@ export interface TemplateMeta {
   image: string | undefined
   title: string | undefined
   url: string | undefined
+}
+
+interface RenderedSize {
+  height: number
+  width: number
 }
 
 export type TemplateOption = TemplateBareOption | TemplateBespokeOption
@@ -36,6 +46,7 @@ interface TemplateBespokeOption {
 export interface TemplateResult {
   rendered: MarpitRenderResult
   result: string
+  size: RenderedSize
 }
 
 export type Template<T = TemplateOption> = (
@@ -57,6 +68,7 @@ export const bare: Template<TemplateBareOption> = async opts => {
       bare: { css: bareScss },
       watchJs: await watchJs(opts.notifyWS),
     }),
+    size: rendered.size,
   }
 }
 
@@ -87,6 +99,7 @@ export const bespoke: Template<TemplateBespokeOption> = async opts => {
         )}</script>`,
       watchJs: await watchJs(opts.notifyWS),
     }),
+    size: rendered.size,
   }
 }
 

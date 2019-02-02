@@ -6,6 +6,13 @@ import { ConvertType } from './converter'
 import { CLIError } from './error'
 import favicon from './assets/favicon.png'
 
+const mimeTypes = {
+  [ConvertType.html]: 'text/html',
+  [ConvertType.pdf]: 'application/pdf',
+  [ConvertType.png]: 'image/png',
+  [ConvertType.jpeg]: 'image/jpeg',
+}
+
 export class Preview extends TypedEventEmitter<Preview.Events> {
   readonly options: Preview.Options
 
@@ -93,12 +100,7 @@ export namespace Preview {
   }
 }
 
-const mimeTypes = {
-  [ConvertType.html]: 'text/html',
-  [ConvertType.pdf]: 'application/pdf',
-}
-
-export function fileToURI(file: File, type: ConvertType = ConvertType.html) {
+export function fileToURI(file: File, type: ConvertType) {
   if (file.type === FileType.File) {
     // Convert path to file URI
     const uri = file.absolutePath.replace(/\\/g, '/')
