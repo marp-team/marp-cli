@@ -1,40 +1,57 @@
 import chalk from 'chalk'
-import { error, info, warn } from '../src/cli'
+import { error, info, silence, warn } from '../src/cli'
 
-afterEach(() => jest.restoreAllMocks())
+afterEach(() => {
+  jest.restoreAllMocks()
+  silence(false)
+})
 
 describe('CLI helpers', () => {
-  describe('#error', () => {
-    it('passes message with colored header to console.error', () => {
-      const errSpy = jest.spyOn(console, 'error').mockImplementation()
+  let spy: jest.SpyInstance
 
+  describe('#error', () => {
+    beforeEach(() => (spy = jest.spyOn(console, 'error').mockImplementation()))
+
+    it('passes message with colored header to console.error', () => {
       error('cli-helper')
-      expect(errSpy).toHaveBeenCalledWith(
-        chalk`{bgRed.white [ ERROR ]} cli-helper`
-      )
+      expect(spy).toBeCalledWith(chalk`{bgRed.white [ ERROR ]} cli-helper`)
+    })
+
+    it('calls console.error even if silenced', () => {
+      silence(true)
+      error('cli-helper')
+      expect(spy).toBeCalled()
     })
   })
 
   describe('#info', () => {
-    it('passes message with colored header to console.warn', () => {
-      // Use console.warn to output into stderr
-      const warnSpy = jest.spyOn(console, 'warn').mockImplementation()
+    // Use console.warn to output into stderr
+    beforeEach(() => (spy = jest.spyOn(console, 'warn').mockImplementation()))
 
+    it('passes message with colored header to console.warn', () => {
       info('cli-helper')
-      expect(warnSpy).toHaveBeenCalledWith(
-        chalk`{bgCyan.black [  INFO ]} cli-helper`
-      )
+      expect(spy).toBeCalledWith(chalk`{bgCyan.black [  INFO ]} cli-helper`)
+    })
+
+    it('does not call console.warn when silenced', () => {
+      silence(true)
+      info('cli-helper')
+      expect(spy).not.toBeCalled()
     })
   })
 
   describe('#warn', () => {
-    it('passes message with colored header to console.warn', () => {
-      const warnSpy = jest.spyOn(console, 'warn').mockImplementation()
+    beforeEach(() => (spy = jest.spyOn(console, 'warn').mockImplementation()))
 
+    it('passes message with colored header to console.warn', () => {
       warn('cli-helper')
-      expect(warnSpy).toHaveBeenCalledWith(
-        chalk`{bgYellow.black [  WARN ]} cli-helper`
-      )
+      expect(spy).toBeCalledWith(chalk`{bgYellow.black [  WARN ]} cli-helper`)
+    })
+
+    it('does not call console.warn when silenced', () => {
+      silence(true)
+      warn('cli-helper')
+      expect(spy).not.toBeCalled()
     })
   })
 })
