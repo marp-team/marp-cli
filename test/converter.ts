@@ -12,8 +12,10 @@ import { WatchNotifier } from '../src/watcher'
 
 jest.mock('fs')
 
-afterAll(() => Converter.closeBrowser())
-afterEach(() => jest.restoreAllMocks())
+afterEach(async () => {
+  await Converter.closeBrowser()
+  jest.restoreAllMocks()
+})
 
 describe('Converter', () => {
   const onePath = path.resolve(__dirname, '_files/1.md')
