@@ -3,7 +3,7 @@ import { EventEmitter } from 'events'
 type Events<T> = Extract<keyof T, string | symbol>
 
 export default class TypedEventEmitter<
-  T extends { [K in Events<T>]: Function }
+  T extends { [event in Events<T>]: (...args: any[]) => void }
 > extends EventEmitter {
   addListener!: <E extends Events<T>>(event: E, listener: T[E]) => this
   on!: <E extends Events<T>>(event: E, listener: T[E]) => this
