@@ -642,14 +642,13 @@ describe('Marp CLI', () => {
         })
 
         it('allows custom engine function specified in js config', async () => {
-          jest.spyOn(process.stdout, 'write').mockImplementation()
           jest.spyOn(console, 'warn').mockImplementation()
 
           const conf = assetFn('_configs/custom-engine/anonymous.js')
           const md = assetFn('_configs/custom-engine/md.md')
           const { engine } = require(conf)
 
-          expect(await marpCli(['-c', conf, md, '-o', '-'])).toBe(0)
+          expect(await marpCli(['-c', conf, md, '--no-output'])).toBe(0)
           expect(engine).toBeCalledWith(
             expect.objectContaining({ customOption: true })
           )
@@ -660,13 +659,12 @@ describe('Marp CLI', () => {
     context('with --preview / -p option', () => {
       let warn: jest.SpyInstance<Console['warn']>
 
-      beforeEach(() => {
-        warn = jest.spyOn(console, 'warn').mockImplementation()
-        jest.spyOn(process.stdout, 'write').mockImplementation()
-      })
+      beforeEach(
+        () => (warn = jest.spyOn(console, 'warn').mockImplementation())
+      )
 
       it('opens preview window through Preview.open()', async () => {
-        await marpCli([onePath, '-p', '-o', '-'])
+        await marpCli([onePath, '-p', '--no-output'])
         expect(Preview.prototype.open).toBeCalledTimes(1)
 
         // Simualte opening event
@@ -681,7 +679,7 @@ describe('Marp CLI', () => {
         afterEach(() => delete process.env.IS_DOCKER)
 
         it('ignores --preview option with warning', async () => {
-          await marpCli([onePath, '--preview', '-o', '-'])
+          await marpCli([onePath, '--preview', '--no-output'])
           expect(Preview.prototype.open).not.toBeCalled()
           expect(warn).toBeCalledWith(
             expect.stringContaining('Preview option was ignored')
@@ -752,9 +750,8 @@ describe('Marp CLI', () => {
     context('with --preview option', () => {
       it('opens 2 preview windows through Preview.open()', async () => {
         jest.spyOn(console, 'warn').mockImplementation()
-        jest.spyOn(process.stdout, 'write').mockImplementation()
 
-        await marpCli([...baseArgs, '--preview', '-o', '-'])
+        await marpCli([...baseArgs, '--preview', '--no-output'])
         expect(Preview.prototype.open).toBeCalledTimes(2)
       })
     })
