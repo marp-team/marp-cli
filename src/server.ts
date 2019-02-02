@@ -48,6 +48,7 @@ export class Server {
   ) {
     const file = new File(filename)
 
+    this.converter.options.output = false
     this.converter.options.type = ((): ConvertType => {
       const queryKeys = Object.keys(query)
 

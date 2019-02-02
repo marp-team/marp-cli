@@ -216,22 +216,28 @@ export default async function(argv: string[] = []): Promise<number> {
       return config.files.length > 0 ? 1 : 0
     }
 
-    if (!cvtOpts.server)
-      cli.info(`Converting ${length} markdown${length > 1 ? 's' : ''}...`)
-
     // Convert markdown into HTML
     const convertedFiles: File[] = []
     const onConverted: ConvertedCallback = ret => {
-      const { file, newFile } = ret
-      const output = (f: File, io: string) =>
-        f.type === FileType.StandardIO ? `<${io}>` : f.relativePath()
+      const { file: i, newFile: o } = ret
+      const fn = (f: File, stdio: string) =>
+        f.type === FileType.StandardIO ? stdio : f.relativePath()
 
-      convertedFiles.push(newFile)
-      cli.info(`${output(file, 'stdin')} => ${output(newFile, 'stdout')}`)
+      convertedFiles.push(o)
+      cli.info(
+        `${fn(i, '<stdin>')} ${
+          o.type === FileType.Null ? 'processed.' : `=> ${fn(o, '<stdout>')}`
+        }`
+      )
     }
 
     try {
-      await converter.convertFiles(foundFiles, { onConverted, initial: true })
+      if (cvtOpts.server) {
+        await converter.convertFiles(foundFiles, { onlyScanning: true })
+      } else {
+        cli.info(`Converting ${length} markdown${length > 1 ? 's' : ''}...`)
+        await converter.convertFiles(foundFiles, { onConverted })
+      }
     } catch (e) {
       error(`Failed converting Markdown. (${e.message})`, e.errorCode)
     }
@@ -281,11 +287,9 @@ export default async function(argv: string[] = []): Promise<number> {
       } else {
         cli.info(chalk.green('[Watch mode] Start watching...'))
 
-        if (cvtOpts.preview) {
-          for (const file of convertedFiles) {
+        if (cvtOpts.preview)
+          for (const file of convertedFiles)
             await preview.open(fileToURI(file, cvtOpts.type))
-          }
-        }
       }
     }
 

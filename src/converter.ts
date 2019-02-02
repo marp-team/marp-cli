@@ -31,7 +31,7 @@ export interface ConverterOption {
   inputDir?: string
   lang: string
   options: MarpitOptions
-  output?: string
+  output?: string | false
   preview?: boolean
   jpegQuality?: number
   readyScript?: string
@@ -44,8 +44,8 @@ export interface ConverterOption {
 }
 
 export interface ConvertFileOption {
-  initial?: boolean
   onConverted?: ConvertedCallback
+  onlyScanning?: boolean
 }
 
 export interface ConvertResult {
@@ -121,47 +121,42 @@ export class Converter {
   }
 
   async convertFile(file: File, opts: ConvertFileOption = {}) {
-    const emit = !(this.options.server && opts.initial)
-
-    const convert = async (): Promise<ConvertResult> => {
-      const template = await this.convert((await file.load()).toString(), file)
-      const newFile = file.convert(this.options.output, this.options.type)
-      newFile.buffer = Buffer.from(template.result)
-
-      return { file, newFile, template }
-    }
-
     let result: ConvertResult
 
     try {
-      silence(!emit)
-      result = await convert()
+      silence(!!opts.onlyScanning)
+
+      const template = await this.convert((await file.load()).toString(), file)
+      const newFile = file.convert(this.options.output, this.options.type)
+
+      newFile.buffer = Buffer.from(template.result)
+      result = { file, newFile, template }
     } finally {
       silence(false)
     }
 
-    if (emit) {
-      switch (this.options.type) {
-        case ConvertType.pdf:
-          await this.convertFileToPDF(result.newFile)
-          break
-        case ConvertType.png:
-          await this.convertFileToImage(result.newFile, {
-            size: result.template.size,
-            type: 'png',
-          })
-          break
-        case ConvertType.jpeg:
-          await this.convertFileToImage(result.newFile, {
-            quality: this.options.jpegQuality,
-            size: result.template.size,
-            type: 'jpeg',
-          })
-      }
+    if (opts.onlyScanning) return result
 
-      if (!this.options.server) await result.newFile.save()
-      if (opts.onConverted) opts.onConverted(result)
+    switch (this.options.type) {
+      case ConvertType.pdf:
+        await this.convertFileToPDF(result.newFile)
+        break
+      case ConvertType.png:
+        await this.convertFileToImage(result.newFile, {
+          size: result.template.size,
+          type: 'png',
+        })
+        break
+      case ConvertType.jpeg:
+        await this.convertFileToImage(result.newFile, {
+          quality: this.options.jpegQuality,
+          size: result.template.size,
+          type: 'jpeg',
+        })
     }
+
+    await result.newFile.save()
+    if (opts.onConverted) opts.onConverted(result)
 
     return result
   }
