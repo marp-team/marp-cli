@@ -5,6 +5,12 @@
 ### Added
 
 - Make the first slide convertible into PNG and JPEG image by `--image` option ([#68](https://github.com/marp-team/marp-cli/pull/68))
+- Support `--no-output` option ([#69](https://github.com/marp-team/marp-cli/pull/69))
+
+### Fixed
+
+- Fix wrong MIME type when opening preview of converted file outputted to stdout ([#68](https://github.com/marp-team/marp-cli/pull/68))
+- Improved log message when processed Markdown in server mode ([#69](https://github.com/marp-team/marp-cli/pull/69))
 
 ## v0.5.0 - 2019-01-31
 
