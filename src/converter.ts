@@ -121,42 +121,42 @@ export class Converter {
   }
 
   async convertFile(file: File, opts: ConvertFileOption = {}) {
-    let result: ConvertResult
+    const result = await (async (): Promise<ConvertResult> => {
+      try {
+        silence(!!opts.onlyScanning)
 
-    try {
-      silence(!!opts.onlyScanning)
+        const tpl = await this.convert((await file.load()).toString(), file)
+        const newFile = file.convert(this.options.output, this.options.type)
 
-      const template = await this.convert((await file.load()).toString(), file)
-      const newFile = file.convert(this.options.output, this.options.type)
+        newFile.buffer = Buffer.from(tpl.result)
+        return { file, newFile, template: tpl }
+      } finally {
+        silence(false)
+      }
+    })()
 
-      newFile.buffer = Buffer.from(template.result)
-      result = { file, newFile, template }
-    } finally {
-      silence(false)
+    if (!opts.onlyScanning) {
+      switch (this.options.type) {
+        case ConvertType.pdf:
+          await this.convertFileToPDF(result.newFile)
+          break
+        case ConvertType.png:
+          await this.convertFileToImage(result.newFile, {
+            size: result.template.size,
+            type: 'png',
+          })
+          break
+        case ConvertType.jpeg:
+          await this.convertFileToImage(result.newFile, {
+            quality: this.options.jpegQuality,
+            size: result.template.size,
+            type: 'jpeg',
+          })
+      }
+
+      await result.newFile.save()
+      if (opts.onConverted) opts.onConverted(result)
     }
-
-    if (opts.onlyScanning) return result
-
-    switch (this.options.type) {
-      case ConvertType.pdf:
-        await this.convertFileToPDF(result.newFile)
-        break
-      case ConvertType.png:
-        await this.convertFileToImage(result.newFile, {
-          size: result.template.size,
-          type: 'png',
-        })
-        break
-      case ConvertType.jpeg:
-        await this.convertFileToImage(result.newFile, {
-          quality: this.options.jpegQuality,
-          size: result.template.size,
-          type: 'jpeg',
-        })
-    }
-
-    await result.newFile.save()
-    if (opts.onConverted) opts.onConverted(result)
 
     return result
   }
@@ -185,7 +185,7 @@ export class Converter {
       type: 'png' | 'jpeg'
     }
   ) {
-    file.buffer = <Buffer>await this.usePuppeteer(file, async (page, uri) => {
+    file.buffer = await this.usePuppeteer(file, async (page, uri) => {
       await page.setViewport({ ...opts.size })
       await page.goto(uri, { waitUntil: ['domcontentloaded', 'networkidle0'] })
       await page.emulateMedia('print')

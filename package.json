@@ -52,8 +52,9 @@
     "@types/get-stdin": "^5.0.1",
     "@types/jest": "^23.3.13",
     "@types/jest-plugin-context": "^2.9.0",
-    "@types/node": "^10.12.20",
+    "@types/node": "^10.12.21",
     "@types/pug": "^2.0.4",
+    "@types/puppeteer": "^1.11.2",
     "@types/supertest": "^2.0.7",
     "@types/ws": "^6.0.1",
     "@types/yargs": "^12.0.8",
@@ -87,7 +88,7 @@
     "stylelint": "^9.10.1",
     "stylelint-config-prettier": "^4.0.0",
     "stylelint-config-standard": "^18.2.0",
-    "stylelint-scss": "^3.5.1",
+    "stylelint-scss": "^3.5.2",
     "supertest": "^3.4.2",
     "ts-jest": "23.10.5",
     "ts-keycode-enum": "^1.0.6",
@@ -95,7 +96,7 @@
     "tslint": "^5.12.1",
     "tslint-config-airbnb": "^5.11.1",
     "tslint-config-prettier": "^1.17.0",
-    "typescript": "^3.2.4"
+    "typescript": "^3.3.1"
   },
   "dependencies": {
     "@marp-team/marp-core": "^0.5.2",
@@ -114,7 +115,7 @@
     "os-locale": "^3.1.0",
     "pkg-up": "^2.0.0",
     "portfinder": "^1.0.20",
-    "puppeteer-core": "^1.12.0",
+    "puppeteer-core": "^1.12.1",
     "serve-index": "^1.9.1",
     "terminate": "^2.1.2",
     "tmp": "^0.0.33",

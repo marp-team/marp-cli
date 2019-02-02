@@ -12,6 +12,10 @@
 - Fix wrong MIME type when opening preview of converted file outputted to stdout ([#68](https://github.com/marp-team/marp-cli/pull/68))
 - Improved log message when processed Markdown in server mode ([#69](https://github.com/marp-team/marp-cli/pull/69))
 
+### Changed
+
+- Upgrade Node and dependent packages to latest ([#70](https://github.com/marp-team/marp-cli/pull/70))
+
 ## v0.5.0 - 2019-01-31
 
 ### Added
