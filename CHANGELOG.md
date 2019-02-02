@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v0.6.0 - 2019-02-02
+
 ### Added
 
 - Make the first slide convertible into PNG and JPEG image by `--image` option ([#68](https://github.com/marp-team/marp-cli/pull/68))
