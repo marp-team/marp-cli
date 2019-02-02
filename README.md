@@ -37,7 +37,10 @@ npx @marp-team/marp-cli -s ./slides
 npx @marp-team/marp-cli -p slide-deck.md
 ```
 
-> :information_source: You have to install [Google Chrome](https://www.google.com/chrome/) (or [Chromium](https://www.chromium.org/)) to convert slide deck into PDF.
+> :information_source: You have to install [Google Chrome] (or [Chromium]) to convert slide deck into PDF.
+
+[google chrome]: https://www.google.com/chrome/
+[chromium]: https://www.chromium.org/
 
 ### Docker
 
@@ -99,15 +102,12 @@ When you want to output the converted result to another directory with keeping t
 
 ### Convert to PDF (`--pdf`)
 
-If you passed `--pdf` option or the output filename specified by `--output` (`-o`) option ends with `.pdf`, Marp CLI will try to convert into PDF file by using the installed [Google Chrome](https://www.google.com/chrome/) or [Chromium](https://www.chromium.org/).
+If you passed `--pdf` option or the output filename specified by `--output` (`-o`) option ends with `.pdf`, Marp CLI will try to convert into PDF file by using the installed [Google Chrome] or [Chromium].
 
 ```bash
 marp --pdf slide-deck.md
 marp slide-deck.md -o converted.pdf
 ```
-
-[google chrome]: https://www.google.com/chrome/
-[chromium]: https://www.chromium.org/
 
 ### Convert the first slide page to image (`--image`)
 
