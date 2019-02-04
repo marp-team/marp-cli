@@ -74,11 +74,6 @@ jobs:
     docker:
       - image: circleci/node:8.15.0-browsers
 
-  least-version:
-    <<: *base
-    docker:
-      - image: circleci/node:8.9.0-browsers
-
   docker-image:
     docker:
       - image: docker:git
@@ -103,13 +98,10 @@ workflows:
     jobs:
       - 10.15.1
       - 8.15.0
-      # NOTE: Node 8.9 in test environment cannot close Chrome correctly.
-      # - least-version
       - docker-image:
           requires:
             - 10.15.1
             - 8.15.0
-            # - least-version
           filters:
             branches:
               only: master
