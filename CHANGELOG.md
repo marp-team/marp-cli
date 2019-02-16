@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix hanging PDF conversion within Docker image ([#73](https://github.com/marp-team/marp-cli/issues/73), [#74](https://github.com/marp-team/marp-cli/pull/74))
+
 ## v0.6.1 - 2019-02-04
 
 ### Changed
