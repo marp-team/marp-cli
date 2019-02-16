@@ -1,4 +1,4 @@
-FROM node:10.14.1-alpine
+FROM node:10.15.1-alpine
 LABEL maintainer "Marp team"
 
 RUN apk update && apk upgrade && \
@@ -27,7 +27,7 @@ ENV IS_DOCKER true
 
 WORKDIR /home/marp/.cli
 COPY --chown=marp:marp . /home/marp/.cli/
-RUN yarn install && yarn build \
+RUN yarn install && yarn add puppeteer-core@chrome-71 && yarn build \
     && rm -rf ./src ./node_modules && yarn install --production && yarn cache clean
 
 WORKDIR /home/marp/app
