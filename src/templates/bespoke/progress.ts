@@ -1,6 +1,8 @@
 // Based on https://github.com/bespokejs/bespoke-progress
 
-const query = '.bespoke-progress-parent > .bespoke-progress-bar'
+// TODO: Revert to the detailed scope after upgrade JSDOM
+// ".bespoke-progress-parent > .bespoke-progress-bar"
+const query = '.bespoke-progress-bar'
 
 export default function basepokeProgress(deck) {
   deck.on('activate', e => {

@@ -120,7 +120,7 @@ describe('Server', () => {
           const server = await startServer()
 
           jest
-            .spyOn(server.converter, 'convertFile')
+            .spyOn<any, any>(server.converter, 'convertFile')
             .mockResolvedValue({ newFile: { buffer: 'converted' } })
 
           await request(server.server).get('/1.md')

@@ -50,7 +50,9 @@ describe('ThemeSet', () => {
         expect(themeSet.themes.size).toBe(1)
 
         const [themeInstance] = [...themeSet.themes.values()]
-        const load = jest.spyOn(themeInstance, 'load').mockResolvedValue(0)
+        const load = jest
+          .spyOn<any, any>(themeInstance, 'load')
+          .mockResolvedValue(0)
 
         await themeSet.load(themeA)
         expect(themeSet.themes.size).toBe(1)
