@@ -17,7 +17,7 @@ import { Watcher } from '../src/watcher'
 const { version } = require('../package.json')
 const coreVersion = require('@marp-team/marp-core/package.json').version
 const marpitVersion = require('@marp-team/marpit/package.json').version
-const previewEmitter = new EventEmitter()
+const previewEmitter = new EventEmitter() as Preview
 
 jest.mock('fs')
 jest.mock('get-stdin')
@@ -42,7 +42,7 @@ describe('Marp CLI', () => {
 
   for (const cmd of ['--version', '-v'])
     context(`with ${cmd} option`, () => {
-      let log: jest.SpyInstance<Console['log']>
+      let log: jest.SpyInstance<void, any>
       let findClassPath: jest.SpyInstance<ResolvedEngine['findClassPath']>
 
       beforeEach(() => {
@@ -115,7 +115,7 @@ describe('Marp CLI', () => {
     context(`with ${cmd || 'empty'} option`, () => {
       const run = (...args) => marpCli([...(cmd ? [cmd] : []), ...args])
 
-      let error: jest.SpyInstance<Console['error']>
+      let error: jest.SpyInstance<ReturnType<Console['error']>, any>
 
       beforeEach(() => {
         error = jest.spyOn(console, 'error').mockImplementation()
@@ -237,7 +237,7 @@ describe('Marp CLI', () => {
         const info = jest.spyOn(cli, 'info')
         info.mockImplementation()
 
-        const serverStart = jest.spyOn(Server.prototype, 'start')
+        const serverStart = jest.spyOn<any, any>(Server.prototype, 'start')
         serverStart.mockResolvedValue(0)
 
         await marpCli(['--input-dir', files, '--server'])
@@ -259,7 +259,7 @@ describe('Marp CLI', () => {
 
         beforeEach(() => {
           jest.spyOn(cli, 'info').mockImplementation()
-          jest.spyOn(Server.prototype, 'start').mockResolvedValue(0)
+          jest.spyOn<any, any>(Server.prototype, 'start').mockResolvedValue(0)
         })
 
         it('opens preview window through Preview.open()', async () => {
@@ -305,8 +305,8 @@ describe('Marp CLI', () => {
   })
 
   context('with --theme option', () => {
-    let convert: jest.MockInstance<any>
-    let info: jest.MockInstance<any>
+    let convert: jest.MockInstance<any, any>
+    let info: jest.MockInstance<any, any>
 
     beforeEach(() => {
       convert = jest.spyOn(Converter.prototype, 'convert')
@@ -374,8 +374,8 @@ describe('Marp CLI', () => {
     const themeB = assetFn('_files/themes/b.css')
     const themeC = assetFn('_files/themes/nested/c.css')
 
-    let convert: jest.MockInstance<Converter['convert']>
-    let observeSpy: jest.MockInstance<ThemeSet['observe']>
+    let convert: jest.MockInstance<ReturnType<Converter['convert']>, any>
+    let observeSpy: jest.MockInstance<ReturnType<ThemeSet['observe']>, any>
 
     beforeEach(() => {
       convert = jest.spyOn(Converter.prototype, 'convert')
@@ -657,7 +657,7 @@ describe('Marp CLI', () => {
     })
 
     context('with --preview / -p option', () => {
-      let warn: jest.SpyInstance<Console['warn']>
+      let warn: jest.SpyInstance<ReturnType<Console['warn']>, any>
 
       beforeEach(
         () => (warn = jest.spyOn(console, 'warn').mockImplementation())
@@ -694,7 +694,7 @@ describe('Marp CLI', () => {
       const cliInfo = jest.spyOn(cli, 'info').mockImplementation()
 
       jest
-        .spyOn(Converter.prototype, 'convertFiles')
+        .spyOn<any, any>(Converter.prototype, 'convertFiles')
         .mockImplementation(() => [])
 
       expect(await marpCli([assetFn('_files')])).toBe(0)
@@ -707,7 +707,7 @@ describe('Marp CLI', () => {
       it('treats passed directory as an input directory of the server', async () => {
         jest.spyOn(cli, 'info').mockImplementation()
 
-        const serverStart = jest.spyOn(Server.prototype, 'start')
+        const serverStart = jest.spyOn<any, any>(Server.prototype, 'start')
         serverStart.mockResolvedValue(0)
 
         await marpCli(['--server', assetFn('_files')])
