@@ -6,6 +6,11 @@
 
 - Fix hanging PDF conversion within Docker image ([#73](https://github.com/marp-team/marp-cli/issues/73), [#74](https://github.com/marp-team/marp-cli/pull/74))
 
+### Changed
+
+- Upgrade to [Marpit v0.7.2](https://github.com/marp-team/marpit/releases/tag/v0.7.2) and [Marp Core v0.6.1](https://github.com/marp-team/marp-core/releases/tag/v0.6.1) ([#75](https://github.com/marp-team/marp-cli/pull/75))
+- Upgrade dependent packages to latest ([#75](https://github.com/marp-team/marp-cli/pull/75))
+
 ## v0.6.1 - 2019-02-04
 
 ### Changed
