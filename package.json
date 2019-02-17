@@ -1,6 +1,6 @@
 {
   "name": "@marp-team/marp-cli",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "A CLI interface for Marp and Marpit based converters",
   "repository": "https://github.com/marp-team/marp-cli",
   "engines": {
