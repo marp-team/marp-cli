@@ -490,12 +490,12 @@ describe('Marp CLI', () => {
       expect(cliError).toHaveBeenCalledWith(expect.stringContaining('FAIL'))
     })
 
-    context('with --pdf option', () =>
+    context('with --pdf option', () => {
       it('converts file with PDF type', async () => {
         const cmd = [onePath, '--pdf']
         expect((await convertion(...cmd)).options.type).toBe(ConvertType.pdf)
       })
-    )
+    })
 
     context('with --image option', () => {
       it('converts file with PNG type by specified png', async () => {

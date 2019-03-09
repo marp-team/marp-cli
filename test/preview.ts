@@ -126,23 +126,23 @@ describe('#fileToURI', () => {
   context('with passing file', () => {
     const { posix, win32 } = <any>path
 
-    context('in posix file system', () =>
+    context('in posix file system', () => {
       it('returns file schema URI', () => {
         posix()
         expect(fileToURI(new File('/a/b/c'), ConvertType.html)).toBe(
           'file:///a/b/c'
         )
       })
-    )
+    })
 
-    context('in Windows file system', () =>
+    context('in Windows file system', () => {
       it('returns file schema URI', () => {
         win32()
         expect(fileToURI(new File('c:\\abc'), ConvertType.html)).toBe(
           'file:///c:/abc'
         )
       })
-    )
+    })
   })
 
   context('with passing standard IO buffer', () => {
@@ -171,9 +171,9 @@ describe('#fileToURI', () => {
       )
     })
 
-    context('when buffer is not ready', () =>
+    context('when buffer is not ready', () => {
       it('throws CLIError', () =>
         expect(() => fileToURI(file(), ConvertType.html)).toThrow(CLIError))
-    )
+    })
   })
 })
