@@ -196,12 +196,8 @@ export class Converter {
 
   private generateEngine(mergeOptions: MarpitOptions): Marpit {
     const { html, options } = this.options
-    const opts: any = { ...options, ...mergeOptions }
-
-    // for marp-core
-    if (html !== undefined) opts.html = html
-
     const { prototype } = this.options.engine
+    const opts = { ...options, ...mergeOptions, html }
 
     const engine =
       prototype && prototype.hasOwnProperty('constructor')
@@ -211,8 +207,7 @@ export class Converter {
     if (typeof engine.render !== 'function')
       error('Specified engine has not implemented render() method.')
 
-    // for Marpit engine
-    if (!(engine instanceof Marp)) engine.markdown.set({ html: !!html })
+    engine.markdown.set({ html })
 
     // Plugins
     engine.use(metaPlugin, engine)
