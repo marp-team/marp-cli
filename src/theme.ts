@@ -1,6 +1,6 @@
 import { Marpit } from '@marp-team/marpit'
 import fs from 'fs'
-import globby from 'globby'
+import globby, { hasMagic } from 'globby'
 import path from 'path'
 import { promisify } from 'util'
 import { warn } from './cli'
@@ -128,7 +128,7 @@ export class ThemeSet {
     const fnForWatch: Set<string> = new Set(found.map(f => path.resolve(f)))
 
     for (const f of fn) {
-      if (!globby.hasMagic(f)) {
+      if (!hasMagic(f)) {
         try {
           const stat: fs.Stats = await lstat(f)
 
@@ -149,7 +149,10 @@ export class ThemeSet {
   private static async findPath(fn: string[]): Promise<string[]> {
     return await globby(fn, {
       absolute: true,
-      expandDirectories: { files: themeExtensions },
+      expandDirectories: {
+        extensions: [],
+        files: themeExtensions,
+      },
       ignore: ['**/node_modules'],
     })
   }
