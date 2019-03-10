@@ -90,8 +90,8 @@ $progressHeight: 5px;
         }
 
         @mixin icon-button($icon, $size: 32px) {
-          background-size: contain;
           background: transparent url($icon) no-repeat center center;
+          background-size: contain;
           height: $size;
           overflow: hidden;
           text-indent: 100%;

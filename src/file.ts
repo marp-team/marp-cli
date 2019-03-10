@@ -112,7 +112,10 @@ export class File {
   static async find(...pathes: string[]): Promise<File[]> {
     return (await globby(pathes, {
       absolute: true,
-      expandDirectories: { files: markdownExtensions.map(ext => `*.${ext}`) },
+      expandDirectories: {
+        extensions: [],
+        files: markdownExtensions.map(ext => `*.${ext}`),
+      },
       ignore: ['**/node_modules'],
     })).map(p => new File(p))
   }
