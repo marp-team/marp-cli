@@ -2,18 +2,7 @@ references:
   base: &base
     working_directory: ~/marp-cli
     steps:
-      # https://github.com/nodejs/docker-node/blob/master/docs/BestPractices.md#upgradingdowngrading-yarn
-      - run:
-          name: Upgrade yarn
-          command: |
-            sudo -E sh -c 'curl -fSLO --compressed "https://yarnpkg.com/downloads/$YARN_VERSION/yarn-v$YARN_VERSION.tar.gz" \
-                           && tar -xzf yarn-v$YARN_VERSION.tar.gz -C /opt/ \
-                           && ln -snf /opt/yarn-v$YARN_VERSION/bin/yarn /usr/local/bin/yarn \
-                           && ln -snf /opt/yarn-v$YARN_VERSION/bin/yarnpkg /usr/local/bin/yarnpkg \
-                           && rm yarn-v$YARN_VERSION.tar.gz'
-          environment:
-            YARN_VERSION: 1.13.0
-
+      - run: node --version
       - checkout
 
       - restore_cache:
@@ -64,15 +53,15 @@ references:
 
 version: 2
 jobs:
-  '10.15.1':
+  '10.15.3':
     <<: *base
     docker:
       - image: circleci/node:10.15.0-browsers
 
-  '8.15.0':
+  carbon:
     <<: *base
     docker:
-      - image: circleci/node:8.15.0-browsers
+      - image: circleci/node:carbon-browsers
 
   docker-image:
     docker:
@@ -96,12 +85,12 @@ workflows:
   version: 2
   build:
     jobs:
-      - 10.15.1
-      - 8.15.0
+      - 10.15.3
+      - carbon
       - docker-image:
           requires:
-            - 10.15.1
-            - 8.15.0
+            - 10.15.3
+            - carbon
           filters:
             branches:
               only: master
