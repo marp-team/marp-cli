@@ -37,7 +37,7 @@ references:
 
       - run:
           name: TypeScript type checking
-          command: yarn check-ts
+          command: yarn check:ts
 
       - run:
           name: TSLint
