@@ -276,6 +276,7 @@ export class Converter {
       Converter.browser = await puppeteer.launch({
         args,
         executablePath: finder ? finder()[0] : undefined,
+        dumpio: !!process.env.CI && process.env.NODE_ENV === 'test',
       })
 
       Converter.browser.once('disconnected', () => {
