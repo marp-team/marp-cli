@@ -56,7 +56,7 @@ jobs:
   '10.15.3':
     <<: *base
     docker:
-      - image: circleci/node:10.15.0-browsers
+      - image: circleci/node:10.15.3-browsers
 
   carbon:
     <<: *base
