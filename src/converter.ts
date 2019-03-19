@@ -257,26 +257,15 @@ export class Converter {
 
   private static async runBrowser() {
     if (!Converter.browser) {
-      // Fix the rendered position of elements in <foreignObject>
-      // See: https://bugs.chromium.org/p/chromium/issues/detail?id=467484
-      const args = ['--enable-blink-gen-property-trees']
-
-      let finder: () => string[] = require('is-wsl')
-        ? chromeFinder.wsl
-        : chromeFinder[process.platform]
-
-      if (process.env.IS_DOCKER || process.env.CI)
-        args.push('--disable-dev-shm-usage')
-
-      if (process.env.IS_DOCKER) {
-        args.push('--no-sandbox')
-        finder = () => ['/usr/bin/chromium-browser']
-      }
+      const finder: () => string[] = (() => {
+        if (process.env.IS_DOCKER) return () => ['/usr/bin/chromium-browser']
+        if (require('is-wsl')) return chromeFinder.wsl
+        return chromeFinder[process.platform]
+      })()
 
       Converter.browser = await puppeteer.launch({
-        args,
+        args: process.env.IS_DOCKER ? ['--no-sandbox'] : [],
         executablePath: finder ? finder()[0] : undefined,
-        dumpio: !!process.env.CI && process.env.NODE_ENV === 'test',
       })
 
       Converter.browser.once('disconnected', () => {
