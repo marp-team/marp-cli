@@ -4,7 +4,11 @@
 
 ### Added
 
-- [Direction keyword](https://marpit.marp.app/image-syntax?id=direction-keyword) for background images, from [Marpit v0.8.0](https://github.com/marp-team/marpit/releases/v0.8.0) ([#77](https://github.com/marp-team/marp-core/pull/77))
+- [Direction keyword](https://marpit.marp.app/image-syntax?id=direction-keyword) for background images, from [Marpit v0.8.0](https://github.com/marp-team/marpit/releases/v0.8.0) ([#77](https://github.com/marp-team/marp-cli/pull/77))
+
+### Fixed
+
+- Fix to work Chrome's BGPT feature in preview window ([#78](https://github.com/marp-team/marp-cli/pull/78))
 
 ### Changed
 
