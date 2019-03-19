@@ -10,6 +10,8 @@ import { bare as bareTpl } from '../src/templates'
 import { ThemeSet } from '../src/theme'
 import { WatchNotifier } from '../src/watcher'
 
+const puppeteerTimeoutMs = 15000
+
 jest.mock('fs')
 
 afterAll(() => Converter.closeBrowser())
@@ -246,75 +248,96 @@ describe('Converter', () => {
       const pdfInstance = (opts = {}) =>
         instance({ ...opts, type: ConvertType.pdf })
 
-      it('converts markdown file into PDF', async () => {
-        const write = (<any>fs).__mockWriteFile()
-        const opts = { output: 'test.pdf' }
-        const ret = await pdfInstance(opts).convertFile(new File(onePath))
-        const pdf: Buffer = write.mock.calls[0][1]
+      it(
+        'converts markdown file into PDF',
+        async () => {
+          const write = (<any>fs).__mockWriteFile()
+          const opts = { output: 'test.pdf' }
+          const ret = await pdfInstance(opts).convertFile(new File(onePath))
+          const pdf: Buffer = write.mock.calls[0][1]
 
-        expect(write).toHaveBeenCalled()
-        expect(write.mock.calls[0][0]).toBe('test.pdf')
-        expect(pdf.toString('ascii', 0, 5)).toBe('%PDF-')
-        expect(ret.newFile.path).toBe('test.pdf')
-        expect(ret.newFile.buffer).toBe(pdf)
-      }, 10000)
+          expect(write).toHaveBeenCalled()
+          expect(write.mock.calls[0][0]).toBe('test.pdf')
+          expect(pdf.toString('ascii', 0, 5)).toBe('%PDF-')
+          expect(ret.newFile.path).toBe('test.pdf')
+          expect(ret.newFile.buffer).toBe(pdf)
+        },
+        puppeteerTimeoutMs
+      )
 
       context('with allowLocalFiles option as true', () => {
-        it('converts with using temporally file', async () => {
-          const file = new File(onePath)
+        it(
+          'converts with using temporally file',
+          async () => {
+            const file = new File(onePath)
 
-          const fileCleanup = jest.spyOn(<any>File.prototype, 'cleanup')
-          const fileSave = jest
-            .spyOn(File.prototype, 'save')
-            .mockImplementation()
+            const fileCleanup = jest.spyOn(<any>File.prototype, 'cleanup')
+            const fileSave = jest
+              .spyOn(File.prototype, 'save')
+              .mockImplementation()
 
-          const fileTmp = jest.spyOn(File.prototype, 'saveTmpFile')
-          const warn = jest.spyOn(console, 'warn').mockImplementation()
+            const fileTmp = jest.spyOn(File.prototype, 'saveTmpFile')
+            const warn = jest.spyOn(console, 'warn').mockImplementation()
 
-          await pdfInstance({
-            allowLocalFiles: true,
-            output: '-',
-          }).convertFile(file)
+            await pdfInstance({
+              allowLocalFiles: true,
+              output: '-',
+            }).convertFile(file)
 
-          expect(warn).toBeCalledWith(
-            expect.stringContaining('Insecure local file accessing is enabled')
-          )
-          expect(fileTmp).toBeCalledWith('.html')
-          expect(fileCleanup).toBeCalledWith(
-            expect.stringContaining(os.tmpdir())
-          )
-          expect(fileSave).toBeCalled()
-        }, 10000)
+            expect(warn).toBeCalledWith(
+              expect.stringContaining(
+                'Insecure local file accessing is enabled'
+              )
+            )
+            expect(fileTmp).toBeCalledWith('.html')
+            expect(fileCleanup).toBeCalledWith(
+              expect.stringContaining(os.tmpdir())
+            )
+            expect(fileSave).toBeCalled()
+          },
+          puppeteerTimeoutMs
+        )
       })
     })
 
     context('when convert type is PNG', () => {
-      it('converts markdown file into PNG', async () => {
-        const write = (<any>fs).__mockWriteFile()
-        const converter = instance({ output: 'a.png', type: ConvertType.png })
+      it(
+        'converts markdown file into PNG',
+        async () => {
+          const write = (<any>fs).__mockWriteFile()
+          const converter = instance({ output: 'a.png', type: ConvertType.png })
 
-        await converter.convertFile(new File(onePath))
-        const png: Buffer = write.mock.calls[0][1]
+          await converter.convertFile(new File(onePath))
+          const png: Buffer = write.mock.calls[0][1]
 
-        expect(write).toHaveBeenCalled()
-        expect(write.mock.calls[0][0]).toBe('a.png')
-        expect(png.toString('ascii', 1, 4)).toBe('PNG')
-      }, 10000)
+          expect(write).toHaveBeenCalled()
+          expect(write.mock.calls[0][0]).toBe('a.png')
+          expect(png.toString('ascii', 1, 4)).toBe('PNG')
+        },
+        puppeteerTimeoutMs
+      )
     })
 
     context('when convert type is JPEG', () => {
-      it('converts markdown file into JPEG', async () => {
-        const write = (<any>fs).__mockWriteFile()
-        const converter = instance({ output: 'b.jpg', type: ConvertType.jpeg })
+      it(
+        'converts markdown file into JPEG',
+        async () => {
+          const write = (<any>fs).__mockWriteFile()
+          const converter = instance({
+            output: 'b.jpg',
+            type: ConvertType.jpeg,
+          })
 
-        await converter.convertFile(new File(onePath))
-        const jpeg: Buffer = write.mock.calls[0][1]
+          await converter.convertFile(new File(onePath))
+          const jpeg: Buffer = write.mock.calls[0][1]
 
-        expect(write).toHaveBeenCalled()
-        expect(write.mock.calls[0][0]).toBe('b.jpg')
-        expect(jpeg[0]).toBe(0xff)
-        expect(jpeg[1]).toBe(0xd8)
-      }, 10000)
+          expect(write).toHaveBeenCalled()
+          expect(write.mock.calls[0][0]).toBe('b.jpg')
+          expect(jpeg[0]).toBe(0xff)
+          expect(jpeg[1]).toBe(0xd8)
+        },
+        puppeteerTimeoutMs
+      )
     })
   })
 
