@@ -20,6 +20,14 @@ references:
             - node_modules
             - ~/.cache/yarn
 
+      # TODO: Remove workaround if https://github.com/GoogleChrome/puppeteer/issues/3774 was resolved
+      - run:
+          name: Workaround for broken Chrome 73 (Use Chromium supported by Puppeteer instead)
+          command: |
+            mkdir -p ~/.puppeteer && cd ~/.puppeteer
+            npm i puppeteer
+            echo "export CHROME_PATH=$(node -e "console.log(require('puppeteer').executablePath())")" >> $BASH_ENV
+
       - run:
           name: Prettier formatting
           command: yarn format:check
