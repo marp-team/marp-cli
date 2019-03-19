@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v0.7.0 - 2019-03-19
+
 ### Added
 
 - [Direction keyword](https://marpit.marp.app/image-syntax?id=direction-keyword) for background images, from [Marpit v0.8.0](https://github.com/marp-team/marpit/releases/v0.8.0) ([#77](https://github.com/marp-team/marp-cli/pull/77))
