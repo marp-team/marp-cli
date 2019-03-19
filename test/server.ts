@@ -183,19 +183,19 @@ describe('Server', () => {
 
     context('when the requested file is not found', () => {
       it('returns 404', async () => {
-        const { server } = await startServer()
-        expect(request(server).get('/__NOT_FOUND__')).rejects.toThrow(
-          'Not Found'
-        )
+        const server = await startServer()
+        const response = await request(server.server).get('/__NOT_FOUND__')
+
+        expect(response.status).toBe(404)
       })
     })
 
     context('when the directory traversal attack is detected', () => {
       it('returns 403', async () => {
-        const { server } = await startServer()
-        expect(request(server).get('/../../README.md')).rejects.toThrow(
-          'Forbidden'
-        )
+        const server = await startServer()
+        const response = await request(server.server).get('/../../README.md')
+
+        expect(response.status).toBe(403)
       })
     })
   })

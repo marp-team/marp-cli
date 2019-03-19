@@ -2,18 +2,7 @@ references:
   base: &base
     working_directory: ~/marp-cli
     steps:
-      # https://github.com/nodejs/docker-node/blob/master/docs/BestPractices.md#upgradingdowngrading-yarn
-      - run:
-          name: Upgrade yarn
-          command: |
-            sudo -E sh -c 'curl -fSLO --compressed "https://yarnpkg.com/downloads/$YARN_VERSION/yarn-v$YARN_VERSION.tar.gz" \
-                           && tar -xzf yarn-v$YARN_VERSION.tar.gz -C /opt/ \
-                           && ln -snf /opt/yarn-v$YARN_VERSION/bin/yarn /usr/local/bin/yarn \
-                           && ln -snf /opt/yarn-v$YARN_VERSION/bin/yarnpkg /usr/local/bin/yarnpkg \
-                           && rm yarn-v$YARN_VERSION.tar.gz'
-          environment:
-            YARN_VERSION: 1.13.0
-
+      - run: node --version
       - checkout
 
       - restore_cache:
@@ -31,13 +20,21 @@ references:
             - node_modules
             - ~/.cache/yarn
 
+      # TODO: Remove workaround if https://github.com/GoogleChrome/puppeteer/issues/3774 was resolved
+      - run:
+          name: Workaround for broken Chrome 73 (Use Chromium supported by Puppeteer instead)
+          command: |
+            mkdir -p ~/.puppeteer && cd ~/.puppeteer
+            npm i puppeteer
+            echo "export CHROME_PATH=$(node -e "console.log(require('puppeteer').executablePath())")" >> $BASH_ENV
+
       - run:
           name: Prettier formatting
           command: yarn format:check
 
       - run:
           name: TypeScript type checking
-          command: yarn check-ts
+          command: yarn check:ts
 
       - run:
           name: TSLint
@@ -64,15 +61,15 @@ references:
 
 version: 2
 jobs:
-  '10.15.1':
+  '10.15.3':
     <<: *base
     docker:
-      - image: circleci/node:10.15.0-browsers
+      - image: circleci/node:10.15.3-browsers
 
-  '8.15.0':
+  carbon:
     <<: *base
     docker:
-      - image: circleci/node:8.15.0-browsers
+      - image: circleci/node:carbon-browsers
 
   docker-image:
     docker:
@@ -96,12 +93,12 @@ workflows:
   version: 2
   build:
     jobs:
-      - 10.15.1
-      - 8.15.0
+      - 10.15.3
+      - carbon
       - docker-image:
           requires:
-            - 10.15.1
-            - 8.15.0
+            - 10.15.3
+            - carbon
           filters:
             branches:
               only: master
