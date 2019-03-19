@@ -63,11 +63,19 @@ export class Preview extends TypedEventEmitter<Preview.Events> {
   }
 
   private async launch() {
-    const args = ['--enable-blink-gen-property-trees']
-    if (process.env.CI) args.push('--disable-dev-shm-usage')
-
     this.carloInternal = await carlo.launch({
-      args,
+      args: [
+        // Fix wrong rendered position of elements in <foreignObject>
+        // https://bugs.chromium.org/p/chromium/issues/detail?id=467484
+        '--enable-blink-gen-property-trees',
+
+        // Puppeteer >= v1.13.0 cannot use BGPT due to crbug.com/937609.
+        // https://github.com/GoogleChrome/puppeteer/commit/ef2251d7a722bcd6d183f7876673224ac58f2244
+        //
+        // Related bug is affected only in capturing, so we override
+        // `--disable-features` option to prevent disabling BGPT.
+        '--disable-features=site-per-process,TranslateUI',
+      ],
       height: this.options.height,
       width: this.options.width,
       channel: ['canary', 'stable'],
