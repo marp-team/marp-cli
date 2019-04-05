@@ -257,6 +257,14 @@ export class Converter {
 
   private static async runBrowser() {
     if (!Converter.browser) {
+      const args: string[] = []
+      if (process.env.IS_DOCKER) args.push('--no-sandbox')
+
+      // Workaround for Chrome 73 in docker and unit testing with CircleCI
+      // https://github.com/GoogleChrome/puppeteer/issues/3774
+      if (process.env.IS_DOCKER || process.env.CI)
+        args.push('--disable-features=VizDisplayCompositor')
+
       const finder: () => string[] = (() => {
         if (process.env.IS_DOCKER) return () => ['/usr/bin/chromium-browser']
         if (require('is-wsl')) return chromeFinder.wsl
@@ -264,7 +272,7 @@ export class Converter {
       })()
 
       Converter.browser = await puppeteer.launch({
-        args: process.env.IS_DOCKER ? ['--no-sandbox'] : [],
+        args,
         executablePath: finder ? finder()[0] : undefined,
       })
 
