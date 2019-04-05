@@ -98,7 +98,7 @@
     "typescript": "^3.3.3333"
   },
   "dependencies": {
-    "@marp-team/marp-core": "^0.7.0",
+    "@marp-team/marp-core": "^0.7.1",
     "@marp-team/marpit": "^0.8.0",
     "carlo": "^0.9.43",
     "chalk": "^2.4.2",
