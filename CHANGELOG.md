@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Update a workaround for the stable chrome's crash in docker image ([#80](https://github.com/marp-team/marp-cli/pull/80))
+
 ## v0.7.0 - 2019-03-19
 
 ### Added
