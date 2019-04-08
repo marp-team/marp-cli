@@ -1,5 +1,3 @@
-import keys from 'bespoke-keys'
-
 export interface BespokeNavigationOption {
   interval?: number
 }
@@ -16,13 +14,31 @@ export default function bespokeNavigation(opts: BespokeNavigationOption = {}) {
   }
 
   return deck => {
-    keys()(deck)
-
     document.addEventListener('keydown', e => {
-      if (e.which === 35) deck.slide(deck.slides.length - 1) // END
-      if (e.which === 36) deck.slide(0) // HOME
-      if (e.which === 38) deck.prev() // UP
-      if (e.which === 40) deck.next() // DOWN
+      // Space + Shift | Page Up | LEFT | UP: Previous page
+      if (
+        (e.which === 32 && e.shiftKey) ||
+        e.which === 33 ||
+        e.which === 37 ||
+        e.which === 38
+      )
+        deck.prev()
+
+      // Space | Page Down | RIGHT | DOWN: Next page
+      if (
+        (e.which === 32 && !e.shiftKey) ||
+        e.which === 34 ||
+        e.which === 39 ||
+        e.which === 40
+      )
+        deck.next()
+
+      // END: Jump to last page/fragment
+      if (e.which === 35)
+        deck.slide(deck.slides.length - 1, { fragment: 'last' })
+
+      // HOME: Jump to first page/fragment
+      if (e.which === 36) deck.slide(0, { fragment: 0 })
     })
 
     let lastWheelNavigationAt = 0

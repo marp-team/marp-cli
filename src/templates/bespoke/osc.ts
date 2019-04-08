@@ -43,6 +43,7 @@ export default function bespokeOSC(selector: string = '.bespoke-marp-osc') {
           (page.textContent = `Page ${index + 1} of ${deck.slides.length}`)
       )
 
+      // TODO: Support fragments
       oscElements<HTMLButtonElement>(
         'prev',
         prev => (prev.disabled = index === 0)

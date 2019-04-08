@@ -1037,11 +1037,6 @@ bespoke-forms@^1.0.0:
   resolved "https://registry.yarnpkg.com/bespoke-forms/-/bespoke-forms-1.0.0.tgz#fccdc60a1f7b598ed7df7c8efe554a4c4d8ce158"
   integrity sha1-/M3GCh97WY7X33yO/lVKTE2M4Vg=
 
-bespoke-keys@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/bespoke-keys/-/bespoke-keys-1.1.0.tgz#64c0418e532ae1c5c5966a9ea0ac60e8f28ecb22"
-  integrity sha1-ZMBBjlMq4cXFlmqeoKxg6PKOyyI=
-
 bespoke@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/bespoke/-/bespoke-1.1.0.tgz#7b0fb3cfff580220a0da4020138365a55f063b3c"

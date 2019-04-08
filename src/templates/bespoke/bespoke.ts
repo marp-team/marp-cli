@@ -2,6 +2,7 @@ import bespoke from 'bespoke'
 import bespokeForms from 'bespoke-forms'
 import bespokeClasses from './classes'
 import bespokeInactive from './inactive'
+import bespokeFragments from './fragments'
 import bespokeFullscreen from './fullscreen'
 import bespokeHash from './hash'
 import bespokeNavigation from './navigation'
@@ -16,6 +17,7 @@ export default function() {
     bespokeInactive(),
     bespokeHash({ history: false }),
     bespokeNavigation(),
+    bespokeFragments,
     bespokeFullscreen,
     bespokeProgress,
     bespokeTouch(),
