@@ -295,13 +295,13 @@
     "@types/istanbul-lib-coverage" "^1.1.0"
     "@types/yargs" "^12.0.9"
 
-"@marp-team/marp-core@^0.7.0":
-  version "0.7.0"
-  resolved "https://registry.yarnpkg.com/@marp-team/marp-core/-/marp-core-0.7.0.tgz#4812a1657b04ea61ba4763941b0f221c79fbe04b"
-  integrity sha512-1d41qnEpkQw3GA32QeIm7DvRziyhqilB2BITnOjUj0Bh9hzYq6j4VbmjFzqug3W7b4jdUlreojkLSnVUYEFqaQ==
+"@marp-team/marp-core@^0.7.1":
+  version "0.7.1"
+  resolved "https://registry.yarnpkg.com/@marp-team/marp-core/-/marp-core-0.7.1.tgz#2dda763d2181c4105186237b8860dce2faa40c0d"
+  integrity sha512-/vSqEpIchvXr1Gtc9J54L02L9Shb0TfCuZJ7OYN1MfKhSr50MGoQXuyNJmF6N5qscA7SaGPPHcAMiRtCK1gOSw==
   dependencies:
     "@marp-team/marpit" "^0.8.0"
-    "@marp-team/marpit-svg-polyfill" "^0.2.0"
+    "@marp-team/marpit-svg-polyfill" "^0.3.0"
     emoji-regex "^8.0.0"
     highlight.js "^9.15.6"
     katex "^0.10.1"
@@ -310,12 +310,12 @@
     twemoji "^11.3.0"
     xss "^1.0.3"
 
-"@marp-team/marpit-svg-polyfill@^0.2.0":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@marp-team/marpit-svg-polyfill/-/marpit-svg-polyfill-0.2.0.tgz#e5bbf2ea9cc6ac21068019d88816fc5cd87410e4"
-  integrity sha512-OczYQQYUGPVuPPD/vQa0gS8UutIo5QOa1WiXgh80D8K8hBiSAJfKxViz0HKUUhwyURJRYiTioNYFcKQ1Ikjuww==
+"@marp-team/marpit-svg-polyfill@^0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@marp-team/marpit-svg-polyfill/-/marpit-svg-polyfill-0.3.0.tgz#33c38089549fc335d6924f55306468e798300cf1"
+  integrity sha512-lQU/wOodM1RusiwkDMCEoTnS/BOEyvKPyNkLsuYA4lda4AtVBe0ZEJKm9a7D9e9CWNwvynyYDeWs0/UJj5IYIw==
   dependencies:
-    detect-browser "^3.0.1"
+    detect-browser "^4.1.0"
 
 "@marp-team/marpit@^0.8.0":
   version "0.8.0"
@@ -1998,10 +1998,10 @@ destroy@~1.0.4:
   resolved "https://registry.yarnpkg.com/destroy/-/destroy-1.0.4.tgz#978857442c44749e4206613e37946205826abd80"
   integrity sha1-l4hXRCxEdJ5CBmE+N5RiBYJqvYA=
 
-detect-browser@^3.0.1:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/detect-browser/-/detect-browser-3.0.1.tgz#39beead014347a8a2be1f3c4cb30a0aef2127c44"
-  integrity sha512-L6b76EfUxnoxGHM5Vz7nrshQPIbOHtitDWpGufrp5srQdJrEYi1xpUVZeFbfssWAJvUWo/iDIVlz8hOP4Z8OCw==
+detect-browser@^4.1.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/detect-browser/-/detect-browser-4.2.0.tgz#d46bcb3c69b25bd94c4433a3f90b971c22d0b2f8"
+  integrity sha512-x0kNC8p3pVYoiyGwQskqN7iupBe90jWDwLNThPtl8JxftfkdDWMxL+ESzo3JlAR5xBtl6HMqxkA5kk0scFcSRQ==
 
 detect-libc@^1.0.2:
   version "1.0.3"
@@ -3884,9 +3884,9 @@ js-tokens@^3.0.2:
   integrity sha1-mGbfOVECEw449/mWvOtlRDIJwls=
 
 js-yaml@^3.12.0, js-yaml@^3.12.2, js-yaml@^3.7.0, js-yaml@^3.9.0:
-  version "3.12.2"
-  resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-3.12.2.tgz#ef1d067c5a9d9cb65bd72f285b5d8105c77f14fc"
-  integrity sha512-QHn/Lh/7HhZ/Twc7vJYQTkjuCa0kaCcDcjK5Zlk2rvnUpy7DxMJ23+Jc2dcyvltwQVg1nygAVlB2oRDFHoRS5Q==
+  version "3.13.0"
+  resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-3.13.0.tgz#38ee7178ac0eea2c97ff6d96fff4b18c7d8cf98e"
+  integrity sha512-pZZoSxcCYco+DIKBTimr67J6Hy+EYGZDY/HCWC+iAEA9h1ByhMXAIVUXMcMFpOCxQ/xjXmPI2MkDL5HRm5eFrQ==
   dependencies:
     argparse "^1.0.7"
     esprima "^4.0.0"
