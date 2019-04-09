@@ -10,6 +10,11 @@
 
 - Update a workaround for the stable chrome's crash in docker image ([#80](https://github.com/marp-team/marp-cli/pull/80))
 
+### Changed
+
+- Upgrade to [Marpit v0.9.2](https://github.com/marp-team/marpit/releases/tag/v0.9.2) and [Marp Core v0.8.0](https://github.com/marp-team/marp-core/releases/tag/v0.8.0) ([#81](https://github.com/marp-team/marp-cli/pull/81))
+- Upgrade dependent packages to the latest version ([#82](https://github.com/marp-team/marp-cli/pull/82))
+
 ## v0.7.0 - 2019-03-19
 
 ### Added
