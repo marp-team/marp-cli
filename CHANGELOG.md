@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v0.8.1 - 2019-04-09
+
 ### Fixed
 
 - Override engine html option only if defined in CLI ([#83](https://github.com/marp-team/marp-cli/pull/83))
