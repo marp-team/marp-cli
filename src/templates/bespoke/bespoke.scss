@@ -9,6 +9,10 @@ $progressHeight: 5px;
     overflow: hidden;
   }
 
+  [data-bespoke-marp-fragment='inactive'] {
+    visibility: hidden;
+  }
+
   .bespoke-marp-osc {
     display: none;
     opacity: 0;

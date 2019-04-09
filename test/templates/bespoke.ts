@@ -42,6 +42,131 @@ describe("Bespoke template's browser context", () => {
     })
   })
 
+  describe('Fragments', () => {
+    let deck
+    let parent: HTMLElement
+
+    beforeEach(() => {
+      parent = render('* A\n* B\n\n---\n\n- C\n- D\n\n---\n\n* E\n* F')
+      deck = bespoke()
+    })
+
+    it('adds inactive data-bespoke-marp-fragment attribute to fragmented list', () => {
+      const q = '[data-marpit-fragment][data-bespoke-marp-fragment="inactive"]'
+      expect(parent.querySelectorAll(q)).toHaveLength(4)
+    })
+
+    it('changes the first fragmented list item to active when calling next()', () => {
+      deck.next()
+
+      expect(deck.slide()).toBe(0)
+      expect(
+        parent.querySelectorAll('[data-bespoke-marp-fragment="inactive"]')
+      ).toHaveLength(3)
+      expect(
+        parent.querySelectorAll('[data-bespoke-marp-fragment="active"]')
+      ).toHaveLength(1)
+    })
+
+    it('adds data-bespoke-marp-current-fragment data attribute to current active item', () => {
+      const firstItem = parent.querySelector<HTMLElement>(
+        '[data-bespoke-marp-fragment]'
+      )!
+
+      deck.next()
+      expect(firstItem.dataset.bespokeMarpFragment).toBe('active')
+      expect(firstItem.dataset.bespokeMarpCurrentFragment).not.toBeUndefined()
+
+      deck.prev()
+      expect(firstItem.dataset.bespokeMarpFragment).toBe('inactive')
+      expect(firstItem.dataset.bespokeMarpCurrentFragment).toBeUndefined()
+    })
+
+    it('activates all fragments in slide when navigating by prev()', () => {
+      deck.slide(1)
+      deck.prev()
+
+      expect(deck.slide()).toBe(0)
+      expect(
+        deck.slides[0].querySelectorAll('[data-bespoke-marp-fragment="active"]')
+      ).toHaveLength(2)
+    })
+
+    it('deactivates all fragments in slide when navigating by next()', () => {
+      deck.slide(1)
+      deck.next()
+
+      expect(deck.slide()).toBe(2)
+      expect(
+        deck.slides[2].querySelectorAll(
+          '[data-bespoke-marp-fragment="inactive"]'
+        )
+      ).toHaveLength(2)
+    })
+
+    it('deactivates all fragments in slide when slide()', () => {
+      deck.slide(2)
+
+      expect(
+        deck.slides[2].querySelectorAll(
+          '[data-bespoke-marp-fragment="inactive"]'
+        )
+      ).toHaveLength(2)
+    })
+
+    it('allows to specify active fragment index when fragment option of slide()', () => {
+      deck.slide(2, { fragment: 1 })
+
+      const fragments = [
+        ...deck.slides[2].querySelectorAll('[data-bespoke-marp-fragment]'),
+      ]
+
+      expect(fragments.map(f => f.dataset.bespokeMarpFragment)).toStrictEqual([
+        'active',
+        'inactive',
+      ])
+    })
+
+    it('deactivates all fragments in slide when navigating by slide() with fragment option as -1', () => {
+      deck.slide(2, { fragment: -1 })
+
+      expect(
+        deck.slides[2].querySelectorAll('[data-bespoke-marp-fragment="active"]')
+      ).toHaveLength(2)
+    })
+
+    it('emits fragment event when changed fragment index', () => {
+      const onFragment = jest.fn()
+      deck.on('fragment', onFragment)
+
+      deck.next()
+      expect(onFragment).toBeCalledWith(
+        expect.objectContaining({
+          index: 0,
+          fragmentIndex: 1,
+        })
+      )
+
+      onFragment.mockClear()
+      deck.prev()
+      expect(onFragment).toBeCalledWith(
+        expect.objectContaining({
+          index: 0,
+          fragmentIndex: 0,
+        })
+      )
+
+      onFragment.mockClear()
+      deck.slide(2, { fragment: -1 })
+      expect(onFragment).toBeCalledWith(
+        expect.objectContaining({
+          index: 2,
+          fragmentIndex: 2,
+        })
+      )
+    })
+  })
+
   describe('Fullscreen', () => {
     let deck
 
@@ -141,7 +266,6 @@ describe("Bespoke template's browser context", () => {
     })
 
     it('navigates page by keyboard', () => {
-      // bespoke-keys
       keydown({ which: Key.RightArrow })
       expect(deck.slide()).toBe(1)
 
@@ -160,7 +284,6 @@ describe("Bespoke template's browser context", () => {
       keydown({ which: Key.PageUp })
       expect(deck.slide()).toBe(0)
 
-      // Additional keys by Marp
       keydown({ which: Key.DownArrow })
       expect(deck.slide()).toBe(1)
 

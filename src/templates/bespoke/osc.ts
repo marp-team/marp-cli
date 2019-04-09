@@ -42,15 +42,20 @@ export default function bespokeOSC(selector: string = '.bespoke-marp-osc') {
         page =>
           (page.textContent = `Page ${index + 1} of ${deck.slides.length}`)
       )
+    })
 
+    deck.on('fragment', ({ index, fragments, fragmentIndex }) => {
       oscElements<HTMLButtonElement>(
         'prev',
-        prev => (prev.disabled = index === 0)
+        prev => (prev.disabled = index === 0 && fragmentIndex === 0)
       )
 
       oscElements<HTMLButtonElement>(
         'next',
-        next => (next.disabled = index === deck.slides.length - 1)
+        next =>
+          (next.disabled =
+            index === deck.slides.length - 1 &&
+            fragmentIndex === fragments.length - 1)
       )
     })
 
