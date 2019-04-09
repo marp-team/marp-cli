@@ -108,6 +108,9 @@ describe('Converter', () => {
     })
 
     it("overrides html option by converter's html option", async () => {
+      const defaultHtml = (await instance().convert('<i><br></i>')).rendered
+      expect(defaultHtml.html).toContain('&lt;i&gt;<br />&lt;/i&gt;')
+
       const enabled = (await instance({ html: true }).convert(md)).rendered
       expect(enabled.html).toContain('<i>Hello!</i>')
 

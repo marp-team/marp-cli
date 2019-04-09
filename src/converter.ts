@@ -207,7 +207,7 @@ export class Converter {
     if (typeof engine.render !== 'function')
       error('Specified engine has not implemented render() method.')
 
-    engine.markdown.set({ html })
+    if (html !== undefined) engine.markdown.set({ html })
 
     // Plugins
     engine.use(metaPlugin, engine)
