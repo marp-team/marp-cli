@@ -27,7 +27,7 @@ const external = [
 
 const plugins = [
   json({ preferConst: true }),
-  nodeResolve({ jsnext: true }),
+  nodeResolve({ mainFields: ['module', 'jsnext:main', 'main'] }),
   commonjs(),
   typescript({ resolveJsonModule: false }),
   postcss({
