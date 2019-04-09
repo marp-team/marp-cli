@@ -177,17 +177,17 @@ describe("Bespoke template's browser context", () => {
 
     it('injects deck.fullscreen() to toggle fullscreen', async () => {
       await deck.fullscreen()
-      expect(screenfull.toggle).toBeCalled()
+      expect((screenfull as any).toggle).toBeCalled()
     })
 
     it('toggles fullscreen by hitting f key', () => {
       keydown({ which: Key.F })
-      expect(screenfull.toggle).toBeCalled()
+      expect((screenfull as any).toggle).toBeCalled()
     })
 
     it('toggles fullscreen by hitting F11 key', () => {
       keydown({ which: Key.F11 })
-      expect(screenfull.toggle).toBeCalled()
+      expect((screenfull as any).toggle).toBeCalled()
     })
   })
 
@@ -461,7 +461,7 @@ describe("Bespoke template's browser context", () => {
 
         it('calls deck.fullscreen() when clicked fullscreen button', () => {
           const deck = bespoke()
-          const fullscreen = jest.spyOn(deck, 'fullscreen')
+          const fullscreen = jest.spyOn(deck as any, 'fullscreen')
           const button = osc.querySelector<HTMLButtonElement>(
             'button[data-bespoke-marp-osc="fullscreen"]'
           )!
@@ -473,7 +473,7 @@ describe("Bespoke template's browser context", () => {
         context('when browser does not support fullscreen', () => {
           it('hides fullscreen button', () => {
             jest
-              .spyOn(screenfull, 'enabled', 'get')
+              .spyOn(screenfull as any, 'enabled', 'get')
               .mockImplementation(() => false)
 
             bespoke()
