@@ -1,8 +1,8 @@
 // Based on https://github.com/bespokejs/bespoke-bullets
 
 export default function bespokeFragments(deck) {
-  let activeSlideIdx
-  let activeFragmentIdx
+  let activeSlideIdx = 0
+  let activeFragmentIdx = 0
 
   const fragments = deck.slides.map(slide => [
     null,
@@ -12,7 +12,7 @@ export default function bespokeFragments(deck) {
   const activeSlideHasFragmentByOffset = (offset: number) =>
     fragments[activeSlideIdx][activeFragmentIdx + offset] !== undefined
 
-  const activate = (slideIdx, fragmentIdx) => {
+  const activate = (slideIdx: number, fragmentIdx: number) => {
     activeSlideIdx = slideIdx
     activeFragmentIdx = fragmentIdx
 
@@ -44,21 +44,13 @@ export default function bespokeFragments(deck) {
         })
       }
     )
-  }
 
-  const parseFragmentEvent = (
-    targetIndex: number,
-    fragmentValue: string | number | undefined
-  ): number | undefined => {
-    if (fragmentValue !== undefined && fragments[targetIndex]) {
-      if (fragmentValue === 'last') return fragments[targetIndex].length - 1
-      if (typeof fragmentValue === 'number') {
-        return Math.min(
-          Math.max(0, fragmentValue),
-          fragments[targetIndex].length - 1
-        )
-      }
-    }
+    deck.fire('fragment', {
+      slide: deck.slides[slideIdx],
+      index: slideIdx,
+      fragments: fragments[slideIdx],
+      fragmentIndex: fragmentIdx,
+    })
   }
 
   deck.on('next', () => {
@@ -81,9 +73,25 @@ export default function bespokeFragments(deck) {
     if (fragments[prevIdx]) activate(prevIdx, fragments[prevIdx].length - 1)
   })
 
-  deck.on('slide', e =>
-    activate(e.index, parseFragmentEvent(e.index, e.fragment) || 0)
-  )
+  deck.on('slide', ({ index, fragment }) => {
+    let fragmentPos = 0
+
+    if (fragment !== undefined) {
+      const slideFragments = fragments[index]
+
+      if (slideFragments) {
+        const { length } = slideFragments
+
+        if (fragment === -1) {
+          fragmentPos = length - 1
+        } else {
+          fragmentPos = Math.min(Math.max(fragment, 0), length - 1)
+        }
+      }
+    }
+
+    activate(index, fragmentPos)
+  })
 
   activate(0, 0)
 }

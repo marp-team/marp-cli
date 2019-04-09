@@ -33,12 +33,11 @@ export default function bespokeNavigation(opts: BespokeNavigationOption = {}) {
       )
         deck.next()
 
-      // END: Jump to last page/fragment
-      if (e.which === 35)
-        deck.slide(deck.slides.length - 1, { fragment: 'last' })
+      // END: Jump to last page
+      if (e.which === 35) deck.slide(deck.slides.length - 1, { fragment: -1 })
 
-      // HOME: Jump to first page/fragment
-      if (e.which === 36) deck.slide(0, { fragment: 0 })
+      // HOME: Jump to first page
+      if (e.which === 36) deck.slide(0)
     })
 
     let lastWheelNavigationAt = 0

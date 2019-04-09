@@ -17,10 +17,10 @@ export default function() {
     bespokeInactive(),
     bespokeHash({ history: false }),
     bespokeNavigation(),
-    bespokeFragments,
     bespokeFullscreen,
     bespokeProgress,
     bespokeTouch(),
     bespokeOSC(),
+    bespokeFragments,
   ])
 }
