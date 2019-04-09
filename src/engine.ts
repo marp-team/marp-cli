@@ -60,7 +60,7 @@ export class ResolvedEngine {
     const classPath = this.findClassPath(this.klass)
     if (!classPath) return
 
-    const pkgPath = await pkgUp(path.dirname(classPath))
+    const pkgPath = await pkgUp({ cwd: path.dirname(classPath) })
     if (!pkgPath) return
 
     this.package = require(pkgPath)
