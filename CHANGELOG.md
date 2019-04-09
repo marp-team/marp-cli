@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v0.8.0 - 2019-04-09
+
 ### Added
 
 - Support [fragmented list](https://marpit.marp.app/fragmented-list) in bespoke template, from [Marpit v0.9.0](https://github.com/marp-team/marpit/releases/v0.9.0) ([#81](https://github.com/marp-team/marp-cli/pull/81))
