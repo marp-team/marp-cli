@@ -1,5 +1,7 @@
 references:
   base: &base
+    docker:
+      - image: circleci/node:10.15.3-browsers
     working_directory: ~/marp-cli
     steps:
       - run: node --version
@@ -53,10 +55,8 @@ references:
 
 version: 2
 jobs:
-  '10.15.3':
+  current:
     <<: *base
-    docker:
-      - image: circleci/node:10.15.3-browsers
 
   carbon:
     <<: *base
@@ -81,16 +81,35 @@ jobs:
             docker login -u $DOCKER_USER -p $DOCKER_PASS
             docker push marpteam/marp-cli:latest
 
+  standalone-build:
+    <<: *base
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+            - dependencies-{{ .Environment.CI_CACHE_KEY }}-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}-{{ .Branch }}
+            - dependencies-{{ .Environment.CI_CACHE_KEY }}-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}-
+            - dependencies-{{ .Environment.CI_CACHE_KEY }}-{{ .Environment.CIRCLE_JOB }}-
+
+      - run: yarn install
+      - run: yarn build:standalone
+
+      - store_artifacts:
+          path: ./bin
+          destination: bin
+
 workflows:
   version: 2
   build:
     jobs:
-      - 10.15.3
+      - current
       - carbon
       - docker-image:
           requires:
-            - 10.15.3
+            - current
             - carbon
           filters:
             branches:
               only: master
+      - standalone-build
