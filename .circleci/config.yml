@@ -112,4 +112,9 @@ workflows:
           filters:
             branches:
               only: master
-      - standalone-build
+      - standalone-build:
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/
