@@ -136,7 +136,7 @@ jobs:
             ENDPOINT="https://uploads.github.com/repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/releases/${RELEASE_ID}/assets" && \
             curl -sS --data-binary @"bin/marp-cli-linux" -H "Accept: application/vnd.github.v3+json" -H "Authorization: token ${GITHUB_TOKEN}" -H "Content-Type: application/octet-stream" ${ENDPOINT}?name=marp-${CIRCLE_TAG}-linux && \
             curl -sS --data-binary @"bin/marp-cli-macos" -H "Accept: application/vnd.github.v3+json" -H "Authorization: token ${GITHUB_TOKEN}" -H "Content-Type: application/octet-stream" ${ENDPOINT}?name=marp-${CIRCLE_TAG}-mac && \
-            curl -sS --data-binary @"bin/marp-cli-win.exe" -H "Accept: application/vnd.github.v3+json" -H "Authorization: token ${GITHUB_TOKEN}" -H "Content-Type: application/octet-stream" ${ENDPOINT}?name=marp-${CIRCLE_TAG}-win
+            curl -sS --data-binary @"bin/marp-cli-win.exe" -H "Accept: application/vnd.github.v3+json" -H "Authorization: token ${GITHUB_TOKEN}" -H "Content-Type: application/octet-stream" ${ENDPOINT}?name=marp-${CIRCLE_TAG}-win.exe
 
 workflows:
   version: 2
