@@ -46,7 +46,7 @@
     "standalone": "rimraf bin && pkg --out-path ./bin .",
     "test": "jest",
     "test:coverage": "jest --coverage",
-    "version": "node version.js && git add -A CHANGELOG.md",
+    "version": "curl https://raw.githubusercontent.com/marp-team/marp/master/version.js | node && git add -A CHANGELOG.md",
     "watch": "rollup -w -c"
   },
   "devDependencies": {
