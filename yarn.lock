@@ -1248,9 +1248,9 @@ caniuse-api@^3.0.0:
     lodash.uniq "^4.5.0"
 
 caniuse-lite@^1.0.0, caniuse-lite@^1.0.30000957, caniuse-lite@^1.0.30000963:
-  version "1.0.30000966"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000966.tgz#f3c6fefacfbfbfb981df6dfa68f2aae7bff41b64"
-  integrity sha512-qqLQ/uYrpZmFhPY96VuBkMEo8NhVFBZ9y/Bh+KnvGzGJ5I8hvpIaWlF2pw5gqe4PLAL+ZjsPgMOvoXSpX21Keg==
+  version "1.0.30000967"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000967.tgz#a5039577806fccee80a04aaafb2c0890b1ee2f73"
+  integrity sha512-rUBIbap+VJfxTzrM4akJ00lkvVb5/n5v3EGXfWzSH5zT8aJmGzjA8HWhJ4U6kCpzxozUSnB+yvAYDRPY6mRpgQ==
 
 capture-exit@^2.0.0:
   version "2.0.0"
@@ -5061,10 +5061,10 @@ pkg-up@^3.1.0:
   dependencies:
     find-up "^3.0.0"
 
-pkg@^4.3.7:
-  version "4.3.7"
-  resolved "https://registry.yarnpkg.com/pkg/-/pkg-4.3.7.tgz#a80767283d728adbcdf668ad99250af440efd8e3"
-  integrity sha512-/BvtFft1nKKtnTuOm/0es0sk1cOs7ZtWgJpqdtszJ4348jYJ8owVyCB/iuGhI3YJFX/ZFIv4Rmra9ETUgpnnfA==
+pkg@^4.3.8:
+  version "4.3.8"
+  resolved "https://registry.yarnpkg.com/pkg/-/pkg-4.3.8.tgz#f90017fe27539e6a9c446d455b885b554600b3c1"
+  integrity sha512-HhnMcHvGFf0VR4fJygqo1WTKztEK6m3UKS+O4NIM9tzbdgCfsAEpNncPlO9Gj6wAMbe9JC48UmzPBErpYSwckQ==
   dependencies:
     "@babel/parser" "7.2.3"
     babel-runtime "6.26.0"
