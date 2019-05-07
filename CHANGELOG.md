@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Prevent making zombie process while running CI ([#86](https://github.com/marp-team/marp-cli/pull/86))
+
+### Changed
+
+- Upgrade to [Marpit v1.0.0](https://github.com/marp-team/marpit/releases/tag/v1.0.0) and [Marp Core v0.9.0](https://github.com/marp-team/marp-core/releases/tag/v0.9.0) ([#86](https://github.com/marp-team/marp-cli/pull/86))
+- Upgrade dependent packages to the latest version ([#86](https://github.com/marp-team/marp-cli/pull/86))
+
 ## v0.8.1 - 2019-04-09
 
 ### Fixed
