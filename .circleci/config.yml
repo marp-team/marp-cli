@@ -57,11 +57,19 @@ jobs:
     <<: *base
     docker:
       - image: circleci/node:10.15.3-browsers
+        entrypoint:
+          - docker-init
+          - --
+          - /docker-entrypoint.sh
 
   carbon:
     <<: *base
     docker:
       - image: circleci/node:carbon-browsers
+        entrypoint:
+          - docker-init
+          - --
+          - /docker-entrypoint.sh
 
   docker-image:
     docker:
