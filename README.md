@@ -80,6 +80,10 @@ You can install with `-g` option if you want to use `marp` command globally.
 npm install -g @marp-team/marp-cli
 ```
 
+### Standalone binary _(EXPERIMENTAL)_
+
+Do you never want to install any dependent tools? we also provide executable binaries for Linux, macOS, and Windows. [:fast_forward: Download the latest standalone binary for your OS from release page.](https://github.com/marp-team/marp-cli/releases)
+
 ## Basic usage
 
 ### Convert to HTML
