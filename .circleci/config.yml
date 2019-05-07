@@ -38,7 +38,7 @@ references:
 
       - run:
           name: Jest
-          command: yarn test:coverage --ci -i --reporters=default --reporters=jest-junit --detectOpenHandles
+          command: yarn test:coverage --ci -i --reporters=default --reporters=jest-junit --detectOpenHandles --forceExit
           environment:
             JEST_JUNIT_OUTPUT: tmp/test-results/jest.xml
 
