@@ -115,7 +115,7 @@ jobs:
       - persist_to_workspace:
           root: ./bin
           paths:
-            - "*"
+            - '*'
 
       - store_artifacts:
           path: ./bin
