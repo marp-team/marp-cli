@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Build standalone executable binaries _(Experimental)_ ([#87](https://github.com/marp-team/marp-cli/pull/87))
+
 ### Fixed
 
 - Prevent making zombie process while running CI ([#86](https://github.com/marp-team/marp-cli/pull/86))

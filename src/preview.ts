@@ -1,5 +1,8 @@
 import carlo from 'carlo'
 import terminate from 'terminate'
+import rimraf from 'rimraf'
+import { tmpName } from 'tmp'
+import { promisify } from 'util'
 import { File, FileType } from './file'
 import TypedEventEmitter from './utils/typed-event-emitter'
 import { ConvertType } from './converter'
@@ -12,6 +15,8 @@ const mimeTypes = {
   [ConvertType.png]: 'image/png',
   [ConvertType.jpeg]: 'image/jpeg',
 }
+
+const tmpNamePromise = promisify(tmpName)
 
 export class Preview extends TypedEventEmitter<Preview.Events> {
   readonly options: Preview.Options
@@ -63,7 +68,10 @@ export class Preview extends TypedEventEmitter<Preview.Events> {
   }
 
   private async launch() {
+    const localDataDir = await tmpNamePromise({ prefix: 'marp-cli-carlo-' })
+
     this.carloInternal = await carlo.launch({
+      localDataDir,
       args: [
         // Fix wrong rendered position of elements in <foreignObject>
         // https://bugs.chromium.org/p/chromium/issues/detail?id=467484
@@ -83,9 +91,11 @@ export class Preview extends TypedEventEmitter<Preview.Events> {
       title: 'Marp CLI',
     })
 
-    this.carlo.on('exit', () => {
-      this.emit('exit')
-      this.carloInternal = undefined
+    this.carlo.once('exit', () => {
+      rimraf(localDataDir, { disableGlob: true }, () => {
+        this.emit('exit')
+        this.carloInternal = undefined
+      })
     })
 
     this.emit('launch')
