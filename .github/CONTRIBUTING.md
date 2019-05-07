@@ -12,10 +12,10 @@ But this document hardly has contents! We are following [the contributing guidel
 ## Development
 
 ```bash
-# Build
+# Build (Bundle and minify)
 yarn build
 
-# Watch
+# Watch (Bundle only)
 yarn watch
 ```
 
@@ -25,4 +25,17 @@ Use `./marp-cli.js` instead of `marp` command.
 
 ```bash
 ./marp-cli.js --help
+```
+
+### Standalone binary
+
+Standalone binaries created by [pkg](https://github.com/zeit/pkg) will output to `./bin` directory.
+
+```bash
+# Build & create standalone binaries
+yarn build:standalone
+```
+
+```bash
+./bin/marp-cli-linux --help
 ```
