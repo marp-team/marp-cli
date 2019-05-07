@@ -4,6 +4,7 @@
 
 ### Added
 
+- Shorthand for setting text color via image syntax, from [Marpit v1.0.0](https://github.com/marp-team/marpit/releases/v1.0.0) ([#86](https://github.com/marp-team/marp-cli/pull/86))
 - Build standalone executable binaries _(Experimental)_ ([#87](https://github.com/marp-team/marp-cli/pull/87))
 
 ### Fixed
