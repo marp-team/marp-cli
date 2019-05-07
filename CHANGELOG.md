@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v0.9.0 - 2019-05-07
+
 ### Added
 
 - Shorthand for setting text color via image syntax, from [Marpit v1.0.0](https://github.com/marp-team/marpit/releases/v1.0.0) ([#86](https://github.com/marp-team/marp-cli/pull/86))
