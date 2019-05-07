@@ -1,6 +1,17 @@
 references:
+  docker-init: &docker-init
+    entrypoint:
+      - docker-init
+      - --
+      - /docker-entrypoint.sh
+    cmd:
+      - /bin/sh
+
   base: &base
     working_directory: ~/marp-cli
+    docker:
+      - image: circleci/node:10.15.3-browsers
+        <<: *docker-init
     steps:
       - run: node --version
       - checkout
@@ -55,21 +66,12 @@ version: 2
 jobs:
   '10.15.3':
     <<: *base
-    docker:
-      - image: circleci/node:10.15.3-browsers
-        entrypoint:
-          - docker-init
-          - --
-          - /docker-entrypoint.sh
 
   carbon:
     <<: *base
     docker:
       - image: circleci/node:carbon-browsers
-        entrypoint:
-          - docker-init
-          - --
-          - /docker-entrypoint.sh
+        <<: *docker-init
 
   docker-image:
     docker:
