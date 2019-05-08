@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v0.9.1 - 2019-05-08
+
 ### Added
 
 - Test with Node 12 (Erbium) ([#91](https://github.com/marp-team/marp-cli/pull/91))
