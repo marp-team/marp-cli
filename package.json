@@ -29,7 +29,7 @@
     "node": ">=8.9.0"
   },
   "main": "lib/marp-cli.js",
-  "types": "types/marp-cli.d.ts",
+  "types": "types/src/marp-cli.d.ts",
   "files": [
     "marp-cli.js",
     "lib/",
