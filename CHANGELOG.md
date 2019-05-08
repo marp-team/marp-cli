@@ -2,7 +2,11 @@
 
 ## [Unreleased]
 
-### Change
+### Added
+
+- Test with Node 12 (Erbium) ([#91](https://github.com/marp-team/marp-cli/pull/91))
+
+### Changed
 
 - Pack built standalone binaries ([#90](https://github.com/marp-team/marp-cli/pull/90))
 

@@ -73,6 +73,12 @@ jobs:
       - image: circleci/node:carbon-browsers
         <<: *docker-init
 
+  erbium:
+    <<: *base
+    docker:
+      - image: circleci/node:12-browsers
+        <<: *docker-init
+
   docker-image:
     docker:
       - image: docker:git
@@ -130,10 +136,12 @@ workflows:
     jobs:
       - current
       - carbon
+      - erbium
       - docker-image:
           requires:
             - current
             - carbon
+            - erbium
           filters:
             branches:
               only: master
