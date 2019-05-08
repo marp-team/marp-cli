@@ -2,10 +2,7 @@
   "name": "@marp-team/marp-cli",
   "version": "0.9.0",
   "description": "A CLI interface for Marp and Marpit based converters",
-  "repository": "https://github.com/marp-team/marp-cli",
-  "engines": {
-    "node": ">=8.9.0"
-  },
+  "license": "MIT",
   "author": {
     "name": "Marp team",
     "url": "https://github.com/marp-team"
@@ -16,17 +13,29 @@
       "url": "https://github.com/yhatt"
     }
   ],
-  "license": "MIT",
-  "publishConfig": {
-    "access": "public"
+  "keywords": [
+    "marp",
+    "markdown",
+    "cli",
+    "slide",
+    "deck",
+    "presentation"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/marp-team/marp-cli"
   },
-  "bin": {
-    "marp": "./marp-cli.js"
+  "engines": {
+    "node": ">=8.9.0"
   },
+  "main": "lib/marp-cli.js",
   "files": [
     "marp-cli.js",
     "lib/"
   ],
+  "bin": {
+    "marp": "./marp-cli.js"
+  },
   "pkg": {
     "scripts": "lib/**/*.js"
   },
@@ -129,5 +138,8 @@
     "tmp": "^0.1.0",
     "ws": "^7.0.0",
     "yargs": "^13.2.2"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
