@@ -124,7 +124,6 @@ jobs:
           name: Upload created packages to the asset of GitHub release
           command: yarn standalone:pack:upload
 
-
 workflows:
   version: 2
   build:
