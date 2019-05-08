@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Change
+
+- Pack built standalone binaries ([#90](https://github.com/marp-team/marp-cli/pull/90))
+
 ## v0.9.0 - 2019-05-07
 
 ### Added
