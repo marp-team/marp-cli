@@ -5,6 +5,7 @@
 ### Added
 
 - Test with Node 12 (Erbium) ([#91](https://github.com/marp-team/marp-cli/pull/91))
+- Add main entry point and type definitions ([#92](https://github.com/marp-team/marp-cli/pull/92))
 
 ### Changed
 

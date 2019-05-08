@@ -1,5 +1,6 @@
 .git/
 coverage/
 lib/
+types/
 node_modules
 package.json
