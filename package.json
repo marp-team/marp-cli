@@ -45,12 +45,14 @@
     "preversion": "run-p check:* format:check lint:* test:coverage",
     "standalone": "rimraf bin && pkg --out-path ./bin .",
     "standalone:pack": "node ./scripts/pack.js",
+    "standalone:pack:upload": "node ./scripts/upload.js",
     "test": "jest",
     "test:coverage": "jest --coverage",
     "version": "curl https://raw.githubusercontent.com/marp-team/marp/master/version.js | node && git add -A CHANGELOG.md",
     "watch": "rollup -w -c"
   },
   "devDependencies": {
+    "@octokit/rest": "^16.25.3",
     "@types/cheerio": "^0.22.11",
     "@types/cosmiconfig": "^5.0.3",
     "@types/express": "^4.16.1",

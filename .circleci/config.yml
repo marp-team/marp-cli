@@ -7,13 +7,6 @@ references:
     cmd:
       - /bin/sh
 
-  on-tagged-version: &on-tagged-version
-    filters:
-      branches:
-        ignore: /.*/
-      tags:
-        only: /^v.*/
-
   base: &base
     docker:
       - image: circleci/node:10.15.3-browsers
@@ -98,10 +91,14 @@ jobs:
             docker login -u $DOCKER_USER -p $DOCKER_PASS
             docker push marpteam/marp-cli:latest
 
-  standalone-build:
+  release:
     <<: *base
     steps:
       - checkout
+
+      - run:
+          name: Create release on GitHub
+          command: curl https://raw.githubusercontent.com/marp-team/marp/master/github-release.js | node
 
       - restore_cache:
           keys:
@@ -110,33 +107,23 @@ jobs:
             - dependencies-{{ .Environment.CI_CACHE_KEY }}-{{ .Environment.CIRCLE_JOB }}-
 
       - run: yarn install
-      - run: yarn build:standalone
-
-      - persist_to_workspace:
-          root: ./bin
-          paths:
-            - '*'
-
-      - store_artifacts:
-          path: ./bin
-          destination: bin
-
-  github-release:
-    <<: *base
-    steps:
-      - checkout
-
-      - attach_workspace:
-          at: ./bin
 
       - run:
-          name: Create release and upload binaries on GitHub
-          command: |
-            RELEASE_ID=$(curl -sS https://raw.githubusercontent.com/marp-team/marp/master/github-release.js | node) && \
-            ENDPOINT="https://uploads.github.com/repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/releases/${RELEASE_ID}/assets" && \
-            curl -sS --data-binary @"bin/marp-cli-linux" -H "Accept: application/vnd.github.v3+json" -H "Authorization: token ${GITHUB_TOKEN}" -H "Content-Type: application/octet-stream" ${ENDPOINT}?name=marp-${CIRCLE_TAG}-linux && \
-            curl -sS --data-binary @"bin/marp-cli-macos" -H "Accept: application/vnd.github.v3+json" -H "Authorization: token ${GITHUB_TOKEN}" -H "Content-Type: application/octet-stream" ${ENDPOINT}?name=marp-${CIRCLE_TAG}-mac && \
-            curl -sS --data-binary @"bin/marp-cli-win.exe" -H "Accept: application/vnd.github.v3+json" -H "Authorization: token ${GITHUB_TOKEN}" -H "Content-Type: application/octet-stream" ${ENDPOINT}?name=marp-${CIRCLE_TAG}-win.exe
+          name: Build and create standalone binaries
+          command: yarn build:standalone
+
+      - run:
+          name: Create packages
+          command: yarn standalone:pack
+
+      - store_artifacts:
+          path: ./dist
+          destination: dist
+
+      - run:
+          name: Upload created packages to the asset of GitHub release
+          command: yarn standalone:pack:upload
+
 
 workflows:
   version: 2
@@ -151,10 +138,10 @@ workflows:
           filters:
             branches:
               only: master
-      - standalone-build:
-          <<: *on-tagged-version
-      - github-release:
-          <<: *on-tagged-version
+      - release:
           context: github-release
-          requires:
-            - standalone-build
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/
