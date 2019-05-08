@@ -29,9 +29,11 @@
     "node": ">=8.9.0"
   },
   "main": "lib/marp-cli.js",
+  "types": "types/marp-cli.d.ts",
   "files": [
     "marp-cli.js",
-    "lib/"
+    "lib/",
+    "types/"
   ],
   "bin": {
     "marp": "./marp-cli.js"
@@ -50,13 +52,14 @@
     "format:write": "yarn -s format --write",
     "lint:ts": "tslint \"{src,test}/**/*.ts\"",
     "lint:css": "stylelint \"src/**/*.{css,scss}\"",
-    "prepack": "npm-run-all --parallel check:* lint:* test:coverage --sequential build",
+    "prepack": "npm-run-all --parallel check:* lint:* test:coverage --parallel build types",
     "preversion": "run-p check:* format:check lint:* test:coverage",
     "standalone": "rimraf bin && pkg --out-path ./bin .",
     "standalone:pack": "node ./scripts/pack.js",
     "standalone:pack:upload": "node ./scripts/upload.js",
     "test": "jest",
     "test:coverage": "jest --coverage",
+    "types": "rimraf types && tsc --declaration --emitDeclarationOnly --outDir types",
     "version": "curl https://raw.githubusercontent.com/marp-team/marp/master/version.js | node && git add -A CHANGELOG.md",
     "watch": "rollup -w -c"
   },
