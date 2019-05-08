@@ -44,6 +44,7 @@
     "prepack": "npm-run-all --parallel check:* lint:* test:coverage --sequential build",
     "preversion": "run-p check:* format:check lint:* test:coverage",
     "standalone": "rimraf bin && pkg --out-path ./bin .",
+    "standalone:pack": "node ./scripts/pack.js",
     "test": "jest",
     "test:coverage": "jest --coverage",
     "version": "curl https://raw.githubusercontent.com/marp-team/marp/master/version.js | node && git add -A CHANGELOG.md",
@@ -92,13 +93,15 @@
     "stylelint-config-standard": "^18.3.0",
     "stylelint-scss": "^3.6.1",
     "supertest": "^4.0.2",
+    "tar-stream": "^2.0.1",
     "ts-jest": "24.0.2",
     "ts-keycode-enum": "^1.0.6",
     "tslib": "^1.9.3",
     "tslint": "^5.16.0",
     "tslint-config-airbnb": "^5.11.1",
     "tslint-config-prettier": "^1.18.0",
-    "typescript": "^3.4.5"
+    "typescript": "^3.4.5",
+    "zip-stream": "^2.0.1"
   },
   "dependencies": {
     "@marp-team/marp-core": "^0.9.0",
