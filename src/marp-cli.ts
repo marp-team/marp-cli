@@ -83,6 +83,13 @@ export default async function(argv: string[] = []): Promise<number> {
           group: OptionGroup.Basic,
           type: 'boolean',
         },
+        stdin: {
+          default: true,
+          describe: 'Read Markdown from stdin',
+          hidden: true, // It is an escape-hatch for advanced user
+          group: OptionGroup.Basic,
+          type: 'boolean',
+        },
         pdf: {
           conflicts: ['image'],
           describe: 'Convert slide deck into PDF',
@@ -197,11 +204,14 @@ export default async function(argv: string[] = []): Promise<number> {
         return File.findDir(cvtOpts.inputDir)
       }
 
+      // Read from stdio
+      // (May disable by --no-stdin option to avoid hung up while reading)
+      // @see https://github.com/marp-team/marp-cli/issues/93
+      const stdin = args.stdin ? await File.stdin() : undefined
+
       // Regular file finding powered by globby
       return <File[]>(
-        [await File.stdin(), ...(await File.find(...config.files))].filter(
-          f => f
-        )
+        [stdin, ...(await File.find(...config.files))].filter(f => f)
       )
     }
 
