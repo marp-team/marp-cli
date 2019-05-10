@@ -758,9 +758,12 @@ describe('Marp CLI', () => {
   })
 
   context('with passing from stdin', () => {
-    it('converts markdown came from stdin and outputs to stdout', async () => {
-      const cliInfo = jest.spyOn(cli, 'info').mockImplementation()
-      const stdout = jest.spyOn(process.stdout, 'write').mockImplementation()
+    let cliInfo: jest.Mock
+    let stdout: jest.Mock
+
+    beforeEach(() => {
+      cliInfo = jest.spyOn(cli, 'info').mockImplementation()
+      stdout = jest.spyOn(process.stdout, 'write').mockImplementation()
 
       jest
         .spyOn(getStdin, 'buffer')
@@ -768,12 +771,24 @@ describe('Marp CLI', () => {
 
       // reset cached stdin buffer
       ;(<any>File).stdinBuffer = undefined
+    })
 
+    it('converts markdown came from stdin and outputs to stdout', async () => {
       expect(await marpCli()).toBe(0)
       expect(cliInfo).toHaveBeenCalledWith(
         expect.stringContaining('<stdin> => <stdout>')
       )
-      expect(stdout).toHaveBeenCalled()
+      expect(stdout).toHaveBeenCalledWith(expect.any(Buffer))
+    })
+
+    context('with --stdin option as false', () => {
+      it('does not convert stdin even if passed', async () => {
+        expect(await marpCli(['--stdin=false'])).toBe(0)
+        expect(cliInfo).not.toHaveBeenCalledWith(
+          expect.stringContaining('<stdin> => <stdout>')
+        )
+        expect(stdout).not.toHaveBeenCalledWith(expect.any(Buffer))
+      })
     })
   })
 })
