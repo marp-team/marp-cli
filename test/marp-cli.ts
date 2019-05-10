@@ -783,6 +783,8 @@ describe('Marp CLI', () => {
 
     context('with --stdin option as false', () => {
       it('does not convert stdin even if passed', async () => {
+        jest.spyOn(console, 'error').mockImplementation()
+
         expect(await marpCli(['--stdin=false'])).toBe(0)
         expect(cliInfo).not.toHaveBeenCalledWith(
           expect.stringContaining('<stdin> => <stdout>')
