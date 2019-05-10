@@ -204,7 +204,7 @@ export default async function(argv: string[] = []): Promise<number> {
         return File.findDir(cvtOpts.inputDir)
       }
 
-      // Read from stdio
+      // Read from stdin
       // (May disable by --no-stdin option to avoid hung up while reading)
       // @see https://github.com/marp-team/marp-cli/issues/93
       const stdin = args.stdin ? await File.stdin() : undefined
