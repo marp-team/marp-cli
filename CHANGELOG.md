@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v0.9.2 - 2019-05-10
+
 ### Added
 
 - A hidden `--stdin` option to allow to disable reading from stdin as a workaround of hang up ([#93](https://github.com/marp-team/marp-cli/issues/93), [#94](https://github.com/marp-team/marp-cli/pull/94))
