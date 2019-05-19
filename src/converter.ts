@@ -1,7 +1,9 @@
-import { Marp, MarpOptions } from '@marp-team/marp-core'
+import { MarpOptions } from '@marp-team/marp-core'
 import { Marpit, MarpitOptions } from '@marp-team/marpit'
+import chalk from 'chalk'
 import * as chromeFinder from 'chrome-launcher/dist/chrome-finder'
 import puppeteer from 'puppeteer-core'
+import { URL } from 'url'
 import { silence, warn } from './cli'
 import { Engine } from './engine'
 import metaPlugin from './engine/meta-plugin'
@@ -89,7 +91,9 @@ export class Converter {
       lang,
       readyScript,
       base:
-        isFile && type !== ConvertType.html ? file!.absolutePath : undefined,
+        isFile && type !== ConvertType.html
+          ? file!.absoluteFileSchema
+          : undefined,
       notifyWS:
         isFile && this.options.watch && type === ConvertType.html
           ? await notifier.register(file!.absolutePath)
@@ -238,15 +242,40 @@ export class Converter {
     try {
       const browser = await Converter.runBrowser()
       const page = await browser.newPage()
+      const tracker = this.trackFailedLocalFileAccess(page)
 
       try {
         return await process(page, uri)
       } finally {
+        if (tracker.size > 0) {
+          warn(
+            `Marp CLI has detected accessing to local file${
+              tracker.size > 1 ? 's' : ''
+            }. ${
+              tracker.size > 1 ? 'They were' : 'That was'
+            } blocked by security reason. Instead we recommend using assets uploaded to online (Or you can use ${chalk.yellow(
+              '--allow-local-files'
+            )} option if you are understood of security risk)`
+          )
+        }
         await page.close()
       }
     } finally {
       if (tmpFile) await tmpFile.cleanup()
     }
+  }
+
+  private trackFailedLocalFileAccess(page: puppeteer.Page): Set<string> {
+    const failedFileSet = new Set<string>()
+
+    page.on('requestfailed', (req: puppeteer.Request) => {
+      try {
+        const url = new URL(req.url())
+        if (url.protocol === 'file:') failedFileSet.add(url.href)
+      } catch (e) {}
+    })
+
+    return failedFileSet
   }
 
   static async closeBrowser() {

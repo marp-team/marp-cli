@@ -34,6 +34,11 @@ export class File {
     return path.resolve(this.path)
   }
 
+  get absoluteFileSchema() {
+    // FIXME: Use url.pathToFileURL if it can be used
+    return `file://${path.posix.resolve(this.path)}`
+  }
+
   convert(output: string | false | undefined, extension: string): File {
     switch (output) {
       case undefined:
