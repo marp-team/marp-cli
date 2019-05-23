@@ -1,3 +1,1 @@
-const wrapAnsi = jest.fn().mockImplementation(m => m) // No ops
-
-export default wrapAnsi
+module.exports = jest.fn().mockImplementation(m => m) // No ops

@@ -3,6 +3,7 @@ import { MarpitOptions } from '@marp-team/marpit'
 import fs from 'fs'
 import os from 'os'
 import path from 'path'
+import { URL } from 'url'
 import { Converter, ConvertType, ConverterOption } from '../src/converter'
 import { CLIError } from '../src/error'
 import { File, FileType } from '../src/file'
@@ -182,9 +183,14 @@ describe('Converter', () => {
       context(`with ${type} convert type`, () => {
         it('adds <base> element with specified base path from passed file', async () => {
           const converter = instance({ type })
-
           const { result } = await converter.convert(md, dummyFile)
-          expect(result).toContain(`<base href="${process.cwd()}">`)
+
+          const matched = result.match(/<base href="(.+?)">/)
+          expect(matched).toBeTruthy()
+
+          const url = new URL((matched && matched[1]) as string)
+          expect(url.protocol).toBe('file:')
+          expect(path.resolve(url.pathname)).toBe(path.resolve(process.cwd()))
         })
       })
     }

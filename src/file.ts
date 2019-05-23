@@ -34,7 +34,7 @@ export class File {
     return path.resolve(this.path)
   }
 
-  get absoluteFileSchema() {
+  get absoluteFileScheme() {
     // FIXME: Use url.pathToFileURL if it can be used
     return `file://${path.posix.resolve(this.path)}`
   }

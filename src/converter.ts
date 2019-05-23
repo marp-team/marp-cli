@@ -92,7 +92,7 @@ export class Converter {
       readyScript,
       base:
         isFile && type !== ConvertType.html
-          ? file!.absoluteFileSchema
+          ? file!.absoluteFileScheme
           : undefined,
       notifyWS:
         isFile && this.options.watch && type === ConvertType.html
