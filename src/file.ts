@@ -3,6 +3,7 @@ import getStdin from 'get-stdin'
 import globby from 'globby'
 import mkdirp from 'mkdirp'
 import path from 'path'
+import * as url from 'url'
 import { tmpName } from 'tmp'
 import { promisify } from 'util'
 
@@ -35,7 +36,9 @@ export class File {
   }
 
   get absoluteFileScheme() {
-    // FIXME: Use url.pathToFileURL if it can be used
+    if (url.pathToFileURL) return url.pathToFileURL(this.absolutePath)
+
+    // Fallback for Node < v10.12.0
     return `file://${path.posix.resolve(this.path)}`
   }
 
