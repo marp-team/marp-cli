@@ -252,8 +252,8 @@ export class Converter {
             `Marp CLI has detected accessing to local file${
               tracker.size > 1 ? 's' : ''
             }. ${
-              tracker.size > 1 ? 'They were' : 'That was'
-            } blocked by security reason. Instead we recommend using assets uploaded to online (Or you can use ${chalk.yellow(
+              tracker.size > 1 ? 'They are' : 'That is'
+            } blocked by security reason. Instead we recommend using assets uploaded to online. (Or you can use ${chalk.yellow(
               '--allow-local-files'
             )} option if you are understood of security risk)`
           )
