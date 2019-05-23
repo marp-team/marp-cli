@@ -23,7 +23,6 @@ references:
             - dependencies-{{ .Environment.CI_CACHE_KEY }}-{{ .Environment.CIRCLE_JOB }}-
 
       - run: yarn install
-      - run: yarn audit
 
       - save_cache:
           key: dependencies-{{ .Environment.CI_CACHE_KEY }}-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}-{{ .Branch }}
@@ -64,6 +63,26 @@ references:
 
 version: 2
 jobs:
+  audit:
+    <<: *base
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+            - dependencies-{{ .Environment.CI_CACHE_KEY }}-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}-{{ .Branch }}
+            - dependencies-{{ .Environment.CI_CACHE_KEY }}-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}-
+            - dependencies-{{ .Environment.CI_CACHE_KEY }}-{{ .Environment.CIRCLE_JOB }}-
+
+      - run: yarn install
+      - run: yarn audit
+
+      - save_cache:
+          key: dependencies-{{ .Environment.CI_CACHE_KEY }}-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}-{{ .Branch }}
+          paths:
+            - node_modules
+            - ~/.cache/yarn
+
   current:
     <<: *base
 
@@ -134,9 +153,16 @@ workflows:
   version: 2
   build:
     jobs:
+      - audit
       - current
+          requires:
+            - audit
       - carbon
+          requires:
+            - audit
       - erbium
+          requires:
+            - audit
       - docker-image:
           requires:
             - current
