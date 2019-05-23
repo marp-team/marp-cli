@@ -237,7 +237,8 @@ export default async function(argv: string[] = []): Promise<number> {
       cli.info(
         `${fn(i, '<stdin>')} ${
           o.type === FileType.Null ? 'processed.' : `=> ${fn(o, '<stdout>')}`
-        }`
+        }`,
+        { singleLine: true }
       )
     }
 

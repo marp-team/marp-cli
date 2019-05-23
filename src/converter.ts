@@ -229,9 +229,9 @@ export class Converter {
     const tmpFile: File.TmpFileInterface | undefined = await (() => {
       if (!this.options.allowLocalFiles) return undefined
 
-      const warning = `Insecure local file accessing is enabled for conversion of ${file.relativePath()}.`
-      warn(warning)
-
+      warn(
+        `Insecure local file accessing is enabled for conversion of ${file.relativePath()}.`
+      )
       return file.saveTmpFile('.html')
     })()
 
