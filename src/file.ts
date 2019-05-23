@@ -31,12 +31,13 @@ export class File {
     this.path = filepath
   }
 
-  get absolutePath() {
+  get absolutePath(): string {
     return path.resolve(this.path)
   }
 
-  get absoluteFileScheme() {
-    if (url.pathToFileURL) return url.pathToFileURL(this.absolutePath)
+  get absoluteFileScheme(): string {
+    if (url.pathToFileURL)
+      return url.pathToFileURL(this.absolutePath).toString()
 
     // Fallback for Node < v10.12.0
     return `file://${path.posix.resolve(this.path)}`
