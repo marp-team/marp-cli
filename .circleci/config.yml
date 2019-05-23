@@ -154,13 +154,13 @@ workflows:
   build:
     jobs:
       - audit
-      - current
+      - current:
           requires:
             - audit
-      - carbon
+      - carbon:
           requires:
             - audit
-      - erbium
+      - erbium:
           requires:
             - audit
       - docker-image:
