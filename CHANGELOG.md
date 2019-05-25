@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Output warning if detected blocking local resources while rendering by Chrome ([#84](https://github.com/marp-team/marp-cli/issues/84), [#98](https://github.com/marp-team/marp-cli/pull/98))
+
 ## v0.9.2 - 2019-05-10
 
 ### Added

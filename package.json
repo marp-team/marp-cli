@@ -101,7 +101,6 @@
     "rollup-plugin-url": "^2.2.1",
     "sass": "^1.20.1",
     "screenfull": "^4.2.0",
-    "strip-ansi": "^5.2.0",
     "stylelint": "^10.0.1",
     "stylelint-config-prettier": "^5.1.0",
     "stylelint-config-standard": "^18.3.0",
@@ -137,8 +136,10 @@
     "puppeteer-core": "^1.15.0",
     "rimraf": "^2.6.3",
     "serve-index": "^1.9.1",
+    "strip-ansi": "^5.2.0",
     "terminate": "^2.1.2",
     "tmp": "^0.1.0",
+    "wrap-ansi": "^5.1.0",
     "ws": "^7.0.0",
     "yargs": "^13.2.2"
   },
