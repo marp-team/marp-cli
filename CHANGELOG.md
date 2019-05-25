@@ -6,6 +6,10 @@
 
 - Output warning if detected blocking local resources while rendering by Chrome ([#84](https://github.com/marp-team/marp-cli/issues/84), [#98](https://github.com/marp-team/marp-cli/pull/98))
 
+### Changed
+
+- Update CircleCI workflow to run `yarn audit` at the beginning ([#97](https://github.com/marp-team/marp-cli/pull/97))
+
 ## v0.9.2 - 2019-05-10
 
 ### Added
