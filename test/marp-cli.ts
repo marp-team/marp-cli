@@ -758,8 +758,8 @@ describe('Marp CLI', () => {
   })
 
   context('with passing from stdin', () => {
-    let cliInfo: jest.Mock
-    let stdout: jest.Mock
+    let cliInfo: jest.SpyInstance
+    let stdout: jest.SpyInstance
 
     beforeEach(() => {
       cliInfo = jest.spyOn(cli, 'info').mockImplementation()
