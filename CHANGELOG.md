@@ -9,6 +9,7 @@
 ### Changed
 
 - Update CircleCI workflow to run `yarn audit` at the beginning ([#97](https://github.com/marp-team/marp-cli/pull/97))
+- Upgrade dependent packages to the latest version ([#99](https://github.com/marp-team/marp-cli/pull/99))
 
 ## v0.9.2 - 2019-05-10
 
