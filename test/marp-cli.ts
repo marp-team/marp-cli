@@ -241,7 +241,7 @@ describe('Marp CLI', () => {
         serverStart.mockResolvedValue(0)
 
         await marpCli(['--input-dir', files, '--server'])
-        expect(info).toBeCalledWith(
+        expect(info.mock.calls.map(([m]) => m)).toContainEqual(
           expect.stringContaining('http://localhost:8080/')
         )
         expect(serverStart).toBeCalledTimes(1)
@@ -276,7 +276,7 @@ describe('Marp CLI', () => {
 
             await run()
             expect(Preview.prototype.open).not.toBeCalled()
-            expect(warn).toBeCalledWith(
+            expect(warn.mock.calls.map(([m]) => m)).toContainEqual(
               expect.stringContaining('Preview option was ignored')
             )
           })
@@ -356,7 +356,7 @@ describe('Marp CLI', () => {
         const args = [assetFn('_files/1.md'), '--theme', themesPath]
 
         expect(await marpCli(args)).toBe(1)
-        expect(cliError).toHaveBeenCalledWith(
+        expect(cliError.mock.calls.map(([m]) => m)).toContainEqual(
           expect.stringContaining('Directory cannot pass to theme option')
         )
         expect(info).toHaveBeenCalledTimes(1)
@@ -470,12 +470,10 @@ describe('Marp CLI', () => {
       ;(<any>fs).__mockWriteFile()
 
       expect(await marpCli([onePath])).toBe(0)
-      expect(cliInfo).toHaveBeenCalledWith(
-        expect.stringContaining('1 markdown')
-      )
-      expect(cliInfo).toHaveBeenCalledWith(
-        expect.stringMatching(/1\.md => .+1\.html/)
-      )
+
+      const logs = cliInfo.mock.calls.map(([m]) => m)
+      expect(logs).toContainEqual(expect.stringContaining('1 markdown'))
+      expect(logs).toContainEqual(expect.stringMatching(/1\.md => .+1\.html/))
     })
 
     it('prints error and return error code when CLIError is raised', async () => {
@@ -487,7 +485,9 @@ describe('Marp CLI', () => {
         .mockImplementation(() => Promise.reject(new CLIError('FAIL', 123)))
 
       expect(await marpCli([onePath])).toBe(123)
-      expect(cliError).toHaveBeenCalledWith(expect.stringContaining('FAIL'))
+      expect(cliError.mock.calls.map(([m]) => m)).toContainEqual(
+        expect.stringContaining('FAIL')
+      )
     })
 
     context('with --pdf option', () => {
@@ -698,7 +698,7 @@ describe('Marp CLI', () => {
         .mockImplementation(() => [])
 
       expect(await marpCli([assetFn('_files')])).toBe(0)
-      expect(cliInfo).toHaveBeenCalledWith(
+      expect(cliInfo.mock.calls.map(([m]) => m)).toContainEqual(
         expect.stringContaining('4 markdowns')
       )
     })
@@ -775,7 +775,7 @@ describe('Marp CLI', () => {
 
     it('converts markdown came from stdin and outputs to stdout', async () => {
       expect(await marpCli()).toBe(0)
-      expect(cliInfo).toHaveBeenCalledWith(
+      expect(cliInfo.mock.calls.map(([m]) => m)).toContainEqual(
         expect.stringContaining('<stdin> => <stdout>')
       )
       expect(stdout).toHaveBeenCalledWith(expect.any(Buffer))
@@ -786,7 +786,7 @@ describe('Marp CLI', () => {
         jest.spyOn(console, 'error').mockImplementation()
 
         expect(await marpCli(['--stdin=false'])).toBe(0)
-        expect(cliInfo).not.toHaveBeenCalledWith(
+        expect(cliInfo.mock.calls.map(([m]) => m)).not.toContainEqual(
           expect.stringContaining('<stdin> => <stdout>')
         )
         expect(stdout).not.toHaveBeenCalledWith(expect.any(Buffer))
