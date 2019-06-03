@@ -32,9 +32,7 @@ export class Theme {
   get css() {
     const buf = this.buffer.toString()
 
-    return this.overrideName
-      ? `${buf}\n/* @theme ${this.overrideName} */`
-      : buf
+    return this.overrideName ? `${buf}\n/* @theme ${this.overrideName} */` : buf
   }
 
   async load() {
