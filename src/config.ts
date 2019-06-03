@@ -14,7 +14,6 @@ import { TemplateOption } from './templates'
 
 const lstat = promisify(fs.lstat)
 
-type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 type Overwrite<T, U> = Omit<T, Extract<keyof T, keyof U>> & U
 
 export type IMarpCLIArguments = IMarpCLIBaseArguments & IMarpCLIBespokeArguments
