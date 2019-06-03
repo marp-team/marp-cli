@@ -12,17 +12,17 @@ const themeExtensions = ['*.css']
 
 export class Theme {
   readonly filename: string
-  readonly overridenName?: string
+  readonly overrideName?: string
   name?: string
 
   private readBuffer?: Buffer
 
   private constructor(filename: string, opts: Theme.Options) {
     this.filename = filename
-    this.overridenName =
+    this.overrideName =
       opts.overrideName === true ? this.genUniqName() : opts.overrideName
 
-    this.name = this.overridenName
+    this.name = this.overrideName
   }
 
   get buffer() {
@@ -32,8 +32,8 @@ export class Theme {
   get css() {
     const buf = this.buffer.toString()
 
-    return this.overridenName
-      ? `${buf}\n/* @theme ${this.overridenName} */`
+    return this.overrideName
+      ? `${buf}\n/* @theme ${this.overrideName} */`
       : buf
   }
 

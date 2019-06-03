@@ -340,9 +340,9 @@ describe('Marp CLI', () => {
         const { themeSet } = converter.options
         const theme = themeSet.themes.get(cssFile)!
 
-        expect(theme.overridenName).not.toBeUndefined()
+        expect(theme.overrideName).not.toBeUndefined()
         expect(converter.options.globalDirectives.theme).toBe(
-          theme.overridenName
+          theme.overrideName
         )
         expect(themeSet.fnForWatch).toContain(cssFile)
       })
