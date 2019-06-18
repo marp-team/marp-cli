@@ -6,7 +6,7 @@ import serveIndex from 'serve-index'
 import url from 'url'
 import { promisify } from 'util'
 import { Converter, ConvertedCallback, ConvertType } from './converter'
-import { error } from './error'
+import { error, CLIError } from './error'
 import { File, markdownExtensions } from './file'
 import favicon from './assets/favicon.png'
 import serverIndex from './server/index.pug'
@@ -39,7 +39,20 @@ export class Server {
 
   async start() {
     this.setup()
-    new Promise<void>(res => this.server!.listen(this.port, res))
+    return new Promise<void>((resolve, reject) => {
+      const httpServer = this.server!.listen(this.port)
+      httpServer.on('listening', () => {
+        resolve()
+      })
+      httpServer.on('error', err => {
+        httpServer.close()
+        if (err['code'] === 'EADDRINUSE') {
+          reject(new CLIError(err.message))
+        } else {
+          reject(err)
+        }
+      })
+    })
   }
 
   private async convertMarkdown(

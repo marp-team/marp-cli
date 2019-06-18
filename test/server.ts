@@ -72,7 +72,7 @@ describe('Server', () => {
       const server = new Server(converter())
       await server.start()
 
-      expect(server.server!.listen).toBeCalledWith(8080, expect.any(Function))
+      expect(server.server!.listen).toBeCalledWith(8080)
     })
   })
 
