@@ -10,7 +10,7 @@ import { Preview, fileToURI } from './preview'
 import { Server } from './server'
 import templates from './templates'
 import version from './version'
-import watcher, { Watcher } from './watcher'
+import watcher, { Watcher, notifier } from './watcher'
 
 enum OptionGroup {
   Basic = 'Basic Options:',
@@ -27,6 +27,8 @@ Usage:
 `.trim()
 
 export default async function(argv: string[] = []): Promise<number> {
+  let watcherInstance: Watcher | undefined
+
   try {
     const base: Argv = yargs(argv)
     const program = base
@@ -255,7 +257,7 @@ export default async function(argv: string[] = []): Promise<number> {
 
     // Watch mode / Server mode
     if (cvtOpts.watch) {
-      watcher(
+      watcherInstance = watcher(
         [
           ...(cvtOpts.inputDir ? [cvtOpts.inputDir] : config.files),
           ...cvtOpts.themeSet.fnForWatch,
@@ -312,5 +314,8 @@ export default async function(argv: string[] = []): Promise<number> {
     return e.errorCode
   } finally {
     await Converter.closeBrowser()
+    notifier.stop()
+
+    if (watcherInstance) watcherInstance.chokidar.close()
   }
 }

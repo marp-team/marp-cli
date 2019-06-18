@@ -39,6 +39,7 @@ export class Server {
 
   async start() {
     this.setup()
+
     return new Promise<void>((resolve, reject) => {
       const httpServer = this.server!.listen(this.port)
       httpServer.on('listening', () => {
@@ -46,6 +47,7 @@ export class Server {
       })
       httpServer.on('error', err => {
         httpServer.close()
+
         if (err['code'] === 'EADDRINUSE') {
           reject(new CLIError(err.message))
         } else {
