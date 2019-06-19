@@ -200,7 +200,7 @@ export class MarpCLIConfig {
       html: this.pickDefined(this.args.html, this.conf.html),
       jpegQuality:
         this.pickDefined(this.args.jpegQuality, this.conf.jpegQuality) || 85,
-      lang: this.conf.lang || (await osLocale()).replace(/[_@]/g, '-'),
+      lang: this.conf.lang || (await osLocale()).replace(/@/g, '-'),
       options: this.conf.options || {},
       readyScript: this.engine.browserScript
         ? `<script>${this.engine.browserScript}</script>`
