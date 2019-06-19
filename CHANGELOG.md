@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v0.10.1 - 2019-06-19
+
 ### Fixed
 
 - Improve error handling while starting up server ([#103](https://github.com/marp-team/marp-cli/pull/103) by [@saiya](https://github.com/saiya))
