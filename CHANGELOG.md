@@ -6,6 +6,11 @@
 
 - Improve error handling while starting up server ([#103](https://github.com/marp-team/marp-cli/pull/103) by [@saiya](https://github.com/saiya))
 
+### Changed
+
+- Upgrade to [Marpit v1.2.0](https://github.com/marp-team/marpit/releases/tag/v1.2.0) and [Marp Core v0.10.1](https://github.com/marp-team/marp-core/releases/tag/v0.10.1) ([#104](https://github.com/marp-team/marp-cli/pull/104))
+- Upgrade Node and dependent packages to the latest version ([#104](https://github.com/marp-team/marp-cli/pull/104))
+
 ## v0.10.0 - 2019-06-03
 
 ### Changed
