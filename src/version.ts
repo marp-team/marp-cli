@@ -10,9 +10,7 @@ export default async function outputVersion(config: MarpCLIConfig): Promise<0> {
   if (engine.klass === Marp) {
     message += `(/w bundled @marp-team/marp-core v${bundledCoreVer})`
   } else if (engine.package && engine.package.name && engine.package.version) {
-    message += `(/w customized engine in ${engine.package.name} v${
-      engine.package.version
-    })`
+    message += `(/w customized engine in ${engine.package.name} v${engine.package.version})`
   } else {
     message += `(/w customized engine)`
   }
