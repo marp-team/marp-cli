@@ -4,21 +4,21 @@ import { MarpCLIConfig } from './config'
 import { name, version } from '../package.json'
 
 export default async function outputVersion(config: MarpCLIConfig): Promise<0> {
+  let engineVer = ''
   const { engine } = config
-  let coreVer = ''
 
   if (engine.klass === Marp) {
-    coreVer = `bundled @marp-team/marp-core v${bundledCoreVer}`
+    engineVer = `bundled @marp-team/marp-core v${bundledCoreVer}`
 
     if (engine.package && engine.package.version !== bundledCoreVer) {
-      coreVer = `user-installed @marp-team/marp-core v${engine.package.version}`
+      engineVer = `user-installed @marp-team/marp-core v${engine.package.version}`
     }
   } else if (engine.package && engine.package.name && engine.package.version) {
-    coreVer = `customized engine in ${engine.package.name} v${engine.package.version}`
+    engineVer = `customized engine in ${engine.package.name} v${engine.package.version}`
   } else {
-    coreVer = `customized engine`
+    engineVer = `customized engine`
   }
 
-  console.log(`${name} v${version}${coreVer ? ` (w/ ${coreVer})` : ''}`)
+  console.log(`${name} v${version}${engineVer ? ` (w/ ${engineVer})` : ''}`)
   return 0
 }
