@@ -43,12 +43,12 @@ describe('Marp CLI', () => {
   for (const cmd of ['--version', '-v'])
     context(`with ${cmd} option`, () => {
       let log: jest.SpyInstance<void, any>
-      let findClassPath: jest.SpyInstance<ResolvedEngine['findClassPath']>
+      let findClassPath: jest.SpyInstance
 
       beforeEach(() => {
         log = jest.spyOn(console, 'log').mockImplementation()
         findClassPath = jest
-          .spyOn(<any>ResolvedEngine.prototype, 'findClassPath')
+          .spyOn(ResolvedEngine.prototype as any, 'findClassPath')
           .mockImplementation()
       })
 
@@ -66,6 +66,33 @@ describe('Marp CLI', () => {
           )
         )
       })
+
+      context(
+        'when resolved core has unexpected version against bundled',
+        () => {
+          const pkgJson = { name: '@marp-team/marp-core', version: '0.0.0' }
+          const pkgPath = '../node_modules/@marp-team/marp-core/package.json'
+
+          beforeEach(() => {
+            findClassPath.mockImplementation(() =>
+              assetFn('../node_modules/@marp-team/marp-core/lib/marp.js')
+            )
+
+            jest.doMock(pkgPath, () => pkgJson)
+          })
+
+          afterEach(() => jest.unmock(pkgPath))
+
+          it('outputs resolved version as user-installed core', async () => {
+            expect(await marpCli([cmd])).toBe(0)
+            expect(log).toBeCalledWith(
+              expect.stringContaining(
+                'user-installed @marp-team/marp-core v0.0.0'
+              )
+            )
+          })
+        }
+      )
 
       context('with specified Marpit engine', () => {
         const cmds = [cmd, '--engine', '@marp-team/marpit']
