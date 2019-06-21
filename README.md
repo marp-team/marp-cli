@@ -82,7 +82,9 @@ npm install -g @marp-team/marp-cli
 
 ### Standalone binary _(EXPERIMENTAL)_
 
-Do you never want to install any dependent tools? we also provide executable binaries for Linux, macOS, and Windows. [:fast_forward: Download the latest standalone binary for your OS from release page.](https://github.com/marp-team/marp-cli/releases)
+Do you never want to install any dependent tools? we also provide executable binaries for Linux, macOS, and Windows.
+
+**[:fast_forward: Download the latest standalone binary for your OS from release page.](https://github.com/marp-team/marp-cli/releases)**
 
 ## Basic usage
 
@@ -326,10 +328,10 @@ By using `--version` (`-v`) option, you may confirm the version of engine that i
 
 ```console
 $ marp --version
-@marp-team/marp-cli v0.x.x (/w bundled @marp-team/marp-core v0.x.x)
+@marp-team/marp-cli v0.x.x (w/ bundled @marp-team/marp-core v0.x.x)
 ```
 
-Marp CLI prefers to use _an installed core by user_ than the bundled. If the current project has installed `@marp-team/marp-core` individually, it would show its version and the annotation "/w customized engine".
+Marp CLI prefers to use _an installed core by user_ than the bundled. If the current project has installed `@marp-team/marp-core` individually, it would show its version and the annotation: `w/ user-installed @marp-team/marp-core vX.X.X` or `w/ customized engine`.
 
 ## Configuration file
 
