@@ -5,6 +5,7 @@
 ### Fixed
 
 - Improve version output when using user-installed Marp Core ([#105](https://github.com/marp-team/marp-cli/pull/105))
+- Reduce file size of converted HTML by upgrading Marp Core to [v0.10.2](https://github.com/marp-team/marp-core/releases/tag/v0.10.2) ([#104](https://github.com/marp-team/marp-cli/pull/104))
 
 ## v0.10.1 - 2019-06-19
 
