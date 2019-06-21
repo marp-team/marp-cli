@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v0.10.2 - 2019-06-21
+
 ### Fixed
 
 - Improve version output when using user-installed Marp Core ([#105](https://github.com/marp-team/marp-cli/pull/105))
