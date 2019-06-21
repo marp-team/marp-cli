@@ -117,7 +117,7 @@
     "zip-stream": "^2.0.1"
   },
   "dependencies": {
-    "@marp-team/marp-core": "^0.10.1",
+    "@marp-team/marp-core": "^0.10.2",
     "@marp-team/marpit": "^1.2.0",
     "carlo": "^0.9.45",
     "chalk": "^2.4.2",
@@ -133,7 +133,7 @@
     "os-locale": "^4.0.0",
     "pkg-up": "^3.1.0",
     "portfinder": "^1.0.20",
-    "puppeteer-core": "^1.17.0",
+    "puppeteer-core": "~1.17.0",
     "rimraf": "^2.6.3",
     "serve-index": "^1.9.1",
     "strip-ansi": "^5.2.0",
