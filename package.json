@@ -143,6 +143,9 @@
     "ws": "^7.0.1",
     "yargs": "^13.2.4"
   },
+  "resolutions": {
+    "fast-glob": "^3.0.2"
+  },
   "publishConfig": {
     "access": "public"
   }
