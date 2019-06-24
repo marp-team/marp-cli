@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v0.11.0 - 2019-06-24
+
 ### Added
 
 - Support [`size` global directive](https://github.com/marp-team/marp-core/#size-global-directive) of the updated Marp Core ([#110](https://github.com/marp-team/marp-cli/pull/110))

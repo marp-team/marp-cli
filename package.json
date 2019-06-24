@@ -1,6 +1,6 @@
 {
   "name": "@marp-team/marp-cli",
-  "version": "0.10.2",
+  "version": "0.11.0",
   "description": "A CLI interface for Marp and Marpit based converters",
   "license": "MIT",
   "author": {
