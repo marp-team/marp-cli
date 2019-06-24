@@ -82,6 +82,7 @@
     "cheerio": "^1.0.0-rc.3",
     "codecov": "^3.5.0",
     "cssnano": "^4.1.10",
+    "image-size": "^0.7.4",
     "jest": "^24.8.0",
     "jest-junit": "^6.4.0",
     "jest-plugin-context": "^2.9.0",
