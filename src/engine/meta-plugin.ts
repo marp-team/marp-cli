@@ -2,7 +2,7 @@ import { Marpit } from '@marp-team/marpit'
 import { URL } from 'url'
 import { warn } from '../cli'
 
-export default function metaPlugin(_, marpit: Marpit) {
+export default function metaPlugin({ marpit }: { marpit: Marpit }) {
   Object.assign(marpit.customDirectives.global, {
     description: v => (typeof v === 'string' ? { marpCLIDescription: v } : {}),
     image: v => (typeof v === 'string' ? { marpCLIImage: v } : {}),
