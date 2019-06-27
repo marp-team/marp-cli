@@ -1,0 +1,6 @@
+tasks:
+  - command: >
+      yarn build &&
+      ./marp-cli.js demo/demo.md &&
+      cd demo &&
+      gp open demo.html
