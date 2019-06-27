@@ -1,4 +1,4 @@
-# marp demo
+# Marp demo
 
 ---
 
