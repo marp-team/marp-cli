@@ -1,5 +1,6 @@
 tasks:
-  - command: >
+  - init: yarn install
+    command: >
       yarn build &&
       ./marp-cli.js demo/demo.md &&
       cd demo &&
