@@ -1,6 +1,7 @@
 import Marp from '@marp-team/marp-core'
 import { MarpitOptions } from '@marp-team/marpit'
 import fs from 'fs'
+import imageSize from 'image-size'
 import os from 'os'
 import path from 'path'
 import { URL } from 'url'
@@ -310,33 +311,61 @@ describe('Converter', () => {
     })
 
     context('when convert type is PNG', () => {
+      let converter: Converter
+      let write: jest.Mock
+
+      beforeEach(() => {
+        converter = instance({ output: 'a.png', type: ConvertType.png })
+        write = (<any>fs).__mockWriteFile()
+      })
+
       it(
         'converts markdown file into PNG',
         async () => {
-          const write = (<any>fs).__mockWriteFile()
-          const converter = instance({ output: 'a.png', type: ConvertType.png })
-
           await converter.convertFile(new File(onePath))
           const png: Buffer = write.mock.calls[0][1]
 
           expect(write).toHaveBeenCalled()
           expect(write.mock.calls[0][0]).toBe('a.png')
           expect(png.toString('ascii', 1, 4)).toBe('PNG')
+
+          const { width, height } = imageSize(png, undefined)
+          expect(width).toBe(1280)
+          expect(height).toBe(720)
         },
         puppeteerTimeoutMs
       )
+
+      context('with 4:3 size global directive for Marp Core', () => {
+        const slide43Path = twoPath
+
+        it(
+          'converts into 4:3 PNG',
+          async () => {
+            await converter.convertFile(new File(slide43Path))
+            const png: Buffer = write.mock.calls[0][1]
+
+            const { width, height } = imageSize(png, undefined)
+            expect(width).toBe(960)
+            expect(height).toBe(720)
+          },
+          puppeteerTimeoutMs
+        )
+      })
     })
 
     context('when convert type is JPEG', () => {
+      let converter: Converter
+      let write: jest.Mock
+
+      beforeEach(() => {
+        converter = instance({ output: 'b.jpg', type: ConvertType.jpeg })
+        write = (<any>fs).__mockWriteFile()
+      })
+
       it(
         'converts markdown file into JPEG',
         async () => {
-          const write = (<any>fs).__mockWriteFile()
-          const converter = instance({
-            output: 'b.jpg',
-            type: ConvertType.jpeg,
-          })
-
           await converter.convertFile(new File(onePath))
           const jpeg: Buffer = write.mock.calls[0][1]
 
@@ -344,9 +373,30 @@ describe('Converter', () => {
           expect(write.mock.calls[0][0]).toBe('b.jpg')
           expect(jpeg[0]).toBe(0xff)
           expect(jpeg[1]).toBe(0xd8)
+
+          const { width, height } = imageSize(jpeg, undefined)
+          expect(width).toBe(1280)
+          expect(height).toBe(720)
         },
         puppeteerTimeoutMs
       )
+
+      context('with 4:3 size global directive for Marp Core', () => {
+        const slide43Path = twoPath
+
+        it(
+          'converts into 4:3 JPEG',
+          async () => {
+            await converter.convertFile(new File(slide43Path))
+            const jpeg: Buffer = write.mock.calls[0][1]
+
+            const { width, height } = imageSize(jpeg, undefined)
+            expect(width).toBe(960)
+            expect(height).toBe(720)
+          },
+          puppeteerTimeoutMs
+        )
+      })
     })
   })
 

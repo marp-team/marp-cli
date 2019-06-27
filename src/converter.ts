@@ -7,6 +7,7 @@ import { URL } from 'url'
 import { silence, warn } from './cli'
 import { Engine } from './engine'
 import metaPlugin from './engine/meta-plugin'
+import infoPlugin, { engineInfo, EngineInfo } from './engine/info-plugin'
 import { error } from './error'
 import { File, FileType } from './file'
 import templates, {
@@ -101,25 +102,12 @@ export class Converter {
       renderer: tplOpts => {
         const engine = this.generateEngine(tplOpts)
         const ret = engine.render(`${markdown}${additionals}`)
+        const info = engine[engineInfo]
 
-        const { themeSet, lastGlobalDirectives } = <any>engine
-        const globalDirectives = lastGlobalDirectives || {}
-        const themeName: string | undefined =
-          globalDirectives.theme || (themeSet.default || {}).name
+        if (isFile)
+          this.options.themeSet.observe(file!.absolutePath, info && info.theme)
 
-        if (isFile) this.options.themeSet.observe(file!.absolutePath, themeName)
-
-        return {
-          ...ret,
-          description: globalDirectives.marpCLIDescription,
-          image: globalDirectives.marpCLIImage,
-          title: globalDirectives.marpCLITitle,
-          url: globalDirectives.marpCLIURL,
-          size: {
-            height: engine.themeSet.getThemeProp(themeName!, 'heightPixel'),
-            width: engine.themeSet.getThemeProp(themeName!, 'widthPixel'),
-          },
-        }
+        return { ...ret, ...info! }
       },
     })
   }
@@ -198,7 +186,9 @@ export class Converter {
     })
   }
 
-  private generateEngine(mergeOptions: MarpitOptions): Marpit {
+  private generateEngine(
+    mergeOptions: MarpitOptions
+  ): Marpit & { [engineInfo]: EngineInfo | undefined } {
     const { html, options } = this.options
     const { prototype } = this.options.engine
     const opts = { ...options, ...mergeOptions, html }
@@ -213,8 +203,8 @@ export class Converter {
 
     if (html !== undefined) engine.markdown.set({ html })
 
-    // Plugins
-    engine.use(metaPlugin, engine)
+    // Marpit plugins
+    engine.use(metaPlugin).use(infoPlugin)
 
     // Additional themes
     this.options.themeSet.registerTo(engine)
