@@ -194,8 +194,3 @@ workflows:
           context: github-release
           requires:
             - pack
-
-  # TODO: This workflow is for debug
-  pack:
-    jobs:
-      - pack
