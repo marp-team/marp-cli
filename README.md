@@ -66,7 +66,6 @@ You can also build and run `marp-cli` in Gitpod, an online IDE for GitHub:
 
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/marp-team/marp-cli)
 
-
 ## Install
 
 ### Local installation
