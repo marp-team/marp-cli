@@ -60,6 +60,13 @@ docker run --rm --init -v $PWD:/home/marp/app/ -e LANG=$LANG -p 52000:52000 marp
 docker run --rm --init -v $PWD:/home/marp/app -e LANG=$LANG -p 8080:8080 -p 52000:52000 marpteam/marp-cli -s .
 ```
 
+### Run in Gitpod
+
+You can also build and run `marp-cli` in Gitpod, an online IDE for GitHub:
+
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/marp-team/marp-cli)
+
+
 ## Install
 
 ### Local installation
