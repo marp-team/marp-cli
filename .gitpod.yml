@@ -3,4 +3,4 @@ ports:
     onOpen: open-preview
 tasks:
   - init: yarn install
-    command:　yarn build && ./marp-cli.js --server demo
+    command: yarn build && ./marp-cli.js --server demo
