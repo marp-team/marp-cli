@@ -116,14 +116,10 @@ jobs:
             docker login -u $DOCKER_USER -p $DOCKER_PASS
             docker push marpteam/marp-cli:latest
 
-  release:
+  pack:
     <<: *base
     steps:
       - checkout
-
-      - run:
-          name: Create release on GitHub
-          command: curl https://raw.githubusercontent.com/marp-team/marp/master/github-release.js | node
 
       - restore_cache:
           keys:
@@ -141,9 +137,26 @@ jobs:
           name: Create packages
           command: yarn standalone:pack
 
+      - persist_to_workspace:
+          root: dist
+          paths:
+            - '*'
+
       - store_artifacts:
           path: ./dist
           destination: dist
+
+  release:
+    <<: *base
+    steps:
+      - checkout
+
+      - run:
+          name: Create release on GitHub
+          command: curl https://raw.githubusercontent.com/marp-team/marp/master/github-release.js | node
+
+      - attach_workspace:
+          at: dist
 
       - run:
           name: Upload created packages to the asset of GitHub release
@@ -171,10 +184,13 @@ workflows:
           filters:
             branches:
               only: master
-      - release:
-          context: github-release
+      - pack:
           filters:
             branches:
               ignore: /.*/
             tags:
               only: /^v.*/
+      - release:
+          context: github-release
+          requires:
+            - pack

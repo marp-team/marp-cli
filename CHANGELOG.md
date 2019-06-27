@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Downgrade pkg to v4.3.x to fix segfault in the standalone build for Windows ([#111](https://github.com/marp-team/marp-cli/issues/111), [#112](https://github.com/marp-team/marp-cli/pull/112))
+
 ## v0.11.0 - 2019-06-24
 
 ### Added
