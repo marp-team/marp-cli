@@ -4,7 +4,7 @@
 
 ### Added
 
-- A demo slide and the button to run in [Gitpod](https://gitpod.io/#https://github.com/marp-team/marp-cli) ([#113](https://github.com/marp-team/marp-cli/pull/113) by [@mouse484](https://github.com/mouse484))
+- A demo slide and the button to run in [Gitpod](https://gitpod.io/#https://github.com/marp-team/marp-cli) ([#113](https://github.com/marp-team/marp-cli/pull/113) by [@mouse484](https://github.com/mouse484), [#114](https://github.com/marp-team/marp-cli/pull/114))
 
 ### Fixed
 
