@@ -61,6 +61,13 @@ references:
           path: ./coverage
           destination: coverage
 
+  version: &version
+    filters:
+      branches:
+        ignore: /.*/
+      tags:
+        only: /^v.*/
+
 version: 2
 jobs:
   audit:
@@ -151,6 +158,14 @@ jobs:
     steps:
       - checkout
 
+      - restore_cache:
+          keys:
+            - dependencies-{{ .Environment.CI_CACHE_KEY }}-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}-{{ .Branch }}
+            - dependencies-{{ .Environment.CI_CACHE_KEY }}-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}-
+            - dependencies-{{ .Environment.CI_CACHE_KEY }}-{{ .Environment.CIRCLE_JOB }}-
+
+      - run: yarn install
+
       - run:
           name: Create release on GitHub
           command: curl https://raw.githubusercontent.com/marp-team/marp/master/github-release.js | node
@@ -185,12 +200,9 @@ workflows:
             branches:
               only: master
       - pack:
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /^v.*/
+          <<: *version
       - release:
+          <<: *version
           context: github-release
           requires:
             - pack
