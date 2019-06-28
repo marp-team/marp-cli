@@ -10,6 +10,7 @@
 
 - Downgrade pkg to v4.3.x to fix segfault in the standalone build for Windows ([#111](https://github.com/marp-team/marp-cli/issues/111), [#112](https://github.com/marp-team/marp-cli/pull/112))
 - Improve error handling while running server ([#115](https://github.com/marp-team/marp-cli/pull/115))
+- Fix up not working watch mode ([#116](https://github.com/marp-team/marp-cli/pull/116))
 
 ## v0.11.0 - 2019-06-24
 
