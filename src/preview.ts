@@ -104,17 +104,17 @@ export class Preview extends TypedEventEmitter<Preview.Events> {
 }
 
 export namespace Preview {
-  export interface Options {
-    height: number
-    width: number
-  }
-
   export interface Events {
     close(window: any): void
     exit(): void
     launch(): void
     open(window: any, location: string): void
     opening(location: string): void
+  }
+
+  export interface Options {
+    height: number
+    width: number
   }
 }
 
