@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- A demo slide and the button to run in [Gitpod](https://gitpod.io/#https://github.com/marp-team/marp-cli) ([#113](https://github.com/marp-team/marp-cli/pull/113) by [@mouse484](https://github.com/mouse484))
+
 ### Fixed
 
 - Downgrade pkg to v4.3.x to fix segfault in the standalone build for Windows ([#111](https://github.com/marp-team/marp-cli/issues/111), [#112](https://github.com/marp-team/marp-cli/pull/112))
