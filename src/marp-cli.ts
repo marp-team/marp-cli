@@ -313,11 +313,14 @@ export default async function(argv: string[] = []): Promise<number> {
     if (!(e instanceof CLIError)) throw e
 
     cli.error(e.message)
+
+    // Stop running notifier and watcher to exit process correctly
+    // (NOTE: Don't close in the finally block to keep watching)
+    notifier.stop()
+    if (watcherInstance) watcherInstance.chokidar.close()
+
     return e.errorCode
   } finally {
     await Converter.closeBrowser()
-    notifier.stop()
-
-    if (watcherInstance) watcherInstance.chokidar.close()
   }
 }
