@@ -287,9 +287,11 @@ export default async function(argv: string[] = []): Promise<number> {
 
       if (cvtOpts.server) {
         const server = new Server(converter, {
-          onConverted,
           directoryIndex: ['index.md', 'PITCHME.md'], // GitPitch compatible
         })
+        server.on('converted', onConverted)
+        server.on('error', e => cli.error(e.toString()))
+
         await server.start()
 
         const url = `http://localhost:${server.port}`
