@@ -87,31 +87,26 @@ describe('Server', () => {
     context('when there is request to a served markdown file', () => {
       it('triggers conversion and returns the content of converted HTML', async () => {
         const server = await startServer()
-        const convertFile = jest.spyOn(server.converter, 'convertFile')
+        const cvt = jest.spyOn(server.converter, 'convertFile')
         const response = await request(server.server).get('/1.md')
 
         expect(response.status).toBe(200)
-        expect(convertFile).toBeCalledTimes(1)
+        expect(cvt).toBeCalledTimes(1)
 
-        const ret = await (<Promise<ConvertResult>>(
-          convertFile.mock.results[0].value
-        ))
-
+        const ret = await (cvt.mock.results[0].value as Promise<ConvertResult>)
         expect(response.text).toBe(ret.newFile.buffer!.toString())
       })
 
-      context('with onConverted option', () => {
-        it('runs onConverted callback after conversion', async () => {
-          const onConverted = jest.fn()
-          const server = await startServer({ onConverted })
-          const convertFile = jest.spyOn(server.converter, 'convertFile')
+      context('with listening `converted` event', () => {
+        it('emits `converted` event after conversion', async () => {
+          let ret: string | undefined
 
-          await request(server.server).get('/1.md')
+          const server = (await startServer()).on('converted', converted => {
+            ret = converted.newFile.buffer!.toString()
+          })
 
-          const ret = await (<Promise<ConvertResult>>(
-            convertFile.mock.results[0].value
-          ))
-          expect(onConverted).toBeCalledWith(ret)
+          const response = await request(server.server).get('/1.md')
+          expect(response.text).toBe(ret)
         })
       })
 
@@ -137,6 +132,21 @@ describe('Server', () => {
 
           await request(server.server).get('/1.md?jpeg')
           expect(server.converter.options.type).toBe(ConvertType.jpeg)
+        })
+      })
+
+      context('when error raised while converting', () => {
+        it('returns 503 with error response and emitting event', async () => {
+          const err = new Error('test')
+          const event = jest.fn()
+          const { server, converter } = (await startServer()).on('error', event)
+
+          jest.spyOn(converter, 'convertFile').mockRejectedValue(err)
+
+          const response = await request(server).get('/1.md')
+          expect(event).toBeCalledWith(err)
+          expect(response.status).toBe(503)
+          expect(response.text).toBe('Error: test')
         })
       })
     })

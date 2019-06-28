@@ -8,6 +8,7 @@ import { promisify } from 'util'
 import { Converter, ConvertedCallback, ConvertType } from './converter'
 import { error, CLIError } from './error'
 import { File, markdownExtensions } from './file'
+import TypedEventEmitter from './utils/typed-event-emitter'
 import favicon from './assets/favicon.png'
 import serverIndex from './server/index.pug'
 import style from './server/index.scss'
@@ -15,18 +16,20 @@ import style from './server/index.scss'
 const stat = promisify(fs.stat)
 const readFile = promisify(fs.readFile)
 
-export class Server {
+export class Server extends TypedEventEmitter<Server.Events> {
   readonly converter: Converter
   readonly inputDir: string
   readonly options: Server.Options
   readonly port: Number
 
   directoryIndex: string[]
-  server?: Express
+  server: Express | undefined
 
   private static script: string | undefined
 
   constructor(converter: Converter, opts: Server.Options = {}) {
+    super()
+
     if (!converter.options.inputDir)
       error('Converter have to specify an input directory.')
 
@@ -61,8 +64,6 @@ export class Server {
     filename: string,
     query: querystring.ParsedUrlQuery = {}
   ) {
-    const file = new File(filename)
-
     this.converter.options.output = false
     this.converter.options.type = ((): ConvertType => {
       const queryKeys = Object.keys(query)
@@ -75,10 +76,10 @@ export class Server {
       return ConvertType.html
     })()
 
-    const converted = await this.converter.convertFile(file)
-    if (this.options.onConverted) this.options.onConverted(converted)
+    const ret = await this.converter.convertFile(new File(filename))
+    this.emit('converted', ret)
 
-    return converted
+    return ret
   }
 
   private async loadScript() {
@@ -96,8 +97,15 @@ export class Server {
     if (!pathname) return
 
     const qs = querystring.parse(query || '')
-    const response = async fn =>
-      res.end((await this.convertMarkdown(fn, qs)).newFile.buffer)
+    const response = async fn => {
+      try {
+        const ret = await this.convertMarkdown(fn, qs)
+        res.end(ret.newFile.buffer)
+      } catch (e) {
+        this.emit('error', e)
+        res.status(503).end(e.toString())
+      }
+    }
 
     const validated = await this.validateMarkdown(pathname)
 
@@ -187,12 +195,16 @@ export class Server {
 }
 
 export namespace Server {
-  export declare interface Options {
-    directoryIndex?: string[]
-    onConverted?: ConvertedCallback
+  export interface Events {
+    converted: ConvertedCallback
+    error: (err: Error) => void
   }
 
-  export declare interface ValidateResult {
+  export interface Options {
+    directoryIndex?: string[]
+  }
+
+  export interface ValidateResult {
     path: string
     stats?: fs.Stats
     valid: boolean
