@@ -127,7 +127,7 @@
     "cosmiconfig": "^5.2.1",
     "express": "^4.17.1",
     "get-stdin": "^7.0.0",
-    "globby": "^9.2.0",
+    "globby": "yhatt/globby#upgrade-fast-glob",
     "import-from": "^3.0.0",
     "is-wsl": "^2.1.0",
     "mkdirp": "^0.5.1",
@@ -143,9 +143,6 @@
     "wrap-ansi": "^6.0.0",
     "ws": "^7.0.1",
     "yargs": "^13.2.4"
-  },
-  "resolutions": {
-    "fast-glob": "^3.0.2"
   },
   "publishConfig": {
     "access": "public"
