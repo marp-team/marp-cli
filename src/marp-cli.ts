@@ -287,9 +287,11 @@ export default async function(argv: string[] = []): Promise<number> {
 
       if (cvtOpts.server) {
         const server = new Server(converter, {
-          onConverted,
           directoryIndex: ['index.md', 'PITCHME.md'], // GitPitch compatible
         })
+        server.on('converted', onConverted)
+        server.on('error', e => cli.error(e.toString()))
+
         await server.start()
 
         const url = `http://localhost:${server.port}`
@@ -311,11 +313,14 @@ export default async function(argv: string[] = []): Promise<number> {
     if (!(e instanceof CLIError)) throw e
 
     cli.error(e.message)
+
+    // Stop running notifier and watcher to exit process correctly
+    // (NOTE: Don't close in the finally block to keep watching)
+    notifier.stop()
+    if (watcherInstance) watcherInstance.chokidar.close()
+
     return e.errorCode
   } finally {
     await Converter.closeBrowser()
-    notifier.stop()
-
-    if (watcherInstance) watcherInstance.chokidar.close()
   }
 }

@@ -1,0 +1,8 @@
+ports:
+  - port: 8080
+    onOpen: open-preview
+  - port: 52000
+    onOpen: ignore
+tasks:
+  - init: yarn install
+    command: yarn build && ./marp-cli.js --server demo

@@ -2,6 +2,29 @@
 
 ## [Unreleased]
 
+## v0.11.1 - 2019-06-28
+
+### Added
+
+- A demo slide and the button to run in [Gitpod](https://gitpod.io/#https://github.com/marp-team/marp-cli) ([#113](https://github.com/marp-team/marp-cli/pull/113) by [@mouse484](https://github.com/mouse484), [#114](https://github.com/marp-team/marp-cli/pull/114))
+
+### Fixed
+
+- Downgrade pkg to v4.3.x to fix segfault in the standalone build for Windows ([#111](https://github.com/marp-team/marp-cli/issues/111), [#112](https://github.com/marp-team/marp-cli/pull/112))
+- Improve error handling while running server ([#115](https://github.com/marp-team/marp-cli/pull/115))
+- Fix up not working watch mode ([#116](https://github.com/marp-team/marp-cli/pull/116))
+
+## v0.11.0 - 2019-06-24
+
+### Added
+
+- Support [`size` global directive](https://github.com/marp-team/marp-core/#size-global-directive) of the updated Marp Core ([#110](https://github.com/marp-team/marp-cli/pull/110))
+
+### Changed
+
+- Upgrade to [Marp Core v0.11.0](https://github.com/marp-team/marp-core/releases/tag/v0.11.0) ([#110](https://github.com/marp-team/marp-cli/pull/110))
+- Upgrade dependent packages to the latest version ([#110](https://github.com/marp-team/marp-cli/pull/110))
+
 ## v0.10.2 - 2019-06-21
 
 ### Fixed
