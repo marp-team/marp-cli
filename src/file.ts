@@ -7,6 +7,7 @@ import * as url from 'url'
 import { tmpName } from 'tmp'
 import { promisify } from 'util'
 
+const stat = promisify(fs.stat)
 const mkdirpPromise = promisify<string, any>(mkdirp)
 const readFile = promisify(fs.readFile)
 const tmpNamePromise = promisify(tmpName)
@@ -119,14 +120,34 @@ export class File {
   private static stdinBuffer?: Buffer
 
   static async find(...pathes: string[]): Promise<File[]> {
-    return (await globby(pathes, {
+    const filepathes = new Set<string>()
+    const globs: string[] = []
+
+    // Collect passed files that refers to a real path at first
+    for (const p of pathes) {
+      try {
+        const s: fs.Stats = await stat(p)
+
+        if (s.isFile()) {
+          filepathes.add(path.resolve(p))
+          continue
+        }
+      } catch (e) {}
+
+      globs.push(p)
+    }
+
+    // Find remaining path through globby
+    ;(await globby(globs, {
       absolute: true,
       expandDirectories: {
         extensions: [],
         files: markdownExtensions.map(ext => `*.${ext}`),
       },
       ignore: ['**/node_modules'],
-    })).map(p => new File(p))
+    })).forEach(p => filepathes.add(p))
+
+    return [...filepathes.values()].map(p => new File(p))
   }
 
   static async findDir(directory: string): Promise<File[]> {
