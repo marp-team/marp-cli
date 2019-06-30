@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix that cannot find Markdown from directory that includes non-ASCII code ([#108](https://github.com/marp-team/marp-cli/issues/108), [#109](https://github.com/marp-team/marp-cli/pull/109))
+
 ## v0.11.1 - 2019-06-28
 
 ### Added
