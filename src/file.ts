@@ -119,17 +119,17 @@ export class File {
 
   private static stdinBuffer?: Buffer
 
-  static async find(...pathes: string[]): Promise<File[]> {
-    const filepathes = new Set<string>()
+  static async find(...paths: string[]): Promise<File[]> {
+    const filepaths = new Set<string>()
     const globs: string[] = []
 
     // Collect passed files that refers to a real path at first
-    for (const p of pathes) {
+    for (const p of paths) {
       try {
         const s: fs.Stats = await stat(p)
 
         if (s.isFile()) {
-          filepathes.add(path.resolve(p))
+          filepaths.add(path.resolve(p))
           continue
         }
       } catch (e) {}
@@ -145,9 +145,9 @@ export class File {
         files: markdownExtensions.map(ext => `*.${ext}`),
       },
       ignore: ['**/node_modules'],
-    })).forEach(p => filepathes.add(p))
+    })).forEach(p => filepaths.add(p))
 
-    return [...filepathes.values()].map(p => new File(p))
+    return [...filepaths.values()].map(p => new File(p))
   }
 
   static async findDir(directory: string): Promise<File[]> {
