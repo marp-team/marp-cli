@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v0.11.3 - 2019-06-30
+
 ### Fixed
 
 - Fix Windows regression in finding files from directory ([#118](https://github.com/marp-team/marp-cli/pull/118))
