@@ -121,7 +121,7 @@ export class MarpCLIConfig {
     const theme = await this.loadTheme()
     const initialThemes = theme instanceof Theme ? [theme] : []
 
-    const themeSetPathes =
+    const themeSetPaths =
       this.args.themeSet ||
       (this.conf.themeSet
         ? (Array.isArray(this.conf.themeSet)
@@ -131,13 +131,13 @@ export class MarpCLIConfig {
         : [])
 
     const themeSet = await ThemeSet.initialize(
-      (inputDir ? [inputDir] : []).concat(themeSetPathes),
+      (inputDir ? [inputDir] : []).concat(themeSetPaths),
       initialThemes
     )
 
     if (
       themeSet.themes.size <= initialThemes.length &&
-      themeSetPathes.length > 0
+      themeSetPaths.length > 0
     )
       warn('Not found additional theme CSS files.')
 

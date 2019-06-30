@@ -730,6 +730,17 @@ describe('Marp CLI', () => {
       )
     })
 
+    context('when glob special chars are included in real file path', () => {
+      it('finds out a file correctly', async () => {
+        jest.spyOn(cli, 'info').mockImplementation()
+        jest
+          .spyOn<any, any>(Converter.prototype, 'convertFiles')
+          .mockImplementation(() => [])
+
+        expect(await marpCli([assetFn('_files/字/(non-ascii).md')])).toBe(0)
+      })
+    })
+
     context('when non-ASCII code is included in directory name', () => {
       it('finds out markdown files correctly', async () => {
         jest.spyOn(cli, 'info').mockImplementation()

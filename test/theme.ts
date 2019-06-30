@@ -24,7 +24,7 @@ describe('ThemeSet', () => {
   })
 
   describe('#findPath', () => {
-    it('returns the result of findings from original pathes', async () => {
+    it('returns the result of findings from original paths', async () => {
       const themeSet = await ThemeSet.initialize([themeDir])
       const found = await themeSet.findPath()
 
