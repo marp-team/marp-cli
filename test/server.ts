@@ -159,8 +159,8 @@ describe('Server', () => {
 
         const $ = cheerio.load(response.text)
         expect($('h1').text()).toBe('/')
-        expect($('ul#index li')).toHaveLength(7) // Actual file count
-        expect($('ul#index li.directory')).toHaveLength(3) // Directories
+        expect($('ul#index li')).toHaveLength(8) // Actual file count
+        expect($('ul#index li.directory')).toHaveLength(4) // Directories
         expect($('ul#index li.directory.nodeModules')).toHaveLength(1)
         expect($('ul#index li.convertible')).toHaveLength(3) // Markdown files
 

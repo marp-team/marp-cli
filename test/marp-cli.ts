@@ -205,7 +205,7 @@ describe('Marp CLI', () => {
       jest.spyOn(cli, 'info').mockImplementation()
 
       expect(await marpCli(['--input-dir', files])).toBe(0)
-      expect(writeFile).toHaveBeenCalledTimes(4)
+      expect(writeFile).toHaveBeenCalledTimes(5)
       writeFile.mock.calls.forEach(([fn]) => expect(fn).toMatch(/\.html$/))
     })
 
@@ -249,7 +249,7 @@ describe('Marp CLI', () => {
         jest.spyOn(cli, 'info').mockImplementation()
 
         expect(await marpCli(args)).toBe(0)
-        expect(writeFile).toHaveBeenCalledTimes(4)
+        expect(writeFile).toHaveBeenCalledTimes(5)
 
         const outputFiles = writeFile.mock.calls.map(([fn]) => fn)
         expect(outputFiles).toContain(assetFn('dist/1.html'))
@@ -726,8 +726,19 @@ describe('Marp CLI', () => {
 
       expect(await marpCli([assetFn('_files')])).toBe(0)
       expect(cliInfo.mock.calls.map(([m]) => m)).toContainEqual(
-        expect.stringContaining('4 markdowns')
+        expect.stringContaining('5 markdowns')
       )
+    })
+
+    context('when non-ASCII code is included in directory name', () => {
+      it('finds out markdown files correctly', async () => {
+        jest.spyOn(cli, 'info').mockImplementation()
+        jest
+          .spyOn<any, any>(Converter.prototype, 'convertFiles')
+          .mockImplementation(() => [])
+
+        expect(await marpCli([assetFn('_files/字')])).toBe(0)
+      })
     })
 
     context('with --server option', () => {
