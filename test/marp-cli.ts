@@ -5,16 +5,17 @@ import path from 'path'
 import stripAnsi from 'strip-ansi'
 import marpCli from '../src/marp-cli'
 import * as cli from '../src/cli'
-import { File } from '../src/file'
 import { Converter, ConvertType } from '../src/converter'
 import { ResolvedEngine } from '../src/engine'
 import { CLIError } from '../src/error'
+import { File } from '../src/file'
 import { Preview } from '../src/preview'
 import { Server } from '../src/server'
 import { ThemeSet } from '../src/theme'
+import * as version from '../src/version'
 import { Watcher } from '../src/watcher'
 
-const { version } = require('../package.json')
+const cliVersion = require('../package.json').version
 const coreVersion = require('@marp-team/marp-core/package.json').version
 const marpitVersion = require('@marp-team/marpit/package.json').version
 const previewEmitter = new EventEmitter() as Preview
@@ -56,9 +57,12 @@ describe('Marp CLI', () => {
         findClassPath.mockImplementation(() => path)
 
       it('outputs package versions about cli and bundled core', async () => {
+        // isMarpCore does not return correct result in Windows environment
+        jest.spyOn(version, 'isMarpCore').mockImplementation(() => true)
+
         expect(await marpCli([cmd])).toBe(0)
         expect(log).toBeCalledWith(
-          expect.stringContaining(`@marp-team/marp-cli v${version}`)
+          expect.stringContaining(`@marp-team/marp-cli v${cliVersion}`)
         )
         expect(log).toBeCalledWith(
           expect.stringContaining(
@@ -74,6 +78,8 @@ describe('Marp CLI', () => {
           const pkgPath = '../node_modules/@marp-team/marp-core/package.json'
 
           beforeEach(() => {
+            jest.spyOn(version, 'isMarpCore').mockImplementation(() => true)
+
             findClassPath.mockImplementation(() =>
               assetFn('../node_modules/@marp-team/marp-core/lib/marp.js')
             )
