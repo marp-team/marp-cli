@@ -1,14 +1,13 @@
 import { Marpit } from '@marp-team/marpit'
 import fs from 'fs'
-import globby, { hasMagic } from 'globby'
+import { hasMagic } from 'globby'
 import path from 'path'
 import { promisify } from 'util'
 import { warn } from './cli'
+import { File } from './file'
 
 const lstat = promisify(fs.lstat)
 const readFile = promisify(fs.readFile)
-
-const themeExtensions = ['*.css']
 
 export class Theme {
   readonly filename: string
@@ -145,14 +144,15 @@ export class ThemeSet {
   }
 
   private static async findPath(fn: string[]): Promise<string[]> {
-    return await globby(fn, {
-      absolute: true,
-      expandDirectories: {
-        extensions: [],
-        files: themeExtensions,
+    return File.findPath(
+      {
+        expandDirectories: {
+          extensions: [],
+          files: ['*.css'],
+        },
       },
-      ignore: ['**/node_modules'],
-    })
+      ...fn
+    )
   }
 }
 
