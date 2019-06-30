@@ -1,6 +1,6 @@
 import fs from 'fs'
 import getStdin from 'get-stdin'
-import globby from 'globby'
+import globby, { GlobbyOptions } from 'globby'
 import mkdirp from 'mkdirp'
 import path from 'path'
 import * as url from 'url'
@@ -119,7 +119,10 @@ export class File {
 
   private static stdinBuffer?: Buffer
 
-  static async find(...paths: string[]): Promise<File[]> {
+  static async findPath(
+    opts: GlobbyOptions,
+    ...paths: string[]
+  ): Promise<string[]> {
     const filepaths = new Set<string>()
     const globs: string[] = []
 
@@ -134,20 +137,30 @@ export class File {
         }
       } catch (e) {}
 
-      globs.push(p)
+      // Convert file path to glob pattern (micromatch must use "/" as path separator)
+      globs.push(p.split(path.sep).join('/'))
     }
 
     // Find remaining path through globby
     ;(await globby(globs, {
       absolute: true,
-      expandDirectories: {
-        extensions: [],
-        files: markdownExtensions.map(ext => `*.${ext}`),
-      },
       ignore: ['**/node_modules'],
+      ...opts,
     })).forEach(p => filepaths.add(p))
 
-    return [...filepaths.values()].map(p => new File(p))
+    return [...filepaths.values()].map(p => path.normalize(p))
+  }
+
+  static async find(...paths: string[]): Promise<File[]> {
+    return (await this.findPath(
+      {
+        expandDirectories: {
+          extensions: [],
+          files: markdownExtensions.map(ext => `*.${ext}`),
+        },
+      },
+      ...paths
+    )).map(p => new File(p))
   }
 
   static async findDir(directory: string): Promise<File[]> {
