@@ -128,13 +128,14 @@ jobs:
     steps:
       - checkout
 
-      - restore_cache:
-          keys:
-            - dependencies-{{ .Environment.CI_CACHE_KEY }}-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}-{{ .Branch }}
-            - dependencies-{{ .Environment.CI_CACHE_KEY }}-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}-
-            - dependencies-{{ .Environment.CI_CACHE_KEY }}-{{ .Environment.CIRCLE_JOB }}-
-
+      # Don't use cache to prevent side-effect of cache to standalone binaries
       - run: yarn install
+
+      - save_cache:
+          key: dependencies-{{ .Environment.CI_CACHE_KEY }}-release-{{ checksum "yarn.lock" }}
+          paths:
+            - node_modules
+            - ~/.cache/yarn
 
       - run:
           name: Build and create standalone binaries
@@ -160,9 +161,7 @@ jobs:
 
       - restore_cache:
           keys:
-            - dependencies-{{ .Environment.CI_CACHE_KEY }}-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}-{{ .Branch }}
-            - dependencies-{{ .Environment.CI_CACHE_KEY }}-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}-
-            - dependencies-{{ .Environment.CI_CACHE_KEY }}-{{ .Environment.CIRCLE_JOB }}-
+            - dependencies-{{ .Environment.CI_CACHE_KEY }}-release-{{ checksum "yarn.lock" }}
 
       - run: yarn install
 
