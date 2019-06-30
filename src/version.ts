@@ -3,11 +3,13 @@ import { version as bundledCoreVer } from '@marp-team/marp-core/package.json'
 import { MarpCLIConfig } from './config'
 import { name, version } from '../package.json'
 
+export const isMarpCore = (klass: any): boolean => klass === Marp
+
 export default async function outputVersion(config: MarpCLIConfig): Promise<0> {
   let engineVer = ''
   const { engine } = config
 
-  if (engine.klass === Marp) {
+  if (isMarpCore(engine.klass)) {
     engineVer = `bundled @marp-team/marp-core v${bundledCoreVer}`
 
     if (engine.package && engine.package.version !== bundledCoreVer) {

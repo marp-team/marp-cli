@@ -191,7 +191,11 @@ describe('Converter', () => {
 
           const url = new URL((matched && matched[1]) as string)
           expect(url.protocol).toBe('file:')
-          expect(path.resolve(url.pathname)).toBe(path.resolve(process.cwd()))
+
+          const normalizedPath = path.resolve(
+            url.pathname.slice(process.platform === 'win32' ? 1 : 0)
+          )
+          expect(normalizedPath).toBe(path.resolve(process.cwd()))
         })
       })
     }

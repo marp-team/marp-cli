@@ -112,10 +112,15 @@ describe('Preview', () => {
           instance.on('close', closeEvent)
 
           const win = await instance.open('about:blank')
-          await win.close()
+          const win2 = await instance.open('about:blank')
 
-          expect(closeEvent).toBeCalledTimes(1)
+          // Closing 2 windows will get test stability in Windows for some reason
+          await win.close()
+          await win2.close()
+
+          expect(closeEvent).toBeCalledTimes(2)
           expect(closeEvent).toBeCalledWith(win)
+          expect(closeEvent).toBeCalledWith(win2)
         })
       })
     })

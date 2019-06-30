@@ -1,5 +1,4 @@
 import carlo from 'carlo'
-import terminate from 'terminate'
 import rimraf from 'rimraf'
 import { tmpName } from 'tmp'
 import { promisify } from 'util'
@@ -39,17 +38,7 @@ export class Preview extends TypedEventEmitter<Preview.Events> {
     this.emit('opening', location)
 
     const win = (await this.createWindow()) || (await this.launch())
-
-    win.on('close', () => {
-      this.emit('close', win)
-
-      // Workaround for unresolved close event in Windows
-      // @see https://github.com/GoogleChromeLabs/carlo/issues/108
-      if (process.platform === 'win32' && this.carlo.windows().length === 0) {
-        const browser = this.carlo.browserForTest()
-        terminate(browser.process().pid)
-      }
-    })
+    win.on('close', () => this.emit('close', win))
 
     await win.load(location)
     this.emit('open', win, location)
@@ -58,13 +47,12 @@ export class Preview extends TypedEventEmitter<Preview.Events> {
   }
 
   private async createWindow() {
-    return (
-      !!this.carlo &&
-      (await this.carlo.createWindow({
-        height: this.options.height,
-        width: this.options.width,
-      }))
-    )
+    if (!this.carlo) return false
+
+    return await this.carlo.createWindow({
+      height: this.options.height,
+      width: this.options.width,
+    })
   }
 
   private async launch() {
