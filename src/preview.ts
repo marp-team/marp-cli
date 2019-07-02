@@ -40,6 +40,16 @@ export class Preview extends TypedEventEmitter<Preview.Events> {
     await win.load(location)
     this.emit('open', win, location)
 
+    // Override close function to ignore raising error if a target page has already close
+    const { close } = win
+    win.close = async () => {
+      try {
+        return await close.call(win)
+      } catch (e) {
+        if (!e.message.includes('Target closed.')) throw e
+      }
+    }
+
     return win
   }
 
@@ -72,6 +82,11 @@ export class Preview extends TypedEventEmitter<Preview.Events> {
       channel: ['canary', 'stable'],
       icon: Buffer.from(favicon.slice(22), 'base64'),
       title: 'Marp CLI',
+    })
+
+    this.carlo.once('exit', () => {
+      this.emit('exit')
+      this.carloInternal = undefined
     })
 
     this.emit('launch')

@@ -17,9 +17,7 @@ describe('Preview', () => {
 
   afterEach(async () => {
     for (const instance of previews) {
-      if (instance.carlo && !instance.carlo.exited_) {
-        await instance.carlo.exit()
-      }
+      if (instance.carlo && !instance.carlo.exited_) await instance.carlo.exit()
     }
     previews.clear()
   })
@@ -101,16 +99,23 @@ describe('Preview', () => {
       })
 
       context('when opened window is closed', () => {
-        it('emits close event with closed window', async () => {
+        it('emits close event with closed window', async done => {
           const instance = preview()
           const closeEvent = jest.fn()
+
           instance.on('close', closeEvent)
+          instance.on('exit', () => {
+            expect(closeEvent).toBeCalledTimes(2)
+            expect(closeEvent).toBeCalledWith(win)
+            expect(closeEvent).toBeCalledWith(win2)
+            done()
+          })
 
           const win = await instance.open('about:blank')
-          await win.close()
+          const win2 = await instance.open('about:blank')
 
-          expect(closeEvent).toBeCalledTimes(1)
-          expect(closeEvent).toBeCalledWith(win)
+          await win.close()
+          await win2.close()
         })
       })
     })
