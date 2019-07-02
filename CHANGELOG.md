@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Set up CI for Windows with Azure Pipelines ([#120](https://github.com/marp-team/marp-cli/pull/120))
+
 ## v0.11.3 - 2019-06-30
 
 ### Fixed
