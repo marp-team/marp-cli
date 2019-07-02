@@ -24,7 +24,6 @@ steps:
     env:
       CODECOV_TOKEN: $(codecovToken)
 
-variables:
   - task: PublishCodeCoverageResults@1
     inputs:
       codeCoverageTool: Cobertura
