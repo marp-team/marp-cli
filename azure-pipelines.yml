@@ -1,0 +1,28 @@
+trigger:
+  - master
+
+pool:
+  vmImage: 'vs2017-win2016'
+
+steps:
+  - task: NodeTool@0
+    displayName: 'Install Node.js'
+    inputs:
+      versionSpec: '10.16.0'
+
+  - script: |
+      yarn install
+      yarn test:coverage --ci -i --reporters=default --reporters=jest-junit
+    displayName: 'yarn install and test'
+
+  # - task: PublishCodeCoverageResults@1
+  #   inputs: 
+  #     codeCoverageTool: Cobertura
+  #     summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/*coverage.xml'
+  #     reportDirectory: '$(System.DefaultWorkingDirectory)/**/coverage'
+
+  - task: PublishTestResults@2
+    condition: succeededOrFailed()
+    inputs:
+      testRunner: JUnit
+      testResultsFiles: 'junit.xml'
