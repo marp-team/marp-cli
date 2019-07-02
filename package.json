@@ -108,7 +108,6 @@
     "stylelint-scss": "^3.8.0",
     "supertest": "^4.0.2",
     "tar-stream": "^2.1.0",
-    "terminate": "^2.1.2",
     "ts-jest": "24.0.2",
     "ts-keycode-enum": "^1.0.6",
     "tslib": "^1.10.0",

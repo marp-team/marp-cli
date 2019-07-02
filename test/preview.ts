@@ -1,5 +1,4 @@
 import path from 'path'
-import terminate from 'terminate'
 import { ConvertType } from '../src/converter'
 import { File, FileType } from '../src/file'
 import { Preview, fileToURI } from '../src/preview'
@@ -18,12 +17,8 @@ describe('Preview', () => {
 
   afterEach(async () => {
     for (const instance of previews) {
-      if (instance.carlo) {
-        const browser = instance.carlo.browserForTest()
-        const { pid } = browser.process()
-
-        await browser.disconnect()
-        await new Promise(resolve => terminate(pid, resolve))
+      if (instance.carlo && !instance.carlo.exited_) {
+        await instance.carlo.exit()
       }
     }
     previews.clear()
@@ -112,15 +107,10 @@ describe('Preview', () => {
           instance.on('close', closeEvent)
 
           const win = await instance.open('about:blank')
-          const win2 = await instance.open('about:blank')
-
-          // Closing 2 windows will get test stability in Windows for some reason
           await win.close()
-          await win2.close()
 
-          expect(closeEvent).toBeCalledTimes(2)
+          expect(closeEvent).toBeCalledTimes(1)
           expect(closeEvent).toBeCalledWith(win)
-          expect(closeEvent).toBeCalledWith(win2)
         })
       })
     })
