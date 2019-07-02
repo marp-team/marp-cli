@@ -19,6 +19,9 @@ steps:
   - script: yarn test:coverage --ci -i --reporters=default --reporters=jest-junit
     displayName: Jest
 
+  - script: yarn codecov
+    displayName: Codecov
+
   - task: PublishCodeCoverageResults@1
     inputs:
       codeCoverageTool: Cobertura
