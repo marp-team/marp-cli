@@ -143,9 +143,6 @@
     "ws": "^7.0.1",
     "yargs": "^13.2.4"
   },
-  "resolutions": {
-    "puppeteer-core": "~1.17.0"
-  },
   "publishConfig": {
     "access": "public"
   }
