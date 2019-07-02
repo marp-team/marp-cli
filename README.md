@@ -1,6 +1,7 @@
 # @marp-team/marp-cli
 
 [![CircleCI](https://img.shields.io/circleci/project/github/marp-team/marp-cli/master.svg?style=flat-square&logo=circleci)](https://circleci.com/gh/marp-team/marp-cli/)
+[![Azure Pipelines](https://img.shields.io/azure-devops/build/marp-team/933081a2-2e47-478d-b330-abe70b4733e0/1/master.svg?logo=azure-pipelines&style=flat-square)](https://dev.azure.com/marp-team/Marp%20CLI/_build?definitionId=1)
 [![Codecov](https://img.shields.io/codecov/c/github/marp-team/marp-cli/master.svg?style=flat-square&logo=codecov)](https://codecov.io/gh/marp-team/marp-cli)
 [![npm](https://img.shields.io/npm/v/@marp-team/marp-cli.svg?style=flat-square&logo=npm)](https://www.npmjs.com/package/@marp-team/marp-cli)
 [![Docker](https://img.shields.io/docker/pulls/marpteam/marp-cli.svg?logo=docker&style=flat-square)](https://hub.docker.com/r/marpteam/marp-cli/)

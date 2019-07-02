@@ -1,7 +1,6 @@
+import os from 'os'
+import path from 'path'
 import carlo from 'carlo'
-import rimraf from 'rimraf'
-import { tmpName } from 'tmp'
-import { promisify } from 'util'
 import { File, FileType } from './file'
 import TypedEventEmitter from './utils/typed-event-emitter'
 import { ConvertType } from './converter'
@@ -14,8 +13,6 @@ const mimeTypes = {
   [ConvertType.png]: 'image/png',
   [ConvertType.jpeg]: 'image/jpeg',
 }
-
-const tmpNamePromise = promisify(tmpName)
 
 export class Preview extends TypedEventEmitter<Preview.Events> {
   readonly options: Preview.Options
@@ -43,6 +40,16 @@ export class Preview extends TypedEventEmitter<Preview.Events> {
     await win.load(location)
     this.emit('open', win, location)
 
+    // Override close function to ignore raising error if a target page has already close
+    const { close } = win
+    win.close = async () => {
+      try {
+        return await close.call(win)
+      } catch (e) {
+        if (!e.message.includes('Target closed.')) throw e
+      }
+    }
+
     return win
   }
 
@@ -56,10 +63,8 @@ export class Preview extends TypedEventEmitter<Preview.Events> {
   }
 
   private async launch() {
-    const localDataDir = await tmpNamePromise({ prefix: 'marp-cli-carlo-' })
-
     this.carloInternal = await carlo.launch({
-      localDataDir,
+      localDataDir: path.resolve(os.tmpdir(), './marp-cli-carlo'),
       args: [
         // Fix wrong rendered position of elements in <foreignObject>
         // https://bugs.chromium.org/p/chromium/issues/detail?id=467484
@@ -80,10 +85,8 @@ export class Preview extends TypedEventEmitter<Preview.Events> {
     })
 
     this.carlo.once('exit', () => {
-      rimraf(localDataDir, { disableGlob: true }, () => {
-        this.emit('exit')
-        this.carloInternal = undefined
-      })
+      this.emit('exit')
+      this.carloInternal = undefined
     })
 
     this.emit('launch')
