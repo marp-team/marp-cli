@@ -11,8 +11,13 @@ steps:
       versionSpec: '10.16.0'
 
   - script: yarn install
+    displayName: yarn install
+
   - script: yarn audit
+    displayName: yarn audit
+
   - script: yarn test:coverage --ci -i --reporters=default --reporters=jest-junit
+    displayName: Jest
 
   - task: PublishCodeCoverageResults@1
     inputs:
