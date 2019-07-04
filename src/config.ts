@@ -13,14 +13,17 @@ import { Theme, ThemeSet } from './theme'
 import { TemplateOption } from './templates'
 
 const lstat = promisify(fs.lstat)
+const pick = <T>(...args: T[]): T | undefined => args.find(v => v !== undefined)
 
 type Overwrite<T, U> = Omit<T, Extract<keyof T, keyof U>> & U
 
-export type IMarpCLIArguments = IMarpCLIBaseArguments & IMarpCLIBespokeArguments
-
-interface IMarpCLIBaseArguments {
+interface IMarpCLIArguments {
   _?: string[]
   allowLocalFiles?: boolean
+  bespoke?: {
+    osc?: boolean
+    progress?: boolean
+  }
   configFile?: string
   description?: string
   engine?: string
@@ -39,20 +42,21 @@ interface IMarpCLIBaseArguments {
   title?: string
   url?: string
   watch?: boolean
-}
 
-interface IMarpCLIBespokeArguments {
+  // Deprecated bespoke arguments
   bespokeOsc?: boolean
   bespokeProgress?: boolean
 }
 
+// TODO: Remove deprecated bespoke arguments
+type IMarpCLIDeprecatedBespokeArguments = 'bespokeOsc' | 'bespokeProgress'
+
 export type IMarpCLIConfig = Overwrite<
-  Omit<IMarpCLIBaseArguments, 'configFile' | '_'>,
+  Omit<
+    IMarpCLIArguments,
+    'configFile' | '_' | IMarpCLIDeprecatedBespokeArguments
+  >,
   {
-    bespoke?: {
-      osc?: boolean
-      progress?: boolean
-    }
     engine?: ResolvableEngine | ResolvableEngine[]
     html?: ConverterOption['html']
     lang?: string
@@ -90,7 +94,7 @@ export class MarpCLIConfig {
 
   async converterOption(): Promise<ConverterOption> {
     const inputDir = await this.inputDir()
-    const server = this.pickDefined(this.args.server, this.conf.server) || false
+    const server = pick(this.args.server, this.conf.server) || false
     const output = (() => {
       if (server) return false
       if (this.args.output !== undefined) return this.args.output
@@ -108,9 +112,14 @@ export class MarpCLIConfig {
         const bespoke = this.conf.bespoke || {}
 
         return {
-          osc: this.pickDefined(this.args.bespokeOsc, bespoke.osc),
-          progress: this.pickDefined(
-            this.args.bespokeProgress,
+          osc: pick(
+            this.args.bespoke && this.args.bespoke.osc,
+            this.args.bespokeOsc, // TODO: Remove deprecated argument
+            bespoke.osc
+          ),
+          progress: pick(
+            this.args.bespoke && this.args.bespoke.progress,
+            this.args.bespokeProgress, // TODO: Remove deprecated argument
             bespoke.progress
           ),
         }
@@ -160,7 +169,7 @@ export class MarpCLIConfig {
     })()
 
     const preview = (() => {
-      const p = this.pickDefined(this.args.preview, this.conf.preview) || false
+      const p = pick(this.args.preview, this.conf.preview) || false
 
       if (p && process.env.IS_DOCKER) {
         warn(
@@ -182,34 +191,24 @@ export class MarpCLIConfig {
       themeSet,
       type,
       allowLocalFiles:
-        this.pickDefined(
-          this.args.allowLocalFiles,
-          this.conf.allowLocalFiles
-        ) || false,
+        pick(this.args.allowLocalFiles, this.conf.allowLocalFiles) || false,
       engine: this.engine.klass,
       globalDirectives: {
-        description: this.pickDefined(
-          this.args.description,
-          this.conf.description
-        ),
-        image: this.pickDefined(this.args.ogImage, this.conf.ogImage),
+        description: pick(this.args.description, this.conf.description),
+        image: pick(this.args.ogImage, this.conf.ogImage),
         theme: theme instanceof Theme ? theme.name : theme,
-        title: this.pickDefined(this.args.title, this.conf.title),
-        url: this.pickDefined(this.args.url, this.conf.url),
+        title: pick(this.args.title, this.conf.title),
+        url: pick(this.args.url, this.conf.url),
       },
-      html: this.pickDefined(this.args.html, this.conf.html),
-      jpegQuality:
-        this.pickDefined(this.args.jpegQuality, this.conf.jpegQuality) || 85,
+      html: pick(this.args.html, this.conf.html),
+      jpegQuality: pick(this.args.jpegQuality, this.conf.jpegQuality) || 85,
       lang: this.conf.lang || (await osLocale()).replace(/@/g, '-'),
       options: this.conf.options || {},
       readyScript: this.engine.browserScript
         ? `<script>${this.engine.browserScript}</script>`
         : undefined,
       watch:
-        this.pickDefined(this.args.watch, this.conf.watch) ||
-        preview ||
-        server ||
-        false,
+        pick(this.args.watch, this.conf.watch) || preview || server || false,
     }
   }
 
@@ -311,10 +310,6 @@ export class MarpCLIConfig {
     }
 
     return theme.name
-  }
-
-  private pickDefined<T>(...args: T[]): T | undefined {
-    return args.find(v => v !== undefined)
   }
 }
 
