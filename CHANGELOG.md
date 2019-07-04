@@ -6,6 +6,14 @@
 
 - Set up CI for Windows with Azure Pipelines ([#120](https://github.com/marp-team/marp-cli/pull/120))
 
+### Changed
+
+- Rename bespoke option arguments using dot notation ([#122](https://github.com/marp-team/marp-cli/pull/122))
+
+### Deprecated
+
+- Deprecate `--bespoke-osc` and `--bespoke-progress` argument options in favor of options using dot notation ([#122](https://github.com/marp-team/marp-cli/pull/122))
+
 ## v0.11.3 - 2019-06-30
 
 ### Fixed
