@@ -17,6 +17,7 @@ const external = [
   'crypto',
   'events',
   'fs',
+  'os',
   'path',
   'querystring',
   'url',
