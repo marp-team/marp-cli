@@ -112,13 +112,18 @@ export class Converter {
     })
   }
 
-  async convertFile(file: File, opts: ConvertFileOption = {}) {
+  async convertFile(
+    file: File,
+    opts: ConvertFileOption = {}
+  ): Promise<ConvertResult> {
     const result = await (async (): Promise<ConvertResult> => {
       try {
         silence(!!opts.onlyScanning)
 
         const tpl = await this.convert((await file.load()).toString(), file)
-        const newFile = file.convert(this.options.output, this.options.type)
+        const newFile = file.convert(this.options.output, {
+          extension: this.options.type,
+        })
 
         newFile.buffer = Buffer.from(tpl.result)
         return { file, newFile, template: tpl }
@@ -150,6 +155,7 @@ export class Converter {
       if (opts.onConverted) opts.onConverted(result)
     }
 
+    // #convertFile must return a single file to serve in server
     return result
   }
 
