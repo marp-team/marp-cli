@@ -273,8 +273,8 @@ describe('Converter', () => {
           expect(write).toHaveBeenCalled()
           expect(write.mock.calls[0][0]).toBe('test.pdf')
           expect(pdf.toString('ascii', 0, 5)).toBe('%PDF-')
-          expect(ret.newFile.path).toBe('test.pdf')
-          expect(ret.newFile.buffer).toBe(pdf)
+          expect(ret.newFile!.path).toBe('test.pdf')
+          expect(ret.newFile!.buffer).toBe(pdf)
         },
         puppeteerTimeoutMs
       )
@@ -401,6 +401,32 @@ describe('Converter', () => {
           puppeteerTimeoutMs
         )
       })
+    })
+
+    context('when pages option is true', () => {
+      let converter: Converter
+      let write: jest.Mock
+
+      beforeEach(() => {
+        converter = instance({
+          output: 'c.png',
+          pages: true,
+          type: ConvertType.png,
+        })
+        write = (<any>fs).__mockWriteFile()
+      })
+
+      it(
+        'converts markdown file into multiple PNG files',
+        async () => {
+          await converter.convertFile(new File(onePath)) // 2 pages
+
+          expect(write).toBeCalledTimes(2)
+          expect(write.mock.calls[0][0]).toBe('c.001.png')
+          expect(write.mock.calls[1][0]).toBe('c.002.png')
+        },
+        puppeteerTimeoutMs
+      )
     })
   })
 

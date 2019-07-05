@@ -485,7 +485,7 @@ describe('Marp CLI', () => {
   context('with passing a file', () => {
     const onePath = assetFn('_files/1.md')
 
-    const convertion = async (...cmd: string[]): Promise<Converter> => {
+    const conversion = async (...cmd: string[]): Promise<Converter> => {
       const cvtFiles = jest
         .spyOn(Converter.prototype, 'convertFiles')
         .mockImplementation()
@@ -526,31 +526,45 @@ describe('Marp CLI', () => {
     context('with --pdf option', () => {
       it('converts file with PDF type', async () => {
         const cmd = [onePath, '--pdf']
-        expect((await convertion(...cmd)).options.type).toBe(ConvertType.pdf)
+        expect((await conversion(...cmd)).options.type).toBe(ConvertType.pdf)
       })
     })
 
     context('with --image option', () => {
       it('converts file with PNG type by specified png', async () => {
         const cmd = [onePath, '--image', 'png']
-        expect((await convertion(...cmd)).options.type).toBe(ConvertType.png)
+        expect((await conversion(...cmd)).options.type).toBe(ConvertType.png)
       })
 
       it('converts file with JPEG type by specified jpeg', async () => {
         const cmd = [onePath, '--image=jpeg']
-        expect((await convertion(...cmd)).options.type).toBe(ConvertType.jpeg)
+        expect((await conversion(...cmd)).options.type).toBe(ConvertType.jpeg)
       })
 
       it('converts file with JPEG type by specified jpg (alias to jpeg)', async () => {
         const cmd = ['--image', 'jpg', onePath]
-        expect((await convertion(...cmd)).options.type).toBe(ConvertType.jpeg)
+        expect((await conversion(...cmd)).options.type).toBe(ConvertType.jpeg)
       })
 
       context('with --jpeg-quality option', () => {
         it('converts file with specified JPEG quality', async () => {
           const cmd = [onePath, '--image', 'jpg', '--jpeg-quality', '50']
-          expect((await convertion(...cmd)).options.jpegQuality).toBe(50)
+          expect((await conversion(...cmd)).options.jpegQuality).toBe(50)
         })
+      })
+    })
+
+    context('with --images option', () => {
+      it('converts file with PNG type and enabled pages option by specified png', async () => {
+        const converter = await conversion(onePath, '--images', 'png')
+        expect(converter.options.type).toBe(ConvertType.png)
+        expect(converter.options.pages).toBe(true)
+      })
+
+      it('converts file with JPEG type and enabled pages option by specified jpeg', async () => {
+        const converter = await conversion(onePath, '--images=jpeg')
+        expect(converter.options.type).toBe(ConvertType.jpeg)
+        expect(converter.options.pages).toBe(true)
       })
     })
 
@@ -566,27 +580,27 @@ describe('Marp CLI', () => {
 
       it('converts file with PDF type when extension is .pdf', async () => {
         const cmd = [onePath, '-o', 'example.pdf']
-        expect((await convertion(...cmd)).options.type).toBe(ConvertType.pdf)
+        expect((await conversion(...cmd)).options.type).toBe(ConvertType.pdf)
       })
 
       it('converts file with PNG type when extension is .png', async () => {
         const cmd = [onePath, '-o', 'example.png']
-        expect((await convertion(...cmd)).options.type).toBe(ConvertType.png)
+        expect((await conversion(...cmd)).options.type).toBe(ConvertType.png)
       })
 
       it('converts file with JPEG type when extension is .jpg', async () => {
         const cmd = [onePath, '-o', 'example.jpg']
-        expect((await convertion(...cmd)).options.type).toBe(ConvertType.jpeg)
+        expect((await conversion(...cmd)).options.type).toBe(ConvertType.jpeg)
       })
 
       it('converts file with JPEG type when extension is .jpeg', async () => {
         const cmd = [onePath, '-o', 'example.jpeg']
-        expect((await convertion(...cmd)).options.type).toBe(ConvertType.jpeg)
+        expect((await conversion(...cmd)).options.type).toBe(ConvertType.jpeg)
       })
 
       it('prefers the specified type option to the output filename', async () => {
         const cmd = [onePath, '-o', 'example.png', '--pdf']
-        expect((await convertion(...cmd)).options.type).toBe(ConvertType.pdf)
+        expect((await conversion(...cmd)).options.type).toBe(ConvertType.pdf)
       })
     })
 
