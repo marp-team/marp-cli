@@ -17,7 +17,7 @@ const writeFile = promisify(fs.writeFile)
 export const markdownExtensions = ['md', 'mdown', 'markdown', 'markdn']
 
 export interface FileConvertOption {
-  extension: string
+  extension?: string
   page?: number
 }
 
@@ -30,7 +30,6 @@ export enum FileType {
 export class File {
   buffer?: Buffer
   inputDir?: string
-  page?: number
   type: FileType = FileType.File
   readonly path: string
 
@@ -51,39 +50,36 @@ export class File {
   }
 
   convert(output: string | false | undefined, opts: FileConvertOption): File {
-    const file = (() => {
-      switch (output) {
-        // Default conversion
-        case undefined:
-          return File.initialize(
-            this.convertName({ extension: opts.extension }),
-            f => (f.type = this.type)
-          )
-
-        // No output
-        case false:
-          return File.initialize(this.path, f => (f.type = FileType.Null))
-
-        // Output to standard IO
-        case '-':
-          return File.initialize('-', f => (f.type = FileType.StandardIO))
-      }
-
-      // Relative path from output directory
-      if (this.inputDir)
+    switch (output) {
+      // Default conversion
+      case undefined:
         return File.initialize(
-          this.convertName({
-            extension: opts.extension,
-            basePath: path.join(output, this.relativePath(this.inputDir)),
-          })
+          this.convertName(opts),
+          f => (f.type = this.type)
         )
 
-      // Specified output filename
-      return File.initialize(output)
-    })()
+      // No output
+      case false:
+        return File.initialize(this.path, f => (f.type = FileType.Null))
 
-    file.page = opts.page
-    return file
+      // Output to standard IO
+      case '-':
+        return File.initialize('-', f => (f.type = FileType.StandardIO))
+    }
+
+    // Relative path from output directory
+    if (this.inputDir)
+      return File.initialize(
+        this.convertName({
+          ...opts,
+          basePath: path.join(output, this.relativePath(this.inputDir)),
+        })
+      )
+
+    // Specified output filename
+    return File.initialize(
+      this.convertName({ ...opts, extension: undefined, basePath: output })
+    )
   }
 
   async load() {
@@ -123,14 +119,19 @@ export class File {
     return unlink(tmpPath)
   }
 
-  private convertName(opts: FileConvertOption & { basePath?: string }): string {
+  private convertName(
+    opts: FileConvertOption & { basePath?: string } = {}
+  ): string {
     const { basePath, extension, page } = { basePath: this.path, ...opts }
+    let ret = basePath
 
     // Convert extension
-    let ret = path.join(
-      path.dirname(basePath),
-      `${path.basename(basePath, path.extname(basePath))}.${extension}`
-    )
+    if (extension !== undefined) {
+      ret = path.join(
+        path.dirname(basePath),
+        `${path.basename(basePath, path.extname(basePath))}.${extension}`
+      )
+    }
 
     if (page !== undefined) {
       // Add page number
@@ -139,7 +140,7 @@ export class File {
 
       ret = path.join(
         path.dirname(ret),
-        `${path.basename(ret, ext)}.${formatedPage}.${ext}`
+        `${path.basename(ret, ext)}.${formatedPage}${ext}`
       )
     }
 

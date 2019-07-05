@@ -264,6 +264,8 @@ export default async function(argv: string[] = []): Promise<number> {
     const convertedFiles: File[] = []
     const onConverted: ConvertedCallback = ret => {
       const { file: i, newFile: o } = ret
+      if (!o) return
+
       const fn = (f: File, stdio: string) =>
         f.type === FileType.StandardIO ? stdio : f.relativePath()
 

@@ -35,6 +35,7 @@ export interface ConverterOption {
   lang: string
   options: MarpitOptions
   output?: string | false
+  pages?: boolean | number[]
   preview?: boolean
   jpegQuality?: number
   readyScript?: string
@@ -51,9 +52,14 @@ export interface ConvertFileOption {
   onlyScanning?: boolean
 }
 
+export interface ConvertImageOption {
+  quality?: number
+  type: ConvertType.png | ConvertType.jpeg
+}
+
 export interface ConvertResult {
   file: File
-  newFile: File
+  newFile?: File
   template: TemplateResult
 }
 
@@ -116,49 +122,45 @@ export class Converter {
     file: File,
     opts: ConvertFileOption = {}
   ): Promise<ConvertResult> {
-    const result = await (async (): Promise<ConvertResult> => {
+    const template = await (async (): Promise<TemplateResult> => {
       try {
         silence(!!opts.onlyScanning)
-
-        const tpl = await this.convert((await file.load()).toString(), file)
-        const buffer = Buffer.from(tpl.result)
-
-        const newFile = file.convert(this.options.output, {
-          extension: this.options.type,
-        })
-        newFile.buffer = buffer
-
-        return { file, newFile, template: tpl }
+        return await this.convert((await file.load()).toString(), file)
       } finally {
         silence(false)
       }
     })()
 
     if (!opts.onlyScanning) {
+      const files: File[] = []
+
       switch (this.options.type) {
         case ConvertType.pdf:
-          await this.convertFileToPDF(result.newFile)
+          files.push(await this.convertFileToPDF(template, file))
           break
         case ConvertType.png:
-          await this.convertFileToImage(result.newFile, {
-            size: result.template.size,
-            type: 'png',
-          })
-          break
         case ConvertType.jpeg:
-          await this.convertFileToImage(result.newFile, {
-            quality: this.options.jpegQuality,
-            size: result.template.size,
-            type: 'jpeg',
-          })
+          files.push(
+            ...(await this.convertFileToImage(template, file, {
+              quality: this.options.jpegQuality,
+              type: this.options.type,
+            }))
+          )
+          break
+        default:
+          files.push(this.convertFileToHTML(template, file))
       }
 
-      await result.newFile.save()
-      if (opts.onConverted) opts.onConverted(result)
+      for (const newFile of files) {
+        await newFile.save()
+        if (opts.onConverted) opts.onConverted({ file, newFile, template })
+      }
+
+      // #convertFile must return a single file to serve in server
+      return { file, template, newFile: files[0] }
     }
 
-    // #convertFile must return a single file to serve in server
-    return result
+    return { file, template }
   }
 
   async convertFiles(files: File[], opts: ConvertFileOption = {}) {
@@ -170,28 +172,78 @@ export class Converter {
     for (const file of files) await this.convertFile(file, opts)
   }
 
-  private async convertFileToPDF(file: File) {
-    file.buffer = await this.usePuppeteer(file, async (page, uri) => {
+  private convertFileToHTML(tpl: TemplateResult, file: File): File {
+    const ret = file.convert(this.options.output, { extension: 'html' })
+    ret.buffer = Buffer.from(tpl.result)
+
+    return ret
+  }
+
+  private async convertFileToPDF(
+    tpl: TemplateResult,
+    file: File
+  ): Promise<File> {
+    const html = new File(file.absolutePath)
+    html.buffer = Buffer.from(tpl.result)
+
+    const ret = file.convert(this.options.output, { extension: 'pdf' })
+
+    ret.buffer = await this.usePuppeteer(html, async (page, uri) => {
       await page.goto(uri, { waitUntil: ['domcontentloaded', 'networkidle0'] })
       return await page.pdf({ printBackground: true, preferCSSPageSize: true })
     })
+
+    return ret
   }
 
   private async convertFileToImage(
+    tpl: TemplateResult,
     file: File,
-    opts: {
-      quality?: number
-      size: { height: number; width: number }
-      type: 'png' | 'jpeg'
-    }
-  ) {
-    file.buffer = await this.usePuppeteer(file, async (page, uri) => {
-      await page.setViewport({ ...opts.size })
+    opts: ConvertImageOption
+  ): Promise<File[]> {
+    const html = new File(file.absolutePath)
+    html.buffer = Buffer.from(tpl.result)
+
+    const files: File[] = []
+
+    await this.usePuppeteer(html, async (page, uri) => {
+      await page.setViewport(tpl.rendered.size)
       await page.goto(uri, { waitUntil: ['domcontentloaded', 'networkidle0'] })
       await page.emulateMedia('print')
 
-      return await page.screenshot({ quality: opts.quality, type: opts.type })
+      const screenshot = async (pageNumber?: number) => {
+        await page.evaluate(
+          `window.scrollTo(0,${((pageNumber || 1) - 1) *
+            tpl.rendered.size.height})`
+        )
+
+        if (opts.type === ConvertType.jpeg)
+          return await page.screenshot({ quality: opts.quality, type: 'jpeg' })
+
+        return await page.screenshot({ type: 'png' })
+      }
+
+      if (this.options.pages) {
+        // Multiple images
+        for (let page = 1; page <= tpl.rendered.length; page += 1) {
+          const ret = file.convert(this.options.output, {
+            page,
+            extension: opts.type,
+          })
+          ret.buffer = await screenshot(page)
+
+          files.push(ret)
+        }
+      } else {
+        // Title image
+        const ret = file.convert(this.options.output, { extension: opts.type })
+        ret.buffer = await screenshot()
+
+        files.push(ret)
+      }
     })
+
+    return files
   }
 
   private generateEngine(
@@ -221,21 +273,21 @@ export class Converter {
   }
 
   private async usePuppeteer<T>(
-    file: File,
+    baseFile: File,
     process: (page: puppeteer.Page, uri: string) => Promise<T>
   ) {
     const tmpFile: File.TmpFileInterface | undefined = await (() => {
       if (!this.options.allowLocalFiles) return undefined
 
       warn(
-        `Insecure local file accessing is enabled for conversion of ${file.relativePath()}.`
+        `Insecure local file accessing is enabled for conversion from ${baseFile.relativePath()}.`
       )
-      return file.saveTmpFile('.html')
+      return baseFile.saveTmpFile('.html')
     })()
 
     const uri = tmpFile
       ? `file://${tmpFile.path}`
-      : `data:text/html;base64,${file.buffer!.toString('base64')}`
+      : `data:text/html;base64,${baseFile.buffer!.toString('base64')}`
 
     try {
       const browser = await Converter.runBrowser()
