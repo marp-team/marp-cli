@@ -156,10 +156,10 @@ export class MarpCLIConfig {
       if (this.args.pdf || this.conf.pdf) return ConvertType.pdf
 
       const image =
-        this.args.image ||
         this.args.images ||
-        this.conf.image ||
-        this.conf.images
+        this.conf.images ||
+        this.args.image ||
+        this.conf.image
 
       if (image === 'png') return ConvertType.png
       if (image === 'jpeg') return ConvertType.jpeg
