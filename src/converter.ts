@@ -121,11 +121,13 @@ export class Converter {
         silence(!!opts.onlyScanning)
 
         const tpl = await this.convert((await file.load()).toString(), file)
+        const buffer = Buffer.from(tpl.result)
+
         const newFile = file.convert(this.options.output, {
           extension: this.options.type,
         })
+        newFile.buffer = buffer
 
-        newFile.buffer = Buffer.from(tpl.result)
         return { file, newFile, template: tpl }
       } finally {
         silence(false)

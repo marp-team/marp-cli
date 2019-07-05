@@ -30,6 +30,7 @@ export enum FileType {
 export class File {
   buffer?: Buffer
   inputDir?: string
+  page?: number
   type: FileType = FileType.File
   readonly path: string
 
@@ -50,34 +51,39 @@ export class File {
   }
 
   convert(output: string | false | undefined, opts: FileConvertOption): File {
-    switch (output) {
-      // Default conversion
-      case undefined:
+    const file = (() => {
+      switch (output) {
+        // Default conversion
+        case undefined:
+          return File.initialize(
+            this.convertName({ extension: opts.extension }),
+            f => (f.type = this.type)
+          )
+
+        // No output
+        case false:
+          return File.initialize(this.path, f => (f.type = FileType.Null))
+
+        // Output to standard IO
+        case '-':
+          return File.initialize('-', f => (f.type = FileType.StandardIO))
+      }
+
+      // Relative path from output directory
+      if (this.inputDir)
         return File.initialize(
-          this.convertName({ extension: opts.extension }),
-          f => (f.type = this.type)
+          this.convertName({
+            extension: opts.extension,
+            basePath: path.join(output, this.relativePath(this.inputDir)),
+          })
         )
 
-      // No output
-      case false:
-        return File.initialize(this.path, f => (f.type = FileType.Null))
+      // Specified output filename
+      return File.initialize(output)
+    })()
 
-      // Output to standard IO
-      case '-':
-        return File.initialize('-', f => (f.type = FileType.StandardIO))
-    }
-
-    // Relative path from output directory
-    if (this.inputDir)
-      return File.initialize(
-        this.convertName({
-          extension: opts.extension,
-          basePath: path.join(output, this.relativePath(this.inputDir)),
-        })
-      )
-
-    // Specified output filename
-    return File.initialize(output)
+    file.page = opts.page
+    return file
   }
 
   async load() {
