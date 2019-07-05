@@ -20,6 +20,7 @@ const external = [
   'os',
   'path',
   'querystring',
+  'stream',
   'url',
   'util',
   'chrome-launcher/dist/chrome-finder',

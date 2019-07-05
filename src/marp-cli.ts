@@ -93,13 +93,19 @@ export default async function(argv: string[] = []): Promise<number> {
           type: 'boolean',
         },
         pdf: {
-          conflicts: ['image'],
+          conflicts: ['image', 'pptx'],
           describe: 'Convert slide deck into PDF',
           group: OptionGroup.Converter,
           type: 'boolean',
         },
+        pptx: {
+          conflicts: ['pdf', 'image'],
+          describe: 'Convert slide deck into PowerPoint document',
+          group: OptionGroup.Converter,
+          type: 'boolean',
+        },
         image: {
-          conflicts: ['pdf'],
+          conflicts: ['pdf', 'pptx'],
           describe: 'Convert slide into image file (first slide only)',
           group: OptionGroup.Converter,
           choices: ['png', 'jpeg'],

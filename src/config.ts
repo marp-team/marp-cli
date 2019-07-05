@@ -34,6 +34,7 @@ interface IMarpCLIArguments {
   ogImage?: string
   output?: string | false
   pdf?: boolean
+  pptx?: boolean
   preview?: boolean
   server?: boolean
   template?: string
@@ -153,6 +154,7 @@ export class MarpCLIConfig {
     const type = ((): ConvertType => {
       // CLI options
       if (this.args.pdf || this.conf.pdf) return ConvertType.pdf
+      if (this.args.pptx || this.conf.pptx) return ConvertType.pptx
 
       const image = this.args.image || this.conf.image
       if (image === 'png') return ConvertType.png
@@ -162,6 +164,7 @@ export class MarpCLIConfig {
       const lowerOutput = (output || '').toLowerCase()
       if (lowerOutput.endsWith('.pdf')) return ConvertType.pdf
       if (lowerOutput.endsWith('.png')) return ConvertType.png
+      if (lowerOutput.endsWith('.pptx')) return ConvertType.pptx
       if (lowerOutput.endsWith('.jpg') || lowerOutput.endsWith('.jpeg'))
         return ConvertType.jpeg
 
