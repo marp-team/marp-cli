@@ -278,14 +278,17 @@ export class Converter {
       page += 1
 
       pptx.defineSlideMaster({
-        title: `PAGE${page}`,
+        title: `Page ${page}`,
         bkgd: {
           data: `data:image/png;base64,${imageFile.buffer!.toString('base64')}`,
         },
         margin: 0,
       })
 
-      pptx.addNewSlide(`PAGE${page}`)
+      const slide = pptx.addNewSlide(`Page ${page}`)
+      const notes = tpl.rendered.comments[page - 1].join('\n\n')
+
+      if (notes) slide.addNotes(notes)
     }
 
     const ret = file.convert(this.options.output, { extension: 'pptx' })
