@@ -122,29 +122,39 @@ marp --pdf slide-deck.md
 marp slide-deck.md -o converted.pdf
 ```
 
-### Convert the first slide page to image (`--image`)
+> :information_source: The all kind of conversions except HTML require [Google Chrome] or [Chromium]. When any problem has occurred while converting, please update your Chrome/Chromium to the latest version or try using [Google Chrome Canary].
 
-You can convert _the first page_ of targeted slide deck into an image when specified `--image [png|jpeg]` option or the output path with PNG and JPEG extensions.
+[google chrome canary]: https://www.google.com/chrome/canary/
+
+### Convert to PNG/JPEG image(s)
+
+#### Multiple images (`--images`)
+
+You can convert the slide deck into multiple images when specified `--images [png|jpeg]` option.
 
 ```bash
-# Convert the first slide page into PNG image
+# Convert into multiple PNG image files
+marp --images png slide-deck.md
+
+# Convert into multiple JPEG image files
+marp --images jpeg slide-deck.md
+```
+
+Output files have a suffix of page number, like `slide-deck.001.png`, `slide-deck.002.png`, and so on.
+
+#### Title slide (`--image`)
+
+When you passed `--image` option or specified the output path with PNG/JPEG extension, Marp CLI will convert _only the first page (title slide)_ of the targeted slide deck into an image.
+
+```bash
+# Convert the title slide into an image
 marp --image png slide-deck.md
 marp slide-deck.md -o output.png
-
-# Convert the first slide page into JPEG image
-marp --image jpeg slide-deck.md
-marp slide-deck.md -o output.jpg
 ```
 
 It would be useful for creating [Open Graph] image that can specify with [`image` global directive and `--og-image` option](#metadata).
 
-> :information_source: PDF and image conversion require [Google Chrome] or [Chromium]. When any problem has occurred while converting, please update your Chrome/Chromium to the latest version or try using [Google Chrome Canary].
->
-> About known issues while converting an image, refer to [#68 comment](https://github.com/marp-team/marp-cli/pull/68#issuecomment-459701753).
-
-[google chrome canary]: https://www.google.com/chrome/canary/
-
-#### Security about local files
+### Security about local files
 
 Because of [the security reason](https://github.com/marp-team/marp-cli/pull/10), **the converted PDF and images cannot use local files by default.** We recommend uploading your assets to online.
 
@@ -153,6 +163,8 @@ But if you want to use local files in rendered PDF, `--alow-local-files` option 
 ```bash
 marp --pdf --allow-local-files slide-deck.md
 ```
+
+## Conversion modes
 
 ### Watch mode (`--watch` / `-w`)
 
@@ -200,9 +212,9 @@ The `bespoke` template is using [Bespoke.js](https://github.com/bespokejs/bespok
 
 - **Navigation**: Navigate the deck through keyboard and swipe geasture.
 - **Fullscreen**: Toggle fullscreen by hitting <kbd>f</kbd> / <kbd>F11</kbd> key.
-- **On-screen controller**: There is a touch-friendly OSC. You may also disable by `--bespoke-osc=false` if unneccesary.
+- **On-screen controller**: There is a touch-friendly OSC. You may also disable by `--bespoke.osc=false` if unneccesary.
 - **Fragmented list**: Recognize [Marpit's fragmented list](https://github.com/marp-team/marpit/issues/145) and appear list one-by-one if used `*` and `1)` as the bullet marker.
-- **Progress bar** (optional): By setting `--bespoke-progress` option, you can add a progress bar on the top of the deck.
+- **Progress bar** (optional): By setting `--bespoke.progress` option, you can add a progress bar on the top of the deck.
 
 ### `bare` template
 
@@ -380,31 +392,32 @@ By default we use configuration file that is placed on current directory, but yo
 
 ### Options
 
-|        Key         |            Type             |      CLI option       | Description                                                                                            |
-| :----------------: | :-------------------------: | :-------------------: | :----------------------------------------------------------------------------------------------------- |
-| `allowLocalFiles`  |           boolean           | `--allow-local-files` | Allow to access local files from Markdown while converting PDF _(NOT SECURE)_                          |
-|     `bespoke`      |           object            |                       | Setting options for `bespoke` template                                                                 |
-|   `bespoke.osc`    |           boolean           |    `--bespoke-osc`    | \[Bespoke\] Use on-screen controller (`true` by default)                                               |
-| `bespoke.progress` |           boolean           | `--bespoke-progress`  | \[Bespoke\] Use progress bar (`false` by default)                                                      |
-|   `description`    |           string            |    `--description`    | Define description of the slide deck                                                                   |
-|      `engine`      | string \| Class \| Function |      `--engine`       | Specify Marpit based engine                                                                            |
-|       `html`       |      boolean \| object      |       `--html`        | Enable or disable HTML (Configuration file can pass [the whitelist object] if you are using Marp Core) |
-|      `image`       |       `png` \| `jpeg`       |       `--image`       | Convert slide into image file (first slide only)                                                       |
-|     `inputDir`     |           string            |  `--input-dir` `-I`   | The base directory to find markdown and theme CSS                                                      |
-|   `jpegQuality`    |           number            |   `--jpeg-quality`    | Setting JPEG image quality (`85` by default)                                                           |
-|       `lang`       |           string            |                       | Define the language of converted HTML                                                                  |
-|     `ogImage`      |           string            |     `--og-image`      | Define [Open Graph] image URL                                                                          |
-|     `options`      |           object            |                       | The base options for the constructor of engine                                                         |
-|      `output`      |           string            |    `--output` `-o`    | Output file path (or directory when input-dir is passed)                                               |
-|       `pdf`        |           boolean           |        `--pdf`        | Convert slide deck into PDF                                                                            |
-|     `preview`      |           boolean           |   `--preview` `-p`    | Open preview window _(EXPERIMENTAL)_                                                                   |
-|      `server`      |           boolean           |    `--server` `-s`    | Enable server mode                                                                                     |
-|     `template`     |     `bare` \| `bespoke`     |     `--template`      | Choose template (`bespoke` by default)                                                                 |
-|      `theme`       |           string            |       `--theme`       | Override theme by name or CSS file                                                                     |
-|     `themeSet`     |     string \| string[]      |     `--theme-set`     | Path to additional theme CSS files                                                                     |
-|      `title`       |           string            |       `--title`       | Define title of the slide deck                                                                         |
-|       `url`        |           string            |        `--url`        | Define [canonical URL]                                                                                 |
-|      `watch`       |           boolean           |    `--watch` `-w`     | Watch input markdowns for changes                                                                      |
+| Key               |            Type             |      CLI option       | Description                                                                                            |
+| :---------------- | :-------------------------: | :-------------------: | :----------------------------------------------------------------------------------------------------- |
+| `allowLocalFiles` |           boolean           | `--allow-local-files` | Allow to access local files from Markdown while converting PDF _(NOT SECURE)_                          |
+| `bespoke`         |           object            |                       | Setting options for `bespoke` template                                                                 |
+| ┗ `osc`           |           boolean           |    `--bespoke.osc`    | \[Bespoke\] Use on-screen controller (`true` by default)                                               |
+| ┗ `progress`      |           boolean           | `--bespoke.progress`  | \[Bespoke\] Use progress bar (`false` by default)                                                      |
+| `description`     |           string            |    `--description`    | Define description of the slide deck                                                                   |
+| `engine`          | string \| Class \| Function |      `--engine`       | Specify Marpit based engine                                                                            |
+| `html`            |      boolean \| object      |       `--html`        | Enable or disable HTML (Configuration file can pass [the whitelist object] if you are using Marp Core) |
+| `image`           |       `png` \| `jpeg`       |       `--image`       | Convert the first slide page into an image file                                                        |
+| `images`          |       `png` \| `jpeg`       |      `--images`       | Convert slide deck into multiple image files                                                           |
+| `inputDir`        |           string            |  `--input-dir` `-I`   | The base directory to find markdown and theme CSS                                                      |
+| `jpegQuality`     |           number            |   `--jpeg-quality`    | Setting JPEG image quality (`85` by default)                                                           |
+| `lang`            |           string            |                       | Define the language of converted HTML                                                                  |
+| `ogImage`         |           string            |     `--og-image`      | Define [Open Graph] image URL                                                                          |
+| `options`         |           object            |                       | The base options for the constructor of engine                                                         |
+| `output`          |           string            |    `--output` `-o`    | Output file path (or directory when input-dir is passed)                                               |
+| `pdf`             |           boolean           |        `--pdf`        | Convert slide deck into PDF                                                                            |
+| `preview`         |           boolean           |   `--preview` `-p`    | Open preview window _(EXPERIMENTAL)_                                                                   |
+| `server`          |           boolean           |    `--server` `-s`    | Enable server mode                                                                                     |
+| `template`        |     `bare` \| `bespoke`     |     `--template`      | Choose template (`bespoke` by default)                                                                 |
+| `theme`           |           string            |       `--theme`       | Override theme by name or CSS file                                                                     |
+| `themeSet`        |     string \| string[]      |     `--theme-set`     | Path to additional theme CSS files                                                                     |
+| `title`           |           string            |       `--title`       | Define title of the slide deck                                                                         |
+| `url`             |           string            |        `--url`        | Define [canonical URL]                                                                                 |
+| `watch`           |           boolean           |    `--watch` `-w`     | Watch input markdowns for changes                                                                      |
 
 [the whitelist object]: https://github.com/marp-team/marp-core#html-boolean--object
 

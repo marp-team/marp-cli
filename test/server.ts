@@ -94,7 +94,7 @@ describe('Server', () => {
         expect(cvt).toBeCalledTimes(1)
 
         const ret = await (cvt.mock.results[0].value as Promise<ConvertResult>)
-        expect(response.text).toBe(ret.newFile.buffer!.toString())
+        expect(response.text).toBe(ret.newFile!.buffer!.toString())
       })
 
       context('with listening `converted` event', () => {
@@ -102,7 +102,7 @@ describe('Server', () => {
           let ret: string | undefined
 
           const server = (await startServer()).on('converted', converted => {
-            ret = converted.newFile.buffer!.toString()
+            ret = converted.newFile!.buffer!.toString()
           })
 
           const response = await request(server.server).get('/1.md')
