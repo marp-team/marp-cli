@@ -93,14 +93,22 @@ export default async function(argv: string[] = []): Promise<number> {
           type: 'boolean',
         },
         pdf: {
-          conflicts: ['image'],
+          conflicts: ['image', 'images'],
           describe: 'Convert slide deck into PDF',
           group: OptionGroup.Converter,
           type: 'boolean',
         },
         image: {
-          conflicts: ['pdf'],
-          describe: 'Convert slide into image file (first slide only)',
+          conflicts: ['pdf', 'images'],
+          describe: 'Convert the first slide page into an image file',
+          group: OptionGroup.Converter,
+          choices: ['png', 'jpeg'],
+          coerce: (type: string) => (type === 'jpg' ? 'jpeg' : type),
+          type: 'string',
+        },
+        images: {
+          conflicts: ['pdf', 'image'],
+          describe: 'Convert slide deck into multiple image files',
           group: OptionGroup.Converter,
           choices: ['png', 'jpeg'],
           coerce: (type: string) => (type === 'jpg' ? 'jpeg' : type),
@@ -264,6 +272,8 @@ export default async function(argv: string[] = []): Promise<number> {
     const convertedFiles: File[] = []
     const onConverted: ConvertedCallback = ret => {
       const { file: i, newFile: o } = ret
+      if (!o) return
+
       const fn = (f: File, stdio: string) =>
         f.type === FileType.StandardIO ? stdio : f.relativePath()
 

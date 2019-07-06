@@ -2,9 +2,10 @@ export interface EngineInfo {
   theme: string | undefined
   description: string | undefined
   image: string | undefined
+  length: number
+  size: { height: number; width: number }
   title: string | undefined
   url: string | undefined
-  size: { height: number; width: number }
 }
 
 export const engineInfo = Symbol()
@@ -29,6 +30,11 @@ export default function infoPlugin(md: any) {
         height: themeSet.getThemeProp(theme!, 'heightPixel'),
         width: themeSet.getThemeProp(theme!, 'widthPixel'),
       },
+      length: 0,
+    }
+
+    for (const token of state.tokens) {
+      if (token.meta && token.meta.marpitSlideElement === 1) info.length += 1
     }
 
     marpit[engineInfo] = info

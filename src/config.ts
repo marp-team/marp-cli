@@ -29,6 +29,7 @@ interface IMarpCLIArguments {
   engine?: string
   html?: boolean
   image?: string
+  images?: string
   inputDir?: string
   jpegQuality?: number
   ogImage?: string
@@ -154,7 +155,12 @@ export class MarpCLIConfig {
       // CLI options
       if (this.args.pdf || this.conf.pdf) return ConvertType.pdf
 
-      const image = this.args.image || this.conf.image
+      const image =
+        this.args.images ||
+        this.conf.images ||
+        this.args.image ||
+        this.conf.image
+
       if (image === 'png') return ConvertType.png
       if (image === 'jpeg') return ConvertType.jpeg
 
@@ -204,6 +210,7 @@ export class MarpCLIConfig {
       jpegQuality: pick(this.args.jpegQuality, this.conf.jpegQuality) || 85,
       lang: this.conf.lang || (await osLocale()).replace(/@/g, '-'),
       options: this.conf.options || {},
+      pages: !!(this.args.images || this.conf.images),
       readyScript: this.engine.browserScript
         ? `<script>${this.engine.browserScript}</script>`
         : undefined,

@@ -16,6 +16,11 @@ const writeFile = promisify(fs.writeFile)
 
 export const markdownExtensions = ['md', 'mdown', 'markdown', 'markdn']
 
+export interface FileConvertOption {
+  extension?: string
+  page?: number
+}
+
 export enum FileType {
   File,
   StandardIO,
@@ -44,28 +49,37 @@ export class File {
     return `file://${path.posix.resolve(this.path)}`
   }
 
-  convert(output: string | false | undefined, extension: string): File {
+  convert(output: string | false | undefined, opts: FileConvertOption): File {
     switch (output) {
+      // Default conversion
       case undefined:
         return File.initialize(
-          this.convertExtension(extension),
+          this.convertName(opts),
           f => (f.type = this.type)
         )
+
+      // No output
       case false:
         return File.initialize(this.path, f => (f.type = FileType.Null))
+
+      // Output to standard IO
       case '-':
         return File.initialize('-', f => (f.type = FileType.StandardIO))
     }
 
+    // Relative path from output directory
     if (this.inputDir)
       return File.initialize(
-        this.convertExtension(
-          extension,
-          path.join(output, this.relativePath(this.inputDir))
-        )
+        this.convertName({
+          ...opts,
+          basePath: path.join(output, this.relativePath(this.inputDir)),
+        })
       )
 
-    return File.initialize(output)
+    // Specified output filename
+    return File.initialize(
+      this.convertName({ ...opts, extension: undefined, basePath: output })
+    )
   }
 
   async load() {
@@ -105,11 +119,32 @@ export class File {
     return unlink(tmpPath)
   }
 
-  private convertExtension(extension: string, basePath = this.path): string {
-    return path.join(
-      path.dirname(basePath),
-      `${path.basename(basePath, path.extname(basePath))}.${extension}`
-    )
+  private convertName(
+    opts: FileConvertOption & { basePath?: string } = {}
+  ): string {
+    const { basePath, extension, page } = { basePath: this.path, ...opts }
+    let ret = basePath
+
+    // Convert extension
+    if (extension !== undefined) {
+      ret = path.join(
+        path.dirname(basePath),
+        `${path.basename(basePath, path.extname(basePath))}.${extension}`
+      )
+    }
+
+    if (page !== undefined) {
+      // Add page number
+      const ext = path.extname(ret)
+      const formatedPage = page.toString().padStart(3, '0')
+
+      ret = path.join(
+        path.dirname(ret),
+        `${path.basename(ret, ext)}.${formatedPage}${ext}`
+      )
+    }
+
+    return ret
   }
 
   private async saveToFile(savePath: string = this.path) {

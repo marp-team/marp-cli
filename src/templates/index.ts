@@ -9,17 +9,18 @@ import bespokeScss from './bespoke/bespoke.scss'
 
 const readFile = promisify(fs.readFile)
 
+type RendererResult = MarpitRenderResult &
+  TemplateMeta & {
+    length: number
+    size: RenderedSize
+  }
+
 interface TemplateCoreOption {
   base?: string
   lang: string
   notifyWS?: string
   readyScript?: string
-  renderer: (
-    tplOpts: MarpitOptions
-  ) => MarpitRenderResult &
-    TemplateMeta & {
-      size: RenderedSize
-    }
+  renderer: (tplOpts: MarpitOptions) => RendererResult
 }
 
 export interface TemplateMeta {
@@ -44,9 +45,8 @@ interface TemplateBespokeOption {
 }
 
 export interface TemplateResult {
-  rendered: MarpitRenderResult
+  rendered: RendererResult
   result: string
-  size: RenderedSize
 }
 
 export type Template<T = TemplateOption> = (
@@ -68,7 +68,6 @@ export const bare: Template<TemplateBareOption> = async opts => {
       bare: { css: bareScss },
       watchJs: await watchJs(opts.notifyWS),
     }),
-    size: rendered.size,
   }
 }
 
@@ -99,7 +98,6 @@ export const bespoke: Template<TemplateBespokeOption> = async opts => {
         )}</script>`,
       watchJs: await watchJs(opts.notifyWS),
     }),
-    size: rendered.size,
   }
 }
 

@@ -65,6 +65,7 @@ export class Server extends TypedEventEmitter<Server.Events> {
     query: querystring.ParsedUrlQuery = {}
   ) {
     this.converter.options.output = false
+    this.converter.options.pages = false
     this.converter.options.type = ((): ConvertType => {
       const queryKeys = Object.keys(query)
 
@@ -100,6 +101,10 @@ export class Server extends TypedEventEmitter<Server.Events> {
     const response = async fn => {
       try {
         const ret = await this.convertMarkdown(fn, qs)
+
+        if (!ret.newFile)
+          throw new Error('Converter must return a converted file to serve.')
+
         res.end(ret.newFile.buffer)
       } catch (e) {
         this.emit('error', e)
