@@ -135,6 +135,9 @@ You can convert the slide deck into multiple images when specified `--images [pn
 ```bash
 # Convert into multiple PNG image files
 marp --images png slide-deck.md
+
+# Convert into multiple JPEG image files
+marp --images jpeg slide-deck.md
 ```
 
 Output files have a suffix of page number, like `slide-deck.001.png`, `slide-deck.002.png`, and so on.
