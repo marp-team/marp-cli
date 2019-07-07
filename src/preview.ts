@@ -3,16 +3,9 @@ import path from 'path'
 import carlo from 'carlo'
 import { File, FileType } from './file'
 import TypedEventEmitter from './utils/typed-event-emitter'
-import { ConvertType } from './converter'
+import { ConvertType, mimeTypes } from './converter'
 import { CLIError } from './error'
 import favicon from './assets/favicon.png'
-
-const mimeTypes = {
-  [ConvertType.html]: 'text/html',
-  [ConvertType.pdf]: 'application/pdf',
-  [ConvertType.png]: 'image/png',
-  [ConvertType.jpeg]: 'image/jpeg',
-}
 
 export class Preview extends TypedEventEmitter<Preview.Events> {
   readonly options: Preview.Options

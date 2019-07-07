@@ -3,7 +3,7 @@ import { Argv } from 'yargs'
 import yargs from 'yargs/yargs'
 import * as cli from './cli'
 import fromArguments from './config'
-import { Converter, ConvertedCallback } from './converter'
+import { Converter, ConvertedCallback, ConvertType } from './converter'
 import { CLIError, error } from './error'
 import { File, FileType } from './file'
 import { Preview, fileToURI } from './preview'
@@ -350,9 +350,12 @@ export default async function(argv: string[] = []): Promise<number> {
       } else {
         cli.info(chalk.green('[Watch mode] Start watching...'))
 
-        if (cvtOpts.preview)
-          for (const file of convertedFiles)
+        if (cvtOpts.preview) {
+          for (const file of convertedFiles) {
+            if (cvtOpts.type === ConvertType.pptx) continue
             await preview.open(fileToURI(file, cvtOpts.type))
+          }
+        }
       }
     }
 

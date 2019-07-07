@@ -27,6 +27,15 @@ export enum ConvertType {
   jpeg = 'jpg',
 }
 
+export const mimeTypes = {
+  [ConvertType.html]: 'text/html',
+  [ConvertType.pdf]: 'application/pdf',
+  [ConvertType.png]: 'image/png',
+  [ConvertType.pptx]:
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  [ConvertType.jpeg]: 'image/jpeg',
+}
+
 export interface ConverterOption {
   allowLocalFiles: boolean
   engine: Engine
