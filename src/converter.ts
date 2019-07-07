@@ -2,7 +2,6 @@ import { MarpOptions } from '@marp-team/marp-core'
 import { Marpit, MarpitOptions } from '@marp-team/marpit'
 import chalk from 'chalk'
 import * as chromeFinder from 'chrome-launcher/dist/chrome-finder'
-import * as PptxGenJs from 'pptxgenjs'
 import puppeteer from 'puppeteer-core'
 import { URL } from 'url'
 import { silence, warn } from './cli'
@@ -259,7 +258,7 @@ export class Converter {
       type: ConvertType.png,
     })
 
-    const pptx = new PptxGenJs.default()
+    const pptx = new (await import('pptxgenjs')).default()
     const layoutName = `${tpl.rendered.size.width}x${tpl.rendered.size.height}`
 
     pptx.setAuthor('Created by Marp')
