@@ -258,7 +258,7 @@ export class Converter {
       type: ConvertType.png,
     })
 
-    const pptx = new (await import('pptxgenjs')).default()
+    const pptx = new (await import('@marp-team/pptx')).default()
     const layoutName = `${tpl.rendered.size.width}x${tpl.rendered.size.height}`
 
     pptx.setAuthor('Created by Marp')
