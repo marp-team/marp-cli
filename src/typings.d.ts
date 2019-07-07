@@ -21,6 +21,6 @@ declare module 'puppeteer-core' {
 }
 
 declare module 'pptxgenjs' {
-  import * as PptxGenJS from 'pptxgenjs/dist/pptxgen'
+  import PptxGenJS from 'pptxgenjs/dist/pptxgen'
   export = PptxGenJS
 }
