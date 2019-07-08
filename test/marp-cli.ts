@@ -733,6 +733,13 @@ describe('Marp CLI', () => {
         )
       })
 
+      context('when PPTX conversion is enabled', () => {
+        it('does not open PPTX in preview window', async () => {
+          await marpCli([onePath, '-p', '--pptx', '--no-output'])
+          expect(Preview.prototype.open).not.toBeCalled()
+        }, 15000)
+      })
+
       context('when CLI is running in an official Docker image', () => {
         beforeEach(() => (process.env.IS_DOCKER = '1'))
         afterEach(() => delete process.env.IS_DOCKER)
