@@ -590,6 +590,11 @@ describe('Marp CLI', () => {
         expect((await conversion(...cmd)).options.type).toBe(ConvertType.pdf)
       })
 
+      it('converts file with PPTX type when extension is .pptx', async () => {
+        const cmd = [onePath, '-o', 'example.pptx']
+        expect((await conversion(...cmd)).options.type).toBe(ConvertType.pptx)
+      })
+
       it('converts file with PNG type when extension is .png', async () => {
         const cmd = [onePath, '-o', 'example.png']
         expect((await conversion(...cmd)).options.type).toBe(ConvertType.png)
