@@ -271,6 +271,7 @@ export class Converter {
     const layoutName = `${tpl.rendered.size.width}x${tpl.rendered.size.height}`
 
     pptx.setAuthor('Created by Marp')
+    pptx.setCompany('Created by Marp')
     pptx.setLayout({
       name: layoutName,
       width: tpl.rendered.size.width / 96,

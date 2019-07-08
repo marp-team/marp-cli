@@ -1,10 +1,13 @@
 import Marp from '@marp-team/marp-core'
 import { MarpitOptions } from '@marp-team/marpit'
+import cheerio from 'cheerio'
 import fs from 'fs'
 import imageSize from 'image-size'
 import os from 'os'
 import path from 'path'
 import { URL } from 'url'
+import { promisify } from 'util'
+import yauzl from 'yauzl'
 import { Converter, ConvertType, ConverterOption } from '../src/converter'
 import { CLIError } from '../src/error'
 import { File, FileType } from '../src/file'
@@ -308,6 +311,95 @@ describe('Converter', () => {
               expect.stringContaining(os.tmpdir())
             )
             expect(fileSave).toBeCalled()
+          },
+          puppeteerTimeoutMs
+        )
+      })
+    })
+
+    context('when convert type is PPTX', () => {
+      let write: jest.Mock
+
+      beforeEach(() => {
+        write = (<any>fs).__mockWriteFile()
+      })
+
+      const converter = (opts: Partial<ConverterOption> = {}) =>
+        instance({ output: 'test.pptx', type: ConvertType.pptx, ...opts })
+
+      const getPptxDocProps = async (buffer: Buffer) => {
+        const zip = await promisify(yauzl.fromBuffer)(buffer, {
+          lazyEntries: true,
+        })
+
+        return await new Promise<Record<string, string>>((res, rej) => {
+          const meta: Record<string, string> = {}
+
+          zip.on('error', err => rej(err))
+          zip.on('entry', entry => {
+            // Read document property from `docProps/core.xml`
+            if (entry.fileName === 'docProps/core.xml') {
+              zip.openReadStream(entry, (err, readStream) => {
+                if (err) return rej(err)
+
+                const readBuffer: Buffer[] = []
+
+                readStream.on('data', chunk => readBuffer.push(chunk))
+                readStream.on('end', () => {
+                  const $ = cheerio.load(Buffer.concat(readBuffer).toString())
+                  const coreProps = $('cp\\:coreProperties')
+
+                  coreProps.children().each((_, elm) => {
+                    meta[elm.tagName] = $(elm).text()
+                  })
+
+                  zip.readEntry()
+                })
+              })
+            } else {
+              zip.readEntry()
+            }
+          })
+          zip.on('end', () => res(meta))
+          zip.readEntry()
+        })
+      }
+
+      it(
+        'converts markdown file into PPTX',
+        async () => {
+          await converter().convertFile(new File(onePath))
+          expect(write).toHaveBeenCalled()
+          expect(write.mock.calls[0][0]).toBe('test.pptx')
+
+          // ZIP PK header for Office Open XML
+          const pptx: Buffer = write.mock.calls[0][1]
+          expect(pptx.toString('ascii', 0, 2)).toBe('PK')
+          expect(pptx.toString('hex', 2, 4)).toBe('0304')
+
+          // Creator meta
+          const meta = await getPptxDocProps(pptx)
+          expect(meta['dc:creator']).toBe('Created by Marp')
+        },
+        puppeteerTimeoutMs
+      )
+
+      context('with meta global directives', () => {
+        it(
+          'assigns meta info thorugh @marp-team/pptx',
+          async () => {
+            await converter({
+              globalDirectives: {
+                title: 'Test meta',
+                description: 'Test description',
+              },
+            }).convertFile(new File(onePath))
+
+            const pptx: Buffer = write.mock.calls[0][1]
+            const meta = await getPptxDocProps(pptx)
+
+            expect(meta['dc:title']).toBe('Test meta')
+            expect(meta['dc:subject']).toBe('Test description')
           },
           puppeteerTimeoutMs
         )

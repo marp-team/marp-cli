@@ -116,6 +116,7 @@
     "tslint-config-airbnb": "^5.11.1",
     "tslint-config-prettier": "^1.18.0",
     "typescript": "^3.5.2",
+    "yauzl": "^2.10.0",
     "zip-stream": "^2.0.1"
   },
   "dependencies": {

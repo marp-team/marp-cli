@@ -530,6 +530,13 @@ describe('Marp CLI', () => {
       })
     })
 
+    context('with --pptx option', () => {
+      it('converts file with PPTX type', async () => {
+        const cmd = [onePath, '--pptx']
+        expect((await conversion(...cmd)).options.type).toBe(ConvertType.pptx)
+      })
+    })
+
     context('with --image option', () => {
       it('converts file with PNG type by specified png', async () => {
         const cmd = [onePath, '--image', 'png']
