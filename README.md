@@ -9,9 +9,11 @@
 
 **A CLI interface, for [Marp](https://github.com/marp-team/marp)** (using [@marp-team/marp-core](https://github.com/marp-team/marp-core)) and any slide deck converter based on [Marpit](https://marpit.marp.app/) framework.
 
-It can convert Marp / Marpit Markdown files into static HTML / CSS and PDF.
+It can convert Marp / Marpit Markdown files into static HTML / CSS, PDF, PowerPoint document, and image(s) easily.
 
-![](https://raw.githubusercontent.com/marp-team/marp-cli/master/docs/images/marp-cli.gif)
+<p align="center">
+  <img src="https://raw.githubusercontent.com/marp-team/marp-cli/master/docs/images/marp-cli.gif" />
+</p>
 
 ## Try it now!
 
@@ -28,6 +30,10 @@ npx @marp-team/marp-cli slide-deck.md -o output.html
 npx @marp-team/marp-cli slide-deck.md --pdf
 npx @marp-team/marp-cli slide-deck.md -o output.pdf
 
+# Convert slide deck into PowerPoint document (PPTX)
+npx @marp-team/marp-cli slide-deck.md --pptx
+npx @marp-team/marp-cli slide-deck.md -o output.pptx
+
 # Watch mode
 npx @marp-team/marp-cli -w slide-deck.md
 
@@ -38,28 +44,18 @@ npx @marp-team/marp-cli -s ./slides
 npx @marp-team/marp-cli -p slide-deck.md
 ```
 
-> :information_source: You have to install [Google Chrome] (or [Chromium]) to convert slide deck into PDF.
+> :information_source: You have to install [Google Chrome] (or [Chromium]) to convert slide deck into PDF, PPTX, and image(s).
 
 [google chrome]: https://www.google.com/chrome/
 [chromium]: https://www.chromium.org/
 
 ### Docker
 
-Do you hate to install node/chrome locally? We have [an official Docker image](https://hub.docker.com/r/marpteam/marp-cli/) ready to use CLI.
+Do you hate to install Node and Chrome locally? We have [an official Docker image `marpteam/marp-cli`][marp-cli-docker] ready to use CLI.
 
-```bash
-# Convert slide deck into HTML
-docker run --rm -v $PWD:/home/marp/app/ -e LANG=$LANG marpteam/marp-cli slide-deck.md
+[Please refer how to use at Docker Hub.][marp-cli-docker]
 
-# Convert slide deck into PDF by using Chromium in Docker
-docker run --rm -v $PWD:/home/marp/app/ -e LANG=$LANG marpteam/marp-cli slide-deck.md --pdf
-
-# Watch mode
-docker run --rm --init -v $PWD:/home/marp/app/ -e LANG=$LANG -p 52000:52000 marpteam/marp-cli -w slide-deck.md
-
-# Server mode (Serve current directory)
-docker run --rm --init -v $PWD:/home/marp/app -e LANG=$LANG -p 8080:8080 -p 52000:52000 marpteam/marp-cli -s .
-```
+[marp-cli-docker]: https://hub.docker.com/r/marpteam/marp-cli/
 
 ### Run in Gitpod
 
@@ -126,6 +122,23 @@ marp slide-deck.md -o converted.pdf
 
 [google chrome canary]: https://www.google.com/chrome/canary/
 
+### Convert to PowerPoint document (`--pptx`)
+
+Do you want more familiar way to share your deck? PPTX conversion to create PowerPoint document is available by passing `--pptx` option or specify the output path with PPTX extension.
+
+```bash
+marp --pptx slide-deck.md
+marp slide-deck.md -o converted.pptx
+```
+
+A created PPTX includes rendered Marp slide pages and the support of [Marpit presenter notes](https://marpit.marp.app/usage?id=presenter-notes). It can open with PowerPoint, Keynote, Google Slides, LibreOffice Impress, and so on...
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/marp-team/marp-cli/master/docs/images/pptx.png" height="300" />
+</p>
+
+> :information_source: A converted PPTX consists of pre-rendered images. Please note that contents would not be able to modify or re-use in PowerPoint.
+
 ### Convert to PNG/JPEG image(s)
 
 #### Multiple images (`--images`)
@@ -156,9 +169,11 @@ It would be useful for creating [Open Graph] image that can specify with [`image
 
 ### Security about local files
 
-Because of [the security reason](https://github.com/marp-team/marp-cli/pull/10), **the converted PDF and images cannot use local files by default.** We recommend uploading your assets to online.
+Because of [the security reason](https://github.com/marp-team/marp-cli/pull/10#user-content-security), **PDF, PPTX and image(s) conversion cannot use local files by default.**
 
-But if you want to use local files in rendered PDF, `--alow-local-files` option helps to find your local files. Warnings about using the insecure option will be outputted in each conversion.
+Marp CLI would output incompleted result with warning if the blocked local file accessing is detected. We recommend uploading your assets to online.
+
+If you really need to use local files in these conversion, `--alow-local-files` option helps to find your local files. _Please use only to the trusted Markdown because there is a potential security risk._
 
 ```bash
 marp --pdf --allow-local-files slide-deck.md
@@ -176,7 +191,9 @@ While you are opening the converted HTML in browser, it would refresh the opened
 
 Server mode supports on-demand conversion by HTTP request. We require to pass `--server` (`-s`) option and a directory to serve.
 
-![](https://raw.githubusercontent.com/marp-team/marp-cli/master/docs/images/server-mode.gif)
+<p align="center">
+  <img src="https://raw.githubusercontent.com/marp-team/marp-cli/master/docs/images/server-mode.gif" />
+</p>
 
 In this mode, the converted file outputs as the result of accessing to server, and not to disk.
 
