@@ -124,7 +124,7 @@ marp slide-deck.md -o converted.pdf
 
 ### Convert to PowerPoint document (`--pptx`)
 
-Do you want more familiar way to share your deck? PPTX conversion to create PowerPoint document is available by passing `--pptx` option or specify the output path with PPTX extension.
+Do you want more familiar way to present and share your deck? PPTX conversion to create PowerPoint document is available by passing `--pptx` option or specify the output path with PPTX extension.
 
 ```bash
 marp --pptx slide-deck.md
