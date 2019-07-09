@@ -63,7 +63,7 @@ jobs:
         env:
           TARGET: win
 
-      - script: yarn standalone:upload
+      - script: yarn standalone:pack:upload
         displayName: Upload created package to the asset of GitHub release
         env:
           GITHUB_TOKEN: $(githubToken)

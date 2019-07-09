@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v0.12.0 - 2019-07-09
+
 ### Added
 
 - `--images` option for conversion into multiple image files ([#71](https://github.com/marp-team/marp-cli/issues/71), [#123](https://github.com/marp-team/marp-cli/pull/123))
