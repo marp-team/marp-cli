@@ -70,10 +70,19 @@ ul#index {
         text-overflow: ellipsis;
       }
 
-      &.pdf {
-        color: #9d3302;
+      &.pdf,
+      &.pptx {
         flex: 0 1 auto;
+        font-size: 14px;
         margin: 0 0 0 $list-icon-horizontal-gap;
+      }
+
+      &.pdf {
+        color: #ee1d1f;
+      }
+
+      &.pptx {
+        color: #b7472a;
       }
     }
   }

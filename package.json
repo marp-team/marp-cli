@@ -116,11 +116,13 @@
     "tslint-config-airbnb": "^5.11.1",
     "tslint-config-prettier": "^1.18.0",
     "typescript": "^3.5.2",
+    "yauzl": "^2.10.0",
     "zip-stream": "^2.0.1"
   },
   "dependencies": {
     "@marp-team/marp-core": "^0.11.0",
     "@marp-team/marpit": "^1.2.0",
+    "@marp-team/pptx": "^0.1.0",
     "carlo": "^0.9.46",
     "chalk": "^2.4.2",
     "chokidar": "^3.0.1",

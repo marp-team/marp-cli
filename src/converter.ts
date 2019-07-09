@@ -23,7 +23,17 @@ export enum ConvertType {
   html = 'html',
   pdf = 'pdf',
   png = 'png',
+  pptx = 'pptx',
   jpeg = 'jpg',
+}
+
+export const mimeTypes = {
+  [ConvertType.html]: 'text/html',
+  [ConvertType.pdf]: 'application/pdf',
+  [ConvertType.png]: 'image/png',
+  [ConvertType.pptx]:
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  [ConvertType.jpeg]: 'image/jpeg',
 }
 
 export interface ConverterOption {
@@ -53,6 +63,7 @@ export interface ConvertFileOption {
 }
 
 export interface ConvertImageOption {
+  pages?: boolean | number[]
   quality?: number
   type: ConvertType.png | ConvertType.jpeg
 }
@@ -142,10 +153,14 @@ export class Converter {
         case ConvertType.jpeg:
           files.push(
             ...(await this.convertFileToImage(template, file, {
+              pages: this.options.pages,
               quality: this.options.jpegQuality,
               type: this.options.type,
             }))
           )
+          break
+        case ConvertType.pptx:
+          files.push(await this.convertFileToPPTX(template, file))
           break
         default:
           files.push(this.convertFileToHTML(template, file))
@@ -223,7 +238,7 @@ export class Converter {
         return await page.screenshot({ type: 'png' })
       }
 
-      if (this.options.pages) {
+      if (opts.pages) {
         // Multiple images
         for (let page = 1; page <= tpl.rendered.length; page += 1) {
           const ret = file.convert(this.options.output, {
@@ -244,6 +259,51 @@ export class Converter {
     })
 
     return files
+  }
+
+  private async convertFileToPPTX(tpl: TemplateResult, file: File) {
+    const imageFiles = await this.convertFileToImage(tpl, file, {
+      pages: true,
+      type: ConvertType.png,
+    })
+
+    const pptx = new (await import('@marp-team/pptx')).default()
+    const layoutName = `${tpl.rendered.size.width}x${tpl.rendered.size.height}`
+
+    pptx.setAuthor('Created by Marp')
+    pptx.setCompany('Created by Marp')
+    pptx.setLayout({
+      name: layoutName,
+      width: tpl.rendered.size.width / 96,
+      height: tpl.rendered.size.height / 96,
+    })
+
+    if (tpl.rendered.title) pptx.setTitle(tpl.rendered.title)
+    if (tpl.rendered.description) pptx.setSubject(tpl.rendered.description)
+
+    let page = 0
+
+    for (const imageFile of imageFiles) {
+      page += 1
+
+      pptx.defineSlideMaster({
+        title: `Page ${page}`,
+        bkgd: {
+          data: `data:image/png;base64,${imageFile.buffer!.toString('base64')}`,
+        },
+        margin: 0,
+      })
+
+      const slide = pptx.addNewSlide(`Page ${page}`)
+      const notes = tpl.rendered.comments[page - 1].join('\n\n')
+
+      if (notes) slide.addNotes(notes)
+    }
+
+    const ret = file.convert(this.options.output, { extension: 'pptx' })
+    ret.buffer = await new Promise(res => pptx.save('jszip', res, 'nodebuffer'))
+
+    return ret
   }
 
   private generateEngine(

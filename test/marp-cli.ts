@@ -530,6 +530,13 @@ describe('Marp CLI', () => {
       })
     })
 
+    context('with --pptx option', () => {
+      it('converts file with PPTX type', async () => {
+        const cmd = [onePath, '--pptx']
+        expect((await conversion(...cmd)).options.type).toBe(ConvertType.pptx)
+      })
+    })
+
     context('with --image option', () => {
       it('converts file with PNG type by specified png', async () => {
         const cmd = [onePath, '--image', 'png']
@@ -581,6 +588,11 @@ describe('Marp CLI', () => {
       it('converts file with PDF type when extension is .pdf', async () => {
         const cmd = [onePath, '-o', 'example.pdf']
         expect((await conversion(...cmd)).options.type).toBe(ConvertType.pdf)
+      })
+
+      it('converts file with PPTX type when extension is .pptx', async () => {
+        const cmd = [onePath, '-o', 'example.pptx']
+        expect((await conversion(...cmd)).options.type).toBe(ConvertType.pptx)
       })
 
       it('converts file with PNG type when extension is .png', async () => {
@@ -719,6 +731,13 @@ describe('Marp CLI', () => {
         expect(warn).toBeCalledWith(
           expect.stringContaining('Opening <location>')
         )
+      })
+
+      context('when PPTX conversion is enabled', () => {
+        it('does not open PPTX in preview window', async () => {
+          await marpCli([onePath, '-p', '--pptx', '--no-output'])
+          expect(Preview.prototype.open).not.toBeCalled()
+        }, 15000)
       })
 
       context('when CLI is running in an official Docker image', () => {

@@ -5,7 +5,12 @@ import querystring from 'querystring'
 import serveIndex from 'serve-index'
 import url from 'url'
 import { promisify } from 'util'
-import { Converter, ConvertedCallback, ConvertType } from './converter'
+import {
+  Converter,
+  ConvertedCallback,
+  ConvertType,
+  mimeTypes,
+} from './converter'
 import { error, CLIError } from './error'
 import { File, markdownExtensions } from './file'
 import TypedEventEmitter from './utils/typed-event-emitter'
@@ -70,6 +75,7 @@ export class Server extends TypedEventEmitter<Server.Events> {
       const queryKeys = Object.keys(query)
 
       if (queryKeys.includes('pdf')) return ConvertType.pdf
+      if (queryKeys.includes('pptx')) return ConvertType.pptx
       if (queryKeys.includes('png')) return ConvertType.png
       if (queryKeys.includes('jpg') || queryKeys.includes('jpeg'))
         return ConvertType.jpeg
@@ -105,7 +111,13 @@ export class Server extends TypedEventEmitter<Server.Events> {
         if (!ret.newFile)
           throw new Error('Converter must return a converted file to serve.')
 
-        res.end(ret.newFile.buffer)
+        const { type } = this.converter.options
+
+        // Download pptx document as an attachment
+        if (type === ConvertType.pptx)
+          res.attachment(`${path.basename(fn, path.extname(fn))}.pptx`)
+
+        res.type(mimeTypes[type]).end(ret.newFile.buffer)
       } catch (e) {
         this.emit('error', e)
         res.status(503).end(e.toString())
