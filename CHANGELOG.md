@@ -11,6 +11,7 @@
 ### Changed
 
 - Rename bespoke option arguments using dot notation ([#122](https://github.com/marp-team/marp-cli/pull/122))
+- Upgrade dependent packages to the latest version ([#125](https://github.com/marp-team/marp-cli/pull/125))
 
 ### Deprecated
 
