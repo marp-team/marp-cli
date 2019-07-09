@@ -6,11 +6,10 @@ trigger:
     include:
       - v*
 
-pool:
-  vmImage: 'vs2017-win2016'
-
 jobs:
   - job: test
+    pool:
+      vmImage: 'vs2017-win2016'
     steps:
       - task: NodeTool@0
         displayName: Install Node.js
@@ -44,7 +43,9 @@ jobs:
           testResultsFiles: 'junit.xml'
 
   - job: release
-    condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))
+    condition: startsWith(variables['Build.SourceBranch'], 'refs/tags/v')
+    pool:
+      vmImage: 'vs2017-win2016'
     steps:
       - task: NodeTool@0
         displayName: Install Node.js
