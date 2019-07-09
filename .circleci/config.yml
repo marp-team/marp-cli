@@ -142,8 +142,10 @@ jobs:
           command: yarn build:standalone
 
       - run:
-          name: Create packages
+          name: Create packages (for Linux and macOS)
           command: yarn standalone:pack
+          environment:
+            TARGET: linux,mac
 
       - persist_to_workspace:
           root: dist

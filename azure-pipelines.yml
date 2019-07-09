@@ -1,37 +1,68 @@
 trigger:
-  - master
+  branches:
+    include:
+      - master
+  tags:
+    include:
+      - v*
 
 pool:
   vmImage: 'vs2017-win2016'
 
-steps:
-  - task: NodeTool@0
-    displayName: 'Install Node.js'
-    inputs:
-      versionSpec: '10.16.0'
+jobs:
+  - job: test
+    steps:
+      - task: NodeTool@0
+        displayName: Install Node.js
+        inputs:
+          versionSpec: '10.16.0'
 
-  - script: yarn install
-    displayName: yarn install
+      - script: yarn install
+        displayName: yarn install
 
-  - script: yarn audit
-    displayName: yarn audit
+      - script: yarn audit
+        displayName: yarn audit
 
-  - script: yarn test:coverage --ci -i --reporters=default --reporters=jest-junit
-    displayName: Jest
+      - script: yarn test:coverage --ci -i --reporters=default --reporters=jest-junit
+        displayName: Jest
 
-  - script: yarn codecov
-    displayName: Codecov
-    env:
-      CODECOV_TOKEN: $(codecovToken)
+      - script: yarn codecov
+        displayName: Codecov
+        env:
+          CODECOV_TOKEN: $(codecovToken)
 
-  - task: PublishCodeCoverageResults@1
-    inputs:
-      codeCoverageTool: Cobertura
-      summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/*coverage.xml'
-      reportDirectory: '$(System.DefaultWorkingDirectory)/**/coverage'
+      - task: PublishCodeCoverageResults@1
+        inputs:
+          codeCoverageTool: Cobertura
+          summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/*coverage.xml'
+          reportDirectory: '$(System.DefaultWorkingDirectory)/**/coverage'
 
-  - task: PublishTestResults@2
-    condition: succeededOrFailed()
-    inputs:
-      testRunner: JUnit
-      testResultsFiles: 'junit.xml'
+      - task: PublishTestResults@2
+        condition: succeededOrFailed()
+        inputs:
+          testRunner: JUnit
+          testResultsFiles: 'junit.xml'
+
+  - job: release
+    condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))
+    steps:
+      - task: NodeTool@0
+        displayName: Install Node.js
+        inputs:
+          versionSpec: '10.16.0'
+
+      - script: yarn install
+        displayName: yarn install
+
+      - script: yarn build:standalone
+        displayName: Build and create standalone binaries
+
+      - script: yarn standalone:pack
+        displayName: Create package for Windows
+        env:
+          TARGET: win
+
+      - script: yarn standalone:upload
+        displayName: Upload created package to the asset of GitHub release
+        env:
+          GITHUB_TOKEN: $(githubToken)
