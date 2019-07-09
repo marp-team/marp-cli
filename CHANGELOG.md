@@ -5,6 +5,7 @@
 ### Added
 
 - `--images` option for conversion into multiple image files ([#71](https://github.com/marp-team/marp-cli/issues/71), [#123](https://github.com/marp-team/marp-cli/pull/123))
+- `--pptx` option to support conversion into PowerPoint document ([#107](https://github.com/marp-team/marp-cli/issues/107), [#124](https://github.com/marp-team/marp-cli/pull/124))
 - Set up CI for Windows with Azure Pipelines ([#120](https://github.com/marp-team/marp-cli/pull/120))
 
 ### Changed
