@@ -27,5 +27,5 @@ const connect = (path: string, reconnect: boolean = false) => {
 
 export default function() {
   const wsPath = (window as any).__marpCliWatchWS
-  if (wsPath) connect(wsPath)
+  if (wsPath) return connect(wsPath)
 }
