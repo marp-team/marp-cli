@@ -1,53 +1,65 @@
 /** @jest-environment jsdom */
+import portfinder from 'portfinder'
+import { Server } from 'ws'
 import watch from '../../src/templates/watch/watch'
-
-const mockAddEventListener = jest.fn()
-
-beforeEach(() => {
-  mockAddEventListener.mockReset()
-  ;(<any>window).WebSocket = jest.fn(() => ({
-    addEventListener: mockAddEventListener,
-  }))
-})
 
 afterEach(() => jest.restoreAllMocks())
 
 describe('Watch mode notifier on browser context', () => {
-  context('when window.__marpCliWatchWS is not defined', () => {
-    it('does not call WebSocket', () => {
-      watch()
-      expect((<any>window).WebSocket).not.toHaveBeenCalled()
-    })
+  let server: Server
+
+  beforeEach(async done => {
+    jest.spyOn(console, 'info').mockImplementation()
+    jest.spyOn(console, 'warn').mockImplementation()
+
+    const port = await portfinder.getPortPromise({ port: 52000 })
+    server = new Server({ port }, done)
   })
 
-  context('when window.__marpCliWatchWS is not defined', () => {
-    beforeEach(
-      () => ((<any>window).__marpCliWatchWS = 'ws://localhost:52000/test')
-    )
+  afterEach(() => server.close())
 
-    afterEach(() => delete (<any>window).__marpCliWatchWS)
-
-    it('calls WebSocket', () => {
-      watch()
-      expect((<any>window).WebSocket).toHaveBeenCalled()
+  context('when window.__marpCliWatchWS is defined', () => {
+    beforeEach(() => {
+      window['__marpCliWatchWS'] = `ws://localhost:${server.options.port}/test`
     })
 
-    it('listens message event', () => {
+    afterEach(() => delete window['__marpCliWatchWS'])
+
+    it('connects to WebSocket server', done => {
+      server.on('connection', (_, socket) => {
+        expect(socket.url).toBe('/test')
+        done()
+      })
+
       watch()
-      expect(mockAddEventListener).toHaveBeenCalledTimes(1)
-      expect(mockAddEventListener).toHaveBeenCalledWith(
-        'message',
-        expect.any(Function)
+    })
+
+    it('listens reload event', async () => {
+      const reload = jest.spyOn(location, 'reload').mockImplementation()
+
+      const send = await new Promise<(data: any) => Promise<void>>(
+        (res, rej) => {
+          server.on('error', e => rej(e))
+          server.on('connection', ws =>
+            res(
+              (data: any) =>
+                new Promise<void>((resolve, reject) => {
+                  ws.once('error', e => reject(e))
+                  ws.send(data)
+
+                  ws.once('pong', resolve)
+                  ws.ping()
+                })
+            )
+          )
+          watch()
+        }
       )
 
-      // Event callback
-      const reload = jest.spyOn(location, 'reload').mockImplementation()
-      const [, callback] = mockAddEventListener.mock.calls[0]
-
-      callback({ data: 'ready' })
+      await send('ready')
       expect(reload).not.toHaveBeenCalled()
 
-      callback({ data: 'reload' })
+      await send('reload')
       expect(reload).toHaveBeenCalled()
     })
   })
