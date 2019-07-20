@@ -1,54 +1,111 @@
 /** @jest-environment jsdom */
+import portfinder from 'portfinder'
+import { Server } from 'ws'
 import watch from '../../src/templates/watch/watch'
-
-const mockAddEventListener = jest.fn()
-
-beforeEach(() => {
-  mockAddEventListener.mockReset()
-  ;(<any>window).WebSocket = jest.fn(() => ({
-    addEventListener: mockAddEventListener,
-  }))
-})
 
 afterEach(() => jest.restoreAllMocks())
 
 describe('Watch mode notifier on browser context', () => {
-  context('when window.__marpCliWatchWS is not defined', () => {
-    it('does not call WebSocket', () => {
-      watch()
-      expect((<any>window).WebSocket).not.toHaveBeenCalled()
+  let server: Server
+
+  const createWSServer = async () => {
+    const port = await portfinder.getPortPromise({ port: 52000 })
+
+    return new Promise<Server>((res, rej) => {
+      try {
+        const createdServer = new Server({ port }, () => res(createdServer))
+      } catch (e) {
+        rej(e)
+      }
     })
+  }
+
+  beforeEach(async () => {
+    jest.spyOn(console, 'info').mockImplementation()
+    jest.spyOn(console, 'warn').mockImplementation()
+
+    server = await createWSServer()
   })
 
-  context('when window.__marpCliWatchWS is not defined', () => {
-    beforeEach(
-      () => ((<any>window).__marpCliWatchWS = 'ws://localhost:52000/test')
-    )
+  afterEach(() => server.close())
 
-    afterEach(() => delete (<any>window).__marpCliWatchWS)
-
-    it('calls WebSocket', () => {
-      watch()
-      expect((<any>window).WebSocket).toHaveBeenCalled()
+  context('when window.__marpCliWatchWS is defined', () => {
+    beforeEach(() => {
+      window['__marpCliWatchWS'] = `ws://localhost:${server.options.port}/test`
     })
 
-    it('listens message event', () => {
+    afterEach(() => delete window['__marpCliWatchWS'])
+
+    it('connects to WebSocket server', done => {
+      server.on('connection', (_, socket) => {
+        expect(socket.url).toBe('/test')
+        done()
+      })
+
       watch()
-      expect(mockAddEventListener).toHaveBeenCalledTimes(1)
-      expect(mockAddEventListener).toHaveBeenCalledWith(
-        'message',
-        expect.any(Function)
+    })
+
+    it('listens reload event', async () => {
+      const reload = jest.spyOn(location, 'reload').mockImplementation()
+      const send = await new Promise<(data: any) => Promise<void>>(
+        (res, rej) => {
+          server.on('error', e => rej(e))
+          server.on('connection', ws =>
+            res(
+              (data: any) =>
+                new Promise<void>((resolve, reject) => {
+                  ws.once('error', e => reject(e))
+                  ws.send(data)
+
+                  ws.once('pong', resolve)
+                  ws.ping()
+                })
+            )
+          )
+          watch()
+        }
       )
 
-      // Event callback
-      const reload = jest.spyOn(location, 'reload').mockImplementation()
-      const [, callback] = mockAddEventListener.mock.calls[0]
+      await send('ready')
+      expect(reload).not.toBeCalled()
 
-      callback({ data: 'ready' })
-      expect(reload).not.toHaveBeenCalled()
+      await send('reload')
+      expect(reload).toBeCalled()
+    })
 
-      callback({ data: 'reload' })
-      expect(reload).toHaveBeenCalled()
+    context('when closed WebSocket server', () => {
+      beforeEach(() => jest.useFakeTimers())
+      afterEach(() => jest.useRealTimers())
+
+      it('reconnects watcher in 5 sec', async done => {
+        const reload = jest.spyOn(location, 'reload').mockImplementation()
+        const clientSocket = await new Promise<WebSocket>((res, rej) => {
+          let socket: WebSocket
+
+          server.once('error', e => rej(e))
+          server.once('connection', () => res(socket))
+
+          socket = watch()!
+        })
+
+        await new Promise(res => {
+          clientSocket.addEventListener('close', res)
+          server.close()
+        })
+
+        server = await createWSServer()
+        server.once('connection', (ws, socket) => {
+          expect(socket.url).toBe('/test')
+
+          ws.on('pong', () => {
+            expect(reload).toBeCalled()
+            done()
+          })
+          ws.ping()
+        })
+
+        jest.advanceTimersByTime(5000)
+      })
     })
   })
 })

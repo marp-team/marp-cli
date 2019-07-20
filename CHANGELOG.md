@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Reconnect to file watcher when disconnected from WebSocket server ([#130](https://github.com/marp-team/marp-cli/pull/130))
+
 ## v0.12.1 - 2019-07-13
 
 ### Changed
