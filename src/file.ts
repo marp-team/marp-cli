@@ -46,7 +46,7 @@ export class File {
       return url.pathToFileURL(this.absolutePath).toString()
 
     // Fallback for Node < v10.12.0
-    return `file://${path.posix.resolve(this.path)}`
+    return new url.URL(`file://${this.absolutePath}`).toString()
   }
 
   convert(output: string | false | undefined, opts: FileConvertOption): File {
