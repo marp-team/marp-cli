@@ -1,11 +1,12 @@
 import fs from 'fs'
+import path from 'path'
+import * as url from 'url'
+import { promisify } from 'util'
+import fileUrl from 'file-url'
 import getStdin from 'get-stdin'
 import globby, { GlobbyOptions } from 'globby'
 import mkdirp from 'mkdirp'
-import path from 'path'
-import * as url from 'url'
 import { tmpName } from 'tmp'
-import { promisify } from 'util'
 
 const stat = promisify(fs.stat)
 const mkdirpPromise = promisify<string, any>(mkdirp)
@@ -46,7 +47,7 @@ export class File {
       return url.pathToFileURL(this.absolutePath).toString()
 
     // Fallback for Node < v10.12.0
-    return `file://${path.posix.resolve(this.path)}`
+    return fileUrl(this.absolutePath)
   }
 
   convert(output: string | false | undefined, opts: FileConvertOption): File {
