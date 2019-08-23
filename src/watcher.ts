@@ -86,7 +86,7 @@ export class WatchNotifier {
 
   async port() {
     if (this.portNumber === undefined)
-      this.portNumber = await portfinder.getPortPromise({ port: 52000 })
+      this.portNumber = await portfinder.getPortPromise({ port: 37717 })
 
     return this.portNumber
   }

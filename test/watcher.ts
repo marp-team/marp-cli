@@ -165,11 +165,11 @@ describe('WatchNotifier', () => {
     expect(notifier).toBeInstanceOf(WatchNotifier))
 
   describe('#port', () => {
-    it('finds available port from 52000', async () => {
+    it('finds available port from 37717', async () => {
       const finderSpy = jest.spyOn(portfinder, 'getPortPromise')
       const instance = new WatchNotifier()
 
-      expect(await instance.port()).toBe(52000)
+      expect(await instance.port()).toBe(37717)
       expect(finderSpy).toHaveBeenCalledTimes(1)
 
       // Return stored port number of instance when called twice
@@ -177,16 +177,16 @@ describe('WatchNotifier', () => {
       expect(finderSpy).toHaveBeenCalledTimes(1)
     })
 
-    context('when 52000 port is using for the other purpose', () => {
+    context('when 37717 port is using for the other purpose', () => {
       let server: http.Server
 
       beforeEach(
-        () => (server = http.createServer((_, res) => res.end()).listen(52000))
+        () => (server = http.createServer((_, res) => res.end()).listen(37717))
       )
       afterEach(() => server.close())
 
-      it('returns port number 52001', async () =>
-        expect(await new WatchNotifier().port()).toBe(52001))
+      it('returns port number 37718', async () =>
+        expect(await new WatchNotifier().port()).toBe(37718))
     })
   })
 
@@ -194,7 +194,7 @@ describe('WatchNotifier', () => {
     it('generates WebSocket URL from path string and add to listeners', async () => {
       const instance = new WatchNotifier()
       expect(await instance.register('test')).toBe(
-        `ws://localhost:52000/${testIdentifier}`
+        `ws://localhost:37717/${testIdentifier}`
       )
 
       const listenerSet = instance.listeners.get(testIdentifier)

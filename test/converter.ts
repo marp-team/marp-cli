@@ -210,7 +210,7 @@ describe('Converter', () => {
 
         const { result } = await converter.convert(md, dummyFile)
         expect(result).toContain(
-          `<script>window\.__marpCliWatchWS="ws://localhost:52000/${hash}";`
+          `<script>window\.__marpCliWatchWS="ws://localhost:37717/${hash}";`
         )
       })
     })
