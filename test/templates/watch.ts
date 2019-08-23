@@ -9,7 +9,7 @@ describe('Watch mode notifier on browser context', () => {
   let server: Server
 
   const createWSServer = async () => {
-    const port = await portfinder.getPortPromise({ port: 52000 })
+    const port = await portfinder.getPortPromise({ port: 37717 })
 
     return new Promise<Server>((res, rej) => {
       try {
