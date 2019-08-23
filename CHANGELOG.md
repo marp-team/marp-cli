@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v0.13.0 - 2019-08-23
+
 ### Fixed
 
 - Fix an issue `--allow-local-files` may not work in the old Node + Windows ([#133](https://github.com/marp-team/marp-cli/issues/133), [#136](https://github.com/marp-team/marp-cli/pull/136))
