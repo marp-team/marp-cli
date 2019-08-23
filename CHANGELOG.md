@@ -9,6 +9,7 @@
 ### Changed
 
 - Reconnect to file watcher when disconnected from WebSocket server ([#130](https://github.com/marp-team/marp-cli/pull/130))
+- Change port number for file watcher from 52000 to 37717 ([#135](https://github.com/marp-team/marp-cli/issues/135), [#137](https://github.com/marp-team/marp-cli/pull/137))
 
 ## v0.12.1 - 2019-07-13
 
