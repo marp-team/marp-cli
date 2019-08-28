@@ -142,6 +142,7 @@
     "serve-index": "^1.9.1",
     "strip-ansi": "^5.2.0",
     "tmp": "^0.1.0",
+    "v8-compile-cache": "^2.1.0",
     "wrap-ansi": "^6.0.0",
     "ws": "^7.1.2",
     "yargs": "^14.0.0"
