@@ -6,6 +6,10 @@
 
 - Add `v8-compile-cache` to make faster startup ([#139](https://github.com/marp-team/marp-cli/pull/139))
 
+### Changed
+
+- Migrate CI for Windows into GitHub Actions ([#132](https://github.com/marp-team/marp-cli/issues/132), [#140](https://github.com/marp-team/marp-cli/pull/140))
+
 ## v0.13.0 - 2019-08-23
 
 ### Fixed
