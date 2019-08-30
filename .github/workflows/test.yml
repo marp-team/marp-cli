@@ -21,10 +21,9 @@ jobs:
       - name: Install with yarn
         run: npm install -g yarn && yarn install
       - name: Jest
-        run: yarn test:coverage --ci -i --reporters=default --reporters=jest-junit
+        run: |
+          yarn test:coverage --ci -i --reporters=default --reporters=jest-junit
+          yarn codecov -F windows
         env:
           CI: true
-      - uses: codecov/codecov-action@v1.0.2
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          flags: windows
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
