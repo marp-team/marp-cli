@@ -1,8 +1,10 @@
+name: Test for Windows
+
 on: push
 
 jobs:
   win-test:
-    runs-on: windows-2016
+    runs-on: windows-latest
 
     strategy:
       fail-fast: false
@@ -14,6 +16,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
         with:
@@ -21,9 +25,10 @@ jobs:
       - name: Install with yarn
         run: npm install -g yarn && yarn install
       - name: Jest
-        run: |
-          yarn test:coverage --ci -i --reporters=default --reporters=jest-junit
-          yarn codecov -F windows
+        run: yarn test:coverage --ci -i --reporters=default --reporters=jest-junit
         env:
           CI: true
+      - name: Codecov
+        run: yarn codecov -F windows
+        env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
