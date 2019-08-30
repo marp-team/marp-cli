@@ -737,7 +737,7 @@ describe('Marp CLI', () => {
         it('does not open PPTX in preview window', async () => {
           await marpCli([onePath, '-p', '--pptx', '--no-output'])
           expect(Preview.prototype.open).not.toBeCalled()
-        }, 15000)
+        }, 30000)
       })
 
       context('when CLI is running in an official Docker image', () => {
