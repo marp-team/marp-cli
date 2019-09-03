@@ -11,6 +11,8 @@ import bespokeProgress from './progress'
 import bespokeTouch from './touch'
 
 export default function() {
+  window.addEventListener('load', () => document.body.classList.add('loaded'))
+
   return bespoke.from(document.getElementById('presentation'), [
     bespokeForms(),
     bespokeClasses,

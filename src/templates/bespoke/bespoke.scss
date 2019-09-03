@@ -144,6 +144,16 @@ $progressHeight: 5px;
       pointer-events: auto;
       z-index: 0;
     }
+
+    @at-root {
+      body.loaded & {
+        display: none;
+      }
+
+      body.loaded &.bespoke-marp-active {
+        display: block;
+      }
+    }
   }
 
   .bespoke-progress-parent {
