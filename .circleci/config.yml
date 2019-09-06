@@ -14,7 +14,7 @@ executors:
         entrypoint:
           - docker-init
           - --
-          - /docker-entrypoint.sh
+          - <<# parameters.browser >>/<</ parameters.browser >>docker-entrypoint.sh
         command:
           - /bin/sh
     working_directory: ~/marp-cli
