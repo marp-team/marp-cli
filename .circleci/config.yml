@@ -15,7 +15,7 @@ executors:
           - docker-init
           - --
           - /docker-entrypoint.sh
-        cmd:
+        command:
           - /bin/sh
     working_directory: ~/marp-cli
 
