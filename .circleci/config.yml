@@ -1,34 +1,79 @@
-references:
-  docker-init: &docker-init
-    entrypoint:
-      - docker-init
-      - --
-      - /docker-entrypoint.sh
-    cmd:
-      - /bin/sh
+version: 2.1
 
-  base: &base
+executors:
+  node:
+    parameters:
+      browser:
+        type: boolean
+        default: false
+      version:
+        type: string
+        default: lts
     docker:
-      - image: circleci/node:10.16.0-browsers
-        <<: *docker-init
+      - image: circleci/node:<< parameters.version >><<# parameters.browser >>-browsers<</ parameters.browser >>
+        entrypoint:
+          - docker-init
+          - --
+          - <<# parameters.browser >>/<</ parameters.browser >>docker-entrypoint.sh
+        command:
+          - /bin/sh
     working_directory: ~/marp-cli
+
+  docker:
+    docker:
+      - image: docker:git
+    working_directory: ~/marp-cli
+
+commands:
+  install:
+    parameters:
+      postinstall:
+        type: steps
+        default: []
+      yarn:
+        type: string
+        default: 1.17.3
     steps:
-      - run: node --version
-      - checkout
+      # https://github.com/nodejs/docker-node/blob/master/docs/BestPractices.md#upgradingdowngrading-yarn
+      - run:
+          name: Upgrade yarn
+          command: |
+            sudo -E sh -c 'curl -fSLO --compressed "https://yarnpkg.com/downloads/$YARN_VERSION/yarn-v$YARN_VERSION.tar.gz" \
+              && tar -xzf yarn-v$YARN_VERSION.tar.gz -C /opt/ \
+              && ln -snf /opt/yarn-v$YARN_VERSION/bin/yarn /usr/local/bin/yarn \
+              && ln -snf /opt/yarn-v$YARN_VERSION/bin/yarnpkg /usr/local/bin/yarnpkg \
+              && rm yarn-v$YARN_VERSION.tar.gz'
+          environment:
+            YARN_VERSION: << parameters.yarn >>
 
       - restore_cache:
           keys:
-            - dependencies-{{ .Environment.CI_CACHE_KEY }}-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}-{{ .Branch }}
-            - dependencies-{{ .Environment.CI_CACHE_KEY }}-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}-
-            - dependencies-{{ .Environment.CI_CACHE_KEY }}-{{ .Environment.CIRCLE_JOB }}-
+            - v2.1-dependencies-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}-{{ .Branch }}
+            - v2.1-dependencies-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}-
+            - v2.1-dependencies-{{ .Environment.CIRCLE_JOB }}-
 
       - run: yarn install
+      - steps: << parameters.postinstall >>
 
       - save_cache:
-          key: dependencies-{{ .Environment.CI_CACHE_KEY }}-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}-{{ .Branch }}
+          key: v2.1-dependencies-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}-{{ .Branch }}
           paths:
             - node_modules
             - ~/.cache/yarn
+
+  audit:
+    steps:
+      - checkout
+      - install:
+          postinstall:
+            - run: yarn audit
+
+  test:
+    steps:
+      - run: node --version
+
+      - checkout
+      - install
 
       - run:
           name: Prettier formatting
@@ -61,149 +106,97 @@ references:
           path: ./coverage
           destination: coverage
 
-  version: &version
-    filters:
-      branches:
-        ignore: /.*/
-      tags:
-        only: /^v.*/
-
-version: 2
-jobs:
-  audit:
-    <<: *base
-    steps:
-      - checkout
-
-      - restore_cache:
-          keys:
-            - dependencies-{{ .Environment.CI_CACHE_KEY }}-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}-{{ .Branch }}
-            - dependencies-{{ .Environment.CI_CACHE_KEY }}-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}-
-            - dependencies-{{ .Environment.CI_CACHE_KEY }}-{{ .Environment.CIRCLE_JOB }}-
-
-      - run: yarn install
-      - run: yarn audit
-
-      - save_cache:
-          key: dependencies-{{ .Environment.CI_CACHE_KEY }}-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}-{{ .Branch }}
-          paths:
-            - node_modules
-            - ~/.cache/yarn
-
-  current:
-    <<: *base
-
-  carbon:
-    <<: *base
-    docker:
-      - image: circleci/node:carbon-browsers
-        <<: *docker-init
-
-  erbium:
-    <<: *base
-    docker:
-      - image: circleci/node:12-browsers
-        <<: *docker-init
-
-  docker-image:
-    docker:
-      - image: docker:git
-    working_directory: ~/marp-cli
+  docker:
+    parameters:
+      tag:
+        type: string
+        default: latest
+      user:
+        type: env_var_name
+        default: DOCKER_USER
+      pass:
+        type: env_var_name
+        default: DOCKER_PASS
     steps:
       - checkout
       - setup_remote_docker
 
       - run:
           name: Build Docker image
-          command: docker build --no-cache -t marpteam/marp-cli:latest .
+          command: docker build --no-cache -t marpteam/marp-cli:<< parameters.tag >> .
 
       - run:
           name: Push to Docker Hub
           command: |
-            docker login -u $DOCKER_USER -p $DOCKER_PASS
-            docker push marpteam/marp-cli:latest
+            docker login -u ${<< parameters.user >>} -p ${<< parameters.pass >>}
+            docker push marpteam/marp-cli:<< parameters.tag >>
 
-  pack:
-    <<: *base
+jobs:
+  audit:
+    executor: node
     steps:
-      - checkout
+      - audit
 
-      # Don't use cache to prevent side-effect of cache to standalone binaries
-      - run: yarn install
-
-      - save_cache:
-          key: dependencies-{{ .Environment.CI_CACHE_KEY }}-release-{{ checksum "yarn.lock" }}
-          paths:
-            - node_modules
-            - ~/.cache/yarn
-
-      - run:
-          name: Build and create standalone binaries
-          command: yarn build:standalone
-
-      - run:
-          name: Create packages (for Linux and macOS)
-          command: yarn standalone:pack
-          environment:
-            TARGET: linux,mac
-
-      - persist_to_workspace:
-          root: dist
-          paths:
-            - '*'
-
-      - store_artifacts:
-          path: ./dist
-          destination: dist
-
-  release:
-    <<: *base
+  test-node8:
+    executor:
+      name: node
+      browser: true
+      version: '8'
     steps:
-      - checkout
+      - test
 
-      - restore_cache:
-          keys:
-            - dependencies-{{ .Environment.CI_CACHE_KEY }}-release-{{ checksum "yarn.lock" }}
+  test-node10:
+    executor:
+      name: node
+      browser: true
+      version: '10.16.0' # Specify TLS version for development
+    steps:
+      - test
 
-      - run: yarn install
+  test-node12:
+    executor:
+      name: node
+      browser: true
+      version: '12'
+    steps:
+      - test
 
-      - run:
-          name: Create release on GitHub
-          command: curl https://raw.githubusercontent.com/marp-team/marp/master/github-release.js | node
+  docker-image-latest:
+    executor: docker
+    steps:
+      - docker:
+          tag: latest
 
-      - attach_workspace:
-          at: dist
-
-      - run:
-          name: Upload created packages to the asset of GitHub release
-          command: yarn standalone:pack:upload
+  docker-image-tag:
+    executor: docker
+    steps:
+      - docker:
+          tag: $CIRCLE_TAG
 
 workflows:
-  version: 2
-  build:
+  test:
     jobs:
       - audit
-      - current:
+      - test-node8:
           requires:
             - audit
-      - carbon:
+      - test-node10:
           requires:
             - audit
-      - erbium:
+      - test-node12:
           requires:
             - audit
-      - docker-image:
+      - docker-image-latest:
           requires:
-            - current
-            - carbon
-            - erbium
+            - test-node8
+            - test-node10
+            - test-node12
           filters:
             branches:
               only: master
-      - pack:
-          <<: *version
-      - release:
-          <<: *version
-          context: github-release
-          requires:
-            - pack
+      - docker-image-tag:
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/

@@ -1,0 +1,53 @@
+name: GitHub Release
+
+on:
+  push:
+    tags:
+      - v*
+
+jobs:
+  github-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: marp-team/actions@v1
+        with:
+          task: release
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  upload-standalone-binary:
+    needs: github-release
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macOS-latest
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Use Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: '10.16.0'
+      - name: Install with yarn
+        run: npm install -g yarn && yarn install
+      - name: Build and create standalone binaries
+        run: yarn build:standalone
+      - name: Create package
+        run: |
+          [[ $MATRIX_OS == ubuntu* ]] && export TARGET=linux
+          [[ $MATRIX_OS == win* ]] && export TARGET=win
+          [[ $MATRIX_OS == mac* ]] && export TARGET=mac
+          yarn standalone:pack
+        env:
+          MATRIX_OS: ${{ matrix.os }}
+      - name: Upload created asset to GitHub Release
+        uses: marp-team/actions@v1
+        with:
+          task: upload
+          token: ${{ secrets.GITHUB_TOKEN }}
+          files: dist
