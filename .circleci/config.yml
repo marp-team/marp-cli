@@ -19,6 +19,11 @@ executors:
           - /bin/sh
     working_directory: ~/marp-cli
 
+  docker:
+    docker:
+      - image: docker:git
+    working_directory: ~/marp-cli
+
 commands:
   install:
     parameters:
@@ -101,6 +106,31 @@ commands:
           path: ./coverage
           destination: coverage
 
+  docker:
+    parameters:
+      tag:
+        type: string
+        default: latest
+      user:
+        type: env_var_name
+        default: DOCKER_USER
+      pass:
+        type: env_var_name
+        default: DOCKER_PASS
+    steps:
+      - checkout
+      - setup_remote_docker
+
+      - run:
+          name: Build Docker image
+          command: docker build --no-cache -t marpteam/marp-cli:<< parameters.tag >> .
+
+      - run:
+          name: Push to Docker Hub
+          command: |
+            docker login -u ${<< parameters.user >>} -p ${<< parameters.pass >>}
+            docker push marpteam/marp-cli:<< parameters.tag >>
+
 jobs:
   audit:
     executor: node
@@ -131,23 +161,17 @@ jobs:
     steps:
       - test
 
-  docker-image:
-    docker:
-      - image: docker:git
-    working_directory: ~/marp-cli
+  docker-image-latest:
+    executor: docker
     steps:
-      - checkout
-      - setup_remote_docker
+      - docker:
+          tag: latest
 
-      - run:
-          name: Build Docker image
-          command: docker build --no-cache -t marpteam/marp-cli:latest .
-
-      - run:
-          name: Push to Docker Hub
-          command: |
-            docker login -u $DOCKER_USER -p $DOCKER_PASS
-            docker push marpteam/marp-cli:latest
+  docker-image-tag:
+    executor: docker
+    steps:
+      - docker:
+          tag: $CIRCLE_TAG
 
 workflows:
   test:
@@ -162,7 +186,7 @@ workflows:
       - test-node12:
           requires:
             - audit
-      - docker-image:
+      - docker-image-latest:
           requires:
             - test-node8
             - test-node10
@@ -170,3 +194,9 @@ workflows:
           filters:
             branches:
               only: master
+      - docker-image-tag:
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/
