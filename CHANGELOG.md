@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v0.13.1 - 2019-09-10
+
 ### Added
 
 - Add `v8-compile-cache` to make faster startup ([#139](https://github.com/marp-team/marp-cli/pull/139))
