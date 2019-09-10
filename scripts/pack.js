@@ -12,7 +12,7 @@ const bin = path.resolve(__dirname, '../bin')
 const binaryName = 'marp'
 const dist = path.resolve(__dirname, '../dist')
 const prefix = `marp-cli-v${version}`
-const target = (process.env.TARGET || 'linux,mac,win').toLowerCase()
+const os = (process.env.MATRIX_OS || 'linux,macos,windows').toLowerCase()
 
 const packToTarGz = binary => {
   const pack = tar.pack()
@@ -28,7 +28,7 @@ rimraf.sync(dist)
 fs.mkdirSync(dist)
 
 // Create package for Linux (.tar.gz)
-if (target.includes('linux')) {
+if (os.includes('linux') || os.includes('ubuntu')) {
   fs.readFile(path.resolve(bin, 'marp-cli-linux'), (err, buffer) => {
     if (err) throw err
 
@@ -39,7 +39,7 @@ if (target.includes('linux')) {
 }
 
 // Create package for macOS (.tar.gz)
-if (target.includes('mac')) {
+if (os.includes('macos')) {
   fs.readFile(path.resolve(bin, 'marp-cli-macos'), (err, buffer) => {
     if (err) throw err
 
@@ -50,7 +50,7 @@ if (target.includes('mac')) {
 }
 
 // Create package for Windows (.zip)
-if (target.includes('win')) {
+if (os.includes('windows')) {
   fs.readFile(path.resolve(bin, 'marp-cli-win.exe'), (err, buffer) => {
     if (err) throw err
 

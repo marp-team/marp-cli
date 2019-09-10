@@ -38,11 +38,7 @@ jobs:
       - name: Build and create standalone binaries
         run: yarn build:standalone
       - name: Create package
-        run: |
-          [[ $MATRIX_OS == ubuntu* ]] && export TARGET=linux
-          [[ $MATRIX_OS == win* ]] && export TARGET=win
-          [[ $MATRIX_OS == mac* ]] && export TARGET=mac
-          yarn standalone:pack
+        run: yarn standalone:pack
         env:
           MATRIX_OS: ${{ matrix.os }}
       - uses: actions/upload-artifact@v1
