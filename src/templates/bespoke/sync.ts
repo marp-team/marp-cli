@@ -23,13 +23,10 @@ export default function bespokeSync(opts: BespokeSyncOption = {}) {
   }
 
   const setState = (
-    updater:
-      | Partial<BespokeSyncState>
-      | ((prevState: Partial<BespokeSyncState>) => Partial<BespokeSyncState>)
+    updater: (prevState: Partial<BespokeSyncState>) => Partial<BespokeSyncState>
   ) => {
-    const updaterFunc = typeof updater === 'function' ? updater : () => updater
     const currentState = getState()
-    const newState = { ...currentState, ...updaterFunc(currentState) }
+    const newState = { ...currentState, ...updater(currentState) }
 
     localStorage.setItem(storageKey, JSON.stringify(newState))
     return newState
@@ -48,7 +45,7 @@ export default function bespokeSync(opts: BespokeSyncOption = {}) {
     // (Wrap by setTimeout to skip fragment event for initialization)
     setTimeout(() => {
       deck.on('fragment', (e: FragmentEvent) => {
-        setState({ index: e.index, fragmentIndex: e.fragmentIndex })
+        setState(() => ({ index: e.index, fragmentIndex: e.fragmentIndex }))
       })
     }, 0)
 
@@ -73,7 +70,7 @@ export default function bespokeSync(opts: BespokeSyncOption = {}) {
       if (reference === undefined || reference <= 1) {
         localStorage.removeItem(storageKey)
       } else {
-        setState({ reference: reference - 1 })
+        setState(() => ({ reference: reference - 1 }))
       }
     })
   }
