@@ -1,4 +1,4 @@
-import screenfull from 'screenfull'
+import { default as screenfull } from 'screenfull'
 
 export default function bespokeOSC(selector: string = '.bespoke-marp-osc') {
   const osc = document.querySelector(selector)
@@ -14,7 +14,7 @@ export default function bespokeOSC(selector: string = '.bespoke-marp-osc') {
   }
 
   // Hide fullscreen button in not-supported browser (e.g. phone device)
-  if (screenfull && !screenfull.enabled)
+  if (!screenfull.isEnabled)
     oscElements('fullscreen', btn => (btn.style.display = 'none'))
 
   return deck => {
@@ -28,11 +28,7 @@ export default function bespokeOSC(selector: string = '.bespoke-marp-osc') {
             deck.prev()
             break
           case 'fullscreen':
-            if (
-              typeof deck.fullscreen === 'function' &&
-              screenfull &&
-              screenfull.enabled
-            )
+            if (typeof deck.fullscreen === 'function' && screenfull.isEnabled)
               deck.fullscreen()
         }
       }
@@ -63,11 +59,15 @@ export default function bespokeOSC(selector: string = '.bespoke-marp-osc') {
       )
     })
 
-    screenfull &&
+    if (screenfull.isEnabled) {
       screenfull.onchange(() =>
         oscElements('fullscreen', fs =>
-          fs.classList.toggle('exit', screenfull && screenfull.isFullscreen)
+          fs.classList.toggle(
+            'exit',
+            screenfull.isEnabled && screenfull.isFullscreen
+          )
         )
       )
+    }
   }
 }
