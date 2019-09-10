@@ -2,13 +2,14 @@
 
 ## [Unreleased]
 
-### Fixed
-
-- Improve HTML performance after preloading ([#143](https://github.com/marp-team/marp-cli/pull/143))
-
 ### Added
 
 - Add `v8-compile-cache` to make faster startup ([#139](https://github.com/marp-team/marp-cli/pull/139))
+- Sync plugin for bespoke template ([#145](https://github.com/marp-team/marp-cli/pull/145))
+
+### Fixed
+
+- Improve HTML performance after preloading ([#143](https://github.com/marp-team/marp-cli/pull/143))
 
 ### Changed
 

@@ -8,12 +8,14 @@ import bespokeHash from './hash'
 import bespokeNavigation from './navigation'
 import bespokeOSC from './osc'
 import bespokeProgress from './progress'
+import bespokeSync from './sync'
 import bespokeTouch from './touch'
+import { readQuery } from './utils'
 
-export default function() {
+export default function(target = document.getElementById('presentation')!) {
   window.addEventListener('load', () => document.body.classList.add('loaded'))
 
-  return bespoke.from(document.getElementById('presentation'), [
+  const deck = bespoke.from(target, [
     bespokeForms(),
     bespokeClasses,
     bespokeInactive(),
@@ -24,5 +26,10 @@ export default function() {
     bespokeTouch(),
     bespokeOSC(),
     bespokeFragments,
+    bespokeSync({ key: readQuery('sync') || undefined }),
   ])
+
+  window.addEventListener('unload', () => deck.destroy())
+
+  return deck
 }

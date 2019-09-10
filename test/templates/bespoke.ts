@@ -8,7 +8,10 @@ import bespoke from '../../src/templates/bespoke/bespoke'
 jest.mock('screenfull')
 jest.useFakeTimers()
 
-afterEach(() => jest.restoreAllMocks())
+afterEach(() => {
+  window.dispatchEvent(new Event('unload'))
+  jest.restoreAllMocks()
+})
 
 describe("Bespoke template's browser context", () => {
   const marp = new Marp({
@@ -17,9 +20,28 @@ describe("Bespoke template's browser context", () => {
 
   const defaultMarkdown = '# 1\n\n---\n\n## 2\n\n---\n\n### 3'
 
-  const render = (md = defaultMarkdown): HTMLElement => {
-    document.body.innerHTML = marp.render(md).html
-    return document.getElementById('presentation')!
+  const render = (
+    md = defaultMarkdown,
+    targetDocument = document
+  ): HTMLElement => {
+    targetDocument.body.innerHTML = marp.render(md).html
+    return targetDocument.getElementById('presentation')!
+  }
+
+  const replaceLocation = <T extends void | Promise<void>>(
+    path: string,
+    action: () => T
+  ): T => {
+    const { title } = document
+    const { href } = location
+
+    history.replaceState(null, title, path)
+
+    try {
+      return action()
+    } finally {
+      history.replaceState(null, title, href)
+    }
   }
 
   const keydown = (opts, target = document) =>
@@ -60,6 +82,7 @@ describe("Bespoke template's browser context", () => {
       deck.next()
 
       expect(deck.slide()).toBe(0)
+      expect(deck.fragmentIndex).toBe(1)
       expect(
         parent.querySelectorAll('[data-bespoke-marp-fragment="inactive"]')
       ).toHaveLength(3)
@@ -87,6 +110,7 @@ describe("Bespoke template's browser context", () => {
       deck.prev()
 
       expect(deck.slide()).toBe(0)
+      expect(deck.fragmentIndex).toBe(2)
       expect(
         deck.slides[0].querySelectorAll('[data-bespoke-marp-fragment="active"]')
       ).toHaveLength(2)
@@ -97,6 +121,7 @@ describe("Bespoke template's browser context", () => {
       deck.next()
 
       expect(deck.slide()).toBe(2)
+      expect(deck.fragmentIndex).toBe(0)
       expect(
         deck.slides[2].querySelectorAll(
           '[data-bespoke-marp-fragment="inactive"]'
@@ -107,6 +132,7 @@ describe("Bespoke template's browser context", () => {
     it('deactivates all fragments in slide when slide()', () => {
       deck.slide(2)
 
+      expect(deck.fragmentIndex).toBe(0)
       expect(
         deck.slides[2].querySelectorAll(
           '[data-bespoke-marp-fragment="inactive"]'
@@ -121,15 +147,17 @@ describe("Bespoke template's browser context", () => {
         ...deck.slides[2].querySelectorAll('[data-bespoke-marp-fragment]'),
       ]
 
+      expect(deck.fragmentIndex).toBe(1)
       expect(fragments.map(f => f.dataset.bespokeMarpFragment)).toStrictEqual([
         'active',
         'inactive',
       ])
     })
 
-    it('deactivates all fragments in slide when navigating by slide() with fragment option as -1', () => {
+    it('activates all fragments in slide when navigating by slide() with fragment option as -1', () => {
       deck.slide(2, { fragment: -1 })
 
+      expect(deck.fragmentIndex).toBe(2)
       expect(
         deck.slides[2].querySelectorAll('[data-bespoke-marp-fragment="active"]')
       ).toHaveLength(2)
@@ -515,6 +543,112 @@ describe("Bespoke template's browser context", () => {
 
       deck.slide(2)
       expect(progressBar.style.flexBasis).toBe('100%')
+    })
+  })
+
+  describe('Sync', () => {
+    const markdown = '# 1\n\n---\n\n# 2\n\n* A\n* B\n* C\n\n---\n\n# 3'
+
+    const storeKey = (key: string) => `bespoke-marp-sync-${key}`
+    const getStore = (key: string) => {
+      const item = localStorage.getItem(storeKey(key))
+      return item ? JSON.parse(item) : null
+    }
+
+    beforeEach(() => render(markdown))
+
+    it('defines auto-generated deck.syncKey', () => {
+      const deck = bespoke()
+      expect(typeof deck.syncKey).toBe('string')
+    })
+
+    it('uses sync query param if defined', () => {
+      replaceLocation('/?sync=test', () => {
+        const deck = bespoke()
+        expect(deck.syncKey).toBe('test')
+      })
+    })
+
+    it('updates reference count stored in localStorage', () => {
+      replaceLocation('/?sync=test', () => {
+        const deck = bespoke()
+        expect(getStore('test').reference).toBe(1)
+
+        const anotherDeck = bespoke(document.createElement('div'))
+        expect(getStore('test').reference).toBe(2)
+
+        anotherDeck.destroy()
+        expect(getStore('test').reference).toBe(1)
+
+        deck.destroy()
+        expect(getStore('test')).toBeNull()
+      })
+    })
+
+    it('stores the state of slide progress by navigation', () => {
+      replaceLocation('/?sync=test', () => {
+        const deck = bespoke()
+        jest.runAllTimers()
+
+        deck.next()
+        expect(getStore('test')).toMatchObject({ index: 1, fragmentIndex: 0 })
+
+        deck.next()
+        expect(getStore('test')).toMatchObject({ index: 1, fragmentIndex: 1 })
+
+        deck.next()
+        expect(getStore('test')).toMatchObject({ index: 1, fragmentIndex: 2 })
+
+        deck.next()
+        expect(getStore('test')).toMatchObject({ index: 1, fragmentIndex: 3 })
+
+        deck.next()
+        expect(getStore('test')).toMatchObject({ index: 2, fragmentIndex: 0 })
+
+        deck.slide(0)
+        expect(getStore('test')).toMatchObject({ index: 0, fragmentIndex: 0 })
+
+        deck.slide(1, { fragment: 2 })
+        expect(getStore('test')).toMatchObject({ index: 1, fragmentIndex: 2 })
+      })
+    })
+
+    it('syncs state by storage event', async () => {
+      const foreignFrame = document.createElement('iframe')
+      document.body.appendChild(foreignFrame)
+
+      const updateStore = (key: string, data: Record<string, any>) =>
+        new Promise((resolve, reject) => {
+          try {
+            window.addEventListener('storage', resolve, { once: true })
+
+            foreignFrame.contentWindow!.localStorage.setItem(
+              storeKey(key),
+              JSON.stringify({ ...getStore(key), ...data })
+            )
+          } catch (e) {
+            reject(e)
+          }
+        })
+
+      await replaceLocation('/?sync=test', async () => {
+        const deck = bespoke()
+        expect(deck.slide()).toBe(0)
+        expect(deck.fragmentIndex).toBe(0)
+
+        await updateStore('test', { index: 1, fragmentIndex: 0 })
+        expect(deck.slide()).toBe(1)
+        expect(deck.fragmentIndex).toBe(0)
+
+        await updateStore('test', { index: 1, fragmentIndex: 3 })
+        expect(deck.slide()).toBe(1)
+        expect(deck.fragmentIndex).toBe(3)
+
+        // Not sync with storage if indexes have not changed
+        deck.next()
+        await updateStore('test', { reference: 2 })
+        expect(deck.slide()).toBe(2)
+      })
     })
   })
 
