@@ -95,7 +95,7 @@ commands:
           name: Jest
           command: yarn test:coverage --ci -i --reporters=default --reporters=jest-junit
           environment:
-            JEST_JUNIT_OUTPUT: tmp/test-results/jest.xml
+            JEST_JUNIT_OUTPUT_DIR: tmp/test-results
 
       - run: yarn codecov
 
