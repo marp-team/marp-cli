@@ -1,5 +1,5 @@
 module.exports = {
-  get enabled() {
+  get isEnabled() {
     return true
   },
   onchange: jest.fn(),
