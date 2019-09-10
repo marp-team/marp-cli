@@ -30,6 +30,10 @@ jobs:
         run: yarn test:coverage --ci -i --reporters=default --reporters=jest-junit
         env:
           CI: true
+      - uses: actions/upload-artifact@v1
+        with:
+          name: coverage
+          path: coverage
       - name: Codecov
         run: yarn codecov -F windows
         env:

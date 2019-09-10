@@ -45,6 +45,10 @@ jobs:
           yarn standalone:pack
         env:
           MATRIX_OS: ${{ matrix.os }}
+      - uses: actions/upload-artifact@v1
+        with:
+          name: assets
+          path: dist
       - name: Upload created asset to GitHub Release
         uses: marp-team/actions@v1
         with:
