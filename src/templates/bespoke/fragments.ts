@@ -1,22 +1,31 @@
-// Based on https://github.com/bespokejs/bespoke-bullets
+export interface FragmentEvent {
+  slide: any[]
+  index: number
+  fragments: any[]
+  fragmentIndex: number
+}
 
+// Based on https://github.com/bespokejs/bespoke-bullets
 export default function bespokeFragments(deck) {
   let activeSlideIdx = 0
   let activeFragmentIdx = 0
 
-  const fragments = deck.slides.map(slide => [
-    null,
-    ...slide.querySelectorAll('[data-marpit-fragment]'),
-  ])
+  Object.defineProperty(deck, 'fragments', {
+    enumerable: true,
+    value: deck.slides.map(slide => [
+      null,
+      ...slide.querySelectorAll('[data-marpit-fragment]'),
+    ]),
+  })
 
   const activeSlideHasFragmentByOffset = (offset: number) =>
-    fragments[activeSlideIdx][activeFragmentIdx + offset] !== undefined
+    deck.fragments[activeSlideIdx][activeFragmentIdx + offset] !== undefined
 
   const activate = (slideIdx: number, fragmentIdx: number) => {
     activeSlideIdx = slideIdx
     activeFragmentIdx = fragmentIdx
 
-    fragments.forEach(
+    deck.fragments.forEach(
       (slideFragments: (HTMLElement | null)[], slideCurrentIdx: number) => {
         slideFragments.forEach((fragment, fragmentCurrentIdx) => {
           if (fragment == null) return
@@ -45,12 +54,16 @@ export default function bespokeFragments(deck) {
       }
     )
 
-    deck.fire('fragment', {
+    deck.fragmentIndex = fragmentIdx
+
+    const fragmentEvent: FragmentEvent = {
       slide: deck.slides[slideIdx],
       index: slideIdx,
-      fragments: fragments[slideIdx],
+      fragments: deck.fragments[slideIdx],
       fragmentIndex: fragmentIdx,
-    })
+    }
+
+    deck.fire('fragment', fragmentEvent)
   }
 
   deck.on('next', () => {
@@ -60,7 +73,7 @@ export default function bespokeFragments(deck) {
     }
 
     const nextIdx = activeSlideIdx + 1
-    if (fragments[nextIdx]) activate(nextIdx, 0)
+    if (deck.fragments[nextIdx]) activate(nextIdx, 0)
   })
 
   deck.on('prev', () => {
@@ -70,14 +83,16 @@ export default function bespokeFragments(deck) {
     }
 
     const prevIdx = activeSlideIdx - 1
-    if (fragments[prevIdx]) activate(prevIdx, fragments[prevIdx].length - 1)
+
+    if (deck.fragments[prevIdx])
+      activate(prevIdx, deck.fragments[prevIdx].length - 1)
   })
 
   deck.on('slide', ({ index, fragment }) => {
     let fragmentPos = 0
 
     if (fragment !== undefined) {
-      const slideFragments = fragments[index]
+      const slideFragments = deck.fragments[index]
 
       if (slideFragments) {
         const { length } = slideFragments
