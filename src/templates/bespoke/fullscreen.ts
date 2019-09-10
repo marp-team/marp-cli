@@ -1,4 +1,4 @@
-import screenfull = require('screenfull')
+import { default as screenfull } from 'screenfull'
 
 export default function bespokeFullscreen(deck) {
   deck.fullscreen = () => {
