@@ -1,10 +1,9 @@
 /** @jest-environment jsdom */
 import Marp from '@marp-team/marp-core'
 import { Element as MarpitElement } from '@marp-team/marpit'
+import { default as screenfull, Screenfull } from 'screenfull'
 import { Key } from 'ts-keycode-enum'
 import bespoke from '../../src/templates/bespoke/bespoke'
-
-import screenfull = require('screenfull')
 
 jest.mock('screenfull')
 jest.useFakeTimers()
@@ -206,17 +205,17 @@ describe("Bespoke template's browser context", () => {
 
     it('injects deck.fullscreen() to toggle fullscreen', async () => {
       await deck.fullscreen()
-      expect((screenfull as screenfull.Screenfull).toggle).toBeCalled()
+      expect((screenfull as Screenfull).toggle).toBeCalled()
     })
 
     it('toggles fullscreen by hitting f key', () => {
       keydown({ which: Key.F })
-      expect((screenfull as screenfull.Screenfull).toggle).toBeCalled()
+      expect((screenfull as Screenfull).toggle).toBeCalled()
     })
 
     it('toggles fullscreen by hitting F11 key', () => {
       keydown({ which: Key.F11 })
-      expect((screenfull as screenfull.Screenfull).toggle).toBeCalled()
+      expect((screenfull as Screenfull).toggle).toBeCalled()
     })
   })
 
@@ -502,7 +501,7 @@ describe("Bespoke template's browser context", () => {
         context('when browser does not support fullscreen', () => {
           it('hides fullscreen button', () => {
             jest
-              .spyOn(screenfull as screenfull.Screenfull, 'isEnabled', 'get')
+              .spyOn(screenfull as Screenfull, 'isEnabled', 'get')
               .mockImplementation(() => false)
 
             bespoke()
