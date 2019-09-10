@@ -63,7 +63,6 @@
     "watch": "rollup -w -c"
   },
   "devDependencies": {
-    "@octokit/rest": "^16.28.7",
     "@types/cheerio": "^0.22.13",
     "@types/cosmiconfig": "^5.0.3",
     "@types/express": "^4.17.1",
