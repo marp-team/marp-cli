@@ -15,6 +15,7 @@
 
 - Migrate CI for Windows into GitHub Actions ([#132](https://github.com/marp-team/marp-cli/issues/132), [#140](https://github.com/marp-team/marp-cli/pull/140), [#146](https://github.com/marp-team/marp-cli/pull/146))
 - Update CircleCI configuration to use v2.1 ([#144](https://github.com/marp-team/marp-cli/pull/144))
+- Upgrade dependent packages to the latest version ([#147](https://github.com/marp-team/marp-cli/pull/147))
 
 ## v0.13.0 - 2019-08-23
 
