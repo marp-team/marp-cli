@@ -219,7 +219,7 @@ describe("Bespoke template's browser context", () => {
     })
   })
 
-  describe('Hash', () => {
+  describe('State', () => {
     it('activates initial page by hash index', () => {
       location.href = 'http://localhost/#2'
 

@@ -1,11 +1,11 @@
 // Based on https://github.com/bespokejs/bespoke-hash
 
-export interface BespokeHashOption {
+export interface BespokeStateOption {
   history?: boolean
 }
 
-export default function bespokeHash(opts: BespokeHashOption = {}) {
-  const options: BespokeHashOption = {
+export default function bespokeState(opts: BespokeStateOption = {}) {
+  const options: BespokeStateOption = {
     history: true,
     ...opts,
   }
