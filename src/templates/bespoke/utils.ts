@@ -1,11 +1,9 @@
 export const generateURLfromParams = (
   params: URLSearchParams,
-  base: Location = location
+  { protocol, host, pathname, hash }: Location = location
 ) => {
-  let query = params.toString()
-  if (query) query = `?${query}`
-
-  return `${base.protocol}//${base.host}${base.pathname}${query}${base.hash}`
+  const q = params.toString()
+  return `${protocol}//${host}${pathname}${q ? '?' : ''}${q}${hash}`
 }
 
 export const readQuery = (name: string) =>
