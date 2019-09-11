@@ -12,7 +12,7 @@ import bespokeSync from './sync'
 import bespokeTouch from './touch'
 import { readQuery } from './utils'
 
-export default function(target = document.getElementById('presentation')!) {
+export default function(target = document.getElementById('p')!) {
   window.addEventListener('load', () => document.body.classList.add('loaded'))
 
   const deck = bespoke.from(target, [
