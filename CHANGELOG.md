@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Hold the progress state of fragments on to URL query parameter ([#149](https://github.com/marp-team/marp-cli/pull/149))
+
 ## v0.13.1 - 2019-09-10
 
 ### Added
