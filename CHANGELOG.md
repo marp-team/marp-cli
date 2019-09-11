@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Precompile v8 cache while building Docker image ([#148](https://github.com/marp-team/marp-cli/pull/148))
+
 ## v0.13.1 - 2019-09-10
 
 ### Added
