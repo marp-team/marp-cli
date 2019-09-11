@@ -32,7 +32,10 @@ export default function bespokeState(opts: BespokeStateOption = {}) {
     const activateSlide = (index: number, fragment: number | null) => {
       const { fragments, slides } = deck
       const idx = Math.max(0, Math.min(index, slides.length - 1))
-      const frag = Math.max(0, Math.min(fragment || 0, fragments.length - 1))
+      const frag = Math.max(
+        0,
+        Math.min(fragment || 0, fragments[idx].length - 1)
+      )
 
       if (idx !== deck.slide() || frag !== deck.fragmentIndex)
         deck.slide(idx, { fragment: frag })

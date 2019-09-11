@@ -11,6 +11,7 @@ jest.useFakeTimers()
 afterEach(() => {
   window.dispatchEvent(new Event('unload'))
   jest.restoreAllMocks()
+  jest.clearAllTimers()
 })
 
 describe("Bespoke template's browser context", () => {
@@ -216,24 +217,6 @@ describe("Bespoke template's browser context", () => {
     it('toggles fullscreen by hitting F11 key', () => {
       keydown({ which: Key.F11 })
       expect((screenfull as Screenfull).toggle).toBeCalled()
-    })
-  })
-
-  describe('State', () => {
-    it('activates initial page by hash index', () => {
-      location.href = 'http://localhost/#2'
-
-      render()
-      const deck = bespoke()
-
-      jest.runAllTimers()
-      expect(deck.slide()).toBe(1)
-
-      // Navigate by anchor
-      location.hash = '#3'
-      window.dispatchEvent(new HashChangeEvent('hashchange'))
-
-      expect(deck.slide()).toBe(2)
     })
   })
 
@@ -543,6 +526,66 @@ describe("Bespoke template's browser context", () => {
 
       deck.slide(2)
       expect(progressBar.style.flexBasis).toBe('100%')
+    })
+  })
+
+  describe('State', () => {
+    it('activates specified page by hash index', () => {
+      history.replaceState(null, document.title, '#2')
+
+      render()
+      const deck = bespoke()
+      jest.runAllTimers()
+
+      expect(deck.slide()).toBe(1)
+
+      // Navigate by anchor
+      history.replaceState(null, document.title, '#3')
+      window.dispatchEvent(new HashChangeEvent('hashchange'))
+
+      expect(deck.slide()).toBe(2)
+    })
+
+    it('activates specified fragment state by "f" query param', () => {
+      history.replaceState(null, document.title, '?f=1')
+
+      render('* a\n* b\n\n---\n\n* a\n* b\n* c')
+      const deck = bespoke()
+      jest.runAllTimers()
+
+      expect(deck.fragmentIndex).toBe(1)
+      expect(
+        deck.slides[0].querySelectorAll('[data-bespoke-marp-fragment="active"]')
+      ).toHaveLength(1)
+      expect(
+        deck.slides[0].querySelectorAll(
+          '[data-bespoke-marp-fragment="inactive"]'
+        )
+      ).toHaveLength(1)
+
+      // In the initial state of fragments, remove query param
+      deck.prev()
+      expect(deck.fragmentIndex).toBe(0)
+      expect(location.search).toBe('')
+
+      deck.next()
+      expect(deck.fragmentIndex).toBe(1)
+      expect(location.search).toBe('?f=1')
+
+      // With hash for page number
+      history.replaceState(null, document.title, '?f=2#2')
+      window.dispatchEvent(new PopStateEvent('popstate'))
+
+      expect(deck.slide()).toBe(1)
+      expect(deck.fragmentIndex).toBe(2)
+      expect(
+        deck.slides[1].querySelectorAll('[data-bespoke-marp-fragment="active"]')
+      ).toHaveLength(2)
+      expect(
+        deck.slides[1].querySelectorAll(
+          '[data-bespoke-marp-fragment="inactive"]'
+        )
+      ).toHaveLength(1)
     })
   })
 
