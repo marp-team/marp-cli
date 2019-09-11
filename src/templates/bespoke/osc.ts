@@ -30,6 +30,15 @@ export default function bespokeOSC(selector: string = '.bespoke-marp-osc') {
           case 'fullscreen':
             if (typeof deck.fullscreen === 'function' && screenfull.isEnabled)
               deck.fullscreen()
+            break
+          case 'presenter':
+            ;(async () => {
+              // In Firefox, the toolbarless window cannot open in fullscreen mode
+              if (screenfull.isEnabled && screenfull.isFullscreen)
+                await screenfull.exit()
+
+              deck.openPresenterView()
+            })()
         }
       }
     })

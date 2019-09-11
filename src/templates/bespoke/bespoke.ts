@@ -7,6 +7,7 @@ import bespokeFullscreen from './fullscreen'
 import bespokeHash from './hash'
 import bespokeNavigation from './navigation'
 import bespokeOSC from './osc'
+import bespokePresenter from './presenter'
 import bespokeProgress from './progress'
 import bespokeSync from './sync'
 import bespokeTouch from './touch'
@@ -27,6 +28,7 @@ export default function(target = document.getElementById('presentation')!) {
     bespokeOSC(),
     bespokeFragments,
     bespokeSync({ key: readQuery('sync') || undefined }),
+    bespokePresenter(),
   ])
 
   window.addEventListener('unload', () => deck.destroy())
