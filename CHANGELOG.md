@@ -9,6 +9,7 @@
 ### Changed
 
 - Hold the progress state of fragments on to URL query parameter ([#149](https://github.com/marp-team/marp-cli/pull/149))
+- Reduce HTML file size of bespoke template by shortened container tag name and id ([#150](https://github.com/marp-team/marp-cli/pull/150))
 
 ## v0.13.1 - 2019-09-10
 

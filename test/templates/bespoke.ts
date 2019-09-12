@@ -16,7 +16,7 @@ afterEach(() => {
 
 describe("Bespoke template's browser context", () => {
   const marp = new Marp({
-    container: new MarpitElement('div', { id: 'presentation' }),
+    container: new MarpitElement('div', { id: 'p' }),
   })
 
   const defaultMarkdown = '# 1\n\n---\n\n## 2\n\n---\n\n### 3'
@@ -26,7 +26,7 @@ describe("Bespoke template's browser context", () => {
     targetDocument = document
   ): HTMLElement => {
     targetDocument.body.innerHTML = marp.render(md).html
-    return targetDocument.getElementById('presentation')!
+    return targetDocument.getElementById('p')!
   }
 
   const replaceLocation = <T extends void | Promise<void>>(
@@ -49,7 +49,7 @@ describe("Bespoke template's browser context", () => {
     target.dispatchEvent(new KeyboardEvent('keydown', opts))
 
   describe('Classes', () => {
-    it('adds bespoke classes to #presentation', () => {
+    it('adds bespoke classes to #p', () => {
       const parent = render()
       const deck = bespoke()
       expect(parent.classList.contains('bespoke-marp-parent')).toBe(true)
