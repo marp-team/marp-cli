@@ -443,16 +443,20 @@ The advanced options that cannot specify through CLI options can be configured b
 
 #### Base options for engine constructor
 
-`options` can specify the base options for the constructor of the used engine. You can fine-tune constructor options for [Marp Core](https://github.com/marp-team/marp-core#constructor-options) / [Marpit](https://marpit-api.marp.app/marpit).
+`options` can set the base options for the constructor of the used engine. You can fine-tune constructor options for [Marp Core](https://github.com/marp-team/marp-core#constructor-options) / [Marpit](https://marpit-api.marp.app/marpit).
 
-For example, this configuration disables Marp Core's line breaks conversion (`\n` to `<br />`) to match for CommonMark, by passing [markdown-it's `breaks` option](https://markdown-it.github.io/markdown-it/#MarkdownIt.new) as `false`.
+For example, the below configuration will set constructor option for Marp Core as specified:
+
+- Disables [Marp Core's line breaks conversion](https://github.com/marp-team/marp-core#marp-markdown) (`\n` to `<br />`) to match for CommonMark, by passing [markdown-it's `breaks` option](https://markdown-it.github.io/markdown-it/#MarkdownIt.new) as `false`.
+- Disable minification for rendered theme CSS to make debug your style easily, by passing [`minifyCSS`](https://github.com/marp-team/marp-core#minifycss-boolean) as `false`.
 
 ```json
 {
   "options": {
     "markdown": {
       "breaks": false
-    }
+    },
+    "minifyCSS": false
   }
 }
 ```

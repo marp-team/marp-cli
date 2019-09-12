@@ -13,7 +13,7 @@ jobs:
       matrix:
         node-version:
           - 8.x
-          - '10.16.0'
+          - '10.16.3'
           - 12.x
 
     steps:
