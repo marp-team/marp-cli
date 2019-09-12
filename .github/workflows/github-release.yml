@@ -32,7 +32,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v1
         with:
-          node-version: '10.16.0'
+          node-version: '10.16.3'
       - name: Install with yarn
         run: npm install -g yarn && yarn install
       - name: Build and create standalone binaries
