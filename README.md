@@ -88,7 +88,7 @@ Do you never want to install any dependent tools? we also provide executable bin
 
 **[:fast_forward: Download the latest standalone binary for your OS from release page.](https://github.com/marp-team/marp-cli/releases)**
 
-## Basic usage
+## Basic usage(Standalone)
 
 ### Convert to HTML
 
