@@ -6,6 +6,11 @@
 
 - Vanished auto-fitting elements when exporting to PDF, PPTX, and images ([#153](https://github.com/marp-team/marp-cli/issues/153), [#154](https://github.com/marp-team/marp-cli/pull/154))
 
+### Changed
+
+- Upgrade to [Marp Core v0.13.1](https://github.com/marp-team/marp-core/releases/tag/v0.13.1) ([#155](https://github.com/marp-team/marp-cli/pull/155))
+- Upgrade dependent packages to the latest version ([#155](https://github.com/marp-team/marp-cli/pull/155))
+
 ## v0.14.0 - 2019-09-12
 
 ### Fixed
