@@ -265,6 +265,19 @@ describe("Bespoke template's browser context", () => {
     })
   })
 
+  describe('Load', () => {
+    it('adds data attribute to each slides after loaded', () => {
+      render('# Regular\n\n---\n\n```\nnot-hideable\n```')
+      const deck = bespoke()
+
+      window.dispatchEvent(new Event('load'))
+
+      const [first, second] = deck.slides
+      expect(first.getAttribute('data-bespoke-marp-load')).toBe('hideable')
+      expect(second.getAttribute('data-bespoke-marp-load')).toBe('')
+    })
+  })
+
   describe('Navigation', () => {
     let parent: HTMLElement
     let deck

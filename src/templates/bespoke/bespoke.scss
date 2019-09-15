@@ -145,12 +145,10 @@ $progressHeight: 5px;
       z-index: 0;
     }
 
-    @at-root {
-      body.loaded & {
-        display: none;
-      }
+    &[data-bespoke-marp-load='hideable'] {
+      display: none;
 
-      body.loaded &.bespoke-marp-active {
+      &.bespoke-marp-active {
         display: block;
       }
     }

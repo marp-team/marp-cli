@@ -2,6 +2,7 @@ import bespoke from 'bespoke'
 import bespokeForms from 'bespoke-forms'
 import bespokeClasses from './classes'
 import bespokeInactive from './inactive'
+import bespokeLoad from './load'
 import bespokeFragments from './fragments'
 import bespokeFullscreen from './fullscreen'
 import bespokeNavigation from './navigation'
@@ -13,12 +14,11 @@ import bespokeTouch from './touch'
 import { readQuery } from './utils'
 
 export default function(target = document.getElementById('p')!) {
-  window.addEventListener('load', () => document.body.classList.add('loaded'))
-
   const deck = bespoke.from(target, [
     bespokeForms(),
     bespokeClasses,
     bespokeInactive(),
+    bespokeLoad,
     bespokeState({ history: false }),
     bespokeNavigation(),
     bespokeFullscreen,
@@ -30,6 +30,5 @@ export default function(target = document.getElementById('p')!) {
   ])
 
   window.addEventListener('unload', () => deck.destroy())
-
   return deck
 }
