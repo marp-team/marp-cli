@@ -1,11 +1,8 @@
 import { default as screenfull } from 'screenfull'
-import { isCurrentView, ViewMode } from './view'
 
 export default function bespokeOSC(selector: string = '.bespoke-marp-osc') {
   const osc = document.querySelector(selector)
   if (!osc) return () => {}
-
-  if (!isCurrentView(ViewMode.Normal)) return () => {}
 
   const oscElements = <T extends HTMLElement = HTMLElement>(
     type: string,

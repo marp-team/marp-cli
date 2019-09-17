@@ -7,31 +7,38 @@ import bespokeFragments from './fragments'
 import bespokeFullscreen from './fullscreen'
 import bespokeNavigation from './navigation'
 import bespokeOSC from './osc'
-import bespokePresenter from './presenter'
+import bespokePresenter, { bespokePresenterPreprocess } from './presenter'
 import bespokeProgress from './progress'
 import bespokeState from './state'
 import bespokeSync from './sync'
 import bespokeTouch from './touch'
-import bespokeView from './view'
-import { readQuery } from './utils'
+import { isCurrentView, readQuery, setViewMode, ViewMode } from './utils'
 
 export default function(target = document.getElementById('p')!) {
-  const deck = bespoke.from(target, [
-    bespokeView(),
-    bespokeSync({ key: readQuery('sync') || undefined }),
-    bespokePresenter(),
-    bespokeForms(),
-    bespokeClasses,
-    bespokeInactive(),
-    bespokeLoad,
-    bespokeState({ history: false }),
-    bespokeNavigation(),
-    bespokeFullscreen,
-    bespokeProgress,
-    bespokeTouch(),
-    bespokeOSC(),
-    bespokeFragments,
-  ])
+  setViewMode()
+  bespokePresenterPreprocess(target)
+
+  const normalView = isCurrentView(ViewMode.Normal)
+  const regularView = isCurrentView(ViewMode.Normal, ViewMode.Presenter)
+
+  const deck = bespoke.from(
+    target,
+    [
+      regularView && bespokeSync({ key: readQuery('sync') || undefined }),
+      bespokePresenter(),
+      bespokeForms(),
+      bespokeClasses,
+      normalView && bespokeInactive(),
+      bespokeLoad,
+      bespokeState({ history: false }),
+      regularView && bespokeNavigation(),
+      regularView && bespokeFullscreen,
+      normalView && bespokeProgress,
+      regularView && bespokeTouch(),
+      normalView && bespokeOSC(),
+      bespokeFragments,
+    ].filter(p => p)
+  )
 
   window.addEventListener('unload', () => deck.destroy())
   return deck

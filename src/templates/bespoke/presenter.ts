@@ -1,34 +1,80 @@
-import { generateURLfromParams } from './utils'
-import { isCurrentView, ViewMode } from './view'
+import { generateURLfromParams, isCurrentView, ViewMode } from './utils'
 
 type BespokeForPresenter = { syncKey: string; [key: string]: any }
 
 const validateDeck = (deck: any): deck is BespokeForPresenter =>
   deck.syncKey && typeof deck.syncKey === 'string'
 
+export const bespokePresenterPreprocess = (target: HTMLElement) => {
+  if (isCurrentView(ViewMode.Next)) {
+    // Add blank slide
+    const span = document.createElement('span')
+    target.appendChild(span)
+  }
+}
+
 export default function bespokePresenter() {
   return deck => {
-    if (!validateDeck(deck))
-      throw new Error(
-        'The current instance of Bespoke.js is invalid for Marp bespoke presenter plugin.'
-      )
-
-    Object.defineProperties(deck, {
-      openPresenterView: { enumerable: true, value: openPresenterView },
-      presenterUrl: { enumerable: true, get: presenterUrl },
-    })
-
-    if (isCurrentView(ViewMode.Presenter)) {
-      const { title } = document
-      document.title = `[Presenter view]${title ? ` - ${title}` : ''}`
-
-      const next = document.createElement('iframe')
-      next.className = 'bespoke-marp-presenter-next'
-      next.src = nextUrl()
-
-      deck.parent.appendChild(next)
-    }
+    if (isCurrentView(ViewMode.Normal)) forNormalView(deck)
+    if (isCurrentView(ViewMode.Presenter)) forPresenterView(deck)
+    if (isCurrentView(ViewMode.Next)) forNextView(deck)
   }
+}
+
+function forNormalView(deck) {
+  if (!validateDeck(deck))
+    throw new Error(
+      'The current instance of Bespoke.js is invalid for Marp bespoke presenter plugin.'
+    )
+
+  Object.defineProperties(deck, {
+    openPresenterView: { enumerable: true, value: openPresenterView },
+    presenterUrl: { enumerable: true, get: presenterUrl },
+  })
+}
+
+function forPresenterView(deck) {
+  // Update title
+  const { title } = document
+  document.title = `[Presenter view]${title ? ` - ${title}` : ''}`
+
+  // Next slide view
+  const next = document.createElement('iframe')
+
+  next.addEventListener('load', () => {
+    const navigate = (idx: number, fragIdx: number) => {
+      const origin = window.origin === 'null' ? '*' : window.origin
+      next.contentWindow!.postMessage(`navigate:${idx},${fragIdx}`, origin)
+    }
+
+    navigate(deck.slide(), deck.fragmentIndex)
+
+    deck.on('fragment', ({ index, fragmentIndex }) =>
+      navigate(index, fragmentIndex)
+    )
+  })
+
+  next.className = 'bespoke-marp-presenter-next'
+  next.src = '?view=next'
+
+  deck.parent.appendChild(next)
+}
+
+function forNextView(deck) {
+  window.addEventListener('message', e => {
+    if (e.origin !== window.origin) return
+
+    const [dir, args] = e.data.split(':')
+
+    if (dir === 'navigate') {
+      const [idx, fragIdx] = args.split(',')
+
+      deck.slide(Number.parseInt(idx, 10), {
+        fragment: Number.parseInt(fragIdx, 10),
+      })
+      deck.next()
+    }
+  })
 }
 
 function openPresenterView(this: BespokeForPresenter) {
@@ -47,15 +93,6 @@ function presenterUrl(this: BespokeForPresenter) {
 
   params.set('view', 'presenter')
   params.set('sync', this.syncKey)
-
-  return generateURLfromParams(params)
-}
-
-function nextUrl() {
-  const params = new URLSearchParams(location.search)
-
-  params.set('view', 'next')
-  params.set('sync', '')
 
   return generateURLfromParams(params)
 }

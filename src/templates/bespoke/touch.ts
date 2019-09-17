@@ -1,5 +1,3 @@
-import { isCurrentView, ViewMode } from './view'
-
 export interface BespokeTouchOption {
   slope?: number
   swipeThreshold?: number
@@ -18,8 +16,6 @@ export default function bespokeTouch(opts: BespokeTouchOption = {}) {
     swipeThreshold: 30,
     ...opts,
   }
-
-  if (isCurrentView(ViewMode.Next)) return () => {}
 
   return deck => {
     let touchStart: TouchPoint | undefined

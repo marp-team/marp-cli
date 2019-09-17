@@ -3,9 +3,12 @@ $progressHeight: 5px;
 @media screen {
   html,
   body {
-    background: #000;
     height: 100%;
     margin: 0;
+  }
+
+  body {
+    background: #000;
     overflow: hidden;
   }
 
@@ -181,7 +184,7 @@ $progressHeight: 5px;
 
   // Next view (for presenter)
   body[data-bespoke-view='next'] {
-    background: #111;
+    background: transparent;
 
     .bespoke-marp-osc,
     .bespoke-progress-parent {
@@ -191,6 +194,14 @@ $progressHeight: 5px;
 
     .bespoke-marp-parent {
       top: 0;
+    }
+
+    svg.bespoke-marp-slide {
+      opacity: 0;
+
+      &.bespoke-marp-active {
+        opacity: 1;
+      }
     }
   }
 
@@ -231,6 +242,7 @@ $progressHeight: 5px;
       }
 
       .bespoke-marp-presenter-next {
+        background: transparent;
         border: 0;
         box-sizing: border-box;
         display: block;

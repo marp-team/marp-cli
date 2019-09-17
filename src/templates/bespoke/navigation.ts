@@ -1,5 +1,3 @@
-import { isCurrentView, ViewMode } from './view'
-
 export interface BespokeNavigationOption {
   interval?: number
 }
@@ -14,8 +12,6 @@ export default function bespokeNavigation(opts: BespokeNavigationOption = {}) {
     interval: 200,
     ...opts,
   }
-
-  if (isCurrentView(ViewMode.Next)) return () => {}
 
   return deck => {
     document.addEventListener('keydown', e => {

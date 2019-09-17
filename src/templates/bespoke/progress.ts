@@ -1,5 +1,3 @@
-import { isCurrentView, ViewMode } from './view'
-
 // Based on https://github.com/bespokejs/bespoke-progress
 
 // TODO: Revert to the detailed scope after upgrade JSDOM
@@ -7,8 +5,6 @@ import { isCurrentView, ViewMode } from './view'
 const query = '.bespoke-progress-bar'
 
 export default function basepokeProgress(deck) {
-  if (!isCurrentView(ViewMode.Normal)) return
-
   deck.on('activate', e => {
     document.querySelectorAll<HTMLElement>(query).forEach(bar => {
       bar.style.flexBasis = `${(e.index * 100) / (deck.slides.length - 1)}%`
