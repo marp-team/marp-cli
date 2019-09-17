@@ -1,43 +1,13 @@
-import { generateURLfromParams, readQuery } from './utils'
+import { generateURLfromParams } from './utils'
+import { isCurrentView, ViewMode } from './view'
 
 type BespokeForPresenter = { syncKey: string; [key: string]: any }
-
-enum BespokeMarpView {
-  Normal = '',
-  Presenter = 'presenter',
-  Next = 'next',
-}
 
 const validateDeck = (deck: any): deck is BespokeForPresenter =>
   deck.syncKey && typeof deck.syncKey === 'string'
 
 export default function bespokePresenter() {
   return deck => {
-    let next: HTMLIFrameElement | undefined
-
-    document.body.setAttribute(
-      'data-marp-view',
-      ((): BespokeMarpView => {
-        switch (readQuery('presenter')) {
-          case 'next':
-            return BespokeMarpView.Next
-          case '':
-            const { title } = document
-            document.title = `[Presenter view]${title ? ` - ${title}` : ''}`
-
-            next = document.createElement('iframe')
-            next.className = 'bespoke-marp-presenter-next'
-            next.src = nextUrl()
-
-            deck.parent.appendChild(next)
-
-            return BespokeMarpView.Presenter
-          default:
-            return BespokeMarpView.Normal
-        }
-      })()
-    )
-
     if (!validateDeck(deck))
       throw new Error(
         'The current instance of Bespoke.js is invalid for Marp bespoke presenter plugin.'
@@ -47,6 +17,17 @@ export default function bespokePresenter() {
       openPresenterView: { enumerable: true, value: openPresenterView },
       presenterUrl: { enumerable: true, get: presenterUrl },
     })
+
+    if (isCurrentView(ViewMode.Presenter)) {
+      const { title } = document
+      document.title = `[Presenter view]${title ? ` - ${title}` : ''}`
+
+      const next = document.createElement('iframe')
+      next.className = 'bespoke-marp-presenter-next'
+      next.src = nextUrl()
+
+      deck.parent.appendChild(next)
+    }
   }
 }
 
@@ -64,7 +45,7 @@ function openPresenterView(this: BespokeForPresenter) {
 function presenterUrl(this: BespokeForPresenter) {
   const params = new URLSearchParams(location.search)
 
-  params.set('presenter', '')
+  params.set('view', 'presenter')
   params.set('sync', this.syncKey)
 
   return generateURLfromParams(params)
@@ -73,7 +54,7 @@ function presenterUrl(this: BespokeForPresenter) {
 function nextUrl() {
   const params = new URLSearchParams(location.search)
 
-  params.set('presenter', 'next')
+  params.set('view', 'next')
   params.set('sync', '')
 
   return generateURLfromParams(params)

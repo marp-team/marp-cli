@@ -1,4 +1,8 @@
+import { isCurrentView, ViewMode } from './view'
+
 export default function bespokeInactive(timeout = 2000) {
+  if (!isCurrentView(ViewMode.Normal)) return () => {}
+
   return deck => {
     let activeTimer
 

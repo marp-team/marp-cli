@@ -12,10 +12,12 @@ import bespokeProgress from './progress'
 import bespokeState from './state'
 import bespokeSync from './sync'
 import bespokeTouch from './touch'
+import bespokeView from './view'
 import { readQuery } from './utils'
 
 export default function(target = document.getElementById('p')!) {
   const deck = bespoke.from(target, [
+    bespokeView(),
     bespokeSync({ key: readQuery('sync') || undefined }),
     bespokePresenter(),
     bespokeForms(),
