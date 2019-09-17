@@ -9,135 +9,13 @@ $progressHeight: 5px;
     overflow: hidden;
   }
 
+  // Visibility control for slides
   [data-bespoke-marp-fragment='inactive'] {
     visibility: hidden;
   }
 
-  .bespoke-marp-osc {
-    display: none;
-    opacity: 0;
-  }
-
-  .bespoke-marp-parent {
-    bottom: 0;
-    left: 0;
-    position: absolute;
-    right: 0;
-    top: 0;
-
-    > .bespoke-marp-osc {
-      background: rgba(#000, 0.65);
-      border-radius: 7px;
-      bottom: 50px;
-      color: #fff;
-      display: block;
-      font-family: Helvetica, Arial, sans-serif;
-      font-size: 16px;
-      left: 50%;
-      line-height: 0;
-      opacity: 1;
-      padding: 12px;
-      position: absolute;
-      touch-action: manipulation;
-      transform: translateX(-50%);
-      transition: opacity 0.2s linear;
-      user-select: none;
-      white-space: nowrap;
-      z-index: 1;
-
-      > * {
-        margin-left: 6px;
-
-        &:first-child {
-          margin-left: 0;
-        }
-      }
-
-      > span {
-        opacity: 0.8;
-
-        &[data-bespoke-marp-osc='page'] {
-          display: inline-block;
-          min-width: 140px;
-          text-align: center;
-        }
-      }
-
-      > button {
-        appearance: none;
-        background-color: transparent;
-        border: 0;
-        color: inherit;
-        cursor: pointer;
-        font-size: inherit;
-        opacity: 0.8;
-        outline: none;
-        padding: 0;
-        transition: opacity 0.2s linear;
-        -webkit-tap-highlight-color: transparent;
-
-        &:disabled {
-          cursor: not-allowed;
-          opacity: 0.15 !important;
-        }
-
-        &:hover {
-          opacity: 1;
-
-          &:active {
-            opacity: 0.6;
-          }
-
-          &:not(:disabled) {
-            transition: none;
-          }
-        }
-
-        @mixin icon-button($icon, $size: 32px) {
-          background: transparent url($icon) no-repeat center center;
-          background-size: contain;
-          height: $size;
-          overflow: hidden;
-          text-indent: 100%;
-          white-space: nowrap;
-          width: $size;
-        }
-
-        &[data-bespoke-marp-osc='prev'] {
-          @include icon-button('../../assets/osc-prev.svg');
-        }
-
-        &[data-bespoke-marp-osc='next'] {
-          @include icon-button('../../assets/osc-next.svg');
-        }
-
-        &[data-bespoke-marp-osc='fullscreen'] {
-          @include icon-button('../../assets/osc-fullscreen.svg');
-
-          &.exit {
-            background-image: url('../../assets//osc-fullscreen-exit.svg');
-          }
-        }
-      }
-    }
-
-    &.bespoke-marp-inactive {
-      cursor: none;
-
-      > .bespoke-marp-osc {
-        opacity: 0;
-        pointer-events: none;
-      }
-    }
-  }
-
   svg.bespoke-marp-slide {
-    height: 100%;
-    left: 0;
     pointer-events: none;
-    position: absolute;
-    top: 0;
-    width: 100%;
     z-index: -1;
 
     &.bespoke-marp-active {
@@ -154,20 +32,187 @@ $progressHeight: 5px;
     }
   }
 
-  .bespoke-progress-parent {
-    background: #222;
-    display: flex;
-    height: $progressHeight;
-    width: 100%;
-
-    & + .bespoke-marp-parent {
-      top: $progressHeight;
+  // Normal view
+  body[data-marp-view=''] {
+    .bespoke-marp-osc {
+      display: none;
+      opacity: 0;
     }
 
-    .bespoke-progress-bar {
-      flex: 0 0 0;
-      background: #0288d1;
-      transition: flex-basis 0.2s cubic-bezier(0, 1, 1, 1);
+    .bespoke-marp-parent {
+      bottom: 0;
+      left: 0;
+      position: absolute;
+      right: 0;
+      top: 0;
+
+      > .bespoke-marp-osc {
+        background: rgba(#000, 0.65);
+        border-radius: 7px;
+        bottom: 50px;
+        color: #fff;
+        display: block;
+        font-family: Helvetica, Arial, sans-serif;
+        font-size: 16px;
+        left: 50%;
+        line-height: 0;
+        opacity: 1;
+        padding: 12px;
+        position: absolute;
+        touch-action: manipulation;
+        transform: translateX(-50%);
+        transition: opacity 0.2s linear;
+        user-select: none;
+        white-space: nowrap;
+        z-index: 1;
+
+        > * {
+          margin-left: 6px;
+
+          &:first-child {
+            margin-left: 0;
+          }
+        }
+
+        > span {
+          opacity: 0.8;
+
+          &[data-bespoke-marp-osc='page'] {
+            display: inline-block;
+            min-width: 140px;
+            text-align: center;
+          }
+        }
+
+        > button {
+          appearance: none;
+          background-color: transparent;
+          border: 0;
+          color: inherit;
+          cursor: pointer;
+          font-size: inherit;
+          opacity: 0.8;
+          outline: none;
+          padding: 0;
+          transition: opacity 0.2s linear;
+          -webkit-tap-highlight-color: transparent;
+
+          &:disabled {
+            cursor: not-allowed;
+            opacity: 0.15 !important;
+          }
+
+          &:hover {
+            opacity: 1;
+
+            &:active {
+              opacity: 0.6;
+            }
+
+            &:not(:disabled) {
+              transition: none;
+            }
+          }
+
+          @mixin icon-button($icon, $size: 32px) {
+            background: transparent url($icon) no-repeat center center;
+            background-size: contain;
+            height: $size;
+            overflow: hidden;
+            text-indent: 100%;
+            white-space: nowrap;
+            width: $size;
+          }
+
+          &[data-bespoke-marp-osc='prev'] {
+            @include icon-button('../../assets/osc-prev.svg');
+          }
+
+          &[data-bespoke-marp-osc='next'] {
+            @include icon-button('../../assets/osc-next.svg');
+          }
+
+          &[data-bespoke-marp-osc='fullscreen'] {
+            @include icon-button('../../assets/osc-fullscreen.svg');
+
+            &.exit {
+              background-image: url('../../assets//osc-fullscreen-exit.svg');
+            }
+          }
+        }
+      }
+
+      &.bespoke-marp-inactive {
+        cursor: none;
+
+        > .bespoke-marp-osc {
+          opacity: 0;
+          pointer-events: none;
+        }
+      }
+    }
+
+    svg.bespoke-marp-slide {
+      height: 100%;
+      left: 0;
+      position: absolute;
+      top: 0;
+      width: 100%;
+    }
+
+    .bespoke-progress-parent {
+      background: #222;
+      display: flex;
+      height: $progressHeight;
+      width: 100%;
+
+      & + .bespoke-marp-parent {
+        top: $progressHeight;
+      }
+
+      .bespoke-progress-bar {
+        flex: 0 0 0;
+        background: #0288d1;
+        transition: flex-basis 0.2s cubic-bezier(0, 1, 1, 1);
+      }
+    }
+  }
+
+  // Presenter view
+  body[data-marp-view='presenter'] {
+    background: #111;
+    color: #fff;
+
+    .bespoke-marp-osc,
+    .bespoke-progress-parent {
+      display: none;
+    }
+
+    .bespoke-marp-parent {
+      all: initial;
+      bottom: 0;
+      left: 0;
+      position: absolute;
+      right: 0;
+      top: 0;
+
+      // Grid layout for presenter view
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      grid-template-rows: minmax(140px, 1fr) 2fr 3em;
+      grid-template-areas:
+        'current next'
+        'current note'
+        'info    note';
+
+      svg.bespoke-marp-slide {
+        box-sizing: border-box;
+        display: block;
+        grid-area: current;
+        height: 100%;
+        padding: 20px;
+        width: 100%;
+      }
     }
   }
 }
@@ -177,9 +222,5 @@ $progressHeight: 5px;
   .bespoke-progress-parent {
     display: none !important;
     transition: none !important;
-  }
-
-  .bespoke-marp-parent {
-    top: 0;
   }
 }

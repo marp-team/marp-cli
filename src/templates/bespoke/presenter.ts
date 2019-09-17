@@ -1,11 +1,28 @@
-import { generateURLfromParams } from './utils'
+import { generateURLfromParams, readQuery } from './utils'
 
 type BespokeForPresenter = { syncKey: string; [key: string]: any }
+
+enum BespokeMarpView {
+  Normal = '',
+  Presenter = 'presenter',
+  Next = 'next',
+}
 
 const validateDeck = (deck: any): deck is BespokeForPresenter =>
   deck.syncKey && typeof deck.syncKey === 'string'
 
 export default function bespokePresenter() {
+  let view: BespokeMarpView = BespokeMarpView.Normal
+
+  if (readQuery('presenter') !== null) {
+    view = BespokeMarpView.Presenter
+
+    const { title } = document
+    document.title = `[Presenter view]${title ? ` - ${title}` : ''}`
+  }
+
+  document.body.setAttribute('data-marp-view', view)
+
   return deck => {
     if (!validateDeck(deck))
       throw new Error(
@@ -35,9 +52,6 @@ function presenterUrl(this: BespokeForPresenter) {
 
   params.set('presenter', '')
   params.set('sync', this.syncKey)
-
-  if (this.fragmentIndex)
-    params.set('initialFragment', this.fragmentIndex.toString())
 
   return generateURLfromParams(params)
 }
