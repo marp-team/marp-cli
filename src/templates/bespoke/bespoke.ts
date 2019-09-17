@@ -16,6 +16,8 @@ import { readQuery } from './utils'
 
 export default function(target = document.getElementById('p')!) {
   const deck = bespoke.from(target, [
+    bespokeSync({ key: readQuery('sync') || undefined }),
+    bespokePresenter(),
     bespokeForms(),
     bespokeClasses,
     bespokeInactive(),
@@ -27,8 +29,6 @@ export default function(target = document.getElementById('p')!) {
     bespokeTouch(),
     bespokeOSC(),
     bespokeFragments,
-    bespokeSync({ key: readQuery('sync') || undefined }),
-    bespokePresenter(),
   ])
 
   window.addEventListener('unload', () => deck.destroy())

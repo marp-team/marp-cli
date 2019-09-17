@@ -33,7 +33,8 @@ $progressHeight: 5px;
   }
 
   // Normal view
-  body[data-marp-view=''] {
+  body[data-marp-view=''],
+  body[data-marp-view='next'] {
     .bespoke-marp-osc {
       display: none;
       opacity: 0;
@@ -178,6 +179,21 @@ $progressHeight: 5px;
     }
   }
 
+  // Next view (for presenter)
+  body[data-marp-view='next'] {
+    background: #111;
+
+    .bespoke-marp-osc,
+    .bespoke-progress-parent {
+      display: none !important;
+      transition: none !important;
+    }
+
+    .bespoke-marp-parent {
+      top: 0;
+    }
+  }
+
   // Presenter view
   body[data-marp-view='presenter'] {
     background: #111;
@@ -189,7 +205,6 @@ $progressHeight: 5px;
     }
 
     .bespoke-marp-parent {
-      all: initial;
       bottom: 0;
       left: 0;
       position: absolute;
@@ -206,9 +221,20 @@ $progressHeight: 5px;
         'info    note';
 
       svg.bespoke-marp-slide {
+        color: initial;
         box-sizing: border-box;
         display: block;
         grid-area: current;
+        height: 100%;
+        padding: 20px;
+        width: 100%;
+      }
+
+      .bespoke-marp-presenter-next {
+        border: 0;
+        box-sizing: border-box;
+        display: block;
+        grid-area: next;
         height: 100%;
         padding: 20px;
         width: 100%;

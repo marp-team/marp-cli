@@ -12,18 +12,32 @@ const validateDeck = (deck: any): deck is BespokeForPresenter =>
   deck.syncKey && typeof deck.syncKey === 'string'
 
 export default function bespokePresenter() {
-  let view: BespokeMarpView = BespokeMarpView.Normal
-
-  if (readQuery('presenter') !== null) {
-    view = BespokeMarpView.Presenter
-
-    const { title } = document
-    document.title = `[Presenter view]${title ? ` - ${title}` : ''}`
-  }
-
-  document.body.setAttribute('data-marp-view', view)
-
   return deck => {
+    let next: HTMLIFrameElement | undefined
+
+    document.body.setAttribute(
+      'data-marp-view',
+      ((): BespokeMarpView => {
+        switch (readQuery('presenter')) {
+          case 'next':
+            return BespokeMarpView.Next
+          case '':
+            const { title } = document
+            document.title = `[Presenter view]${title ? ` - ${title}` : ''}`
+
+            next = document.createElement('iframe')
+            next.className = 'bespoke-marp-presenter-next'
+            next.src = nextUrl()
+
+            deck.parent.appendChild(next)
+
+            return BespokeMarpView.Presenter
+          default:
+            return BespokeMarpView.Normal
+        }
+      })()
+    )
+
     if (!validateDeck(deck))
       throw new Error(
         'The current instance of Bespoke.js is invalid for Marp bespoke presenter plugin.'
@@ -52,6 +66,15 @@ function presenterUrl(this: BespokeForPresenter) {
 
   params.set('presenter', '')
   params.set('sync', this.syncKey)
+
+  return generateURLfromParams(params)
+}
+
+function nextUrl() {
+  const params = new URLSearchParams(location.search)
+
+  params.set('presenter', 'next')
+  params.set('sync', '')
 
   return generateURLfromParams(params)
 }
