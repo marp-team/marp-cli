@@ -2,13 +2,29 @@
 
 ## [Unreleased]
 
+## v0.14.1 - 2019-09-15
+
+### Fixed
+
+- Vanished auto-fitting elements when exporting to PDF, PPTX, and images ([#153](https://github.com/marp-team/marp-cli/issues/153), [#154](https://github.com/marp-team/marp-cli/pull/154))
+
+### Changed
+
+- Upgrade to [Marp Core v0.13.1](https://github.com/marp-team/marp-core/releases/tag/v0.13.1) ([#155](https://github.com/marp-team/marp-cli/pull/155))
+- Upgrade dependent packages to the latest version ([#155](https://github.com/marp-team/marp-cli/pull/155))
+
+## v0.14.0 - 2019-09-12
+
 ### Fixed
 
 - Precompile v8 cache while building Docker image ([#148](https://github.com/marp-team/marp-cli/pull/148))
 
 ### Changed
 
+- Upgrade [Marpit v1.4.0](https://github.com/marp-team/marpit/releases/tag/v1.4.0) and [Marp Core v0.13.0](https://github.com/marp-team/marp-core/releases/tag/v0.13.0) ([#151](https://github.com/marp-team/marp-cli/pull/151))
 - Hold the progress state of fragments on to URL query parameter ([#149](https://github.com/marp-team/marp-cli/pull/149))
+- Reduce HTML file size of bespoke template by shortened container tag name and id ([#150](https://github.com/marp-team/marp-cli/pull/150))
+- Upgrade Node and depedent packages to the latest version ([#151](https://github.com/marp-team/marp-cli/pull/151))
 
 ## v0.13.1 - 2019-09-10
 

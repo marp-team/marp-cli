@@ -73,7 +73,7 @@ export const bare: Template<TemplateBareOption> = async opts => {
 
 export const bespoke: Template<TemplateBespokeOption> = async opts => {
   const rendered = opts.renderer({
-    container: new Element('article', { id: 'presentation' }),
+    container: new Element('div', { id: 'p' }),
     inlineSVG: true,
     slideContainer: [],
   })
