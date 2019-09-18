@@ -15,6 +15,15 @@ export default function normalView(deck) {
     openPresenterView: { enumerable: true, value: openPresenterView },
     presenterUrl: { enumerable: true, get: presenterUrl },
   })
+
+  // Register keyboard shortcut
+  document.addEventListener('keydown', e => {
+    // `p` without modifier key (Alt, Control, and Command)
+    if (e.which === 80 && !e.altKey && !e.ctrlKey && !e.metaKey) {
+      e.preventDefault()
+      deck.openPresenterView()
+    }
+  })
 }
 
 /** Open new window for presenter view. */

@@ -1,9 +1,14 @@
-@mixin icon-button($icon, $size: 32px) {
+@mixin _button-icon($icon) {
   background: transparent url($icon) no-repeat center center;
   background-size: contain;
   overflow: hidden;
   text-indent: 100%;
   white-space: nowrap;
+}
+
+@mixin button-icon($icon, $size: 32px) {
+  @extend %button-#{$icon};
+  @include button-size($size);
 }
 
 @mixin button-size($size) {
@@ -43,18 +48,23 @@
   }
 }
 
+// Use placeholder selectors to prevent multi time definitions of image data URI
 %button-prev {
-  @include icon-button('../../assets/osc-prev.svg');
+  @include _button-icon('../../assets/osc-prev.svg');
 }
 
 %button-next {
-  @include icon-button('../../assets/osc-next.svg');
+  @include _button-icon('../../assets/osc-next.svg');
 }
 
 %button-fullscreen {
-  @include icon-button('../../assets/osc-fullscreen.svg');
+  @include _button-icon('../../assets/osc-fullscreen.svg');
 
   &.exit {
     background-image: url('../../assets/osc-fullscreen-exit.svg');
   }
+}
+
+%button-presenter {
+  @include _button-icon('../../assets/osc-presenter.svg');
 }

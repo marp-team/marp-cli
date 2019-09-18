@@ -35,7 +35,7 @@ export default function(target = document.getElementById('p')!) {
       //   P  N
       [[x, x, _], bespokeSync({ key: readQuery('sync') || undefined })],
       [[x, x, x], bespokePresenter(target)],
-      [[x, x, x], bespokeForms()],
+      [[x, x, _], bespokeForms()],
       [[x, x, x], bespokeClasses],
       [[x, _, _], bespokeInactive()],
       [[x, x, x], bespokeLoad],

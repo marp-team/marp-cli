@@ -98,18 +98,19 @@ $progressHeight: 5px;
           @extend %button;
 
           &[data-bespoke-marp-osc='prev'] {
-            @extend %button-prev;
-            @include button-size(32px);
+            @include button-icon(prev);
           }
 
           &[data-bespoke-marp-osc='next'] {
-            @extend %button-next;
-            @include button-size(32px);
+            @include button-icon(next);
           }
 
           &[data-bespoke-marp-osc='fullscreen'] {
-            @extend %button-fullscreen;
-            @include button-size(32px);
+            @include button-icon(fullscreen);
+          }
+
+          &[data-bespoke-marp-osc='presenter'] {
+            @include button-icon(presenter);
           }
         }
       }
