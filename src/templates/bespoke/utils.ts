@@ -14,8 +14,18 @@ export const generateURLfromParams = (
   return `${protocol}//${host}${pathname}${q ? '?' : ''}${q}${hash}`
 }
 
-export const isCurrentView = (...viewModes: ViewMode[]) =>
-  viewModes.includes(document.body.getAttribute(viewAttr) as ViewMode)
+export const getViewMode = () => {
+  switch (document.body.getAttribute(viewAttr)) {
+    case ViewMode.Normal:
+      return ViewMode.Normal
+    case ViewMode.Presenter:
+      return ViewMode.Presenter
+    case ViewMode.Next:
+      return ViewMode.Next
+    default:
+      throw new Error('View mode is not assigned.')
+  }
+}
 
 export const readQuery = (name: string) =>
   new URLSearchParams(location.search).get(name)

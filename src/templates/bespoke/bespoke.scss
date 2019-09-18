@@ -1,5 +1,12 @@
 $progressHeight: 5px;
 
+.bespoke-marp-note,
+.bespoke-marp-osc,
+.bespoke-progress-parent {
+  display: none;
+  transition: none;
+}
+
 @media screen {
   html,
   body {
@@ -12,16 +19,14 @@ $progressHeight: 5px;
     overflow: hidden;
   }
 
-  // Visibility control for slides
-  [data-bespoke-marp-fragment='inactive'] {
-    visibility: hidden;
-  }
-
+  // Common visibility control for slides
   svg.bespoke-marp-slide {
+    opacity: 0;
     pointer-events: none;
     z-index: -1;
 
     &.bespoke-marp-active {
+      opacity: 1;
       pointer-events: auto;
       z-index: 0;
     }
@@ -35,18 +40,13 @@ $progressHeight: 5px;
     }
   }
 
-  .bespoke-marp-note {
-    display: none;
+  [data-bespoke-marp-fragment='inactive'] {
+    visibility: hidden;
   }
 
   // Normal view
   body[data-bespoke-view=''],
   body[data-bespoke-view='next'] {
-    .bespoke-marp-osc {
-      display: none;
-      opacity: 0;
-    }
-
     .bespoke-marp-parent {
       bottom: 0;
       left: 0;
@@ -167,7 +167,10 @@ $progressHeight: 5px;
       top: 0;
       width: 100%;
     }
+  }
 
+  // Progress bar (Only for normal view)
+  body[data-bespoke-view=''] {
     .bespoke-progress-parent {
       background: #222;
       display: flex;
@@ -186,40 +189,18 @@ $progressHeight: 5px;
     }
   }
 
-  // Next view (for presenter)
+  // Next view
   body[data-bespoke-view='next'] {
     background: transparent;
-
-    .bespoke-marp-osc,
-    .bespoke-progress-parent {
-      display: none !important;
-      transition: none !important;
-    }
-
-    .bespoke-marp-parent {
-      top: 0;
-    }
-
-    svg.bespoke-marp-slide {
-      opacity: 0;
-
-      &.bespoke-marp-active {
-        opacity: 1;
-      }
-    }
   }
 
   // Presenter view
   body[data-bespoke-view='presenter'] {
-    background: #111;
-    color: #fff;
+    $text-color: #ddd;
 
-    .bespoke-marp-osc,
-    .bespoke-progress-parent {
-      display: none;
-    }
+    background: #161616;
 
-    .bespoke-marp-parent {
+    .bespoke-marp-presenter-container {
       bottom: 0;
       left: 0;
       position: absolute;
@@ -235,64 +216,121 @@ $progressHeight: 5px;
         'current note'
         'info    note';
 
-      svg.bespoke-marp-slide {
-        color: initial;
-        box-sizing: border-box;
-        display: block;
+      .bespoke-marp-parent {
         grid-area: current;
-        height: 100%;
-        padding: 20px;
-        width: 100%;
+        position: relative;
+        overflow: hidden;
+
+        svg.bespoke-marp-slide {
+          height: calc(100% - 40px);
+          left: 20px;
+          position: absolute;
+          pointer-events: none;
+          top: 20px;
+          user-select: none;
+          width: calc(100% - 40px);
+
+          &.bespoke-marp-active {
+            filter: drop-shadow(0 3px 10px rgba(#000, 0.5));
+          }
+        }
       }
 
-      .bespoke-marp-presenter-next-parent {
-        box-sizing: border-box;
+      .bespoke-marp-presenter-next-container {
+        background: #222;
         cursor: pointer;
-        padding: 20px;
         display: none;
         grid-area: next;
-        height: 100%;
-        width: 100%;
+        overflow: hidden;
+        position: relative;
 
         &.active {
           display: block;
         }
 
-        .bespoke-marp-presenter-next {
-          display: block;
+        iframe.bespoke-marp-presenter-next {
           background: transparent;
           border: 0;
-          width: 100%;
-          height: 100%;
-        }
-      }
-
-      svg.bespoke-marp-slide,
-      .bespoke-marp-presenter-next-parent {
-        * {
+          display: block;
+          filter: drop-shadow(0 3px 10px rgba(#000, 0.5));
+          height: calc(100% - 40px);
+          left: 20px;
+          position: absolute;
           pointer-events: none;
           user-select: none;
+          top: 20px;
+          width: calc(100% - 40px);
         }
       }
 
-      .bespoke-marp-note.active {
-        display: block;
+      .bespoke-marp-presenter-note-container {
+        background: #222;
+        color: $text-color;
         grid-area: note;
-        width: 100%;
-        height: 100%;
-        overflow: auto;
-        white-space: pre-wrap;
-        word-break: break-word;
-        font-size: calc(90% + 0.5vw);
+
+        .bespoke-marp-note {
+          margin: 20px;
+          width: calc(100% - 40px);
+          height: calc(100% - 40px);
+          box-sizing: border-box;
+          overflow: auto;
+          padding-right: 3px;
+          white-space: pre-wrap;
+          word-wrap: break-word;
+
+          // Scrollbar (Firefox)
+          scrollbar-width: thin;
+          scrollbar-color: rgba($text-color, 0.5) transparent;
+
+          // Scrollbar (Chrome)
+          &::-webkit-scrollbar {
+            width: 6px;
+          }
+
+          &::-webkit-scrollbar-track {
+            background: transparent;
+          }
+
+          &::-webkit-scrollbar-thumb {
+            background: rgba($text-color, 0.5);
+            border-radius: 6px;
+          }
+
+          &:empty {
+            pointer-events: none;
+          }
+
+          &.active {
+            display: block;
+          }
+
+          p {
+            &:first-child {
+              margin-top: 0;
+            }
+
+            &:last-child {
+              margin-bottom: 0;
+            }
+          }
+        }
+      }
+
+      .bespoke-marp-presenter-info-container {
+        color: $text-color;
+        grid-area: info;
+        display: flex;
+        justify-content: center;
+        align-items: center;
       }
     }
   }
 }
 
 @media print {
-  .bespoke-marp-osc,
-  .bespoke-progress-parent {
-    display: none !important;
-    transition: none !important;
+  .bespoke-marp-presenter-next-container,
+  .bespoke-marp-presenter-note-container,
+  .bespoke-marp-presenter-info-container {
+    display: none;
   }
 }
