@@ -294,7 +294,8 @@ $progressHeight: 5px;
         justify-content: center;
         padding: 0 10px;
 
-        > * {
+        %info-element {
+          display: block;
           box-sizing: border-box;
           padding: 0 10px;
           white-space: nowrap;
@@ -315,6 +316,8 @@ $progressHeight: 5px;
         }
 
         .bespoke-marp-presenter-info-page {
+          @extend %info-element;
+
           order: 2;
           text-align: center;
 
@@ -326,13 +329,16 @@ $progressHeight: 5px;
         }
 
         .bespoke-marp-presenter-info-time {
+          @extend %info-element;
+
           color: #999;
-          display: block;
           order: 1;
           text-align: left;
         }
 
         .bespoke-marp-presenter-info-timer {
+          @extend %info-element;
+
           color: #999;
           order: 3;
           text-align: right;
