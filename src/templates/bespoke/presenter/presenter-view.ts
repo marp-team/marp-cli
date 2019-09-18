@@ -69,6 +69,12 @@ function buildInfoPage(deck): HTMLElement {
     deck.next()
   })
 
+  deck.on('fragment', ({ index, fragments, fragmentIndex }) => {
+    prev.disabled = index === 0 && fragmentIndex === 0
+    next.disabled =
+      index === deck.slides.length - 1 && fragmentIndex === fragments.length - 1
+  })
+
   page.appendChild(prev)
   page.appendChild(text)
   page.appendChild(next)
@@ -83,9 +89,10 @@ function buildInfoTime() {
   time.title = 'Current time'
   time.className = 'bespoke-marp-presenter-info-time'
 
-  setInterval(() => {
-    time.textContent = new Date().toLocaleTimeString()
-  }, 250)
+  const update = () => (time.textContent = new Date().toLocaleTimeString())
+
+  update()
+  setInterval(update, 250)
 
   return time
 }
