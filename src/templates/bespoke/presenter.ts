@@ -39,14 +39,21 @@ function forPresenterView(deck) {
   document.title = `[Presenter view]${title ? ` - ${title}` : ''}`
 
   // Next slide view
+  const nextParent = document.createElement('div')
+  nextParent.className = 'bespoke-marp-presenter-next-parent'
+  nextParent.addEventListener('click', () => deck.next())
+
   const next = document.createElement('iframe')
 
   next.addEventListener('load', () => {
+    nextParent.classList.add('active')
+
     const navigate = (idx: number, fragIdx: number) => {
       const origin = window.origin === 'null' ? '*' : window.origin
       next.contentWindow!.postMessage(`navigate:${idx},${fragIdx}`, origin)
     }
 
+    // Navigate slide
     navigate(deck.slide(), deck.fragmentIndex)
 
     deck.on('fragment', ({ index, fragmentIndex }) =>
@@ -57,7 +64,8 @@ function forPresenterView(deck) {
   next.className = 'bespoke-marp-presenter-next'
   next.src = '?view=next'
 
-  deck.parent.appendChild(next)
+  nextParent.appendChild(next)
+  deck.parent.appendChild(nextParent)
 }
 
 function forNextView(deck) {

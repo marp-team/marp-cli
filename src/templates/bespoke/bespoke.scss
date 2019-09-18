@@ -241,15 +241,34 @@ $progressHeight: 5px;
         width: 100%;
       }
 
-      .bespoke-marp-presenter-next {
-        background: transparent;
-        border: 0;
+      .bespoke-marp-presenter-next-parent {
         box-sizing: border-box;
-        display: block;
+        cursor: pointer;
+        padding: 20px;
+        display: none;
         grid-area: next;
         height: 100%;
-        padding: 20px;
         width: 100%;
+
+        &.active {
+          display: block;
+        }
+
+        .bespoke-marp-presenter-next {
+          display: block;
+          background: transparent;
+          border: 0;
+          width: 100%;
+          height: 100%;
+        }
+      }
+
+      svg.bespoke-marp-slide,
+      .bespoke-marp-presenter-next-parent {
+        * {
+          pointer-events: none;
+          user-select: none;
+        }
       }
     }
   }
