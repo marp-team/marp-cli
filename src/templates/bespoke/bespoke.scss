@@ -35,6 +35,10 @@ $progressHeight: 5px;
     }
   }
 
+  .bespoke-marp-note {
+    display: none;
+  }
+
   // Normal view
   body[data-bespoke-view=''],
   body[data-bespoke-view='next'] {
@@ -269,6 +273,17 @@ $progressHeight: 5px;
           pointer-events: none;
           user-select: none;
         }
+      }
+
+      .bespoke-marp-note.active {
+        display: block;
+        grid-area: note;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        white-space: pre-wrap;
+        word-break: break-word;
+        font-size: calc(90% + 0.5vw);
       }
     }
   }

@@ -16,5 +16,11 @@ prepend deck
       button(data-bespoke-marp-osc="fullscreen" tabindex=-1 title="Toggle fullscreen (f)") Toggle fullscreen
       button(data-bespoke-marp-osc="presenter" tabindex=-1 title="Open presenter view") Open presenter view
 
+append deck
+  each notes, index in comments
+    .bespoke-marp-note(data-index=index tabindex="0")
+      each paragraph in notes
+        p= paragraph
+
 block script
   script!= bespoke.js

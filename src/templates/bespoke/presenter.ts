@@ -66,6 +66,19 @@ function forPresenterView(deck) {
 
   nextParent.appendChild(next)
   deck.parent.appendChild(nextParent)
+
+  // Presenter notes
+  const notes = document.querySelectorAll<HTMLElement>('.bespoke-marp-note')
+  notes.forEach(note => deck.parent.appendChild(note))
+
+  deck.on('activate', () => {
+    notes.forEach(note =>
+      note.classList.toggle(
+        'active',
+        Number.parseInt(note.dataset.index || '', 10) === deck.slide()
+      )
+    )
+  })
 }
 
 function forNextView(deck) {
