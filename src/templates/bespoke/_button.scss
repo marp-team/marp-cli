@@ -1,0 +1,60 @@
+@mixin icon-button($icon, $size: 32px) {
+  background: transparent url($icon) no-repeat center center;
+  background-size: contain;
+  overflow: hidden;
+  text-indent: 100%;
+  white-space: nowrap;
+}
+
+@mixin button-size($size) {
+  height: $size;
+  line-height: $size;
+  width: $size;
+}
+
+%button {
+  appearance: none;
+  background-color: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  font-size: inherit;
+  opacity: 0.8;
+  outline: none;
+  padding: 0;
+  transition: opacity 0.2s linear;
+  -webkit-tap-highlight-color: transparent;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.15 !important;
+  }
+
+  &:hover {
+    opacity: 1;
+
+    &:active {
+      opacity: 0.6;
+    }
+
+    &:not(:disabled) {
+      transition: none;
+    }
+  }
+}
+
+%button-prev {
+  @include icon-button('../../assets/osc-prev.svg');
+}
+
+%button-next {
+  @include icon-button('../../assets/osc-next.svg');
+}
+
+%button-fullscreen {
+  @include icon-button('../../assets/osc-fullscreen.svg');
+
+  &.exit {
+    background-image: url('../../assets/osc-fullscreen-exit.svg');
+  }
+}

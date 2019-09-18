@@ -12,6 +12,8 @@ export default function presenterView(deck) {
   const info = buildInfoContainer()
 
   info.appendChild(buildInfoPage(deck))
+  info.appendChild(buildInfoTime())
+  info.appendChild(buildInfoTimer())
   container.appendChild(info)
 
   document.body.appendChild(container)
@@ -40,11 +42,63 @@ function buildInfoPage(deck): HTMLElement {
   const page = document.createElement('div')
   page.className = 'bespoke-marp-presenter-info-page'
 
+  const text = document.createElement('span')
+  text.className = 'bespoke-marp-presenter-info-page-text'
+
   deck.on('activate', ({ index }) => {
-    page.textContent = `${index + 1} / ${deck.slides.length}`
+    text.textContent = `${index + 1} / ${deck.slides.length}`
   })
 
+  const prev = document.createElement('button')
+  prev.className = 'bespoke-marp-presenter-info-page-prev'
+  prev.tabIndex = -1
+  prev.textContent = 'Previous'
+  prev.title = 'Previous'
+  prev.addEventListener('click', () => {
+    prev.blur()
+    deck.prev()
+  })
+
+  const next = document.createElement('button')
+  next.className = 'bespoke-marp-presenter-info-page-next'
+  next.tabIndex = -1
+  next.textContent = 'Next'
+  next.title = 'Next'
+  next.addEventListener('click', () => {
+    next.blur()
+    deck.next()
+  })
+
+  page.appendChild(prev)
+  page.appendChild(text)
+  page.appendChild(next)
+
   return page
+}
+
+/** Add element to show current time */
+function buildInfoTime() {
+  const time = document.createElement('time')
+
+  time.title = 'Current time'
+  time.className = 'bespoke-marp-presenter-info-time'
+
+  setInterval(() => {
+    time.textContent = new Date().toLocaleTimeString()
+  }, 250)
+
+  return time
+}
+
+/** Add element to control timer */
+function buildInfoTimer() {
+  const container = document.createElement('div')
+  container.className = 'bespoke-marp-presenter-info-timer'
+
+  // TODO: Start timer
+  container.textContent = 'Start timer'
+
+  return container
 }
 
 /** Build next slide view. */
@@ -86,13 +140,11 @@ function buildPresenterNote(deck) {
     container.appendChild(note)
   })
 
-  // Truck active note
-  deck.on('activate', () => {
+  deck.on('activate', () =>
     notes.forEach(
-      note =>
-        note.classList.toggle('active', note.dataset.index == deck.slide()) // tslint:disable-line: triple-equals
+      n => n.classList.toggle('active', n.dataset.index == deck.slide()) // tslint:disable-line: triple-equals
     )
-  })
+  )
 
   return container
 }

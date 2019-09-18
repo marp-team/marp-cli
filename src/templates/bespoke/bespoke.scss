@@ -8,6 +8,8 @@ $progressHeight: 5px;
 }
 
 @media screen {
+  @import './button';
+
   html,
   body {
     height: 100%;
@@ -93,59 +95,21 @@ $progressHeight: 5px;
         }
 
         > button {
-          appearance: none;
-          background-color: transparent;
-          border: 0;
-          color: inherit;
-          cursor: pointer;
-          font-size: inherit;
-          opacity: 0.8;
-          outline: none;
-          padding: 0;
-          transition: opacity 0.2s linear;
-          -webkit-tap-highlight-color: transparent;
-
-          &:disabled {
-            cursor: not-allowed;
-            opacity: 0.15 !important;
-          }
-
-          &:hover {
-            opacity: 1;
-
-            &:active {
-              opacity: 0.6;
-            }
-
-            &:not(:disabled) {
-              transition: none;
-            }
-          }
-
-          @mixin icon-button($icon, $size: 32px) {
-            background: transparent url($icon) no-repeat center center;
-            background-size: contain;
-            height: $size;
-            overflow: hidden;
-            text-indent: 100%;
-            white-space: nowrap;
-            width: $size;
-          }
+          @extend %button;
 
           &[data-bespoke-marp-osc='prev'] {
-            @include icon-button('../../assets/osc-prev.svg');
+            @extend %button-prev;
+            @include button-size(32px);
           }
 
           &[data-bespoke-marp-osc='next'] {
-            @include icon-button('../../assets/osc-next.svg');
+            @extend %button-next;
+            @include button-size(32px);
           }
 
           &[data-bespoke-marp-osc='fullscreen'] {
-            @include icon-button('../../assets/osc-fullscreen.svg');
-
-            &.exit {
-              background-image: url('../../assets//osc-fullscreen-exit.svg');
-            }
+            @extend %button-fullscreen;
+            @include button-size(32px);
           }
         }
       }
@@ -236,6 +200,7 @@ $progressHeight: 5px;
         }
       }
 
+      // Next slide view
       .bespoke-marp-presenter-next-container {
         background: #222;
         cursor: pointer;
@@ -263,6 +228,7 @@ $progressHeight: 5px;
         }
       }
 
+      // Presenter note
       .bespoke-marp-presenter-note-container {
         background: #222;
         color: $text-color;
@@ -316,12 +282,60 @@ $progressHeight: 5px;
         }
       }
 
+      // Informations
       .bespoke-marp-presenter-info-container {
-        color: $text-color;
-        grid-area: info;
-        display: flex;
-        justify-content: center;
         align-items: center;
+        box-sizing: border-box;
+        color: $text-color;
+        display: flex;
+        flex-wrap: nowrap;
+        grid-area: info;
+        justify-content: center;
+        padding: 0 10px;
+
+        > * {
+          box-sizing: border-box;
+          padding: 0 10px;
+          white-space: nowrap;
+          width: 100%;
+        }
+
+        button {
+          @extend %button;
+          @include button-size(1.5em);
+
+          &.bespoke-marp-presenter-info-page-prev {
+            @extend %button-prev;
+          }
+
+          &.bespoke-marp-presenter-info-page-next {
+            @extend %button-next;
+          }
+        }
+
+        .bespoke-marp-presenter-info-page {
+          order: 2;
+          text-align: center;
+
+          .bespoke-marp-presenter-info-page-text {
+            display: inline-block;
+            min-width: 120px;
+            text-align: center;
+          }
+        }
+
+        .bespoke-marp-presenter-info-time {
+          color: #999;
+          display: block;
+          order: 1;
+          text-align: left;
+        }
+
+        .bespoke-marp-presenter-info-timer {
+          color: #999;
+          order: 3;
+          text-align: right;
+        }
       }
     }
   }
