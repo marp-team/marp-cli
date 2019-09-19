@@ -166,11 +166,11 @@ $progressHeight: 5px;
     background: #161616;
 
     .bespoke-marp-presenter-container {
-      bottom: 0;
+      height: 100%;
       left: 0;
       position: absolute;
-      right: 0;
       top: 0;
+      width: 100%;
 
       // Grid layout for presenter view
       display: grid;
