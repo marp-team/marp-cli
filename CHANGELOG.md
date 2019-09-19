@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Safari prevents moving slide after too many navigations ([#158](https://github.com/marp-team/marp-cli/issues/158), [#160](https://github.com/marp-team/marp-cli/pull/160))
+
 ## v0.14.1 - 2019-09-15
 
 ### Fixed
