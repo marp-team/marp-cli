@@ -12,8 +12,16 @@ const coerceInt = (ns: string) => {
 export default function bespokeState(opts: BespokeStateOption = {}) {
   const options: BespokeStateOption = { history: true, ...opts }
 
-  const updateState = (...args: Parameters<typeof history['pushState']>) =>
-    options.history ? history.pushState(...args) : history.replaceState(...args)
+  const updateState = (...args: Parameters<typeof history['pushState']>) => {
+    try {
+      options.history
+        ? history.pushState(...args)
+        : history.replaceState(...args)
+    } catch (e) {
+      // Safari may throw SecurityError by replacing state 100 times per 30 seconds.
+      console.error(e)
+    }
+  }
 
   return deck => {
     let internalNavigation = true
@@ -77,11 +85,15 @@ export default function bespokeState(opts: BespokeStateOption = {}) {
           const params = new URLSearchParams(location.search)
           params.delete('f')
 
-          history.replaceState(
-            null,
-            document.title,
-            generateURLfromParams(params)
-          )
+          try {
+            history.replaceState(
+              null,
+              document.title,
+              generateURLfromParams(params)
+            )
+          } catch (e) {
+            console.error(e)
+          }
         })
       )
 
