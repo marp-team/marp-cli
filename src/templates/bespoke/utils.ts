@@ -17,6 +17,13 @@ export const generateURLfromParams = (
 export const readQuery = (name: string) =>
   new URLSearchParams(location.search).get(name)
 
+export const popQuery = (name: string) => {
+  const value = readQuery(name)
+  setQuery({ [name]: undefined })
+
+  return value
+}
+
 export const setQuery = (
   queries: Record<string, string | false | null | undefined>,
   opts: { location?: LocationLike; setter?: QuerySetter } = {}

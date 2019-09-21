@@ -11,9 +11,11 @@ import bespokeProgress from './progress'
 import bespokeState from './state'
 import bespokeSync from './sync'
 import bespokeTouch from './touch'
-import { readQuery } from './utils'
+import { popQuery, setQuery } from './utils'
 
 export default function(target = document.getElementById('p')!) {
+  const key = popQuery('sync') || undefined
+
   const deck = bespoke.from(target, [
     bespokeForms(),
     bespokeClasses,
@@ -26,9 +28,13 @@ export default function(target = document.getElementById('p')!) {
     bespokeTouch(),
     bespokeOSC(),
     bespokeFragments,
-    bespokeSync({ key: readQuery('sync') || undefined }),
+    bespokeSync({ key }),
   ])
 
+  window.addEventListener('beforeunload', () =>
+    setQuery({ sync: deck.syncKey })
+  )
   window.addEventListener('unload', () => deck.destroy())
+
   return deck
 }
