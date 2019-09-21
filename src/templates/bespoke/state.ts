@@ -1,4 +1,4 @@
-import { generateURLfromParams, readQuery } from './utils'
+import { readQuery, setQuery } from './utils'
 
 export interface BespokeStateOption {
   history?: boolean
@@ -11,17 +11,6 @@ const coerceInt = (ns: string) => {
 
 export default function bespokeState(opts: BespokeStateOption = {}) {
   const options: BespokeStateOption = { history: true, ...opts }
-
-  const updateState = (...args: Parameters<typeof history['pushState']>) => {
-    try {
-      options.history
-        ? history.pushState(...args)
-        : history.replaceState(...args)
-    } catch (e) {
-      // Safari may throw SecurityError by replacing state 100 times per 30 seconds.
-      console.error(e)
-    }
-  }
 
   return deck => {
     let internalNavigation = true
@@ -59,18 +48,15 @@ export default function bespokeState(opts: BespokeStateOption = {}) {
     deck.on('fragment', ({ index, fragmentIndex }) => {
       if (internalNavigation) return
 
-      const params = new URLSearchParams(location.search)
-
-      if (fragmentIndex === 0) {
-        params.delete('f')
-      } else {
-        params.set('f', fragmentIndex.toString())
-      }
-
-      updateState(
-        null,
-        document.title,
-        generateURLfromParams(params, { ...location, hash: `#${index + 1}` })
+      setQuery(
+        { f: fragmentIndex === 0 || fragmentIndex.toString() },
+        {
+          location: { ...location, hash: `#${index + 1}` },
+          setter: (...args) =>
+            options.history
+              ? history.pushState(...args)
+              : history.replaceState(...args),
+        }
       )
     })
 
@@ -80,20 +66,7 @@ export default function bespokeState(opts: BespokeStateOption = {}) {
       window.addEventListener('hashchange', () =>
         navInternally(() => {
           parseState({ fragment: false })
-
-          // f parameter has to remove
-          const params = new URLSearchParams(location.search)
-          params.delete('f')
-
-          try {
-            history.replaceState(
-              null,
-              document.title,
-              generateURLfromParams(params)
-            )
-          } catch (e) {
-            console.error(e)
-          }
+          setQuery({ f: undefined }) // f parameter has to remove
         })
       )
 
