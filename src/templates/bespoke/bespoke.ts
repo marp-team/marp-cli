@@ -12,7 +12,7 @@ import bespokeProgress from './progress'
 import bespokeState from './state'
 import bespokeSync from './sync'
 import bespokeTouch from './touch'
-import { getViewMode, readQuery, setViewMode, ViewMode } from './utils'
+import { getViewMode, popQuery, setQuery, setViewMode, ViewMode } from './utils'
 
 const pattern = [ViewMode.Normal, ViewMode.Presenter, ViewMode.Next] as const
 
@@ -26,6 +26,7 @@ const parse = (...patterns: [[boolean, boolean, boolean], Function][]) => {
 export default function(target = document.getElementById('p')!) {
   setViewMode()
 
+  const key = popQuery('sync') || undefined
   const _ = false
   const x = true
 
@@ -33,7 +34,7 @@ export default function(target = document.getElementById('p')!) {
     target,
     parse(
       //   P  N
-      [[x, x, _], bespokeSync({ key: readQuery('sync') || undefined })],
+      [[x, x, _], bespokeSync({ key })],
       [[x, x, x], bespokePresenter(target)],
       [[x, x, _], bespokeForms()],
       [[x, x, x], bespokeClasses],
@@ -49,6 +50,10 @@ export default function(target = document.getElementById('p')!) {
     )
   )
 
+  window.addEventListener('beforeunload', () =>
+    setQuery({ sync: deck.syncKey })
+  )
   window.addEventListener('unload', () => deck.destroy())
+
   return deck
 }
