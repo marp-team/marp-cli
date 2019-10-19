@@ -8,7 +8,7 @@
 
 ### Changed
 
-- Upgrade dependent packages to the latest version ([#164](https://github.com/marp-team/marp-cli/pull/164))
+- Upgrade dependent packages to the latest version ([#164](https://github.com/marp-team/marp-cli/pull/164), [#169](https://github.com/marp-team/marp-cli/pull/169))
 
 ## v0.14.1 - 2019-09-15
 
