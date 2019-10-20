@@ -83,16 +83,11 @@ describe('Converter', () => {
 
     it('returns the result of template', async () => {
       const options: any = { html: true }
-      const readyScript = '<b>ready</b>'
-      const { result, rendered } = await instance({
-        options,
-        readyScript,
-      }).convert(md)
+      const { result, rendered } = await instance({ options }).convert(md)
 
       expect(result).toMatch(/^<!DOCTYPE html>[\s\S]+<\/html>$/)
       expect(result).toContain(rendered.html)
       expect(result).toContain(rendered.css)
-      expect(result).toContain(readyScript)
       expect(result).not.toContain('<base')
       expect(rendered.css).toContain('@theme default')
     })
