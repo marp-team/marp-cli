@@ -6,6 +6,7 @@
 
 - Safari prevents moving slide after too many navigations ([#158](https://github.com/marp-team/marp-cli/issues/158), [#160](https://github.com/marp-team/marp-cli/pull/160))
 - Support preview mode in macOS Catalina ([#173](https://github.com/marp-team/marp-cli/pull/173))
+- Update Dockerfile to work Chromium correctly ([#174](https://github.com/marp-team/marp-cli/pull/174))
 
 ### Changed
 
