@@ -8,6 +8,7 @@
 
 ### Changed
 
+- Upgrade [Marpit v1.4.1](https://github.com/marp-team/marpit/releases/tag/v1.4.1) and [Marp Core v0.14.0](https://github.com/marp-team/marp-core/releases/tag/v0.14.0) ([#169](https://github.com/marp-team/marp-cli/pull/169))
 - Upgrade dependent packages to the latest version ([#164](https://github.com/marp-team/marp-cli/pull/164), [#169](https://github.com/marp-team/marp-cli/pull/169))
 
 ### Removed
