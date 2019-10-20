@@ -9,6 +9,7 @@ RUN apk update && apk upgrade && \
       grep \
       chromium@edge \
       freetype@edge \
+      libstdc++@edge \
       harfbuzz@edge \
       wqy-zenhei@edge \
       ttf-liberation@edge \
