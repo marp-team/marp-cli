@@ -48,7 +48,6 @@ export interface ConverterOption {
   pages?: boolean | number[]
   preview?: boolean
   jpegQuality?: number
-  readyScript?: string
   server?: boolean
   template: string
   templateOption?: TemplateOption
@@ -91,7 +90,7 @@ export class Converter {
   }
 
   async convert(markdown: string, file?: File): Promise<TemplateResult> {
-    const { lang, readyScript, globalDirectives, type } = this.options
+    const { lang, globalDirectives, type } = this.options
     const isFile = file && file.type === FileType.File
 
     let additionals = ''
@@ -107,7 +106,6 @@ export class Converter {
     return await this.template({
       ...(this.options.templateOption || {}),
       lang,
-      readyScript,
       base:
         isFile && type !== ConvertType.html
           ? file!.absoluteFileScheme

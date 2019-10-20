@@ -101,7 +101,7 @@
     "rollup-plugin-replace": "^2.2.0",
     "rollup-plugin-terser": "^5.1.2",
     "rollup-plugin-typescript": "^1.0.1",
-    "rollup-plugin-url": "^3.0.0",
+    "rollup-plugin-url": "^2.2.4",
     "sass": "^1.23.0",
     "screenfull": "^5.0.0",
     "stylelint": "^11.1.1",

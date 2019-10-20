@@ -214,9 +214,6 @@ export class MarpCLIConfig {
       lang: this.conf.lang || (await osLocale()).replace(/@/g, '-'),
       options: this.conf.options || {},
       pages: !!(this.args.images || this.conf.images),
-      readyScript: this.engine.browserScript
-        ? `<script>${this.engine.browserScript}</script>`
-        : undefined,
       watch:
         pick(this.args.watch, this.conf.watch) || preview || server || false,
     }
