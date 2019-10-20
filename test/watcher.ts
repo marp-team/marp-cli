@@ -2,7 +2,7 @@ import chokidar from 'chokidar'
 import http from 'http'
 import portfinder from 'portfinder'
 import { File, FileType } from '../src/file'
-import { ThemeSet, Theme } from '../src/theme'
+import { ThemeSet } from '../src/theme'
 import { Watcher, WatchNotifier, notifier } from '../src/watcher'
 
 const mockWsOn = jest.fn()

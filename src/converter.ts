@@ -1,9 +1,9 @@
 import { MarpOptions } from '@marp-team/marp-core'
 import { Marpit, MarpitOptions } from '@marp-team/marpit'
 import chalk from 'chalk'
-import * as chromeFinder from 'chrome-launcher/dist/chrome-finder'
 import puppeteer from 'puppeteer-core'
 import { URL } from 'url'
+import findChrome from './utils/find-chrome'
 import { silence, warn } from './cli'
 import { Engine } from './engine'
 import metaPlugin from './engine/meta-plugin'
@@ -402,15 +402,9 @@ export class Converter {
       if (process.env.IS_DOCKER || process.env.CI)
         args.push('--disable-features=VizDisplayCompositor')
 
-      const finder: () => string[] = (() => {
-        if (process.env.IS_DOCKER) return () => ['/usr/bin/chromium-browser']
-        if (require('is-wsl')) return chromeFinder.wsl
-        return chromeFinder[process.platform]
-      })()
-
       Converter.browser = await puppeteer.launch({
         args,
-        executablePath: finder ? finder()[0] : undefined,
+        executablePath: findChrome(),
       })
 
       Converter.browser.once('disconnected', () => {
