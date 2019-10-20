@@ -5,6 +5,7 @@
 ### Fixed
 
 - Safari prevents moving slide after too many navigations ([#158](https://github.com/marp-team/marp-cli/issues/158), [#160](https://github.com/marp-team/marp-cli/pull/160))
+- Custom engine doesn't render code blocks well ([#168](https://github.com/marp-team/marp-cli/issues/168), [#172](https://github.com/marp-team/marp-cli/pull/172))
 - Support preview mode in macOS Catalina ([#173](https://github.com/marp-team/marp-cli/pull/173))
 - Update Dockerfile to work Chromium correctly ([#174](https://github.com/marp-team/marp-cli/pull/174))
 
