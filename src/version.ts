@@ -10,7 +10,7 @@ export default async function outputVersion(config: MarpCLIConfig): Promise<0> {
   const { engine } = config
 
   if (isMarpCore(engine.klass)) {
-    engineVer = `bundled @marp-team/marp-core v${bundledCoreVer}`
+    engineVer = `@marp-team/marp-core v${bundledCoreVer}`
 
     if (engine.package && engine.package.version !== bundledCoreVer) {
       engineVer = `user-installed @marp-team/marp-core v${engine.package.version}`

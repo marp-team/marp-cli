@@ -19,7 +19,6 @@ interface TemplateCoreOption {
   base?: string
   lang: string
   notifyWS?: string
-  readyScript?: string
   renderer: (tplOpts: MarpitOptions) => RendererResult
 }
 
@@ -89,13 +88,6 @@ export const bespoke: Template<TemplateBespokeOption> = async opts => {
         osc: opts.osc === undefined ? true : opts.osc,
         progress: opts.progress,
       },
-      readyScript:
-        opts.readyScript ||
-        `<script>${await libJs(
-          require.resolve(
-            '@marp-team/marpit-svg-polyfill/lib/polyfill.browser.js'
-          )
-        )}</script>`,
       watchJs: await watchJs(opts.notifyWS),
     }),
   }

@@ -65,9 +65,7 @@ describe('Marp CLI', () => {
           expect.stringContaining(`@marp-team/marp-cli v${cliVersion}`)
         )
         expect(log).toBeCalledWith(
-          expect.stringContaining(
-            `bundled @marp-team/marp-core v${coreVersion}`
-          )
+          expect.stringContaining(`@marp-team/marp-core v${coreVersion}`)
         )
       })
 
