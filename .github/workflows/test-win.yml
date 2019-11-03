@@ -24,8 +24,10 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-      - name: Install with yarn
-        run: npm install -g yarn && yarn install
+      - name: Install yarn
+        run: npm install -g yarn
+      - name: yarn install
+        run: yarn install
       - name: Jest
         run: yarn test:coverage --ci -i --reporters=default --reporters=jest-junit
         env:
