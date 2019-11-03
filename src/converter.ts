@@ -4,6 +4,7 @@ import { Marpit, MarpitOptions } from '@marp-team/marpit'
 import chalk from 'chalk'
 import puppeteer from 'puppeteer-core'
 import {
+  generatePuppeteerDataDirPath,
   generatePuppeteerLaunchArgs,
   isWSL,
   resolveWSLPath,
@@ -402,9 +403,10 @@ export class Converter {
 
   private static async runBrowser() {
     if (!Converter.browser) {
-      Converter.browser = await puppeteer.launch(
-        generatePuppeteerLaunchArgs({ profile: 'marp-cli-conversion' })
-      )
+      Converter.browser = await puppeteer.launch({
+        ...(await generatePuppeteerLaunchArgs()),
+        userDataDir: await generatePuppeteerDataDirPath('marp-cli-conversion'),
+      })
       Converter.browser.once('disconnected', () => {
         Converter.browser = undefined
       })

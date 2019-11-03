@@ -7,10 +7,6 @@ import * as chromeFinder from 'chrome-launcher/dist/chrome-finder'
 
 const execPromise = promisify(exec)
 
-interface PuppeteerLaunchArgs {
-  profile?: string
-}
-
 let executablePath: string | undefined | false = false
 let isWsl: boolean | undefined
 
@@ -22,9 +18,18 @@ export function isWSL(): boolean {
 export const resolveWSLPath = async (path: string): Promise<string> =>
   (await execPromise(`wslpath -m ${path.replace(/\\/g, '\\\\')}`)).stdout.trim()
 
-export function generatePuppeteerLaunchArgs({
-  profile,
-}: PuppeteerLaunchArgs = {}): Partial<LaunchOptions> {
+export const generatePuppeteerDataDirPath = async (
+  name: string
+): Promise<string> => {
+  let userDataDir: string = path.resolve(os.tmpdir(), name)
+  if (isWSL()) userDataDir = await resolveWSLPath(userDataDir)
+
+  return userDataDir
+}
+
+export async function generatePuppeteerLaunchArgs(): Promise<
+  Partial<LaunchOptions>
+> {
   // Puppeteer >= v1.13.0 doesn't use BGPT due to crbug.com/937609.
   // https://github.com/GoogleChrome/puppeteer/blob/master/lib/Launcher.js
   //
@@ -55,12 +60,8 @@ export function generatePuppeteerLaunchArgs({
     executablePath = finder ? finder()[0] : undefined
   }
 
-  // Specify data directories (Chrome on WSL must speficy to avoid failing cleanup)
-  const userDataDir = profile ? path.resolve(os.tmpdir(), profile) : undefined
-
   return {
     executablePath,
-    userDataDir,
     ignoreDefaultArgs: ['--disable-features=TranslateUI,BlinkGenPropertyTrees'],
     args: [...args],
   }

@@ -1,8 +1,9 @@
-import os from 'os'
-import path from 'path'
 import carlo from 'carlo'
 import { File, FileType } from './file'
-import { generatePuppeteerLaunchArgs } from './utils/puppeteer'
+import {
+  generatePuppeteerDataDirPath,
+  generatePuppeteerLaunchArgs,
+} from './utils/puppeteer'
 import TypedEventEmitter from './utils/typed-event-emitter'
 import { ConvertType, mimeTypes } from './converter'
 import { CLIError } from './error'
@@ -57,12 +58,14 @@ export class Preview extends TypedEventEmitter<Preview.Events> {
   }
 
   private async launch() {
+    const baseArgs = await generatePuppeteerLaunchArgs()
+
     this.carloInternal = await carlo.launch({
-      localDataDir: path.resolve(os.tmpdir(), './marp-cli-carlo'),
-      args: ['--disable-features=TranslateUI'],
+      localDataDir: await generatePuppeteerDataDirPath('marp-cli-carlo'),
+      args: baseArgs.args,
       height: this.options.height,
       width: this.options.width,
-      executablePath: generatePuppeteerLaunchArgs().executablePath,
+      executablePath: baseArgs.executablePath,
       icon: Buffer.from(favicon.slice(22), 'base64'),
       title: 'Marp CLI',
     })
