@@ -9,6 +9,7 @@ const execPromise = promisify(exec)
 
 let executablePath: string | undefined | false = false
 let isWsl: boolean | undefined
+let wslTmp: string | undefined
 
 export function isWSL(): boolean {
   if (isWsl === undefined) isWsl = require('is-wsl') as boolean
@@ -21,10 +22,18 @@ export const resolveWSLPath = async (path: string): Promise<string> =>
 export const generatePuppeteerDataDirPath = async (
   name: string
 ): Promise<string> => {
-  let userDataDir: string = path.resolve(os.tmpdir(), name)
-  if (isWSL()) userDataDir = await resolveWSLPath(userDataDir)
-
-  return userDataDir
+  if (isWSL()) {
+    // In WSL environment, Marp CLI will use Chrome on Windows. Thus, we have to
+    // specify Windows path when converting within WSL.
+    if (wslTmp === undefined) {
+      const tmpRet = (await execPromise('cmd.exe /c SET TMP')).stdout.trim()
+      if (tmpRet.startsWith('TMP=')) wslTmp = tmpRet.slice(4)
+    }
+    if (wslTmp !== undefined) {
+      return path.win32.resolve(wslTmp, name)
+    }
+  }
+  return path.resolve(os.tmpdir(), name)
 }
 
 export async function generatePuppeteerLaunchArgs(): Promise<
