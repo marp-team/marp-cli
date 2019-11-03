@@ -1,9 +1,9 @@
+import { URL } from 'url'
 import { MarpOptions } from '@marp-team/marp-core'
 import { Marpit, MarpitOptions } from '@marp-team/marpit'
 import chalk from 'chalk'
 import puppeteer from 'puppeteer-core'
-import { URL } from 'url'
-import findChrome from './utils/find-chrome'
+import { generatePuppeteerLaunchArgs } from './utils/puppeteer'
 import { silence, warn } from './cli'
 import { Engine } from './engine'
 import metaPlugin from './engine/meta-plugin'
@@ -403,8 +403,8 @@ export class Converter {
         args.push('--disable-features=VizDisplayCompositor')
 
       Converter.browser = await puppeteer.launch({
+        ...generatePuppeteerLaunchArgs({ profile: 'marp-cli-conversion' }),
         args,
-        executablePath: findChrome(),
       })
 
       Converter.browser.once('disconnected', () => {

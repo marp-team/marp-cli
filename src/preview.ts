@@ -2,7 +2,7 @@ import os from 'os'
 import path from 'path'
 import carlo from 'carlo'
 import { File, FileType } from './file'
-import findChrome from './utils/find-chrome'
+import { generatePuppeteerLaunchArgs } from './utils/puppeteer'
 import TypedEventEmitter from './utils/typed-event-emitter'
 import { ConvertType, mimeTypes } from './converter'
 import { CLIError } from './error'
@@ -69,7 +69,7 @@ export class Preview extends TypedEventEmitter<Preview.Events> {
       ],
       height: this.options.height,
       width: this.options.width,
-      executablePath: findChrome(),
+      executablePath: generatePuppeteerLaunchArgs().executablePath,
       icon: Buffer.from(favicon.slice(22), 'base64'),
       title: 'Marp CLI',
     })
