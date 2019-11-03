@@ -25,7 +25,14 @@ export const resolveWSLPath = async (path: string): Promise<string> =>
 export function generatePuppeteerLaunchArgs({
   profile,
 }: PuppeteerLaunchArgs = {}): Partial<LaunchOptions> {
-  const args = new Set<string>()
+  // Puppeteer >= v1.13.0 doesn't use BGPT due to crbug.com/937609.
+  // https://github.com/GoogleChrome/puppeteer/blob/master/lib/Launcher.js
+  //
+  // But it causes invalid rendering in Marp's `inlineSVG` mode. So we override
+  // `--disable-features` option to prevent disabling BGPT.
+  const args = new Set<string>(['--disable-features=TranslateUI'])
+
+  // Docker environment and WSL environment need to disable sandbox. :(
   if (process.env.IS_DOCKER || isWSL()) args.add('--no-sandbox')
 
   // Workaround for Chrome 73 in docker and unit testing with CircleCI
@@ -48,10 +55,13 @@ export function generatePuppeteerLaunchArgs({
     executablePath = finder ? finder()[0] : undefined
   }
 
-  const ret: Partial<LaunchOptions> = { executablePath }
-
   // Specify data directories (Chrome on WSL must speficy to avoid failing cleanup)
-  if (profile) ret.userDataDir = path.resolve(os.tmpdir(), profile)
+  const userDataDir = profile ? path.resolve(os.tmpdir(), profile) : undefined
 
-  return { ...ret, args: [...args] }
+  return {
+    executablePath,
+    userDataDir,
+    ignoreDefaultArgs: ['--disable-features=TranslateUI,BlinkGenPropertyTrees'],
+    args: [...args],
+  }
 }

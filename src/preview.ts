@@ -59,14 +59,7 @@ export class Preview extends TypedEventEmitter<Preview.Events> {
   private async launch() {
     this.carloInternal = await carlo.launch({
       localDataDir: path.resolve(os.tmpdir(), './marp-cli-carlo'),
-      args: [
-        // Puppeteer >= v1.13.0 cannot use BGPT due to crbug.com/937609.
-        // https://github.com/GoogleChrome/puppeteer/blob/master/lib/Launcher.js
-        //
-        // Related bug is affected only in capturing, so we override
-        // `--disable-features` option to prevent disabling BGPT.
-        '--disable-features=TranslateUI',
-      ],
+      args: ['--disable-features=TranslateUI'],
       height: this.options.height,
       width: this.options.width,
       executablePath: generatePuppeteerLaunchArgs().executablePath,
