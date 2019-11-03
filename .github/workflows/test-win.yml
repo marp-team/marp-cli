@@ -25,7 +25,9 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - name: Install with yarn
-        run: npm install -g yarn && yarn install
+        run: |
+          yarn policies set-version 1.17.3
+          yarn install
       - name: Jest
         run: yarn test:coverage --ci -i --reporters=default --reporters=jest-junit
         env:

@@ -1,9 +1,14 @@
+import { URL } from 'url'
 import { MarpOptions } from '@marp-team/marp-core'
 import { Marpit, MarpitOptions } from '@marp-team/marpit'
 import chalk from 'chalk'
 import puppeteer from 'puppeteer-core'
-import { URL } from 'url'
-import findChrome from './utils/find-chrome'
+import {
+  generatePuppeteerDataDirPath,
+  generatePuppeteerLaunchArgs,
+  isWSL,
+  resolveWSLPath,
+} from './utils/puppeteer'
 import { silence, warn } from './cli'
 import { Engine } from './engine'
 import metaPlugin from './engine/meta-plugin'
@@ -343,9 +348,13 @@ export class Converter {
       return baseFile.saveTmpFile('.html')
     })()
 
-    const uri = tmpFile
-      ? `file://${tmpFile.path}`
-      : `data:text/html;base64,${baseFile.buffer!.toString('base64')}`
+    const uri = await (async () => {
+      if (tmpFile) {
+        if (isWSL()) return `file:${await resolveWSLPath(tmpFile.path)}`
+        return `file://${tmpFile.path}`
+      }
+      return `data:text/html;base64,${baseFile.buffer!.toString('base64')}`
+    })()
 
     try {
       const browser = await Converter.runBrowser()
@@ -394,19 +403,10 @@ export class Converter {
 
   private static async runBrowser() {
     if (!Converter.browser) {
-      const args: string[] = []
-      if (process.env.IS_DOCKER) args.push('--no-sandbox')
-
-      // Workaround for Chrome 73 in docker and unit testing with CircleCI
-      // https://github.com/GoogleChrome/puppeteer/issues/3774
-      if (process.env.IS_DOCKER || process.env.CI)
-        args.push('--disable-features=VizDisplayCompositor')
-
       Converter.browser = await puppeteer.launch({
-        args,
-        executablePath: findChrome(),
+        ...(await generatePuppeteerLaunchArgs()),
+        userDataDir: await generatePuppeteerDataDirPath('marp-cli-conversion'),
       })
-
       Converter.browser.once('disconnected', () => {
         Converter.browser = undefined
       })

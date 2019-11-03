@@ -34,7 +34,9 @@ jobs:
         with:
           node-version: '10.16.3'
       - name: Install with yarn
-        run: npm install -g yarn && yarn install
+        run: |
+          yarn policies set-version 1.17.3
+          yarn install
       - name: Build and create standalone binaries
         run: yarn build:standalone
       - name: Create package
