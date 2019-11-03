@@ -394,19 +394,9 @@ export class Converter {
 
   private static async runBrowser() {
     if (!Converter.browser) {
-      const args: string[] = []
-      if (process.env.IS_DOCKER) args.push('--no-sandbox')
-
-      // Workaround for Chrome 73 in docker and unit testing with CircleCI
-      // https://github.com/GoogleChrome/puppeteer/issues/3774
-      if (process.env.IS_DOCKER || process.env.CI)
-        args.push('--disable-features=VizDisplayCompositor')
-
-      Converter.browser = await puppeteer.launch({
-        ...generatePuppeteerLaunchArgs({ profile: 'marp-cli-conversion' }),
-        args,
-      })
-
+      Converter.browser = await puppeteer.launch(
+        generatePuppeteerLaunchArgs({ profile: 'marp-cli-conversion' })
+      )
       Converter.browser.once('disconnected', () => {
         Converter.browser = undefined
       })
