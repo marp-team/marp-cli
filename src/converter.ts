@@ -3,7 +3,11 @@ import { MarpOptions } from '@marp-team/marp-core'
 import { Marpit, MarpitOptions } from '@marp-team/marpit'
 import chalk from 'chalk'
 import puppeteer from 'puppeteer-core'
-import { generatePuppeteerLaunchArgs } from './utils/puppeteer'
+import {
+  generatePuppeteerLaunchArgs,
+  isWSL,
+  resolveWSLPath,
+} from './utils/puppeteer'
 import { silence, warn } from './cli'
 import { Engine } from './engine'
 import metaPlugin from './engine/meta-plugin'
@@ -343,9 +347,13 @@ export class Converter {
       return baseFile.saveTmpFile('.html')
     })()
 
-    const uri = tmpFile
-      ? `file://${tmpFile.path}`
-      : `data:text/html;base64,${baseFile.buffer!.toString('base64')}`
+    const uri = await (async () => {
+      if (tmpFile) {
+        if (isWSL()) return `file:${await resolveWSLPath(tmpFile.path)}`
+        return `file://${tmpFile.path}`
+      }
+      return `data:text/html;base64,${baseFile.buffer!.toString('base64')}`
+    })()
 
     try {
       const browser = await Converter.runBrowser()

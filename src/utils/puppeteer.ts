@@ -1,7 +1,11 @@
+import { exec } from 'child_process'
+import { promisify } from 'util'
 import os from 'os'
 import path from 'path'
 import { LaunchOptions } from 'puppeteer-core'
 import * as chromeFinder from 'chrome-launcher/dist/chrome-finder'
+
+const execPromise = promisify(exec)
 
 interface PuppeteerLaunchArgs {
   profile?: string
@@ -10,10 +14,13 @@ interface PuppeteerLaunchArgs {
 let executablePath: string | undefined | false = false
 let isWsl: boolean | undefined
 
-function isWSL() {
-  if (isWsl === undefined) isWsl = require('is-wsl')
+export function isWSL(): boolean {
+  if (isWsl === undefined) isWsl = require('is-wsl') as boolean
   return isWsl
 }
+
+export const resolveWSLPath = async (path: string): Promise<string> =>
+  (await execPromise(`wslpath -m ${path.replace(/\\/g, '\\\\')}`)).stdout.trim()
 
 export function generatePuppeteerLaunchArgs({
   profile,
