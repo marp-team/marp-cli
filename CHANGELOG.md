@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v0.15.1 - 2019-11-03
+
 ### Fixed
 
 - Fix no response of conversions in WSL environment ([#175](https://github.com/marp-team/marp-cli/issues/175), [#176](https://github.com/marp-team/marp-cli/pull/176))
