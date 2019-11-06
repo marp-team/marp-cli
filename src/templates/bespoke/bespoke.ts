@@ -1,7 +1,7 @@
 import bespoke from 'bespoke'
-import bespokeForms from 'bespoke-forms'
 import bespokeClasses from './classes'
 import bespokeInactive from './inactive'
+import bespokeInteractive from './interactive'
 import bespokeLoad from './load'
 import bespokeFragments from './fragments'
 import bespokeFullscreen from './fullscreen'
@@ -15,7 +15,7 @@ import { readQuery } from './utils'
 
 export default function(target = document.getElementById('p')!) {
   const deck = bespoke.from(target, [
-    bespokeForms(),
+    bespokeInteractive,
     bespokeClasses,
     bespokeInactive(),
     bespokeLoad,
