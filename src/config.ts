@@ -1,6 +1,6 @@
 import { Marp } from '@marp-team/marp-core'
 import chalk from 'chalk'
-import cosmiconfig from 'cosmiconfig'
+import { cosmiconfig } from 'cosmiconfig'
 import path from 'path'
 import fs from 'fs'
 import osLocale from 'os-locale'
@@ -44,20 +44,10 @@ interface IMarpCLIArguments {
   title?: string
   url?: string
   watch?: boolean
-
-  // Deprecated bespoke arguments
-  bespokeOsc?: boolean
-  bespokeProgress?: boolean
 }
 
-// TODO: Remove deprecated bespoke arguments
-type IMarpCLIDeprecatedBespokeArguments = 'bespokeOsc' | 'bespokeProgress'
-
 export type IMarpCLIConfig = Overwrite<
-  Omit<
-    IMarpCLIArguments,
-    'configFile' | '_' | IMarpCLIDeprecatedBespokeArguments
-  >,
+  Omit<IMarpCLIArguments, 'configFile' | '_'>,
   {
     engine?: ResolvableEngine | ResolvableEngine[]
     html?: ConverterOption['html']
@@ -114,14 +104,10 @@ export class MarpCLIConfig {
         const bespoke = this.conf.bespoke || {}
 
         return {
-          osc: pick(
-            this.args.bespoke && this.args.bespoke.osc,
-            this.args.bespokeOsc, // TODO: Remove deprecated argument
-            bespoke.osc
-          ),
+          // TODO: Better to use TypeScript v3.7 optional chaining
+          osc: pick(this.args.bespoke && this.args.bespoke.osc, bespoke.osc),
           progress: pick(
             this.args.bespoke && this.args.bespoke.progress,
-            this.args.bespokeProgress, // TODO: Remove deprecated argument
             bespoke.progress
           ),
         }
@@ -214,9 +200,6 @@ export class MarpCLIConfig {
       lang: this.conf.lang || (await osLocale()).replace(/@/g, '-'),
       options: this.conf.options || {},
       pages: !!(this.args.images || this.conf.images),
-      readyScript: this.engine.browserScript
-        ? `<script>${this.engine.browserScript}</script>`
-        : undefined,
       watch:
         pick(this.args.watch, this.conf.watch) || preview || server || false,
     }

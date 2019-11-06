@@ -2,9 +2,53 @@
 
 ## [Unreleased]
 
+### Breaking
+
+- Marp CLI requires Node >= v8.16.0
+- [GFM strikethrough syntax](https://github.com/marp-team/marp-core/issues/102) added to Marp Core v0.15.0 may break existing slides
+
+### Added
+
+- Add bespoke interactive plugin to improve event handling ([#181](https://github.com/marp-team/marp-cli/pull/181))
+
+### Fixed
+
+- Navigate twice when hitting space bar after clicked next button on OSC ([#156](https://github.com/marp-team/marp-cli/issues/156), [#181](https://github.com/marp-team/marp-cli/pull/181))
+
+### Changed
+
+- Upgrade Node to v12 LTS ([#179](https://github.com/marp-team/marp-cli/pull/179))
+- Upgrade [Marpit v1.4.2](https://github.com/marp-team/marpit/releases/tag/v1.4.2) and [Marp Core v0.15.1](https://github.com/marp-team/marp-core/releases/tag/v0.15.1) ([#179](https://github.com/marp-team/marp-cli/pull/179))
+- Upgrade dependent packages to the latest version ([#179](https://github.com/marp-team/marp-cli/pull/179))
+
+### Removed
+
+- CSS hack for Chrome scaling on bare template ([#177](https://github.com/marp-team/marp-cli/issues/177), [#178](https://github.com/marp-team/marp-cli/pull/178))
+- Remove deprecated `--bespoke-osc` and `--bespoke-progress` argument options ([#180](https://github.com/marp-team/marp-cli/pull/180))
+
+## v0.15.1 - 2019-11-03
+
+### Fixed
+
+- Fix no response of conversions in WSL environment ([#175](https://github.com/marp-team/marp-cli/issues/175), [#176](https://github.com/marp-team/marp-cli/pull/176))
+
+## v0.15.0 - 2019-10-20
+
 ### Fixed
 
 - Safari prevents moving slide after too many navigations ([#158](https://github.com/marp-team/marp-cli/issues/158), [#160](https://github.com/marp-team/marp-cli/pull/160))
+- Custom engine doesn't render code blocks well ([#168](https://github.com/marp-team/marp-cli/issues/168), [#172](https://github.com/marp-team/marp-cli/pull/172))
+- Support preview mode in macOS Catalina ([#173](https://github.com/marp-team/marp-cli/pull/173))
+- Update Dockerfile to work Chromium correctly ([#174](https://github.com/marp-team/marp-cli/pull/174))
+
+### Changed
+
+- Upgrade [Marpit v1.4.1](https://github.com/marp-team/marpit/releases/tag/v1.4.1) and [Marp Core v0.14.0](https://github.com/marp-team/marp-core/releases/tag/v0.14.0) ([#169](https://github.com/marp-team/marp-cli/pull/169))
+- Upgrade dependent packages to the latest version ([#164](https://github.com/marp-team/marp-cli/pull/164), [#169](https://github.com/marp-team/marp-cli/pull/169))
+
+### Removed
+
+- Remove the detection of helper script from resolved engine ([#171](https://github.com/marp-team/marp-cli/pull/171))
 
 ## v0.14.1 - 2019-09-15
 

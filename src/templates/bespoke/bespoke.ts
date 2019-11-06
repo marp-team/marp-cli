@@ -1,7 +1,7 @@
 import bespoke from 'bespoke'
-import bespokeForms from 'bespoke-forms'
 import bespokeClasses from './classes'
 import bespokeInactive from './inactive'
+import bespokeInteractive from './interactive'
 import bespokeLoad from './load'
 import bespokeFragments from './fragments'
 import bespokeFullscreen from './fullscreen'
@@ -17,7 +17,7 @@ export default function(target = document.getElementById('p')!) {
   const key = popQuery('sync') || undefined
 
   const deck = bespoke.from(target, [
-    bespokeForms(),
+    bespokeInteractive,
     bespokeClasses,
     bespokeInactive(),
     bespokeLoad,

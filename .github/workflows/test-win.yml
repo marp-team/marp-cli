@@ -12,9 +12,9 @@ jobs:
       fail-fast: false
       matrix:
         node-version:
-          - 8.x
-          - '10.16.3'
-          - 12.x
+          - '^8.16.0'
+          - '^10.17.0'
+          - '12.13.0'
 
     steps:
       - uses: actions/checkout@v1
@@ -25,7 +25,9 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - name: Install with yarn
-        run: npm install -g yarn && yarn install
+        run: |
+          yarn policies set-version 1.19.1
+          yarn install
       - name: Jest
         run: yarn test:coverage --ci -i --reporters=default --reporters=jest-junit
         env:

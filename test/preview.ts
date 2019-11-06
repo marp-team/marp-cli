@@ -5,6 +5,7 @@ import { Preview, fileToURI } from '../src/preview'
 import { CLIError } from '../src/error'
 
 jest.mock('path')
+jest.setTimeout(15000)
 
 describe('Preview', () => {
   const previews = new Set<Preview>()

@@ -1,22 +1,15 @@
 import { Marpit } from '@marp-team/marpit'
-import fs from 'fs'
 import path from 'path'
 import pkgUp from 'pkg-up'
-import { promisify } from 'util'
 import importFrom from 'import-from'
 import { CLIError } from './error'
-
-const readFile = promisify(fs.readFile)
 
 export type Engine = typeof Marpit
 export type ResolvableEngine = Engine | string
 
 export class ResolvedEngine {
-  browserScript?: string
   klass: Engine
-  package?: { [key: string]: any }
-
-  private static browserScriptKey = 'marpBrowser'
+  package?: Record<string, any>
 
   static async resolve(
     engine: ResolvableEngine | ResolvableEngine[],
@@ -26,7 +19,7 @@ export class ResolvedEngine {
       ResolvedEngine.resolveModule(engine, from)
     )
 
-    await resolvedEngine.resolveBrowserScript()
+    await resolvedEngine.resolvePackage()
     return resolvedEngine
   }
 
@@ -56,7 +49,7 @@ export class ResolvedEngine {
     this.klass = klass
   }
 
-  private async resolveBrowserScript(): Promise<void> {
+  private async resolvePackage(): Promise<void> {
     const classPath = this.findClassPath(this.klass)
     if (!classPath) return
 
@@ -64,12 +57,6 @@ export class ResolvedEngine {
     if (!pkgPath) return
 
     this.package = require(pkgPath)
-    const scriptPath = this.package![ResolvedEngine.browserScriptKey]
-    if (!scriptPath) return undefined
-
-    this.browserScript = (await readFile(
-      path.resolve(path.dirname(pkgPath), scriptPath)
-    )).toString()
   }
 
   // NOTE: It cannot test because of overriding `require` in Jest context.

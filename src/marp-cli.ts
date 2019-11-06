@@ -145,42 +145,10 @@ export default async function(argv: string[] = []): Promise<number> {
           group: OptionGroup.Template,
           type: 'boolean',
         },
-        'bespoke-osc': {
-          coerce: v => {
-            cli.warn(
-              `${chalk.yellow(
-                '--bespoke-osc'
-              )} option is deprecated. Please use ${chalk.yellow(
-                '--bespoke.osc'
-              )} instead.`
-            )
-            return v
-          },
-          describe: '[DEPRECATED]',
-          group: OptionGroup.Template,
-          hidden: true,
-          type: 'boolean',
-        },
         'bespoke.progress': {
           describe: '[Bespoke] Use progress bar',
           defaultDescription: 'false',
           group: OptionGroup.Template,
-          type: 'boolean',
-        },
-        'bespoke-progress': {
-          coerce: v => {
-            cli.warn(
-              `${chalk.yellow(
-                '--bespoke-progress'
-              )} option is deprecated. Please use ${chalk.yellow(
-                '--bespoke.progress'
-              )} instead.`
-            )
-            return v
-          },
-          describe: '[DEPRECATED]',
-          group: OptionGroup.Template,
-          hidden: true,
           type: 'boolean',
         },
         title: {

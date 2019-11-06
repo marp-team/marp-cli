@@ -17,6 +17,7 @@ afterEach(() => {
 describe("Bespoke template's browser context", () => {
   const marp = new Marp({
     container: new MarpitElement('div', { id: 'p' }),
+    html: true,
   })
 
   const defaultMarkdown = '# 1\n\n---\n\n## 2\n\n---\n\n### 3'
@@ -45,7 +46,7 @@ describe("Bespoke template's browser context", () => {
     }
   }
 
-  const keydown = (opts, target = document) =>
+  const keydown = (opts, target: EventTarget = document) =>
     target.dispatchEvent(new KeyboardEvent('keydown', opts))
 
   describe('Classes', () => {
@@ -263,6 +264,37 @@ describe("Bespoke template's browser context", () => {
       jest.advanceTimersByTime(1)
       expect(parent.className).toContain('bespoke-marp-inactive')
     })
+  })
+
+  describe('Interactive', () => {
+    const elements = {
+      input: '<input type="text" id="element" />',
+      textarea: '<textarea id="element"></textarea>',
+      select: '<select id="element"><option value="a">a</option></select>',
+      button: '<button type="button" id="element">button</button>',
+      audio:
+        '<audio controls src="https://example.com/audio.mp3" id="element"></audio>',
+      video:
+        '<video controls src="https://example.com/video.mp3" id="element"></video>',
+    }
+
+    for (const kind of Object.keys(elements)) {
+      const element = elements[kind]
+
+      it(`prevents navigation on ${kind} element`, () => {
+        render(`${element}\n\n---\n\n2`)
+        const deck = bespoke()
+
+        keydown(
+          { bubbles: true, which: Key.RightArrow },
+          document.getElementById('element')!
+        )
+        expect(deck.slide()).toBe(0)
+
+        keydown({ bubbles: true, which: Key.RightArrow }, deck.slides[0])
+        expect(deck.slide()).toBe(1)
+      })
+    }
   })
 
   describe('Load', () => {
