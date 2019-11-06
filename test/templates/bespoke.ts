@@ -658,19 +658,24 @@ describe("Bespoke template's browser context", () => {
     })
 
     it('updates reference count stored in localStorage', () => {
+      let deck
+      let anotherDeck
+
       replaceLocation('/?sync=test', () => {
-        const deck = bespoke()
+        deck = bespoke()
         expect(getStore('test').reference).toBe(1)
-
-        const anotherDeck = bespoke(document.createElement('div'))
-        expect(getStore('test').reference).toBe(2)
-
-        anotherDeck.destroy()
-        expect(getStore('test').reference).toBe(1)
-
-        deck.destroy()
-        expect(getStore('test')).toBeNull()
       })
+
+      replaceLocation('/?sync=test', () => {
+        anotherDeck = bespoke(document.createElement('div'))
+        expect(getStore('test').reference).toBe(2)
+      })
+
+      anotherDeck.destroy()
+      expect(getStore('test').reference).toBe(1)
+
+      deck.destroy()
+      expect(getStore('test')).toBeNull()
     })
 
     it('stores the state of slide progress by navigation', () => {

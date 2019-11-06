@@ -14,6 +14,7 @@
 ### Fixed
 
 - Navigate twice when hitting space bar after clicked next button on OSC ([#156](https://github.com/marp-team/marp-cli/issues/156), [#181](https://github.com/marp-team/marp-cli/pull/181))
+- Keep generated `sync` query between navigations ([#162](https://github.com/marp-team/marp-cli/pull/162))
 
 ### Changed
 
