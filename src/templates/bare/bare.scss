@@ -16,7 +16,4 @@ body > svg {
   height: 100%;
   scroll-snap-align: center center;
   width: 100%;
-
-  /* Hack for incorrect rendering on Chrome */
-  transform: translateZ(0);
 }
