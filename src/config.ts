@@ -1,6 +1,6 @@
 import { Marp } from '@marp-team/marp-core'
 import chalk from 'chalk'
-import cosmiconfig from 'cosmiconfig'
+import { cosmiconfig } from 'cosmiconfig'
 import path from 'path'
 import fs from 'fs'
 import osLocale from 'os-locale'
