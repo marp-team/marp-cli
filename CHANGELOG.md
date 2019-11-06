@@ -13,6 +13,10 @@
 - Upgrade [Marpit v1.4.2](https://github.com/marp-team/marpit/releases/tag/v1.4.2) and [Marp Core v0.15.1](https://github.com/marp-team/marp-core/releases/tag/v0.15.1) ([#179](https://github.com/marp-team/marp-cli/pull/179))
 - Upgrade dependent packages to the latest version ([#179](https://github.com/marp-team/marp-cli/pull/179))
 
+### Removed
+
+- CSS hack for Chrome scaling on bare template ([#177](https://github.com/marp-team/marp-cli/issues/177), [#178](https://github.com/marp-team/marp-cli/pull/178))
+
 ## v0.15.1 - 2019-11-03
 
 ### Fixed
