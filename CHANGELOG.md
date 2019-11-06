@@ -5,7 +5,7 @@
 ### Breaking
 
 - Marp CLI requires Node >= v8.16.0
-- [GFM strikethrough syntax](https://github.com/marp-team/marp-core/issues/102) added to Marp Core may break existing slides
+- [GFM strikethrough syntax](https://github.com/marp-team/marp-core/issues/102) added to Marp Core v0.15.0 may break existing slides
 
 ### Changed
 
@@ -16,6 +16,7 @@
 ### Removed
 
 - CSS hack for Chrome scaling on bare template ([#177](https://github.com/marp-team/marp-cli/issues/177), [#178](https://github.com/marp-team/marp-cli/pull/178))
+- Remove deprecated `--bespoke-osc` and `--bespoke-progress` argument options ([#180](https://github.com/marp-team/marp-cli/pull/180))
 
 ## v0.15.1 - 2019-11-03
 
