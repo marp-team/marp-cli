@@ -2,6 +2,17 @@
 
 ## [Unreleased]
 
+### Breaking
+
+- Marp CLI requires Node >= v8.16.0
+- [GFM strikethrough syntax](https://github.com/marp-team/marp-core/issues/102) added to Marp Core may break existing slides
+
+### Changed
+
+- Upgrade Node to v12 LTS ([#179](https://github.com/marp-team/marp-cli/pull/179))
+- Upgrade [Marpit v1.4.2](https://github.com/marp-team/marpit/releases/tag/v1.4.2) and [Marp Core v0.15.1](https://github.com/marp-team/marp-core/releases/tag/v0.15.1) ([#179](https://github.com/marp-team/marp-cli/pull/179))
+- Upgrade dependent packages to the latest version ([#179](https://github.com/marp-team/marp-cli/pull/179))
+
 ## v0.15.1 - 2019-11-03
 
 ### Fixed
