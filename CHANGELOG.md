@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v0.16.0 - 2019-11-06
+
 ### Breaking
 
 - Marp CLI requires Node >= v8.16.0
