@@ -1095,11 +1095,6 @@ bcrypt-pbkdf@^1.0.0:
   dependencies:
     tweetnacl "^0.14.3"
 
-bespoke-forms@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/bespoke-forms/-/bespoke-forms-1.0.0.tgz#fccdc60a1f7b598ed7df7c8efe554a4c4d8ce158"
-  integrity sha1-/M3GCh97WY7X33yO/lVKTE2M4Vg=
-
 bespoke@bespokejs/bespoke:
   version "1.2.0-dev"
   resolved "https://codeload.github.com/bespokejs/bespoke/tar.gz/81c1da25210feca2a166ec782abcbf88ae969593"

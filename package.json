@@ -76,7 +76,6 @@
     "@types/yargs": "^13.0.3",
     "autoprefixer": "^9.7.1",
     "bespoke": "bespokejs/bespoke",
-    "bespoke-forms": "^1.0.0",
     "builtin-modules": "^3.1.0",
     "cheerio": "^1.0.0-rc.3",
     "codecov": "^3.6.1",
