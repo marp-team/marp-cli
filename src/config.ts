@@ -44,20 +44,10 @@ interface IMarpCLIArguments {
   title?: string
   url?: string
   watch?: boolean
-
-  // Deprecated bespoke arguments
-  bespokeOsc?: boolean
-  bespokeProgress?: boolean
 }
 
-// TODO: Remove deprecated bespoke arguments
-type IMarpCLIDeprecatedBespokeArguments = 'bespokeOsc' | 'bespokeProgress'
-
 export type IMarpCLIConfig = Overwrite<
-  Omit<
-    IMarpCLIArguments,
-    'configFile' | '_' | IMarpCLIDeprecatedBespokeArguments
-  >,
+  Omit<IMarpCLIArguments, 'configFile' | '_'>,
   {
     engine?: ResolvableEngine | ResolvableEngine[]
     html?: ConverterOption['html']
@@ -114,14 +104,10 @@ export class MarpCLIConfig {
         const bespoke = this.conf.bespoke || {}
 
         return {
-          osc: pick(
-            this.args.bespoke && this.args.bespoke.osc,
-            this.args.bespokeOsc, // TODO: Remove deprecated argument
-            bespoke.osc
-          ),
+          // TODO: Better to use TypeScript v3.7 optional chaining
+          osc: pick(this.args.bespoke && this.args.bespoke.osc, bespoke.osc),
           progress: pick(
             this.args.bespoke && this.args.bespoke.progress,
-            this.args.bespokeProgress, // TODO: Remove deprecated argument
             bespoke.progress
           ),
         }
