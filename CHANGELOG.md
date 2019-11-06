@@ -7,6 +7,14 @@
 - Marp CLI requires Node >= v8.16.0
 - [GFM strikethrough syntax](https://github.com/marp-team/marp-core/issues/102) added to Marp Core v0.15.0 may break existing slides
 
+### Added
+
+- Add bespoke interactive plugin to improve event handling ([#181](https://github.com/marp-team/marp-cli/pull/181))
+
+### Fixed
+
+- Navigate twice when hitting space bar after clicked next button on OSC ([#156](https://github.com/marp-team/marp-cli/issues/156), [#181](https://github.com/marp-team/marp-cli/pull/181))
+
 ### Changed
 
 - Upgrade Node to v12 LTS ([#179](https://github.com/marp-team/marp-cli/pull/179))
