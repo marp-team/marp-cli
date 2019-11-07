@@ -99,10 +99,10 @@ export class Converter {
     const isFile = (f: File | undefined): f is File =>
       !!f && f.type === FileType.File
 
-    const resolveBase = async ({ absoluteFileScheme }: File) =>
+    const resolveBase = async (f: File) =>
       isWSL()
-        ? `file:${await resolveWSLPath(absoluteFileScheme)}`
-        : absoluteFileScheme
+        ? `file:${await resolveWSLPath(f.absolutePath)}`
+        : f.absoluteFileScheme
 
     let additionals = ''
 
