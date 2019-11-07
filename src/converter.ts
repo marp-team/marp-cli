@@ -96,7 +96,13 @@ export class Converter {
 
   async convert(markdown: string, file?: File): Promise<TemplateResult> {
     const { lang, globalDirectives, type } = this.options
-    const isFile = file && file.type === FileType.File
+    const isFile = (f: File | undefined): f is File =>
+      !!f && f.type === FileType.File
+
+    const resolveBase = async (f: File) =>
+      isWSL()
+        ? `file:${await resolveWSLPath(f.absolutePath)}`
+        : f.absoluteFileScheme
 
     let additionals = ''
 
@@ -112,20 +118,20 @@ export class Converter {
       ...(this.options.templateOption || {}),
       lang,
       base:
-        isFile && type !== ConvertType.html
-          ? file!.absoluteFileScheme
+        isFile(file) && type !== ConvertType.html
+          ? await resolveBase(file)
           : undefined,
       notifyWS:
-        isFile && this.options.watch && type === ConvertType.html
-          ? await notifier.register(file!.absolutePath)
+        isFile(file) && this.options.watch && type === ConvertType.html
+          ? await notifier.register(file.absolutePath)
           : undefined,
       renderer: tplOpts => {
         const engine = this.generateEngine(tplOpts)
         const ret = engine.render(`${markdown}${additionals}`)
         const info = engine[engineInfo]
 
-        if (isFile)
-          this.options.themeSet.observe(file!.absolutePath, info && info.theme)
+        if (isFile(file))
+          this.options.themeSet.observe(file.absolutePath, info && info.theme)
 
         return { ...ret, ...info! }
       },
