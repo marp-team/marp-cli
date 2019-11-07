@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix failing `--allow-local-files` option on WSL environment ([#182](https://github.com/marp-team/marp-cli/pull/182))
+
 ## v0.16.0 - 2019-11-06
 
 ### Breaking
