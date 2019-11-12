@@ -20,7 +20,11 @@ export default function bespokeOSC(selector: string = '.bespoke-marp-osc') {
   return deck => {
     osc.addEventListener('click', e => {
       if (e.target instanceof HTMLElement) {
-        switch (e.target.dataset.bespokeMarpOsc) {
+        const { bespokeMarpOsc } = e.target.dataset
+
+        if (bespokeMarpOsc) e.target.blur()
+
+        switch (bespokeMarpOsc) {
           case 'next':
             deck.next()
             break

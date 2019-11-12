@@ -76,6 +76,9 @@ $progressHeight: 5px;
         white-space: nowrap;
         z-index: 1;
 
+        /* Hack for Chrome to show OSC overlay onto video correctly */
+        will-change: transform;
+
         > * {
           margin-left: 6px;
 

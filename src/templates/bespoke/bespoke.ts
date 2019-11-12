@@ -1,7 +1,7 @@
 import bespoke from 'bespoke'
-import bespokeForms from 'bespoke-forms'
 import bespokeClasses from './classes'
 import bespokeInactive from './inactive'
+import bespokeInteractive from './interactive'
 import bespokeLoad from './load'
 import bespokeFragments from './fragments'
 import bespokeFullscreen from './fullscreen'
@@ -36,7 +36,7 @@ export default function(target = document.getElementById('p')!) {
       //   P  N
       [[x, x, _], bespokeSync({ key })],
       [[x, x, x], bespokePresenter(target)],
-      [[x, x, _], bespokeForms()],
+      [[x, x, _], bespokeInteractive],
       [[x, x, x], bespokeClasses],
       [[x, _, _], bespokeInactive()],
       [[x, x, x], bespokeLoad],

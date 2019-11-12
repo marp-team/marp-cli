@@ -1,7 +1,9 @@
-import os from 'os'
-import path from 'path'
 import carlo from 'carlo'
 import { File, FileType } from './file'
+import {
+  generatePuppeteerDataDirPath,
+  generatePuppeteerLaunchArgs,
+} from './utils/puppeteer'
 import TypedEventEmitter from './utils/typed-event-emitter'
 import { ConvertType, mimeTypes } from './converter'
 import { CLIError } from './error'
@@ -56,23 +58,14 @@ export class Preview extends TypedEventEmitter<Preview.Events> {
   }
 
   private async launch() {
-    this.carloInternal = await carlo.launch({
-      localDataDir: path.resolve(os.tmpdir(), './marp-cli-carlo'),
-      args: [
-        // Fix wrong rendered position of elements in <foreignObject>
-        // https://bugs.chromium.org/p/chromium/issues/detail?id=467484
-        '--enable-blink-gen-property-trees',
+    const baseArgs = await generatePuppeteerLaunchArgs()
 
-        // Puppeteer >= v1.13.0 cannot use BGPT due to crbug.com/937609.
-        // https://github.com/GoogleChrome/puppeteer/commit/ef2251d7a722bcd6d183f7876673224ac58f2244
-        //
-        // Related bug is affected only in capturing, so we override
-        // `--disable-features` option to prevent disabling BGPT.
-        '--disable-features=site-per-process,TranslateUI',
-      ],
+    this.carloInternal = await carlo.launch({
+      localDataDir: await generatePuppeteerDataDirPath('marp-cli-carlo'),
+      args: baseArgs.args,
       height: this.options.height,
       width: this.options.width,
-      channel: ['canary', 'stable'],
+      executablePath: baseArgs.executablePath,
       icon: Buffer.from(favicon.slice(22), 'base64'),
       title: 'Marp CLI',
     })

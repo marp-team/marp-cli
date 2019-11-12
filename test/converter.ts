@@ -2,7 +2,7 @@ import Marp from '@marp-team/marp-core'
 import { MarpitOptions } from '@marp-team/marpit'
 import cheerio from 'cheerio'
 import fs from 'fs'
-import imageSize from 'image-size'
+import { imageSize } from 'image-size'
 import os from 'os'
 import path from 'path'
 import { URL } from 'url'
@@ -83,16 +83,11 @@ describe('Converter', () => {
 
     it('returns the result of template', async () => {
       const options: any = { html: true }
-      const readyScript = '<b>ready</b>'
-      const { result, rendered } = await instance({
-        options,
-        readyScript,
-      }).convert(md)
+      const { result, rendered } = await instance({ options }).convert(md)
 
       expect(result).toMatch(/^<!DOCTYPE html>[\s\S]+<\/html>$/)
       expect(result).toContain(rendered.html)
       expect(result).toContain(rendered.css)
-      expect(result).toContain(readyScript)
       expect(result).not.toContain('<base')
       expect(rendered.css).toContain('@theme default')
     })
@@ -425,7 +420,7 @@ describe('Converter', () => {
           expect(write.mock.calls[0][0]).toBe('a.png')
           expect(png.toString('ascii', 1, 4)).toBe('PNG')
 
-          const { width, height } = imageSize(png, undefined)
+          const { width, height } = imageSize(png) as any
           expect(width).toBe(1280)
           expect(height).toBe(720)
         },
@@ -441,7 +436,7 @@ describe('Converter', () => {
             await converter.convertFile(new File(slide43Path))
             const png: Buffer = write.mock.calls[0][1]
 
-            const { width, height } = imageSize(png, undefined)
+            const { width, height } = imageSize(png) as any
             expect(width).toBe(960)
             expect(height).toBe(720)
           },
@@ -470,7 +465,7 @@ describe('Converter', () => {
           expect(jpeg[0]).toBe(0xff)
           expect(jpeg[1]).toBe(0xd8)
 
-          const { width, height } = imageSize(jpeg, undefined)
+          const { width, height } = imageSize(jpeg) as any
           expect(width).toBe(1280)
           expect(height).toBe(720)
         },
@@ -486,7 +481,7 @@ describe('Converter', () => {
             await converter.convertFile(new File(slide43Path))
             const jpeg: Buffer = write.mock.calls[0][1]
 
-            const { width, height } = imageSize(jpeg, undefined)
+            const { width, height } = imageSize(jpeg) as any
             expect(width).toBe(960)
             expect(height).toBe(720)
           },
