@@ -34,7 +34,7 @@ export default function infoPlugin(md: any) {
     }
 
     for (const token of state.tokens) {
-      if (token.meta && token.meta.marpitSlideElement === 1) info.length += 1
+      if (token.meta?.marpitSlideElement === 1) info.length += 1
     }
 
     marpit[engineInfo] = info

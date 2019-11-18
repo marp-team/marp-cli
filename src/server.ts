@@ -91,9 +91,9 @@ export class Server extends TypedEventEmitter<Server.Events> {
 
   private async loadScript() {
     if (Server.script === undefined) {
-      Server.script = (await readFile(
-        path.resolve(__dirname, './server/server-index.js')
-      )).toString()
+      Server.script = (
+        await readFile(path.resolve(__dirname, './server/server-index.js'))
+      ).toString()
     }
 
     return Server.script
@@ -130,7 +130,7 @@ export class Server extends TypedEventEmitter<Server.Events> {
       await response(validated.path)
     } else {
       // Find default files from current directory
-      if (validated.stats && validated.stats.isDirectory()) {
+      if (validated.stats?.isDirectory()) {
         for (const dirIdxFn of this.directoryIndex) {
           const dirIdxValidated = await this.validateMarkdown(
             path.join(path.relative(this.inputDir, validated.path), dirIdxFn)
@@ -165,7 +165,7 @@ export class Server extends TypedEventEmitter<Server.Events> {
 
       for (const f of fileList) {
         const { name, stat } = f
-        const directory = stat && stat.isDirectory()
+        const directory = stat?.isDirectory()
         const parent = name === '..' && directory
         const nodeModules = name === 'node_modules' && directory
         const convertible =
@@ -202,7 +202,7 @@ export class Server extends TypedEventEmitter<Server.Events> {
     let stats: fs.Stats | undefined
     try {
       stats = fetchedStats || (await stat(targetPath))
-      valid = valid && !!(stats && stats.isFile())
+      valid = valid && !!stats?.isFile()
     } catch (e) {
       valid = false
     }

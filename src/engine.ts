@@ -34,7 +34,7 @@ export class ResolvedEngine {
           (from && importFrom.silent(path.dirname(path.resolve(from)), eng)) ||
           importFrom.silent(process.cwd(), eng)
 
-        if (resolved && resolved.__esModule) resolved = resolved.default
+        if (resolved?.__esModule) resolved = resolved.default
       } else {
         resolved = eng
       }
@@ -66,7 +66,7 @@ export class ResolvedEngine {
 
       if (
         expt === klass ||
-        (expt && expt.__esModule && Object.values(expt).includes(klass))
+        (expt?.__esModule && Object.values(expt).includes(klass))
       )
         return moduleId
     }
