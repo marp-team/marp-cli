@@ -50,7 +50,7 @@ export default function bespokeNavigation(opts: BespokeNavigationOption = {}) {
 
       const detectScrollable = (elm: HTMLElement, dir: Direction) => {
         if (elm) scrollable = scrollable || isScrollable(elm, dir)
-        if (elm && elm.parentElement) detectScrollable(elm.parentElement, dir)
+        if (elm?.parentElement) detectScrollable(elm.parentElement, dir)
       }
 
       if (e.deltaX !== 0) detectScrollable(<HTMLElement>e.target, Direction.X)

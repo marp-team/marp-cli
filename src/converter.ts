@@ -131,7 +131,7 @@ export class Converter {
         const info = engine[engineInfo]
 
         if (isFile(file))
-          this.options.themeSet.observe(file.absolutePath, info && info.theme)
+          this.options.themeSet.observe(file.absolutePath, info?.theme)
 
         return { ...ret, ...info! }
       },
@@ -322,10 +322,9 @@ export class Converter {
     const { prototype } = this.options.engine
     const opts = { ...options, ...mergeOptions, html }
 
-    const engine =
-      prototype && prototype.hasOwnProperty('constructor')
-        ? new this.options.engine(opts)
-        : (<any>this.options.engine)(opts)
+    const engine = prototype?.hasOwnProperty('constructor')
+      ? new this.options.engine(opts)
+      : (<any>this.options.engine)(opts)
 
     if (typeof engine.render !== 'function')
       error('Specified engine has not implemented render() method.')

@@ -13,7 +13,6 @@ import { Theme, ThemeSet } from './theme'
 import { TemplateOption } from './templates'
 
 const lstat = promisify(fs.lstat)
-const pick = <T>(...args: T[]): T | undefined => args.find(v => v !== undefined)
 
 type Overwrite<T, U> = Omit<T, Extract<keyof T, keyof U>> & U
 
@@ -86,7 +85,7 @@ export class MarpCLIConfig {
 
   async converterOption(): Promise<ConverterOption> {
     const inputDir = await this.inputDir()
-    const server = pick(this.args.server, this.conf.server) || false
+    const server = this.args.server ?? this.conf.server ?? false
     const output = (() => {
       if (server) return false
       if (this.args.output !== undefined) return this.args.output
@@ -104,12 +103,8 @@ export class MarpCLIConfig {
         const bespoke = this.conf.bespoke || {}
 
         return {
-          // TODO: Better to use TypeScript v3.7 optional chaining
-          osc: pick(this.args.bespoke && this.args.bespoke.osc, bespoke.osc),
-          progress: pick(
-            this.args.bespoke && this.args.bespoke.progress,
-            bespoke.progress
-          ),
+          osc: this.args.bespoke?.osc ?? bespoke.osc,
+          progress: this.args.bespoke?.progress ?? bespoke.progress,
         }
       }
       return {}
@@ -164,7 +159,7 @@ export class MarpCLIConfig {
     })()
 
     const preview = (() => {
-      const p = pick(this.args.preview, this.conf.preview) || false
+      const p = this.args.preview ?? this.conf.preview ?? false
 
       if (p && process.env.IS_DOCKER) {
         warn(
@@ -186,22 +181,21 @@ export class MarpCLIConfig {
       themeSet,
       type,
       allowLocalFiles:
-        pick(this.args.allowLocalFiles, this.conf.allowLocalFiles) || false,
+        this.args.allowLocalFiles ?? this.conf.allowLocalFiles ?? false,
       engine: this.engine.klass,
       globalDirectives: {
-        description: pick(this.args.description, this.conf.description),
-        image: pick(this.args.ogImage, this.conf.ogImage),
+        description: this.args.description ?? this.conf.description,
+        image: this.args.ogImage ?? this.conf.ogImage,
         theme: theme instanceof Theme ? theme.name : theme,
-        title: pick(this.args.title, this.conf.title),
-        url: pick(this.args.url, this.conf.url),
+        title: this.args.title ?? this.conf.title,
+        url: this.args.url ?? this.conf.url,
       },
-      html: pick(this.args.html, this.conf.html),
-      jpegQuality: pick(this.args.jpegQuality, this.conf.jpegQuality) || 85,
+      html: this.args.html ?? this.conf.html,
+      jpegQuality: this.args.jpegQuality ?? this.conf.jpegQuality ?? 85,
       lang: this.conf.lang || (await osLocale()).replace(/@/g, '-'),
       options: this.conf.options || {},
       pages: !!(this.args.images || this.conf.images),
-      watch:
-        pick(this.args.watch, this.conf.watch) || preview || server || false,
+      watch: (this.args.watch ?? this.conf.watch) || preview || server || false,
     }
   }
 
