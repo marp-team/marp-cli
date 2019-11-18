@@ -178,25 +178,29 @@ export class File {
     }
 
     // Find remaining path through globby
-    ;(await globby(globs, {
-      absolute: true,
-      ignore: ['**/node_modules'],
-      ...opts,
-    })).forEach(p => filepaths.add(p))
+    ;(
+      await globby(globs, {
+        absolute: true,
+        ignore: ['**/node_modules'],
+        ...opts,
+      })
+    ).forEach(p => filepaths.add(p))
 
     return [...filepaths.values()].map(p => path.normalize(p))
   }
 
   static async find(...paths: string[]): Promise<File[]> {
-    return (await this.findPath(
-      {
-        expandDirectories: {
-          extensions: [],
-          files: markdownExtensions.map(ext => `*.${ext}`),
+    return (
+      await this.findPath(
+        {
+          expandDirectories: {
+            extensions: [],
+            files: markdownExtensions.map(ext => `*.${ext}`),
+          },
         },
-      },
-      ...paths
-    )).map(p => new File(p))
+        ...paths
+      )
+    ).map(p => new File(p))
   }
 
   static async findDir(directory: string): Promise<File[]> {
