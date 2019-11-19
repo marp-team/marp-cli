@@ -20,22 +20,37 @@ jobs:
       - uses: actions/checkout@v1
         with:
           fetch-depth: 1
+
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-      - name: Install with yarn
-        run: |
-          yarn policies set-version 1.19.1
-          yarn install
+
+      - name: Install yarn
+        run: yarn policies set-version 1.19.1
+
+      - name: Restore node_modules cache
+        uses: actions/cache@v1
+        with:
+          path: node_modules
+          key: node_modules-${{ runner.os }}-${{ matrix.node-version }}-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            node_modules-${{ runner.os }}-${{ matrix.node-version }}-
+            node_modules-${{ runner.os }}-
+
+      - name: Install dependencies with yarn
+        run: yarn install
+
       - name: Jest
         run: yarn test:coverage --ci -i --reporters=default --reporters=jest-junit
         env:
           CI: true
+
       - uses: actions/upload-artifact@v1
         with:
           name: coverage
           path: coverage
+
       - name: Codecov
         run: yarn codecov -F windows
         env:
