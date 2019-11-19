@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Update community health files ([#185](https://github.com/marp-team/marp-cli/pull/185))
+
 ## v0.16.2 - 2019-11-18
 
 ### Changed
