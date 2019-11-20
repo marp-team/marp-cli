@@ -5,8 +5,15 @@ on:
   - push
 
 jobs:
+  validate:
+    runs-on: ubuntu-latest
+    if: "! ( contains(github.event.head_commit.message, '[ci skip]') || contains(github.event.head_commit.message, '[skip ci]') )"
+    steps:
+      - run: echo "${{ github.event.head_commit.message }}"
+
   win-test:
     runs-on: windows-latest
+    needs: validate
 
     strategy:
       fail-fast: false
