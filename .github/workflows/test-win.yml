@@ -29,6 +29,19 @@ jobs:
       - name: Install yarn
         run: yarn policies set-version 1.19.1
 
+      - name: Get yarn cache
+        id: yarn-cache
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+
+      - name: Cache yarn
+        uses: actions/cache@v1
+        with:
+          path: ${{ steps.yarn-cache.outputs.dir }}
+          key: yarn_cache-${{ runner.os }}-${{ matrix.node-version }}-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            yarn_cache-${{ runner.os }}-${{ matrix.node-version }}-
+            yarn_cache-${{ runner.os }}-
+
       - name: Cache node_modules
         uses: actions/cache@v1
         with:
