@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Setup cache, badge, and skip tag support for GitHub Actions ([#186](https://github.com/marp-team/marp-cli/pull/186))
+
 ### Changed
 
 - Update community health files ([#185](https://github.com/marp-team/marp-cli/pull/185))
