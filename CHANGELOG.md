@@ -2,6 +2,21 @@
 
 ## [Unreleased]
 
+### Added
+
+- Setup cache, badge, and skip tag support for GitHub Actions ([#186](https://github.com/marp-team/marp-cli/pull/186))
+
+### Changed
+
+- Update community health files ([#185](https://github.com/marp-team/marp-cli/pull/185))
+
+## v0.16.2 - 2019-11-18
+
+### Changed
+
+- Upgrade [Marp Core v0.15.2](https://github.com/marp-team/marp-core/releases/tag/v0.15.2) ([#184](https://github.com/marp-team/marp-cli/pull/184))
+- Upgrade dependent packages to the latest version ([#184](https://github.com/marp-team/marp-cli/pull/184))
+
 ## v0.16.1 - 2019-11-07
 
 ### Fixed

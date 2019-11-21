@@ -85,7 +85,7 @@ export const bespoke: Template<TemplateBespokeOption> = async opts => {
       bespoke: {
         css: bespokeScss,
         js: await libJs('bespoke.js'),
-        osc: opts.osc === undefined ? true : opts.osc,
+        osc: opts.osc ?? true,
         progress: opts.progress,
       },
       watchJs: await watchJs(opts.notifyWS),

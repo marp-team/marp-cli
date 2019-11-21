@@ -11,12 +11,7 @@ const connect = (path: string, reconnect: boolean = false) => {
     console.warn(
       `[Marp CLI] WebSocket for file watcher was disconnected. Try re-connecting in ${reconnectMs}ms...`
     )
-    setTimeout(() => {
-      connect(
-        path,
-        true
-      )
-    }, reconnectMs)
+    setTimeout(() => connect(path, true), reconnectMs)
   })
   ws.addEventListener('message', e => {
     if (e.data === 'reload') location.reload()

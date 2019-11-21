@@ -1,6 +1,7 @@
 # @marp-team/marp-cli
 
 [![CircleCI](https://img.shields.io/circleci/project/github/marp-team/marp-cli/master.svg?style=flat-square&logo=circleci)](https://circleci.com/gh/marp-team/marp-cli/)
+[![GitHub Actions](https://github.com/marp-team/marp-cli/workflows/Test%20for%20Windows/badge.svg?branch=master)](https://github.com/marp-team/marp-cli/actions?query=workflow%3A%22Test+for+Windows%22+branch%3Amaster)
 [![Codecov](https://img.shields.io/codecov/c/github/marp-team/marp-cli/master.svg?style=flat-square&logo=codecov)](https://codecov.io/gh/marp-team/marp-cli)
 [![npm](https://img.shields.io/npm/v/@marp-team/marp-cli.svg?style=flat-square&logo=npm)](https://www.npmjs.com/package/@marp-team/marp-cli)
 [![Docker](https://img.shields.io/docker/pulls/marpteam/marp-cli.svg?logo=docker&style=flat-square)](https://hub.docker.com/r/marpteam/marp-cli/)
@@ -465,7 +466,7 @@ For example, the below configuration will set constructor option for Marp Core a
 
 ## Contributing
 
-Are you interested in contributing? Please see [CONTRIBUTING.md](.github/CONTRIBUTING.md).
+Are you interested in contributing? Please see [CONTRIBUTING.md](.github/CONTRIBUTING.md) and [the common contributing guideline for Marp team](https://github.com/marp-team/.github/blob/master/CONTRIBUTING.md).
 
 ## Author
 
