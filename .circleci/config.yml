@@ -149,7 +149,7 @@ jobs:
     executor:
       name: node
       browser: true
-      version: '12.13.0' # Specify LTS version for development
+      version: '12.13.1' # Specify LTS version for development
     steps:
       - test
 
