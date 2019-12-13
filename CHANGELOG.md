@@ -9,6 +9,7 @@
 ### Changed
 
 - Update community health files ([#185](https://github.com/marp-team/marp-cli/pull/185))
+- Upgrade Node and dependent packages to the latest version ([#191](https://github.com/marp-team/marp-cli/pull/191))
 
 ## v0.16.2 - 2019-11-18
 
