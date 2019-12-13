@@ -32,7 +32,7 @@ commands:
         default: []
       yarn:
         type: string
-        default: 1.19.1
+        default: 1.21.1
     steps:
       - run:
           name: Upgrade yarn for current user
