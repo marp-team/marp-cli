@@ -4,7 +4,7 @@
 
 ### Added
 
-- Setup cache, badge, and skip tag support for GitHub Actions ([#186](https://github.com/marp-team/marp-cli/pull/186))
+- Setup cache, badge, and skip tag support for GitHub Actions ([#186](https://github.com/marp-team/marp-cli/pull/186), [#192](https://github.com/marp-team/marp-cli/pull/192))
 
 ### Changed
 
