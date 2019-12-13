@@ -233,7 +233,7 @@ export class Converter {
     await this.usePuppeteer(html, async (page, uri) => {
       await page.setViewport(tpl.rendered.size)
       await page.goto(uri, { waitUntil: ['domcontentloaded', 'networkidle0'] })
-      await page.emulateMedia('print')
+      await page.emulateMediaType('print')
 
       const screenshot = async (pageNumber?: number) => {
         await page.evaluate(

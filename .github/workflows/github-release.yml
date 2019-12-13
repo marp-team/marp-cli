@@ -32,10 +32,10 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v1
         with:
-          node-version: '12.13.0'
+          node-version: '12.13.1'
       - name: Install with yarn
         run: |
-          yarn policies set-version 1.19.1
+          yarn policies set-version 1.21.1
           yarn install
       - name: Build and create standalone binaries
         run: yarn build:standalone
