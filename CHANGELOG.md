@@ -2,14 +2,19 @@
 
 ## [Unreleased]
 
+### Breaking
+
+- Drop support for EOL Node 8 (Require Node >= 10) ([#198](https://github.com/marp-team/marp-cli/pull/198))
+
 ### Added
 
 - Setup cache, badge, and skip tag support for GitHub Actions ([#186](https://github.com/marp-team/marp-cli/pull/186), [#192](https://github.com/marp-team/marp-cli/pull/192))
 
 ### Changed
 
+- Upgrade [Marpit v1.5.0](https://github.com/marp-team/marpit/releases/tag/v1.5.0) and [Marp Core v1.0.1](https://github.com/marp-team/marp-core/releases/tag/v1.0.1) ([#198](https://github.com/marp-team/marp-cli/pull/198))
 - Update community health files ([#185](https://github.com/marp-team/marp-cli/pull/185))
-- Upgrade Node and dependent packages to the latest version ([#191](https://github.com/marp-team/marp-cli/pull/191))
+- Upgrade Node and dependent packages to the latest version ([#191](https://github.com/marp-team/marp-cli/pull/191), [#198](https://github.com/marp-team/marp-cli/pull/198))
 
 ## v0.16.2 - 2019-11-18
 
