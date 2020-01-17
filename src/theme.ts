@@ -125,7 +125,8 @@ export class ThemeSet {
     const fnForWatch: Set<string> = new Set(found.map(f => path.resolve(f)))
 
     for (const f of fn) {
-      if (!hasMagic(f)) {
+      // globby's hasMagic (backed by fast-glob) always recognizes "\\" (Windows path separator) as the escape character.
+      if (!hasMagic(f.split(path.sep).join('/'))) {
         try {
           const stat: fs.Stats = await lstat(f)
 
