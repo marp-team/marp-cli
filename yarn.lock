@@ -313,10 +313,10 @@
     "@types/istanbul-reports" "^1.1.1"
     "@types/yargs" "^13.0.0"
 
-"@marp-team/marp-core@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@marp-team/marp-core/-/marp-core-1.0.0.tgz#90260c71c9192f00bce3e6862e94bcf552755856"
-  integrity sha512-aNt+RV+glyNyIrzF1DO1/lWuIUAJ6cX6mZv02ivrQHaQ1oMCVXqOLh8BpTLjgJXTqRPpiiCyQMAxFRnMSUMoOw==
+"@marp-team/marp-core@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@marp-team/marp-core/-/marp-core-1.0.1.tgz#abc62bd6392734c7198590be3c190dc1a8075abd"
+  integrity sha512-lTt+qhkcMXuOgXZShV8FnMz66J+2bSUgXgtAZ3XtUMeEHZcinWhgOrBGzzmX59uvjR6UgwbYOJPJiESxNgObwg==
   dependencies:
     "@marp-team/marpit" "^1.5.0"
     "@marp-team/marpit-svg-polyfill" "^1.2.0"

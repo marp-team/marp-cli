@@ -120,7 +120,7 @@
     "zip-stream": "^2.1.3"
   },
   "dependencies": {
-    "@marp-team/marp-core": "^1.0.0",
+    "@marp-team/marp-core": "^1.0.1",
     "@marp-team/marpit": "^1.5.0",
     "@marp-team/pptx": "^0.1.0",
     "carlo": "^0.9.46",
