@@ -129,14 +129,6 @@ jobs:
     steps:
       - audit
 
-  test-node8:
-    executor:
-      name: node
-      browser: true
-      version: '8'
-    steps:
-      - test
-
   test-node10:
     executor:
       name: node
@@ -169,9 +161,6 @@ workflows:
   test:
     jobs:
       - audit
-      - test-node8:
-          requires:
-            - audit
       - test-node10:
           requires:
             - audit
@@ -180,7 +169,6 @@ workflows:
             - audit
       - docker-image-latest:
           requires:
-            - test-node8
             - test-node10
             - test-node12
           filters:

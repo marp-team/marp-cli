@@ -26,7 +26,7 @@
     "url": "https://github.com/marp-team/marp-cli"
   },
   "engines": {
-    "node": ">=8.16.0"
+    "node": ">=10"
   },
   "main": "lib/marp-cli.js",
   "types": "types/src/marp-cli.d.ts",
