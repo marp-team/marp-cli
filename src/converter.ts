@@ -1,6 +1,6 @@
 import { URL } from 'url'
 import { MarpOptions } from '@marp-team/marp-core'
-import { Marpit, MarpitOptions } from '@marp-team/marpit'
+import { Marpit, Options as MarpitOptions } from '@marp-team/marpit'
 import chalk from 'chalk'
 import puppeteer from 'puppeteer-core'
 import {

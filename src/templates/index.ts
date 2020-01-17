@@ -1,4 +1,4 @@
-import { MarpitOptions, MarpitRenderResult, Element } from '@marp-team/marpit'
+import { Element, Options, RenderResult } from '@marp-team/marpit'
 import fs from 'fs'
 import path from 'path'
 import { promisify } from 'util'
@@ -9,7 +9,7 @@ import bespokeScss from './bespoke/bespoke.scss'
 
 const readFile = promisify(fs.readFile)
 
-type RendererResult = MarpitRenderResult &
+type RendererResult = RenderResult &
   TemplateMeta & {
     length: number
     size: RenderedSize
@@ -19,7 +19,7 @@ interface TemplateCoreOption {
   base?: string
   lang: string
   notifyWS?: string
-  renderer: (tplOpts: MarpitOptions) => RendererResult
+  renderer: (tplOpts: Options) => RendererResult
 }
 
 export interface TemplateMeta {
