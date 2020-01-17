@@ -1,5 +1,5 @@
 import Marp from '@marp-team/marp-core'
-import { MarpitOptions } from '@marp-team/marpit'
+import { Options } from '@marp-team/marpit'
 import cheerio from 'cheerio'
 import fs from 'fs'
 import { imageSize } from 'image-size'
@@ -54,7 +54,7 @@ describe('Converter', () => {
         engine: Marp,
         globalDirectives: { theme: 'default' },
         lang: 'fr',
-        options: <MarpitOptions>{ html: true },
+        options: <Options>{ html: true },
         server: false,
         template: 'test-template',
         templateOption: {},
