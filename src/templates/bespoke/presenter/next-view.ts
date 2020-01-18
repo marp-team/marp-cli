@@ -1,6 +1,6 @@
 export default function nextView(deck) {
   // Listen "navigate" message from parent
-  window.addEventListener('message', e => {
+  const listener = (e: MessageEvent) => {
     if (e.origin !== window.origin) return
 
     const [dir, args] = e.data.split(':')
@@ -13,5 +13,8 @@ export default function nextView(deck) {
       })
       deck.next()
     }
-  })
+  }
+
+  window.addEventListener('message', listener)
+  deck.on('destroy', () => window.removeEventListener('message', listener))
 }
