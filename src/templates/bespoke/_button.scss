@@ -1,0 +1,70 @@
+@mixin _button-icon($icon) {
+  background: transparent url($icon) no-repeat center center;
+  background-size: contain;
+  overflow: hidden;
+  text-indent: 100%;
+  white-space: nowrap;
+}
+
+@mixin button-icon($icon, $size: 32px) {
+  @extend %button-#{$icon};
+  @include button-size($size);
+}
+
+@mixin button-size($size) {
+  height: $size;
+  line-height: $size;
+  width: $size;
+}
+
+%button {
+  appearance: none;
+  background-color: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  font-size: inherit;
+  opacity: 0.8;
+  outline: none;
+  padding: 0;
+  transition: opacity 0.2s linear;
+  -webkit-tap-highlight-color: transparent;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.15 !important;
+  }
+
+  &:hover {
+    opacity: 1;
+
+    &:active {
+      opacity: 0.6;
+    }
+
+    &:not(:disabled) {
+      transition: none;
+    }
+  }
+}
+
+// Use placeholder selectors to prevent multi time definitions of image data URI
+%button-prev {
+  @include _button-icon('../../assets/osc-prev.svg');
+}
+
+%button-next {
+  @include _button-icon('../../assets/osc-next.svg');
+}
+
+%button-fullscreen {
+  @include _button-icon('../../assets/osc-fullscreen.svg');
+
+  &.exit {
+    background-image: url('../../assets/osc-fullscreen-exit.svg');
+  }
+}
+
+%button-presenter {
+  @include _button-icon('../../assets/osc-presenter.svg');
+}

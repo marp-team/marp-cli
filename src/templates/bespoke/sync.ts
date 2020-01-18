@@ -43,9 +43,12 @@ export default function bespokeSync(opts: BespokeSyncOption = {}) {
 
     // Update storage value to store current page and fragment index
     // (Wrap by setTimeout to skip fragment event for initialization)
+    let updateFragment = true
+
     setTimeout(() => {
       deck.on('fragment', (e: FragmentEvent) => {
-        setState(() => ({ index: e.index, fragmentIndex: e.fragmentIndex }))
+        if (updateFragment)
+          setState(() => ({ index: e.index, fragmentIndex: e.fragmentIndex }))
       })
     }, 0)
 
@@ -59,7 +62,12 @@ export default function bespokeSync(opts: BespokeSyncOption = {}) {
           prev.index !== current.index ||
           prev.fragmentIndex !== current.fragmentIndex
         ) {
-          deck.slide(current.index, { fragment: current.fragmentIndex })
+          try {
+            updateFragment = false
+            deck.slide(current.index, { fragment: current.fragmentIndex })
+          } finally {
+            updateFragment = true
+          }
         }
       }
     })

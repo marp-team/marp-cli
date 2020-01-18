@@ -34,6 +34,9 @@ export default function bespokeOSC(selector: string = '.bespoke-marp-osc') {
           case 'fullscreen':
             if (typeof deck.fullscreen === 'function' && screenfull.isEnabled)
               deck.fullscreen()
+            break
+          case 'presenter':
+            deck.openPresenterView()
         }
       }
     })

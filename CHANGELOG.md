@@ -8,6 +8,7 @@
 
 ### Added
 
+- Presenter view for bespoke template ([#142](https://github.com/marp-team/marp-cli/issues/142), [#157](https://github.com/marp-team/marp-cli/pull/157))
 - Setup cache, badge, and skip tag support for GitHub Actions ([#186](https://github.com/marp-team/marp-cli/pull/186), [#192](https://github.com/marp-team/marp-cli/pull/192))
 
 ### Changed

@@ -4,9 +4,14 @@ import { Element as MarpitElement } from '@marp-team/marpit'
 import { default as screenfull, Screenfull } from 'screenfull'
 import { Key } from 'ts-keycode-enum'
 import bespoke from '../../src/templates/bespoke/bespoke'
+import { classes } from '../../src/templates/bespoke/presenter/presenter-view'
 
 jest.mock('screenfull')
 jest.useFakeTimers()
+
+beforeAll(() => {
+  ;(global as any).origin = 'null'
+})
 
 afterEach(() => {
   window.dispatchEvent(new Event('unload'))
@@ -26,7 +31,16 @@ describe("Bespoke template's browser context", () => {
     md = defaultMarkdown,
     targetDocument = document
   ): HTMLElement => {
-    targetDocument.body.innerHTML = marp.render(md).html
+    let { html, comments } = marp.render(md) // tslint:disable-line: prefer-const
+
+    comments.forEach((c, i) => {
+      if (c.length > 0)
+        html = `${html}<div class="bespoke-marp-note" data-index="${i}"><p>${c.join(
+          '\n\n'
+        )}</p></div>`
+    })
+
+    targetDocument.body.innerHTML = html
     return targetDocument.getElementById('p')!
   }
 
@@ -471,6 +485,7 @@ describe("Bespoke template's browser context", () => {
             <button data-bespoke-marp-osc="prev">Prev</button>
             <button data-bespoke-marp-osc="next">Next</button>
             <button data-bespoke-marp-osc="fullscreen">Toggle fullscreen</button>
+            <button data-bespoke-marp-osc="presenter">Open presenter view</button>
           `
 
           document.body.appendChild(osc)
@@ -526,6 +541,17 @@ describe("Bespoke template's browser context", () => {
           expect(fullscreen).toBeCalled()
         })
 
+        it('calls deck.openPresenterView() when clicked presenter view button', () => {
+          bespoke()
+          const windowOpen = jest.spyOn(window, 'open').mockImplementation()
+          const button = osc.querySelector<HTMLButtonElement>(
+            'button[data-bespoke-marp-osc="presenter"]'
+          )!
+
+          button.click()
+          expect(windowOpen).toBeCalled()
+        })
+
         context('when browser does not support fullscreen', () => {
           it('hides fullscreen button', () => {
             jest
@@ -543,6 +569,194 @@ describe("Bespoke template's browser context", () => {
         })
       }
     )
+  })
+
+  describe('Presenter view', () => {
+    describe('In normal view mode', () => {
+      beforeEach(() => {
+        jest.spyOn(window, 'open').mockImplementation()
+        render()
+      })
+
+      it('injects deck.presenterUrl property to get URL of presenter view', () => {
+        replaceLocation('/?sync=xxx', () => {
+          const deck = bespoke()
+
+          expect(typeof deck.presenterUrl).toBe('string')
+          expect(deck.presenterUrl).toContain('view=presenter')
+          expect(deck.presenterUrl).toContain('sync=xxx')
+        })
+      })
+
+      it('injects deck.openPresenterView() to open presenter view', () => {
+        replaceLocation('/?sync=synckey', () => {
+          const deck = bespoke()
+          expect(deck.openPresenterView).toBeInstanceOf(Function)
+
+          deck.openPresenterView()
+          expect(window.open).toBeCalledWith(
+            deck.presenterUrl,
+            'bespoke-marp-presenter-synckey',
+            expect.stringContaining('menubar=no,toolbar=no')
+          )
+        })
+      })
+
+      it('opens presenter view by hitting p key', () => {
+        bespoke()
+        keydown({ which: Key.P })
+        expect(window.open).toBeCalled()
+
+        // Ignore hitting p key with modifier
+        ;(window.open as jest.Mock).mockClear()
+        keydown({ which: Key.P, ctrlKey: true })
+        expect(window.open).not.toBeCalled()
+      })
+    })
+
+    describe('In presenter view mode', () => {
+      const $p = (klass: string) =>
+        document.querySelector(`.${klass}`) as HTMLElement
+
+      const testPresenterView = (
+        func: (obj: { deck: any; parent: HTMLElement }) => void,
+        md?: string
+      ) =>
+        replaceLocation('/?view=presenter', () => {
+          const parent = render(md)
+          const deck = bespoke()
+
+          func({ deck, parent })
+        })
+
+      it('adds container for presenter', () => {
+        document.title = 'TITLE'
+
+        testPresenterView(() => {
+          expect(document.title).toBe('[Presenter view] - TITLE')
+          expect($p(classes.container)).toBeTruthy()
+        })
+      })
+
+      it('navigates slide when clicked navigation button', () =>
+        testPresenterView(({ deck }) => {
+          const text = $p(classes.infoPageText)
+
+          expect(deck.slide()).toBe(0)
+          expect(text.textContent).toBe('1 / 2')
+
+          $p(classes.infoPageNext).click()
+          expect(deck.slide()).toBe(1)
+          expect(deck.fragmentIndex).toBe(0)
+          expect(text.textContent).toBe('2 / 2')
+
+          $p(classes.infoPageNext).click()
+          expect(deck.slide()).toBe(1)
+          expect(deck.fragmentIndex).toBe(1)
+
+          $p(classes.infoPagePrev).click()
+          expect(deck.slide()).toBe(1)
+          expect(deck.fragmentIndex).toBe(0)
+        }, '\n\n---\n\n* a\n* b'))
+
+      describe('Next slide view', () => {
+        context('when next slide frame is loaded', () => {
+          const setupNext = () => {
+            const postMessageSpy = jest.spyOn(
+              ($p(classes.next) as any).contentWindow,
+              'postMessage'
+            )
+
+            $p(classes.next).dispatchEvent(new Event('load'))
+            return { postMessageSpy }
+          }
+
+          it('marks next slide container as active', () =>
+            testPresenterView(({ deck }) => {
+              expect($p(classes.nextContainer).className).not.toContain(
+                'active'
+              )
+              deck.slide(2)
+
+              const { postMessageSpy } = setupNext()
+              expect($p(classes.nextContainer).className).toContain('active')
+
+              // Send navigate command with current page
+              expect(postMessageSpy).toBeCalledWith('navigate:2,0', '*')
+            }))
+
+          it('sends navigate command to next slide view when navigated slide', () =>
+            testPresenterView(({ deck }) => {
+              const { postMessageSpy } = setupNext()
+
+              postMessageSpy.mockClear()
+              expect(postMessageSpy).not.toBeCalled()
+
+              deck.next()
+              expect(postMessageSpy).toBeCalledWith('navigate:1,0', '*')
+            }))
+        })
+
+        it('navigates to next slide when clicked next slide container', () => {
+          testPresenterView(({ deck }) => {
+            expect($p(classes.nextContainer)).toBeTruthy()
+            expect(deck.slide()).toBe(0)
+
+            $p(classes.nextContainer).click()
+            expect(deck.slide()).toBe(1)
+          })
+        })
+      })
+
+      describe('Presenter note', () => {
+        it('marks element with bespoke-marp-note class and current slide index as active', () =>
+          testPresenterView(({ deck }) => {
+            const noteA = document.querySelector(
+              '.bespoke-marp-note[data-index="0"]'
+            )!
+            const noteB = document.querySelector(
+              '.bespoke-marp-note[data-index="1"]'
+            )!
+
+            expect(noteA).toBeTruthy()
+            expect(noteB).toBeTruthy()
+
+            expect(noteA.className).toContain('active')
+            expect(noteB.className).not.toContain('active')
+
+            deck.next()
+            expect(noteA.className).not.toContain('active')
+            expect(noteB.className).toContain('active')
+          }, '<!-- A -->\n\n---\n\n<!-- B -->'))
+      })
+    })
+
+    describe('In next view mode', () => {
+      const testNextView = (
+        func: (obj: { deck: any; parent: HTMLElement }) => void,
+        md?: string
+      ) =>
+        replaceLocation('/?view=next', () => {
+          const parent = render(md)
+          const deck = bespoke()
+
+          func({ deck, parent })
+        })
+
+      it('subscribes navigation in the parent presenter view and navigate to its next page', done =>
+        testNextView(({ deck }) => {
+          // https://github.com/jsdom/jsdom/issues/2745
+          jest
+            .spyOn(MessageEvent.prototype, 'origin', 'get')
+            .mockImplementation(() => 'null')
+
+          window.addEventListener('message', () => {
+            expect(deck.slide()).toBe(2)
+            done()
+          })
+          window.postMessage('navigate:1,0', '*')
+        }))
+    })
   })
 
   describe('Progress', () => {

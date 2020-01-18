@@ -1,149 +1,34 @@
 $progressHeight: 5px;
 
+.bespoke-marp-note,
+.bespoke-marp-osc,
+.bespoke-progress-parent {
+  display: none;
+  transition: none;
+}
+
 @media screen {
+  @import './button';
+
   html,
   body {
-    background: #000;
     height: 100%;
     margin: 0;
+  }
+
+  body {
+    background: #000;
     overflow: hidden;
   }
 
-  [data-bespoke-marp-fragment='inactive'] {
-    visibility: hidden;
-  }
-
-  .bespoke-marp-osc {
-    display: none;
-    opacity: 0;
-  }
-
-  .bespoke-marp-parent {
-    bottom: 0;
-    left: 0;
-    position: absolute;
-    right: 0;
-    top: 0;
-
-    > .bespoke-marp-osc {
-      background: rgba(#000, 0.65);
-      border-radius: 7px;
-      bottom: 50px;
-      color: #fff;
-      display: block;
-      font-family: Helvetica, Arial, sans-serif;
-      font-size: 16px;
-      left: 50%;
-      line-height: 0;
-      opacity: 1;
-      padding: 12px;
-      position: absolute;
-      touch-action: manipulation;
-      transform: translateX(-50%);
-      transition: opacity 0.2s linear;
-      user-select: none;
-      white-space: nowrap;
-      z-index: 1;
-
-      /* Hack for Chrome to show OSC overlay onto video correctly */
-      will-change: transform;
-
-      > * {
-        margin-left: 6px;
-
-        &:first-child {
-          margin-left: 0;
-        }
-      }
-
-      > span {
-        opacity: 0.8;
-
-        &[data-bespoke-marp-osc='page'] {
-          display: inline-block;
-          min-width: 140px;
-          text-align: center;
-        }
-      }
-
-      > button {
-        appearance: none;
-        background-color: transparent;
-        border: 0;
-        color: inherit;
-        cursor: pointer;
-        font-size: inherit;
-        opacity: 0.8;
-        outline: none;
-        padding: 0;
-        transition: opacity 0.2s linear;
-        -webkit-tap-highlight-color: transparent;
-
-        &:disabled {
-          cursor: not-allowed;
-          opacity: 0.15 !important;
-        }
-
-        &:hover {
-          opacity: 1;
-
-          &:active {
-            opacity: 0.6;
-          }
-
-          &:not(:disabled) {
-            transition: none;
-          }
-        }
-
-        @mixin icon-button($icon, $size: 32px) {
-          background: transparent url($icon) no-repeat center center;
-          background-size: contain;
-          height: $size;
-          overflow: hidden;
-          text-indent: 100%;
-          white-space: nowrap;
-          width: $size;
-        }
-
-        &[data-bespoke-marp-osc='prev'] {
-          @include icon-button('../../assets/osc-prev.svg');
-        }
-
-        &[data-bespoke-marp-osc='next'] {
-          @include icon-button('../../assets/osc-next.svg');
-        }
-
-        &[data-bespoke-marp-osc='fullscreen'] {
-          @include icon-button('../../assets/osc-fullscreen.svg');
-
-          &.exit {
-            background-image: url('../../assets//osc-fullscreen-exit.svg');
-          }
-        }
-      }
-    }
-
-    &.bespoke-marp-inactive {
-      cursor: none;
-
-      > .bespoke-marp-osc {
-        opacity: 0;
-        pointer-events: none;
-      }
-    }
-  }
-
+  // Common visibility control for slides
   svg.bespoke-marp-slide {
-    height: 100%;
-    left: 0;
+    opacity: 0;
     pointer-events: none;
-    position: absolute;
-    top: 0;
-    width: 100%;
     z-index: -1;
 
     &.bespoke-marp-active {
+      opacity: 1;
       pointer-events: auto;
       z-index: 0;
     }
@@ -157,32 +42,319 @@ $progressHeight: 5px;
     }
   }
 
-  .bespoke-progress-parent {
-    background: #222;
-    display: flex;
-    height: $progressHeight;
-    width: 100%;
+  [data-bespoke-marp-fragment='inactive'] {
+    visibility: hidden;
+  }
 
-    & + .bespoke-marp-parent {
-      top: $progressHeight;
+  // Normal view
+  body[data-bespoke-view=''],
+  body[data-bespoke-view='next'] {
+    .bespoke-marp-parent {
+      bottom: 0;
+      left: 0;
+      position: absolute;
+      right: 0;
+      top: 0;
+
+      > .bespoke-marp-osc {
+        background: rgba(#000, 0.65);
+        border-radius: 7px;
+        bottom: 50px;
+        color: #fff;
+        display: block;
+        font-family: Helvetica, Arial, sans-serif;
+        font-size: 16px;
+        left: 50%;
+        line-height: 0;
+        opacity: 1;
+        padding: 12px;
+        position: absolute;
+        touch-action: manipulation;
+        transform: translateX(-50%);
+        transition: opacity 0.2s linear;
+        user-select: none;
+        white-space: nowrap;
+        z-index: 1;
+
+        /* Hack for Chrome to show OSC overlay onto video correctly */
+        will-change: transform;
+
+        > * {
+          margin-left: 6px;
+
+          &:first-child {
+            margin-left: 0;
+          }
+        }
+
+        > span {
+          opacity: 0.8;
+
+          &[data-bespoke-marp-osc='page'] {
+            display: inline-block;
+            min-width: 140px;
+            text-align: center;
+          }
+        }
+
+        > button {
+          @extend %button;
+
+          &[data-bespoke-marp-osc='prev'] {
+            @include button-icon(prev);
+          }
+
+          &[data-bespoke-marp-osc='next'] {
+            @include button-icon(next);
+          }
+
+          &[data-bespoke-marp-osc='fullscreen'] {
+            @include button-icon(fullscreen);
+          }
+
+          &[data-bespoke-marp-osc='presenter'] {
+            @include button-icon(presenter);
+          }
+        }
+      }
+
+      &.bespoke-marp-inactive {
+        cursor: none;
+
+        > .bespoke-marp-osc {
+          opacity: 0;
+          pointer-events: none;
+        }
+      }
     }
 
-    .bespoke-progress-bar {
-      flex: 0 0 0;
-      background: #0288d1;
-      transition: flex-basis 0.2s cubic-bezier(0, 1, 1, 1);
+    svg.bespoke-marp-slide {
+      height: 100%;
+      left: 0;
+      position: absolute;
+      top: 0;
+      width: 100%;
+    }
+  }
+
+  // Progress bar (Only for normal view)
+  body[data-bespoke-view=''] {
+    .bespoke-progress-parent {
+      background: #222;
+      display: flex;
+      height: $progressHeight;
+      width: 100%;
+
+      & + .bespoke-marp-parent {
+        top: $progressHeight;
+      }
+
+      .bespoke-progress-bar {
+        flex: 0 0 0;
+        background: #0288d1;
+        transition: flex-basis 0.2s cubic-bezier(0, 1, 1, 1);
+      }
+    }
+  }
+
+  // Next view
+  body[data-bespoke-view='next'] {
+    background: transparent;
+  }
+
+  // Presenter view
+  body[data-bespoke-view='presenter'] {
+    $text-color: #ddd;
+
+    background: #161616;
+
+    .bespoke-marp-presenter-container {
+      height: 100%;
+      left: 0;
+      position: absolute;
+      top: 0;
+      width: 100%;
+
+      // Grid layout for presenter view
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      grid-template-rows: minmax(140px, 1fr) 2fr 3em;
+      grid-template-areas:
+        'current next'
+        'current note'
+        'info    note';
+
+      .bespoke-marp-parent {
+        grid-area: current;
+        position: relative;
+        overflow: hidden;
+
+        svg.bespoke-marp-slide {
+          height: calc(100% - 40px);
+          left: 20px;
+          position: absolute;
+          pointer-events: none;
+          top: 20px;
+          user-select: none;
+          width: calc(100% - 40px);
+
+          &.bespoke-marp-active {
+            filter: drop-shadow(0 3px 10px rgba(#000, 0.5));
+          }
+        }
+      }
+
+      // Next slide view
+      .bespoke-marp-presenter-next-container {
+        background: #222;
+        cursor: pointer;
+        display: none;
+        grid-area: next;
+        overflow: hidden;
+        position: relative;
+
+        &.active {
+          display: block;
+        }
+
+        iframe.bespoke-marp-presenter-next {
+          background: transparent;
+          border: 0;
+          display: block;
+          filter: drop-shadow(0 3px 10px rgba(#000, 0.5));
+          height: calc(100% - 40px);
+          left: 20px;
+          position: absolute;
+          pointer-events: none;
+          user-select: none;
+          top: 20px;
+          width: calc(100% - 40px);
+        }
+      }
+
+      // Presenter note
+      .bespoke-marp-presenter-note-container {
+        background: #222;
+        color: $text-color;
+        grid-area: note;
+
+        .bespoke-marp-note {
+          margin: 20px;
+          width: calc(100% - 40px);
+          height: calc(100% - 40px);
+          box-sizing: border-box;
+          overflow: auto;
+          padding-right: 3px;
+          white-space: pre-wrap;
+          word-wrap: break-word;
+
+          // Scrollbar (Firefox)
+          scrollbar-width: thin;
+          scrollbar-color: rgba($text-color, 0.5) transparent;
+
+          // Scrollbar (Chrome)
+          &::-webkit-scrollbar {
+            width: 6px;
+          }
+
+          &::-webkit-scrollbar-track {
+            background: transparent;
+          }
+
+          &::-webkit-scrollbar-thumb {
+            background: rgba($text-color, 0.5);
+            border-radius: 6px;
+          }
+
+          &:empty {
+            pointer-events: none;
+          }
+
+          &.active {
+            display: block;
+          }
+
+          p {
+            &:first-child {
+              margin-top: 0;
+            }
+
+            &:last-child {
+              margin-bottom: 0;
+            }
+          }
+        }
+      }
+
+      // Informations
+      .bespoke-marp-presenter-info-container {
+        align-items: center;
+        box-sizing: border-box;
+        color: $text-color;
+        display: flex;
+        flex-wrap: nowrap;
+        grid-area: info;
+        justify-content: center;
+        padding: 0 10px;
+
+        %info-element {
+          display: block;
+          box-sizing: border-box;
+          padding: 0 10px;
+          white-space: nowrap;
+          width: 100%;
+        }
+
+        button {
+          @extend %button;
+          @include button-size(1.5em);
+
+          &.bespoke-marp-presenter-info-page-prev {
+            @extend %button-prev;
+          }
+
+          &.bespoke-marp-presenter-info-page-next {
+            @extend %button-next;
+          }
+        }
+
+        .bespoke-marp-presenter-info-page {
+          @extend %info-element;
+
+          order: 2;
+          text-align: center;
+
+          .bespoke-marp-presenter-info-page-text {
+            display: inline-block;
+            min-width: 120px;
+            text-align: center;
+          }
+        }
+
+        .bespoke-marp-presenter-info-time {
+          @extend %info-element;
+
+          color: #999;
+          order: 1;
+          text-align: left;
+        }
+
+        .bespoke-marp-presenter-info-timer {
+          @extend %info-element;
+
+          color: #999;
+          order: 3;
+          text-align: right;
+        }
+      }
     }
   }
 }
 
 @media print {
-  .bespoke-marp-osc,
-  .bespoke-progress-parent {
-    display: none !important;
-    transition: none !important;
-  }
-
-  .bespoke-marp-parent {
-    top: 0;
+  .bespoke-marp-presenter-next-container,
+  .bespoke-marp-presenter-note-container,
+  .bespoke-marp-presenter-info-container {
+    display: none;
   }
 }
