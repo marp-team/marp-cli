@@ -1,6 +1,6 @@
 import { URL } from 'url'
 import { MarpOptions } from '@marp-team/marp-core'
-import { Marpit, MarpitOptions } from '@marp-team/marpit'
+import { Marpit, Options as MarpitOptions } from '@marp-team/marpit'
 import chalk from 'chalk'
 import puppeteer from 'puppeteer-core'
 import {
@@ -233,7 +233,7 @@ export class Converter {
     await this.usePuppeteer(html, async (page, uri) => {
       await page.setViewport(tpl.rendered.size)
       await page.goto(uri, { waitUntil: ['domcontentloaded', 'networkidle0'] })
-      await page.emulateMedia('print')
+      await page.emulateMediaType('print')
 
       const screenshot = async (pageNumber?: number) => {
         await page.evaluate(

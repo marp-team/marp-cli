@@ -19,9 +19,8 @@ jobs:
       fail-fast: false
       matrix:
         node-version:
-          - '^8.16.0'
           - '^10.17.0'
-          - '12.13.0'
+          - '12.14.1'
 
     steps:
       - uses: actions/checkout@v1
@@ -34,7 +33,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: Install yarn
-        run: yarn policies set-version 1.19.1
+        run: yarn policies set-version 1.21.1
 
       - name: Get yarn cache
         id: yarn-cache
