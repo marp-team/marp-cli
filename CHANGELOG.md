@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v0.17.0 - 2020-01-18
+
 ### Breaking
 
 - Drop support for EOL Node 8 (Require Node >= 10) ([#198](https://github.com/marp-team/marp-cli/pull/198))
