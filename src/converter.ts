@@ -364,17 +364,29 @@ export class Converter {
     try {
       const browser = await Converter.runBrowser()
       const page = await browser.newPage()
-      const tracker = this.trackFailedLocalFileAccess(page)
+      const {
+        missingFileSet: missingTracker,
+        failedFileSet: failedTracker,
+      } = this.trackFailedLocalFileAccess(page)
 
       try {
         return await process(page, uri)
       } finally {
-        if (tracker.size > 0) {
+        if (missingTracker.size > 0) {
           warn(
             `Marp CLI has detected accessing to local file${
-              tracker.size > 1 ? 's' : ''
+              missingTracker.size > 1 ? 's' : ''
+            } ${
+              missingTracker.size > 1 ? 'that do not' : 'that does not'
+            } exist.`
+          )
+        }
+        if (failedTracker.size > 0) {
+          warn(
+            `Marp CLI has detected accessing to local file${
+              failedTracker.size > 1 ? 's' : ''
             }. ${
-              tracker.size > 1 ? 'They are' : 'That is'
+              failedTracker.size > 1 ? 'They are' : 'That is'
             } blocked by security reason. Instead we recommend using assets uploaded to online. (Or you can use ${chalk.yellow(
               '--allow-local-files'
             )} option if you are understood of security risk)`
@@ -387,17 +399,26 @@ export class Converter {
     }
   }
 
-  private trackFailedLocalFileAccess(page: puppeteer.Page): Set<string> {
+  private trackFailedLocalFileAccess(
+    page: puppeteer.Page
+  ): { missingFileSet: Set<string>; failedFileSet: Set<string> } {
+    const missingFileSet = new Set<string>()
     const failedFileSet = new Set<string>()
 
     page.on('requestfailed', (req: puppeteer.Request) => {
       try {
         const url = new URL(req.url())
-        if (url.protocol === 'file:') failedFileSet.add(url.href)
+        if (url.protocol === 'file:') {
+          if (req.failure()?.errorText === 'net::ERR_FILE_NOT_FOUND') {
+            missingFileSet.add(url.href)
+          } else {
+            failedFileSet.add(url.href)
+          }
+        }
       } catch (e) {}
     })
 
-    return failedFileSet
+    return { missingFileSet, failedFileSet }
   }
 
   static async closeBrowser() {
