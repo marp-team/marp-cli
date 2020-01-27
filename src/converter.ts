@@ -374,11 +374,11 @@ export class Converter {
       } finally {
         if (missingTracker.size > 0) {
           warn(
-            `Marp CLI has detected accessing to local file${
-              missingTracker.size > 1 ? 's' : ''
-            } ${
-              missingTracker.size > 1 ? 'that do not' : 'that does not'
-            } exist.`
+            `${missingTracker.size > 1 ? 'Some of t' : 'T'}he local file${
+              missingTracker.size > 1 ? 's are' : ' is'
+            } missing and will be ignored. Make sure the file path${
+              missingTracker.size > 1 ? 's are' : ' is'
+            } correct.`
           )
         }
         if (failedTracker.size > 0) {
