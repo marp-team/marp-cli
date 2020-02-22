@@ -555,7 +555,7 @@ describe("Bespoke template's browser context", () => {
         context('when browser does not support fullscreen', () => {
           it('hides fullscreen button', () => {
             jest
-              .spyOn(screenfull as Screenfull, 'isEnabled', 'get')
+              .spyOn(screenfull as any, 'isEnabled', 'get')
               .mockImplementation(() => false)
 
             bespoke()

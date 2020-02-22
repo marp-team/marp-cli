@@ -3,6 +3,11 @@ import portfinder from 'portfinder'
 import { Server } from 'ws'
 import watch from '../../src/templates/watch/watch'
 
+beforeEach(() => {
+  delete window.location
+  ;(window as any).location = { reload: jest.fn() }
+})
+
 afterEach(() => jest.restoreAllMocks())
 
 describe('Watch mode notifier on browser context', () => {
@@ -46,7 +51,6 @@ describe('Watch mode notifier on browser context', () => {
     })
 
     it('listens reload event', async () => {
-      const reload = jest.spyOn(location, 'reload').mockImplementation()
       const send = await new Promise<(data: any) => Promise<void>>(
         (res, rej) => {
           server.on('error', e => rej(e))
@@ -67,10 +71,10 @@ describe('Watch mode notifier on browser context', () => {
       )
 
       await send('ready')
-      expect(reload).not.toBeCalled()
+      expect(location.reload).not.toBeCalled()
 
       await send('reload')
-      expect(reload).toBeCalled()
+      expect(location.reload).toBeCalled()
     })
 
     context('when closed WebSocket server', () => {
@@ -78,7 +82,6 @@ describe('Watch mode notifier on browser context', () => {
       afterEach(() => jest.useRealTimers())
 
       it('reconnects watcher in 5 sec', async done => {
-        const reload = jest.spyOn(location, 'reload').mockImplementation()
         const clientSocket = await new Promise<WebSocket>((res, rej) => {
           let socket: WebSocket
 
@@ -98,7 +101,7 @@ describe('Watch mode notifier on browser context', () => {
           expect(socket.url).toBe('/test')
 
           ws.on('pong', () => {
-            expect(reload).toBeCalled()
+            expect(location.reload).toBeCalled()
             done()
           })
           ws.ping()
