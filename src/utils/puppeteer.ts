@@ -2,7 +2,6 @@ import { exec } from 'child_process'
 import { promisify } from 'util'
 import os from 'os'
 import path from 'path'
-import { LaunchOptions } from 'puppeteer-core'
 import * as chromeFinder from 'chrome-launcher/dist/chrome-finder'
 
 const execPromise = promisify(exec)
