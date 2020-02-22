@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v0.17.1 - 2020-02-22
+
 ### Added
 
 - Output warning if enabled `--allow-local-files` and missing local file(s) ([#200](https://github.com/marp-team/marp-cli/pull/200) by [@cosnomi](https://github.com/cosnomi))
