@@ -20,7 +20,7 @@ jobs:
       matrix:
         node-version:
           - '^10.17.0'
-          - '12.14.1'
+          - '12.16.1'
 
     steps:
       - uses: actions/checkout@v1
@@ -33,7 +33,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: Install yarn
-        run: yarn policies set-version 1.21.1
+        run: yarn policies set-version 1.22.0
 
       - name: Get yarn cache
         id: yarn-cache
