@@ -10,7 +10,6 @@ import mkdirp from 'mkdirp'
 import { tmpName } from 'tmp'
 
 const stat = promisify(fs.stat)
-const mkdirpPromise = promisify<string, any>(mkdirp)
 const readFile = promisify(fs.readFile)
 const tmpNamePromise = promisify(tmpName)
 const unlink = promisify(fs.unlink)
@@ -156,7 +155,7 @@ export class File {
   }
 
   private async saveToFile(savePath: string = this.path) {
-    await mkdirpPromise(path.dirname(path.resolve(savePath)))
+    await mkdirp(path.dirname(path.resolve(savePath)))
     await writeFile(savePath, this.buffer)
   }
 
