@@ -10,6 +10,10 @@
 
 - Fix failing `--allow-local-files` option with [Snapd Chromium](https://snapcraft.io/install/chromium/ubuntu) ([#201](https://github.com/marp-team/marp-cli/issues/201), [#203](https://github.com/marp-team/marp-cli/pull/203))
 
+### Changed
+
+- Upgrade Node and dependent packages to the latest version ([#204](https://github.com/marp-team/marp-cli/pull/204))
+
 ## v0.17.0 - 2020-01-18
 
 ### Breaking

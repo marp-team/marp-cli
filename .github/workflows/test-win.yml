@@ -20,7 +20,7 @@ jobs:
       matrix:
         node-version:
           - '^10.17.0'
-          - '12.14.1'
+          - '12.16.1'
 
     steps:
       - uses: actions/checkout@v1
@@ -33,7 +33,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: Install yarn
-        run: yarn policies set-version 1.21.1
+        run: yarn policies set-version 1.22.0
 
       - name: Get yarn cache
         id: yarn-cache
@@ -47,15 +47,6 @@ jobs:
           restore-keys: |
             yarn_cache-${{ runner.os }}-${{ matrix.node-version }}-
             yarn_cache-${{ runner.os }}-
-
-      - name: Cache node_modules
-        uses: actions/cache@v1
-        with:
-          path: node_modules
-          key: node_modules-${{ runner.os }}-${{ matrix.node-version }}-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            node_modules-${{ runner.os }}-${{ matrix.node-version }}-
-            node_modules-${{ runner.os }}-
 
       - name: Install dependencies with yarn
         run: yarn install

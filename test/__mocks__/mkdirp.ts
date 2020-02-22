@@ -1,3 +1,3 @@
-const mkdirp = jest.fn().mockImplementation((_, callback) => callback())
+const mkdirp = jest.fn().mockImplementation(path => Promise.resolve(path))
 
 export default mkdirp

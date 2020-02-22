@@ -23,7 +23,9 @@ const parse = (...patterns: [[boolean, boolean, boolean], Function][]) => {
   return patterns.map(([pat, plugin]) => pat[idx] && plugin).filter(p => p)
 }
 
-export default function(target = document.getElementById('p')!) {
+export default function bespokeTemplate(
+  target = document.getElementById('p')!
+) {
   setViewMode()
 
   const key = popQuery('sync') || undefined
