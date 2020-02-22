@@ -301,7 +301,9 @@ describe('Converter', () => {
                 'Insecure local file accessing is enabled'
               )
             )
-            expect(fileTmp).toBeCalledWith('.html')
+            expect(fileTmp).toBeCalledWith(
+              expect.objectContaining({ extension: '.html' })
+            )
             expect(fileCleanup).toBeCalledWith(
               expect.stringContaining(os.tmpdir())
             )

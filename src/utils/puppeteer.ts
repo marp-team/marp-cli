@@ -36,9 +36,7 @@ export const generatePuppeteerDataDirPath = async (
   return path.resolve(os.tmpdir(), name)
 }
 
-export async function generatePuppeteerLaunchArgs(): Promise<
-  Partial<LaunchOptions>
-> {
+export async function generatePuppeteerLaunchArgs() {
   // Puppeteer >= v1.13.0 doesn't use BGPT due to crbug.com/937609.
   // https://github.com/GoogleChrome/puppeteer/blob/master/lib/Launcher.js
   //
