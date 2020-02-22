@@ -1,4 +1,5 @@
 import fs from 'fs'
+import os from 'os'
 import path from 'path'
 import * as url from 'url'
 import { promisify } from 'util'
@@ -102,8 +103,14 @@ export class File {
     }
   }
 
-  async saveTmpFile(ext?: string): Promise<File.TmpFileInterface> {
-    const tmp: string = await tmpNamePromise({ postfix: ext })
+  async saveTmpFile(
+    opts: { extension?: string; home?: boolean } = {}
+  ): Promise<File.TmpFileInterface> {
+    const tmp: string = await tmpNamePromise({
+      dir: opts.home ? os.homedir() : undefined,
+      postfix: opts.extension,
+    })
+
     await this.saveToFile(tmp)
 
     return {

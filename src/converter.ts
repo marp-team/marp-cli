@@ -24,6 +24,11 @@ import templates, {
 import { ThemeSet } from './theme'
 import { notifier } from './watcher'
 
+type ResolvedType<T> = T extends Promise<infer U> ? U : never
+type GeneratedPuppeteerLaunchArgs = ResolvedType<
+  ReturnType<typeof generatePuppeteerLaunchArgs>
+>
+
 export enum ConvertType {
   html = 'html',
   pdf = 'pdf',
@@ -342,15 +347,24 @@ export class Converter {
 
   private async usePuppeteer<T>(
     baseFile: File,
-    process: (page: puppeteer.Page, uri: string) => Promise<T>
+    processer: (page: puppeteer.Page, uri: string) => Promise<T>
   ) {
+    const { executablePath } = await Converter.puppeteerLaunchArgs()
+
     const tmpFile: File.TmpFileInterface | undefined = await (() => {
       if (!this.options.allowLocalFiles) return undefined
 
       warn(
         `Insecure local file accessing is enabled for conversion from ${baseFile.relativePath()}.`
       )
-      return baseFile.saveTmpFile('.html')
+
+      // Snapd Chromium cannot access from sandbox container to user-land `/tmp`
+      // directory so create tmp file to home directory if executed Chromium was
+      // placed in `/snap`.
+      const home =
+        process.platform === 'linux' && executablePath?.startsWith('/snap/')
+
+      return baseFile.saveTmpFile({ home, extension: '.html' })
     })()
 
     const uri = await (async () => {
@@ -370,7 +384,7 @@ export class Converter {
       } = this.trackFailedLocalFileAccess(page)
 
       try {
-        return await process(page, uri)
+        return await processer(page, uri)
       } finally {
         if (missingTracker.size > 0) {
           warn(
@@ -426,11 +440,12 @@ export class Converter {
   }
 
   private static browser?: puppeteer.Browser
+  private static cachedPuppeteerLaunchArgs?: GeneratedPuppeteerLaunchArgs
 
   private static async runBrowser() {
     if (!Converter.browser) {
       Converter.browser = await puppeteer.launch({
-        ...(await generatePuppeteerLaunchArgs()),
+        ...(await Converter.puppeteerLaunchArgs()),
         userDataDir: await generatePuppeteerDataDirPath('marp-cli-conversion'),
       })
       Converter.browser.once('disconnected', () => {
@@ -438,5 +453,14 @@ export class Converter {
       })
     }
     return Converter.browser
+  }
+
+  private static async puppeteerLaunchArgs(): Promise<
+    GeneratedPuppeteerLaunchArgs
+  > {
+    if (!Converter.cachedPuppeteerLaunchArgs) {
+      Converter.cachedPuppeteerLaunchArgs = await generatePuppeteerLaunchArgs()
+    }
+    return Converter.cachedPuppeteerLaunchArgs
   }
 }
