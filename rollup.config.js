@@ -28,7 +28,7 @@ const plugins = (opts = {}) => [
   }),
   replace({ 'process.env.NODE_ENV': JSON.stringify('production') }),
   commonjs(),
-  typescript(),
+  typescript({ module: 'esnext' }),
   postcss({
     inject: false,
     plugins: [
