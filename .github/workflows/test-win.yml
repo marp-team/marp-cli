@@ -48,15 +48,6 @@ jobs:
             yarn_cache-${{ runner.os }}-${{ matrix.node-version }}-
             yarn_cache-${{ runner.os }}-
 
-      - name: Cache node_modules
-        uses: actions/cache@v1
-        with:
-          path: node_modules
-          key: node_modules-${{ runner.os }}-${{ matrix.node-version }}-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            node_modules-${{ runner.os }}-${{ matrix.node-version }}-
-            node_modules-${{ runner.os }}-
-
       - name: Install dependencies with yarn
         run: yarn install
 
