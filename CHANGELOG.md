@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- PPTX creation does no longer make multiple master slides ([#166](https://github.com/marp-team/marp-cli/issues/166), [#205](https://github.com/marp-team/marp-cli/pull/205))
+
+### Changed
+
+- Use PptxGenJS v3 instead of `@marp-team/pptx` ([#205](https://github.com/marp-team/marp-cli/pull/205))
+
 ## v0.17.1 - 2020-02-22
 
 ### Added

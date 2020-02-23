@@ -281,41 +281,43 @@ export class Converter {
       type: ConvertType.png,
     })
 
-    const pptx = new (await import('@marp-team/pptx')).default()
+    const pptx = new (await import('pptxgenjs')).default()
     const layoutName = `${tpl.rendered.size.width}x${tpl.rendered.size.height}`
 
-    pptx.setAuthor('Created by Marp')
-    pptx.setCompany('Created by Marp')
-    pptx.setLayout({
+    pptx.author = 'Created by Marp'
+    pptx.company = 'Created by Marp'
+
+    pptx.defineLayout({
       name: layoutName,
       width: tpl.rendered.size.width / 96,
       height: tpl.rendered.size.height / 96,
     })
+    pptx.layout = layoutName
 
-    if (tpl.rendered.title) pptx.setTitle(tpl.rendered.title)
-    if (tpl.rendered.description) pptx.setSubject(tpl.rendered.description)
+    if (tpl.rendered.title) pptx.title = tpl.rendered.title
+    if (tpl.rendered.description) pptx.subject = tpl.rendered.description
 
     let page = 0
 
     for (const imageFile of imageFiles) {
       page += 1
 
-      pptx.defineSlideMaster({
-        title: `Page ${page}`,
-        bkgd: {
-          data: `data:image/png;base64,${imageFile.buffer!.toString('base64')}`,
-        },
-        margin: 0,
+      const slide = pptx.addSlide()
+
+      slide.addImage({
+        data: `data:image/png;base64,${imageFile.buffer!.toString('base64')}`,
       })
 
-      const slide = pptx.addNewSlide(`Page ${page}`)
-      const notes = tpl.rendered.comments[page - 1].join('\n\n')
+      const [img] = slide.relsMedia
+      slide.bkgdImgRid = img.rId
+      slide.data = []
 
+      const notes = tpl.rendered.comments[page - 1].join('\n\n')
       if (notes) slide.addNotes(notes)
     }
 
     const ret = file.convert(this.options.output, { extension: 'pptx' })
-    ret.buffer = await new Promise(res => pptx.save('jszip', res, 'nodebuffer'))
+    ret.buffer = (await pptx.write('nodebuffer')) as Buffer
 
     return ret
   }

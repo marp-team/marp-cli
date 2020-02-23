@@ -383,7 +383,7 @@ describe('Converter', () => {
 
       context('with meta global directives', () => {
         it(
-          'assigns meta info thorugh @marp-team/pptx',
+          'assigns meta info thorugh PptxGenJs',
           async () => {
             await converter({
               globalDirectives: {
