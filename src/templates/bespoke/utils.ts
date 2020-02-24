@@ -91,7 +91,9 @@ export const setViewMode = () =>
 export const storage = (() => {
   const available = (() => {
     try {
-      localStorage.getItem('bespoke-marp')
+      localStorage.setItem('bespoke-marp', 'bespoke-marp')
+      localStorage.removeItem('bespoke-marp')
+
       return true
     } catch (e) {
       console.warn(
