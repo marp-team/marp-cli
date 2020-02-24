@@ -1,4 +1,4 @@
-import { generateURLfromParams } from '../utils'
+import { generateURLfromParams, storage } from '../utils'
 
 type BespokeForPresenter = { syncKey: string; [key: string]: any }
 
@@ -16,14 +16,15 @@ export default function normalView(deck) {
     presenterUrl: { enumerable: true, get: presenterUrl },
   })
 
-  // Register keyboard shortcut
-  document.addEventListener('keydown', e => {
-    // `p` without modifier key (Alt, Control, and Command)
-    if (e.which === 80 && !e.altKey && !e.ctrlKey && !e.metaKey) {
-      e.preventDefault()
-      deck.openPresenterView()
-    }
-  })
+  // Register keyboard shortcut if using localStorage is not restricted
+  if (storage.available)
+    document.addEventListener('keydown', e => {
+      // `p` without modifier key (Alt, Control, and Command)
+      if (e.which === 80 && !e.altKey && !e.ctrlKey && !e.metaKey) {
+        e.preventDefault()
+        deck.openPresenterView()
+      }
+    })
 }
 
 /** Open new window for presenter view. */
