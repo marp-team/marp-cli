@@ -234,6 +234,8 @@ The `bespoke` template is using [Bespoke.js](https://github.com/bespokejs/bespok
 - **Presenter view**: Open presenter view in external window by hitting <kbd>p</kbd> key.
 - **Progress bar** (optional): By setting `--bespoke.progress` option, you can add a progress bar on the top of the deck.
 
+> ℹ️ Presenter view may be disabled if [the browser restricted using localStorage](https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API#Feature-detecting_localStorage) (e.g. Open HTML in the old Safari with private browsing, or open the _local_ HTML file with Chrome that has blocked 3rd party cookies in `chrome://settings/content/cookies`).
+
 ### `bare` template
 
 The `bare` template is a primitive template, and there is no extra features. It only has minimum assets to give your presentation with browser.
