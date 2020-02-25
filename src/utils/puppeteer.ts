@@ -2,7 +2,6 @@ import { exec } from 'child_process'
 import { promisify } from 'util'
 import os from 'os'
 import path from 'path'
-import { LaunchOptions } from 'puppeteer-core'
 import * as chromeFinder from 'chrome-launcher/dist/chrome-finder'
 
 const execPromise = promisify(exec)
@@ -37,12 +36,7 @@ export const generatePuppeteerDataDirPath = async (
 }
 
 export async function generatePuppeteerLaunchArgs() {
-  // Puppeteer >= v1.13.0 doesn't use BGPT due to crbug.com/937609.
-  // https://github.com/GoogleChrome/puppeteer/blob/master/lib/Launcher.js
-  //
-  // But it causes invalid rendering in Marp's `inlineSVG` mode. So we override
-  // `--disable-features` option to prevent disabling BGPT.
-  const args = new Set<string>(['--disable-features=TranslateUI'])
+  const args = new Set<string>()
 
   // Docker environment and WSL environment need to disable sandbox. :(
   if (process.env.IS_DOCKER || isWSL()) args.add('--no-sandbox')
@@ -67,9 +61,5 @@ export async function generatePuppeteerLaunchArgs() {
     executablePath = finder ? finder()[0] : undefined
   }
 
-  return {
-    executablePath,
-    ignoreDefaultArgs: ['--disable-features=TranslateUI,BlinkGenPropertyTrees'],
-    args: [...args],
-  }
+  return { executablePath, args: [...args] }
 }
