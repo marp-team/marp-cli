@@ -395,16 +395,6 @@
     markdown-it-front-matter "^0.1.2"
     postcss "^7.0.26"
 
-"@marp-team/pptx@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@marp-team/pptx/-/pptx-0.1.0.tgz#a998b19263f6e5a1c8198de5614eadcba6239849"
-  integrity sha512-67oUjmIWSDEmj5J0RCT1jt5buBQuyV4HomcgOURiteLT1j7wvGca7WPhUMlGU9WhKqlbFbEK6guFcnwdfM2Rgw==
-  dependencies:
-    image-size "^0.7.4"
-    jquery "^3.4.1"
-    jsdom "^15.1.1"
-    jszip "^3.2.2"
-
 "@nodelib/fs.scandir@2.1.3":
   version "2.1.3"
   resolved "https://registry.yarnpkg.com/@nodelib/fs.scandir/-/fs.scandir-2.1.3.tgz#3a582bdb53804c6ba6d146579c46e52130cf4a3b"
@@ -3089,6 +3079,11 @@ https-proxy-agent@^4.0.0:
     agent-base "5"
     debug "4"
 
+https@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/https/-/https-1.0.0.tgz#3c37c7ae1a8eeb966904a2ad1e975a194b7ed3a4"
+  integrity sha1-PDfHrhqO65ZpBKKtHpdaGUt+06Q=
+
 human-signals@^1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/human-signals/-/human-signals-1.1.1.tgz#c5b1cd14f50aeae09ab6c59fe63ba3395fe4dfa3"
@@ -3122,11 +3117,6 @@ ignore@^5.1.4:
   version "5.1.4"
   resolved "https://registry.yarnpkg.com/ignore/-/ignore-5.1.4.tgz#84b7b3dbe64552b6ef0eca99f6743dbec6d97adf"
   integrity sha512-MzbUSahkTW1u7JpKKjY7LCARd1fU5W2rLdxlM4kdkayuCwZImjkpluF9CM1aLewYJguPDqewLam18Y6AU69A8A==
-
-image-size@^0.7.4:
-  version "0.7.5"
-  resolved "https://registry.yarnpkg.com/image-size/-/image-size-0.7.5.tgz#269f357cf5797cb44683dfa99790e54c705ead04"
-  integrity sha512-Hiyv+mXHfFEP7LzUL/llg9RwFxxY+o9N3JVLIeG5E7iFIFAalxvRU9UZthBdYDEVnzHMgjnKJPPpay5BWf1g9g==
 
 image-size@^0.8.3:
   version "0.8.3"
@@ -4019,11 +4009,6 @@ jest@^25.1.0:
     "@jest/core" "^25.1.0"
     import-local "^3.0.2"
     jest-cli "^25.1.0"
-
-jquery@^3.4.1:
-  version "3.4.1"
-  resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.4.1.tgz#714f1f8d9dde4bdfa55764ba37ef214630d80ef2"
-  integrity sha512-36+AdBzCL+y6qjw5Tx7HgzeGCzC81MDDgaUP8ld2zhx58HdqXGoBd+tHdrBMiyjGQs0Hxs/MLZTu/eHNJJuWPw==
 
 js-stringify@^1.0.1:
   version "1.0.2"
@@ -5671,6 +5656,15 @@ postcss@^7.0.0, postcss@^7.0.1, postcss@^7.0.14, postcss@^7.0.2, postcss@^7.0.21
     chalk "^2.4.2"
     source-map "^0.6.1"
     supports-color "^6.1.0"
+
+pptxgenjs@^3.1.1:
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/pptxgenjs/-/pptxgenjs-3.1.1.tgz#3b4d86ac943cbe8e8b1f7f2085c7e436628c839f"
+  integrity sha512-mFOh0dtnvjh5qyualGranvHq660b6KZl1yRIe4vXlKd3nqT98hSNPg9YLcKLy8PtBYojyEOUEn37R5lRLa05Yw==
+  dependencies:
+    https "^1.0.0"
+    image-size "^0.8.3"
+    jszip "^3.2.2"
 
 prelude-ls@~1.1.2:
   version "1.1.2"

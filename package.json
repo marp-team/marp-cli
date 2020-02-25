@@ -123,7 +123,6 @@
   "dependencies": {
     "@marp-team/marp-core": "^1.0.1",
     "@marp-team/marpit": "^1.5.0",
-    "@marp-team/pptx": "^0.1.0",
     "carlo": "^0.9.46",
     "chalk": "^3.0.0",
     "chokidar": "^3.3.1",
@@ -139,6 +138,7 @@
     "os-locale": "^4.0.0",
     "pkg-up": "^3.1.0",
     "portfinder": "^1.0.25",
+    "pptxgenjs": "^3.1.1",
     "puppeteer-core": "~2.1.1",
     "serve-index": "^1.9.1",
     "strip-ansi": "^6.0.0",

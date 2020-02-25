@@ -30,9 +30,14 @@ export default function bespokeTouch(opts: BespokeTouchOption = {}) {
       }
     }
 
-    parent.addEventListener('touchstart', e => {
-      touchStart = e.touches.length === 1 ? touchPoint(e.touches[0]) : undefined
-    })
+    parent.addEventListener(
+      'touchstart',
+      e => {
+        touchStart =
+          e.touches.length === 1 ? touchPoint(e.touches[0]) : undefined
+      },
+      { passive: true }
+    )
 
     parent.addEventListener('touchmove', e => {
       if (touchStart) {
@@ -51,17 +56,21 @@ export default function bespokeTouch(opts: BespokeTouchOption = {}) {
       }
     })
 
-    parent.addEventListener('touchend', e => {
-      if (touchStart) {
-        if (touchStart.delta && touchStart.delta >= options.swipeThreshold!) {
-          let radian = touchStart.radian! - options.slope!
-          radian = ((radian + Math.PI) % (Math.PI * 2)) - Math.PI
+    parent.addEventListener(
+      'touchend',
+      e => {
+        if (touchStart) {
+          if (touchStart.delta && touchStart.delta >= options.swipeThreshold!) {
+            let radian = touchStart.radian! - options.slope!
+            radian = ((radian + Math.PI) % (Math.PI * 2)) - Math.PI
 
-          deck[radian < 0 ? 'next' : 'prev']()
-          e.stopPropagation()
+            deck[radian < 0 ? 'next' : 'prev']()
+            e.stopPropagation()
+          }
+          touchStart = undefined
         }
-        touchStart = undefined
-      }
-    })
+      },
+      { passive: true }
+    )
   }
 }

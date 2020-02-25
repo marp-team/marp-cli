@@ -1,4 +1,5 @@
 import { default as screenfull } from 'screenfull'
+import { storage } from './utils'
 
 export default function bespokeOSC(selector: string = '.bespoke-marp-osc') {
   const osc = document.querySelector(selector)
@@ -16,6 +17,13 @@ export default function bespokeOSC(selector: string = '.bespoke-marp-osc') {
   // Hide fullscreen button in not-supported browser (e.g. phone device)
   if (!screenfull.isEnabled)
     oscElements('fullscreen', btn => (btn.style.display = 'none'))
+
+  // Disable presenter button if using localStorage is restricted
+  if (!storage.available)
+    oscElements('presenter', (btn: HTMLButtonElement) => {
+      btn.disabled = true
+      btn.title = 'Presenter view is disabled due to restricted localStorage.'
+    })
 
   return deck => {
     osc.addEventListener('click', e => {

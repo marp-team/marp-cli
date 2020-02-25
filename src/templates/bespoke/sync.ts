@@ -1,5 +1,6 @@
 import nanoid from 'nanoid'
 import { FragmentEvent } from './fragments'
+import { storage } from './utils'
 
 export interface BespokeSyncOption {
   key?: string
@@ -16,7 +17,7 @@ export default function bespokeSync(opts: BespokeSyncOption = {}) {
   const storageKey = `bespoke-marp-sync-${key}`
 
   const getState = (): Partial<BespokeSyncState> => {
-    const stateJSON = localStorage.getItem(storageKey)
+    const stateJSON = storage.get(storageKey)
     if (!stateJSON) return Object.create(null)
 
     return JSON.parse(stateJSON)
@@ -28,7 +29,7 @@ export default function bespokeSync(opts: BespokeSyncOption = {}) {
     const currentState = getState()
     const newState = { ...currentState, ...updater(currentState) }
 
-    localStorage.setItem(storageKey, JSON.stringify(newState))
+    storage.set(storageKey, JSON.stringify(newState))
     return newState
   }
 
@@ -76,7 +77,7 @@ export default function bespokeSync(opts: BespokeSyncOption = {}) {
       const { reference } = getState()
 
       if (reference === undefined || reference <= 1) {
-        localStorage.removeItem(storageKey)
+        storage.remove(storageKey)
       } else {
         setState(() => ({ reference: reference - 1 }))
       }

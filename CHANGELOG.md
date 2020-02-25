@@ -2,6 +2,17 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- PPTX creation does no longer make multiple master slides ([#166](https://github.com/marp-team/marp-cli/issues/166), [#205](https://github.com/marp-team/marp-cli/pull/205))
+- Make bespoke plugins robust against storage error ([#207](https://github.com/marp-team/marp-cli/issues/207), [#208](https://github.com/marp-team/marp-cli/pull/208))
+
+### Changed
+
+- Use PptxGenJS v3 instead of `@marp-team/pptx` ([#205](https://github.com/marp-team/marp-cli/pull/205))
+- Disable opening presenter view in `bespoke` template if using `localStorage` has restricted in browser ([#208](https://github.com/marp-team/marp-cli/pull/208))
+- Use passive event listener as much as possible ([#209](https://github.com/marp-team/marp-cli/pull/209))
+
 ## v0.17.1 - 2020-02-22
 
 ### Added
