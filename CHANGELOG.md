@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v0.17.2 - 2020-02-25
+
 ### Fixed
 
 - PPTX creation does no longer make multiple master slides ([#166](https://github.com/marp-team/marp-cli/issues/166), [#205](https://github.com/marp-team/marp-cli/pull/205))
