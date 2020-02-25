@@ -11,6 +11,7 @@
 
 - Use PptxGenJS v3 instead of `@marp-team/pptx` ([#205](https://github.com/marp-team/marp-cli/pull/205))
 - Disable opening presenter view in `bespoke` template if using `localStorage` has restricted in browser ([#208](https://github.com/marp-team/marp-cli/pull/208))
+- Use passive event listener as much as possible ([#209](https://github.com/marp-team/marp-cli/pull/209))
 
 ## v0.17.1 - 2020-02-22
 
