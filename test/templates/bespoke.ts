@@ -567,6 +567,33 @@ describe("Bespoke template's browser context", () => {
             expect(button.style.display).toBe('none')
           })
         })
+
+        context(
+          'when localStorage throws error just by getting property',
+          () => {
+            beforeEach(() => {
+              jest.resetModules()
+              jest.spyOn(console, 'warn').mockImplementation()
+              jest
+                .spyOn(window, 'localStorage', 'get')
+                .mockImplementation(() => {
+                  throw new Error()
+                })
+            })
+
+            it('disables OSC button for opening presenter view', async () => {
+              // Whether storage is available will determine while initializing
+              // module, so we have to use isolated bespoke instance.
+              ;(await import('../../src/templates/bespoke/bespoke')).default()
+
+              const button = osc.querySelector<HTMLButtonElement>(
+                'button[data-bespoke-marp-osc="presenter"]'
+              )!
+
+              expect(button.disabled).toBe(true)
+            })
+          }
+        )
       }
     )
   })
@@ -609,6 +636,7 @@ describe("Bespoke template's browser context", () => {
 
         // Ignore hitting p key with modifier
         ;(window.open as jest.Mock).mockClear()
+
         keydown({ which: Key.P, ctrlKey: true })
         expect(window.open).not.toBeCalled()
       })
@@ -956,6 +984,34 @@ describe("Bespoke template's browser context", () => {
         await updateStore('test', { reference: 2 })
         expect(deck.slide()).toBe(2)
       })
+    })
+
+    context('when the quota of storage has limited', () => {
+      beforeEach(() => {
+        // Eat up to the default quota
+        localStorage.clear()
+        localStorage.setItem('eater', 'x'.repeat(4999995))
+      })
+
+      afterEach(() => localStorage.clear())
+
+      it('does not throw any errors while initialize plugin', () =>
+        expect(() =>
+          replaceLocation('/?sync=test', () => bespoke())
+        ).not.toThrow())
+    })
+
+    context('when localStorage throws error just by getting property', () => {
+      beforeEach(() =>
+        jest.spyOn(window, 'localStorage', 'get').mockImplementation(() => {
+          throw new Error()
+        })
+      )
+
+      it('does not throw any errors while initialize plugin', () =>
+        expect(() =>
+          replaceLocation('/?sync=test', () => bespoke())
+        ).not.toThrow())
     })
   })
 

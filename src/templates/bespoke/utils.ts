@@ -87,3 +87,46 @@ export const setViewMode = () =>
       }
     })()
   )
+
+export const storage = (() => {
+  const available = (() => {
+    try {
+      localStorage.setItem('bespoke-marp', 'bespoke-marp')
+      localStorage.removeItem('bespoke-marp')
+
+      return true
+    } catch (e) {
+      console.warn(
+        'Warning: Using localStorage is restricted in the current host so some features may not work.'
+      )
+      return false
+    }
+  })()
+
+  return {
+    available,
+    get: (key: string): string | null => {
+      try {
+        return localStorage.getItem(key)
+      } catch (e) {
+        return null
+      }
+    },
+    set: (key: string, value: string): boolean => {
+      try {
+        localStorage.setItem(key, value)
+        return true
+      } catch (e) {
+        return false
+      }
+    },
+    remove: (key: string): boolean => {
+      try {
+        localStorage.removeItem(key)
+        return true
+      } catch (e) {
+        return false
+      }
+    },
+  }
+})()
