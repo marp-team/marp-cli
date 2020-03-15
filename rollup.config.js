@@ -14,11 +14,7 @@ import pugPlugin from 'rollup-plugin-pug'
 import { terser } from 'rollup-plugin-terser'
 import { dependencies } from './package.json'
 
-const external = [
-  ...Object.keys(dependencies),
-  'chrome-launcher/dist/chrome-finder',
-  'yargs/yargs',
-]
+const external = [...Object.keys(dependencies), 'yargs/yargs']
 
 const plugins = (opts = {}) => [
   json({ preferConst: true }),
@@ -28,7 +24,7 @@ const plugins = (opts = {}) => [
   }),
   replace({ 'process.env.NODE_ENV': JSON.stringify('production') }),
   commonjs(),
-  typescript({ module: 'esnext' }),
+  typescript(),
   postcss({
     inject: false,
     plugins: [
