@@ -2,7 +2,7 @@ import { exec } from 'child_process'
 import { promisify } from 'util'
 import os from 'os'
 import path from 'path'
-import * as chromeFinder from 'chrome-launcher/dist/chrome-finder'
+import { Launcher } from 'chrome-launcher'
 
 const execPromise = promisify(exec)
 
@@ -48,17 +48,12 @@ export async function generatePuppeteerLaunchArgs() {
 
   // Resolve Chrome path to execute
   if (executablePath === false) {
-    const finder: (() => string[]) | undefined = (() => {
+    if (process.env.IS_DOCKER) {
       // Use already known path within Marp CLI official Docker image
-      if (process.env.IS_DOCKER) return () => ['/usr/bin/chromium-browser']
-
-      // Use Chrome installed to Windows within WSL
-      if (isWSL()) return chromeFinder.wsl
-
-      return chromeFinder[process.platform]
-    })()
-
-    executablePath = finder ? finder()[0] : undefined
+      executablePath = '/usr/bin/chromium-browser'
+    } else {
+      ;[executablePath] = Launcher.getInstallations()
+    }
   }
 
   return { executablePath, args: [...args] }
