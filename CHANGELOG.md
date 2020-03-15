@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Upgrade dependent packages to the latest version ([#212](https://github.com/marp-team/marp-cli/pull/212))
+
 ## v0.17.2 - 2020-02-25
 
 ### Fixed
