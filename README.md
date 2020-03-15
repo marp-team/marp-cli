@@ -39,9 +39,6 @@ npx @marp-team/marp-cli -w slide-deck.md
 
 # Server mode (Pass directory to serve)
 npx @marp-team/marp-cli -s ./slides
-
-# Open converted HTML in preview window
-npx @marp-team/marp-cli -p slide-deck.md
 ```
 
 > :information_source: You have to install [Google Chrome] (or [Chromium]) to convert slide deck into PDF, PPTX, and image(s).
@@ -205,6 +202,8 @@ Marp CLI server will provide the list of served files by default, but you can pl
 
 Place Markdown named `index.md` or `PITCHME.md` ([GitPitch style](https://gitpitch.com/docs/getting-started/pitchme/)) to served directory. It would be redirected just accessing to `http://localhost:8080/`.
 
+<!--
+
 ### Preview window (_Experimental:_ `--preview` / `-p`)
 
 When conversions were executed together with `--preview` (`-p`) option, Marp CLI will open preview window(s) to check the converted result immediately.
@@ -212,6 +211,8 @@ When conversions were executed together with `--preview` (`-p`) option, Marp CLI
 Unlike opening with browser, you may present deck with the immersive window. [Watch mode](#watch-mode) is enabled automatically.
 
 > :information_source: `--preview` option cannot use when you are using Marp CLI through official docker image.
+
+-->
 
 ## Template
 
@@ -430,7 +431,6 @@ By default we use configuration file that is placed on current directory, but yo
 | `options`         |           object            |                       | The base options for the constructor of engine                                                         |
 | `output`          |           string            |    `--output` `-o`    | Output file path (or directory when input-dir is passed)                                               |
 | `pdf`             |           boolean           |        `--pdf`        | Convert slide deck into PDF                                                                            |
-| `preview`         |           boolean           |   `--preview` `-p`    | Open preview window _(EXPERIMENTAL)_                                                                   |
 | `server`          |           boolean           |    `--server` `-s`    | Enable server mode                                                                                     |
 | `template`        |     `bare` \| `bespoke`     |     `--template`      | Choose template (`bespoke` by default)                                                                 |
 | `theme`           |           string            |       `--theme`       | Override theme by name or CSS file                                                                     |

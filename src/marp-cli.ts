@@ -81,7 +81,8 @@ export default async function(argv: string[] = []): Promise<number> {
         preview: {
           alias: 'p',
           describe: 'Open preview window (EXPERIMENTAL)',
-          hidden: !!process.env.IS_DOCKER,
+          // hidden: !!process.env.IS_DOCKER,
+          hidden: true, // https://github.com/marp-team/marp-cli/issues/211
           group: OptionGroup.Basic,
           type: 'boolean',
         },
@@ -296,6 +297,9 @@ export default async function(argv: string[] = []): Promise<number> {
       const preview = new Preview()
       preview.on('exit', () => process.exit())
       preview.on('opening', (location: string) => {
+        cli.error(
+          'The EXPERIMENTAL preview option does no longer work with the current stable Chrome >= 81 because of the unmaintained dependent package carlo. See details: https://github.com/marp-team/marp-cli/issues/211'
+        )
         const loc = location.substr(0, 50)
         const msg = `[Preview] (EXPERIMENTAL) Opening ${loc}...`
         cli.info(chalk.cyan(msg))
