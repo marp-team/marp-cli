@@ -96,8 +96,8 @@
     "prettier": "^1.19.1",
     "pug": "^2.0.4",
     "rimraf": "^3.0.2",
-    "rollup": "^2.0.6",
-    "rollup-plugin-postcss": "^2.4.1",
+    "rollup": "^2.1.0",
+    "rollup-plugin-postcss": "^2.5.0",
     "rollup-plugin-pug": "^1.1.1",
     "rollup-plugin-terser": "^5.3.0",
     "sass": "^1.26.3",
@@ -145,7 +145,7 @@
     "v8-compile-cache": "^2.1.0",
     "wrap-ansi": "^6.2.0",
     "ws": "^7.2.3",
-    "yargs": "^15.3.0"
+    "yargs": "^15.3.1"
   },
   "publishConfig": {
     "access": "public"
