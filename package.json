@@ -147,6 +147,11 @@
     "ws": "^7.2.3",
     "yargs": "^15.3.1"
   },
+  "resolutions": {
+    "**/chrome-launcher/mkdirp": "^0.5.3",
+    "**/extract-zip/mkdirp": "^0.5.3",
+    "**/gonzales-pe/minimist": "^1.2.5"
+  },
   "publishConfig": {
     "access": "public"
   }
