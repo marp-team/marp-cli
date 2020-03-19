@@ -10,6 +10,10 @@
 
 - Upgrade dependent packages to the latest version ([#212](https://github.com/marp-team/marp-cli/pull/212), [#215](https://github.com/marp-team/marp-cli/pull/215))
 
+### Deprecated
+
+- Hide the experimental `--preview` / `-p` option and show deprecation warning when used ([#211](https://github.com/marp-team/marp-cli/issues/211), [#213](https://github.com/marp-team/marp-cli/pull/213))
+
 ## v0.17.2 - 2020-02-25
 
 ### Fixed
