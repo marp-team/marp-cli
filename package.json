@@ -77,7 +77,7 @@
     "@types/pug": "^2.0.4",
     "@types/puppeteer": "^2.0.1",
     "@types/supertest": "^2.0.8",
-    "@types/ws": "^7.2.2",
+    "@types/ws": "^7.2.3",
     "@types/yargs": "^15.0.4",
     "autoprefixer": "^9.7.4",
     "bespoke": "bespokejs/bespoke",
