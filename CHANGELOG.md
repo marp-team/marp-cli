@@ -2,9 +2,13 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Ignore installing step of `puppeteer-core` in Dockerfile if the compatible tag was not found ([#214](https://github.com/marp-team/marp-cli/pull/214))
+
 ### Changed
 
-- Upgrade dependent packages to the latest version ([#212](https://github.com/marp-team/marp-cli/pull/212))
+- Upgrade dependent packages to the latest version ([#212](https://github.com/marp-team/marp-cli/pull/212), [#215](https://github.com/marp-team/marp-cli/pull/215))
 
 ## v0.17.2 - 2020-02-25
 
