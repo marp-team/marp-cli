@@ -297,8 +297,8 @@ export default async function(argv: string[] = []): Promise<number> {
       const preview = new Preview()
       preview.on('exit', () => process.exit())
       preview.on('opening', (location: string) => {
-        cli.error(
-          'The EXPERIMENTAL preview option does no longer work with the current stable Chrome >= 81 because of the unmaintained dependent package carlo. See details: https://github.com/marp-team/marp-cli/issues/211'
+        cli.warn(
+          `${chalk.yellow`[DEPRECATION WARNING]`} Due to the unmaintained dependent package ${chalk.cyan`carlo`} and incompatible Chrome / Chromium >= 81, the EXPERIMENTAL preview option provided by ${chalk.yellow`--preview`} or ${chalk.yellow`-p`} may no longer work correctly. See details: ${chalk.blueBright`https://github.com/marp-team/marp-cli/issues/211`}`
         )
         const loc = location.substr(0, 50)
         const msg = `[Preview] (EXPERIMENTAL) Opening ${loc}...`
