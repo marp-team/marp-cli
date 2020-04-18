@@ -14,7 +14,7 @@ const dist = path.resolve(__dirname, '../dist')
 const prefix = `marp-cli-v${version}`
 const os = (process.env.MATRIX_OS || 'linux,macos,windows').toLowerCase()
 
-const packToTarGz = binary => {
+const packToTarGz = (binary) => {
   const pack = tar.pack()
 
   pack.entry({ name: binaryName, mode: 0755 }, binary)

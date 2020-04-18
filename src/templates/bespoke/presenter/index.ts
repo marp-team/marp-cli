@@ -9,7 +9,7 @@ export default function bespokePresenter(target: HTMLElement) {
   // Append blank slide to next view
   if (mode === ViewMode.Next) target.appendChild(document.createElement('span'))
 
-  return deck => {
+  return (deck) => {
     if (mode === ViewMode.Normal) normalView(deck)
     if (mode === ViewMode.Presenter) presenterView(deck)
     if (mode === ViewMode.Next) nextView(deck)

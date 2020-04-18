@@ -119,7 +119,7 @@ export class MarpCLIConfig {
         ? (Array.isArray(this.conf.themeSet)
             ? this.conf.themeSet
             : [this.conf.themeSet]
-          ).map(f => path.resolve(path.dirname(this.confPath!), f))
+          ).map((f) => path.resolve(path.dirname(this.confPath!), f))
         : [])
 
     const themeSet = await ThemeSet.initialize(
@@ -255,7 +255,7 @@ export class MarpCLIConfig {
           e.name !== 'Error' && `(${e.name})`,
           confPath !== undefined && `[${confPath}]`,
         ]
-          .filter(m => m)
+          .filter((m) => m)
           .join(' ')
       )
     }

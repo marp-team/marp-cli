@@ -101,7 +101,7 @@ describe('Server', () => {
         it('emits `converted` event after conversion', async () => {
           let ret: string | undefined
 
-          const server = setupServer().on('converted', converted => {
+          const server = setupServer().on('converted', (converted) => {
             ret = converted.newFile!.buffer!.toString()
           })
 

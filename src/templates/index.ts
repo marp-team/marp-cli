@@ -52,7 +52,7 @@ export type Template<T = TemplateOption> = (
   locals: TemplateCoreOption & T
 ) => Promise<TemplateResult>
 
-export const bare: Template<TemplateBareOption> = async opts => {
+export const bare: Template<TemplateBareOption> = async (opts) => {
   const rendered = opts.renderer({
     container: [],
     inlineSVG: true,
@@ -70,7 +70,7 @@ export const bare: Template<TemplateBareOption> = async opts => {
   }
 }
 
-export const bespoke: Template<TemplateBespokeOption> = async opts => {
+export const bespoke: Template<TemplateBespokeOption> = async (opts) => {
   const rendered = opts.renderer({
     container: new Element('div', { id: 'p' }),
     inlineSVG: true,

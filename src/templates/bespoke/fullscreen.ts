@@ -5,7 +5,7 @@ export default function bespokeFullscreen(deck) {
     if (screenfull.isEnabled) screenfull.toggle(document.body)
   }
 
-  document.addEventListener('keydown', e => {
+  document.addEventListener('keydown', (e) => {
     // `f` or F11 without modifier key Alt, Control, and Command
     if (
       (e.which === 70 || e.which === 122) &&

@@ -1,5 +1,5 @@
 export default function bespokeInactive(timeout = 2000) {
-  return deck => {
+  return (deck) => {
     let activeTimer
 
     function activate() {

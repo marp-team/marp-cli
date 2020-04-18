@@ -26,7 +26,7 @@ Usage:
   marp [options] -I <dir>
 `.trim()
 
-export default async function(argv: string[] = []): Promise<number> {
+export default async function (argv: string[] = []): Promise<number> {
   let watcherInstance: Watcher | undefined
 
   try {
@@ -228,7 +228,7 @@ export default async function(argv: string[] = []): Promise<number> {
 
       // Regular file finding powered by globby
       return <File[]>(
-        [stdin, ...(await File.find(...config.files))].filter(f => f)
+        [stdin, ...(await File.find(...config.files))].filter((f) => f)
       )
     }
 
@@ -245,7 +245,7 @@ export default async function(argv: string[] = []): Promise<number> {
 
     // Convert markdown into HTML
     const convertedFiles: File[] = []
-    const onConverted: ConvertedCallback = ret => {
+    const onConverted: ConvertedCallback = (ret) => {
       const { file: i, newFile: o } = ret
       if (!o) return
 
@@ -284,7 +284,7 @@ export default async function(argv: string[] = []): Promise<number> {
           finder,
           events: {
             onConverted,
-            onError: e =>
+            onError: (e) =>
               cli.error(`Failed converting Markdown. (${e.message})`),
           },
           mode: cvtOpts.server
@@ -310,7 +310,7 @@ export default async function(argv: string[] = []): Promise<number> {
           directoryIndex: ['index.md', 'PITCHME.md'], // GitPitch compatible
         })
         server.on('converted', onConverted)
-        server.on('error', e => cli.error(e.toString()))
+        server.on('error', (e) => cli.error(e.toString()))
 
         await server.start()
 

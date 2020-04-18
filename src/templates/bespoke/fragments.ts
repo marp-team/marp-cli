@@ -12,7 +12,7 @@ export default function bespokeFragments(deck) {
 
   Object.defineProperty(deck, 'fragments', {
     enumerable: true,
-    value: deck.slides.map(slide => [
+    value: deck.slides.map((slide) => [
       null,
       ...slide.querySelectorAll('[data-marpit-fragment]'),
     ]),

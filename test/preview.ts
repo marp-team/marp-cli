@@ -100,7 +100,7 @@ xdescribe('Preview', () => {
       })
 
       context('when opened window is closed', () => {
-        it('emits close event with closed window', async done => {
+        it('emits close event with closed window', async (done) => {
           const instance = preview()
           const closeEvent = jest.fn()
 

@@ -164,10 +164,9 @@ describe("Bespoke template's browser context", () => {
       ]
 
       expect(deck.fragmentIndex).toBe(1)
-      expect(fragments.map(f => f.dataset.bespokeMarpFragment)).toStrictEqual([
-        'active',
-        'inactive',
-      ])
+      expect(
+        fragments.map((f) => f.dataset.bespokeMarpFragment)
+      ).toStrictEqual(['active', 'inactive'])
     })
 
     it('activates all fragments in slide when navigating by slide() with fragment option as -1', () => {
@@ -439,7 +438,7 @@ describe("Bespoke template's browser context", () => {
         const overflowYAutoElement = overflowAuto('overflowY')
 
         beforeEach(() => {
-          const section = idx => deck.slides[idx].querySelector('section')
+          const section = (idx) => deck.slides[idx].querySelector('section')
 
           section(0).appendChild(notScrollableElement)
           section(0).appendChild(overflowAutoElement)
@@ -771,7 +770,7 @@ describe("Bespoke template's browser context", () => {
           func({ deck, parent })
         })
 
-      it('subscribes navigation in the parent presenter view and navigate to its next page', done =>
+      it('subscribes navigation in the parent presenter view and navigate to its next page', (done) =>
         testNextView(({ deck }) => {
           // https://github.com/jsdom/jsdom/issues/2745
           jest
@@ -1048,7 +1047,7 @@ describe("Bespoke template's browser context", () => {
       const type = `touch${event}`
 
       return parent[type]({
-        touches: touches.map(t => ({ pageX: t[0], pageY: t[1] })),
+        touches: touches.map((t) => ({ pageX: t[0], pageY: t[1] })),
         preventDefault: jest.fn(),
         stopPropagation: jest.fn(),
       })

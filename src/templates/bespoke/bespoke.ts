@@ -17,10 +17,10 @@ import { getViewMode, popQuery, setQuery, setViewMode, ViewMode } from './utils'
 const pattern = [ViewMode.Normal, ViewMode.Presenter, ViewMode.Next] as const
 
 const parse = (...patterns: [[boolean, boolean, boolean], Function][]) => {
-  const idx = pattern.findIndex(v => getViewMode() === v)
+  const idx = pattern.findIndex((v) => getViewMode() === v)
   if (idx < 0) throw new Error('Invalid view')
 
-  return patterns.map(([pat, plugin]) => pat[idx] && plugin).filter(p => p)
+  return patterns.map(([pat, plugin]) => pat[idx] && plugin).filter((p) => p)
 }
 
 export default function bespokeTemplate(

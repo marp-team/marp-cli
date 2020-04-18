@@ -12,7 +12,7 @@ const coerceInt = (ns: string) => {
 export default function bespokeState(opts: BespokeStateOption = {}) {
   const options: BespokeStateOption = { history: true, ...opts }
 
-  return deck => {
+  return (deck) => {
     let internalNavigation = true
 
     const navInternally = (action: () => any) => {

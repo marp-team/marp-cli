@@ -5,4 +5,4 @@
 require('v8-compile-cache')
 require('./lib/marp-cli.js')
   .default(process.argv.slice(2))
-  .then(exitCode => process.on('exit', () => process.exit(exitCode)))
+  .then((exitCode) => process.on('exit', () => process.exit(exitCode)))

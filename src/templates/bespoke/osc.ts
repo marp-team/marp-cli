@@ -16,7 +16,7 @@ export default function bespokeOSC(selector: string = '.bespoke-marp-osc') {
 
   // Hide fullscreen button in not-supported browser (e.g. phone device)
   if (!screenfull.isEnabled)
-    oscElements('fullscreen', btn => (btn.style.display = 'none'))
+    oscElements('fullscreen', (btn) => (btn.style.display = 'none'))
 
   // Disable presenter button if using localStorage is restricted
   if (!storage.available)
@@ -25,8 +25,8 @@ export default function bespokeOSC(selector: string = '.bespoke-marp-osc') {
       btn.title = 'Presenter view is disabled due to restricted localStorage.'
     })
 
-  return deck => {
-    osc.addEventListener('click', e => {
+  return (deck) => {
+    osc.addEventListener('click', (e) => {
       if (e.target instanceof HTMLElement) {
         const { bespokeMarpOsc } = e.target.dataset
 
@@ -54,7 +54,7 @@ export default function bespokeOSC(selector: string = '.bespoke-marp-osc') {
     deck.on('activate', ({ index }) => {
       oscElements(
         'page',
-        page =>
+        (page) =>
           (page.textContent = `Page ${index + 1} of ${deck.slides.length}`)
       )
     })
@@ -62,12 +62,12 @@ export default function bespokeOSC(selector: string = '.bespoke-marp-osc') {
     deck.on('fragment', ({ index, fragments, fragmentIndex }) => {
       oscElements<HTMLButtonElement>(
         'prev',
-        prev => (prev.disabled = index === 0 && fragmentIndex === 0)
+        (prev) => (prev.disabled = index === 0 && fragmentIndex === 0)
       )
 
       oscElements<HTMLButtonElement>(
         'next',
-        next =>
+        (next) =>
           (next.disabled =
             index === deck.slides.length - 1 &&
             fragmentIndex === fragments.length - 1)
@@ -76,7 +76,7 @@ export default function bespokeOSC(selector: string = '.bespoke-marp-osc') {
 
     if (screenfull.isEnabled) {
       screenfull.onchange(() =>
-        oscElements('fullscreen', fs =>
+        oscElements('fullscreen', (fs) =>
           fs.classList.toggle(
             'exit',
             screenfull.isEnabled && screenfull.isFullscreen

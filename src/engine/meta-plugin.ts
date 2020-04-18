@@ -4,10 +4,11 @@ import { warn } from '../cli'
 
 export default function metaPlugin({ marpit }: { marpit: Marpit }) {
   Object.assign(marpit.customDirectives.global, {
-    description: v => (typeof v === 'string' ? { marpCLIDescription: v } : {}),
-    image: v => (typeof v === 'string' ? { marpCLIImage: v } : {}),
-    title: v => (typeof v === 'string' ? { marpCLITitle: v } : {}),
-    url: v => {
+    description: (v) =>
+      typeof v === 'string' ? { marpCLIDescription: v } : {},
+    image: (v) => (typeof v === 'string' ? { marpCLIImage: v } : {}),
+    title: (v) => (typeof v === 'string' ? { marpCLITitle: v } : {}),
+    url: (v) => {
       // URL validation
       try {
         if (v) new URL(v)

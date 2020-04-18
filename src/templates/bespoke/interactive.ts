@@ -10,7 +10,7 @@ const interactiveNodes = [
 ]
 
 export default function bespokeInteractive(deck) {
-  ;(deck.parent as HTMLElement).addEventListener('keydown', e => {
+  ;(deck.parent as HTMLElement).addEventListener('keydown', (e) => {
     if (!e.target) return
 
     const element = e.target as HTMLElement
