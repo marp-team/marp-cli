@@ -17,7 +17,7 @@ export default function bespokeTouch(opts: BespokeTouchOption = {}) {
     ...opts,
   }
 
-  return deck => {
+  return (deck) => {
     let touchStart: TouchPoint | undefined
     const parent: HTMLElement = deck.parent
 
@@ -32,14 +32,14 @@ export default function bespokeTouch(opts: BespokeTouchOption = {}) {
 
     parent.addEventListener(
       'touchstart',
-      e => {
+      (e) => {
         touchStart =
           e.touches.length === 1 ? touchPoint(e.touches[0]) : undefined
       },
       { passive: true }
     )
 
-    parent.addEventListener('touchmove', e => {
+    parent.addEventListener('touchmove', (e) => {
       if (touchStart) {
         if (e.touches.length === 1) {
           e.preventDefault()
@@ -58,7 +58,7 @@ export default function bespokeTouch(opts: BespokeTouchOption = {}) {
 
     parent.addEventListener(
       'touchend',
-      e => {
+      (e) => {
         if (touchStart) {
           if (touchStart.delta && touchStart.delta >= options.swipeThreshold!) {
             let radian = touchStart.radian! - options.slope!

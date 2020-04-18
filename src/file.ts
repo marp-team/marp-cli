@@ -56,16 +56,16 @@ export class File {
       case undefined:
         return File.initialize(
           this.convertName(opts),
-          f => (f.type = this.type)
+          (f) => (f.type = this.type)
         )
 
       // No output
       case false:
-        return File.initialize(this.path, f => (f.type = FileType.Null))
+        return File.initialize(this.path, (f) => (f.type = FileType.Null))
 
       // Output to standard IO
       case '-':
-        return File.initialize('-', f => (f.type = FileType.StandardIO))
+        return File.initialize('-', (f) => (f.type = FileType.StandardIO))
     }
 
     // Relative path from output directory
@@ -190,9 +190,9 @@ export class File {
         ignore: ['**/node_modules'],
         ...opts,
       })
-    ).forEach(p => filepaths.add(p))
+    ).forEach((p) => filepaths.add(p))
 
-    return [...filepaths.values()].map(p => path.normalize(p))
+    return [...filepaths.values()].map((p) => path.normalize(p))
   }
 
   static async find(...paths: string[]): Promise<File[]> {
@@ -201,17 +201,17 @@ export class File {
         {
           expandDirectories: {
             extensions: [],
-            files: markdownExtensions.map(ext => `*.${ext}`),
+            files: markdownExtensions.map((ext) => `*.${ext}`),
           },
         },
         ...paths
       )
-    ).map(p => new File(p))
+    ).map((p) => new File(p))
   }
 
   static async findDir(directory: string): Promise<File[]> {
     const found = await this.find(directory)
-    found.forEach(p => (p.inputDir = path.resolve(directory)))
+    found.forEach((p) => (p.inputDir = path.resolve(directory)))
 
     return found
   }
@@ -220,7 +220,7 @@ export class File {
     this.stdinBuffer = this.stdinBuffer || (await getStdin.buffer())
     if (this.stdinBuffer.length === 0) return undefined
 
-    return this.initialize('-', f => {
+    return this.initialize('-', (f) => {
       f.buffer = this.stdinBuffer
       f.type = FileType.StandardIO
     })

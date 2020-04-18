@@ -130,7 +130,7 @@ export class Converter {
         isFile(file) && this.options.watch && type === ConvertType.html
           ? await notifier.register(file.absolutePath)
           : undefined,
-      renderer: tplOpts => {
+      renderer: (tplOpts) => {
         const engine = this.generateEngine(tplOpts)
         const ret = engine.render(`${markdown}${additionals}`)
         const info = engine[engineInfo]
@@ -242,8 +242,9 @@ export class Converter {
 
       const screenshot = async (pageNumber?: number) => {
         await page.evaluate(
-          `window.scrollTo(0,${((pageNumber || 1) - 1) *
-            tpl.rendered.size.height})`
+          `window.scrollTo(0,${
+            ((pageNumber || 1) - 1) * tpl.rendered.size.height
+          })`
         )
 
         if (opts.type === ConvertType.jpeg)

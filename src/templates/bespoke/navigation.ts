@@ -13,8 +13,8 @@ export default function bespokeNavigation(opts: BespokeNavigationOption = {}) {
     ...opts,
   }
 
-  return deck => {
-    document.addEventListener('keydown', e => {
+  return (deck) => {
+    document.addEventListener('keydown', (e) => {
       // Space + Shift | Page Up | LEFT | UP: Previous page
       if (
         (e.which === 32 && e.shiftKey) ||
@@ -44,7 +44,7 @@ export default function bespokeNavigation(opts: BespokeNavigationOption = {}) {
     let lastWheelDelta
     let wheelIntervalTimer
 
-    deck.parent.addEventListener('wheel', e => {
+    deck.parent.addEventListener('wheel', (e) => {
       // Detect scrollable element
       let scrollable = false
 

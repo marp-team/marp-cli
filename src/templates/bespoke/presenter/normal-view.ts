@@ -18,7 +18,7 @@ export default function normalView(deck) {
 
   // Register keyboard shortcut if using localStorage is not restricted
   if (storage.available)
-    document.addEventListener('keydown', e => {
+    document.addEventListener('keydown', (e) => {
       // `p` without modifier key (Alt, Control, and Command)
       if (e.which === 80 && !e.altKey && !e.ctrlKey && !e.metaKey) {
         e.preventDefault()

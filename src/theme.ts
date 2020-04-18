@@ -39,10 +39,7 @@ export class Theme {
   }
 
   private genUniqName() {
-    const uniq = () =>
-      Math.random()
-        .toString(36)
-        .slice(2)
+    const uniq = () => Math.random().toString(36).slice(2)
 
     return `${uniq()}${uniq()}${uniq()}${uniq()}`
   }
@@ -120,9 +117,9 @@ export class ThemeSet {
   }
 
   static async initialize(baseFn: string[], themes: Theme[] = []) {
-    const fn = [...baseFn, ...themes.map(t => t.filename)]
+    const fn = [...baseFn, ...themes.map((t) => t.filename)]
     const found = await ThemeSet.findPath(fn)
-    const fnForWatch: Set<string> = new Set(found.map(f => path.resolve(f)))
+    const fnForWatch: Set<string> = new Set(found.map((f) => path.resolve(f)))
 
     for (const f of fn) {
       // globby's hasMagic (backed by fast-glob) always recognizes "\\" (Windows path separator) as the escape character.
@@ -139,7 +136,7 @@ export class ThemeSet {
     const instance = new ThemeSet({ fn, fnForWatch: [...fnForWatch] })
     for (const f of found) await instance.load(f)
 
-    themes.forEach(t => instance.add(t))
+    themes.forEach((t) => instance.add(t))
 
     return instance
   }

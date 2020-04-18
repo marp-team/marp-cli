@@ -22,11 +22,11 @@ export class Watcher {
 
     this.chokidar = chokidar
       .watch(watchPath, { disableGlobbing: true, ignoreInitial: true })
-      .on('change', f => this.convert(f))
-      .on('add', f => this.convert(f))
-      .on('unlink', f => this.delete(f))
+      .on('change', (f) => this.convert(f))
+      .on('add', (f) => this.convert(f))
+      .on('unlink', (f) => this.delete(f))
 
-    this.converter.options.themeSet.onThemeUpdated = f => this.convert(f)
+    this.converter.options.themeSet.onThemeUpdated = (f) => this.convert(f)
 
     notifier.start()
   }
@@ -34,10 +34,10 @@ export class Watcher {
   private async convert(filename: string) {
     const resolvedFn = path.resolve(filename)
     const mdFiles = (await this.finder()).filter(
-      f => path.resolve(f.path) === resolvedFn
+      (f) => path.resolve(f.path) === resolvedFn
     )
     const cssFile = (await this.converter.options.themeSet.findPath()).find(
-      f => path.resolve(f) === resolvedFn
+      (f) => path.resolve(f) === resolvedFn
     )
 
     const notify = (f: File) => {
@@ -48,7 +48,7 @@ export class Watcher {
       if (this.mode === Watcher.WatchMode.Convert) {
         // Convert markdown
         await this.converter.convertFiles(mdFiles, {
-          onConverted: ret => {
+          onConverted: (ret) => {
             this.events.onConverted(ret)
             notify(ret.file)
           },
@@ -106,7 +106,7 @@ export class WatchNotifier {
     const sockets = this.listeners.get(WatchNotifier.sha256(fn))
     if (!sockets) return false
 
-    sockets.forEach(ws => ws.send(command))
+    sockets.forEach((ws) => ws.send(command))
     return true
   }
 

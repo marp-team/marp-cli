@@ -53,7 +53,7 @@ export class Server extends TypedEventEmitter<Server.Events> {
       httpServer.on('listening', () => {
         resolve()
       })
-      httpServer.on('error', err => {
+      httpServer.on('error', (err) => {
         httpServer.close()
 
         if (err['code'] === 'EADDRINUSE') {
@@ -104,7 +104,7 @@ export class Server extends TypedEventEmitter<Server.Events> {
     if (!pathname) return
 
     const qs = querystring.parse(query || '')
-    const response = async fn => {
+    const response = async (fn) => {
       try {
         const ret = await this.convertMarkdown(fn, qs)
 

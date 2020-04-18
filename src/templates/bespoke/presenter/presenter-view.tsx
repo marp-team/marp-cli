@@ -62,7 +62,7 @@ export default function presenterView(deck) {
     return $cache[klass]
   }
 
-  const subscribe = deck => {
+  const subscribe = (deck) => {
     // Next slide view
     $(classes.nextContainer).addEventListener('click', () => deck.next())
 
@@ -83,15 +83,15 @@ export default function presenterView(deck) {
     // Presenter note
     const notes = document.querySelectorAll<HTMLElement>('.bespoke-marp-note')
 
-    notes.forEach(note => {
-      note.addEventListener('keydown', e => e.stopPropagation())
+    notes.forEach((note) => {
+      note.addEventListener('keydown', (e) => e.stopPropagation())
       $(classes.noteContainer).appendChild(note)
     })
 
     deck.on('activate', () =>
       notes.forEach(
         // tslint:disable-next-line: triple-equals
-        n => n.classList.toggle('active', n.dataset.index == deck.slide())
+        (n) => n.classList.toggle('active', n.dataset.index == deck.slide())
       )
     )
 

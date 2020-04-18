@@ -98,7 +98,7 @@ describe('ThemeSet', () => {
       expect(marpit.themeSet.has('c')).toBe(true)
 
       // Reflects parsed theme name back to own themes
-      const names = [...themeSet.themes.values()].map(t => t.name)
+      const names = [...themeSet.themes.values()].map((t) => t.name)
       expect(names).toContain('a')
       expect(names).toContain('b')
       expect(names).toContain('c')

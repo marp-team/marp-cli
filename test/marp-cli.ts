@@ -39,7 +39,7 @@ afterEach(() => {
 })
 
 describe('Marp CLI', () => {
-  const assetFn = fn => path.resolve(__dirname, fn)
+  const assetFn = (fn) => path.resolve(__dirname, fn)
 
   for (const cmd of ['--version', '-v'])
     context(`with ${cmd} option`, () => {
@@ -53,7 +53,7 @@ describe('Marp CLI', () => {
           .mockImplementation()
       })
 
-      const mockEnginePath = path =>
+      const mockEnginePath = (path) =>
         findClassPath.mockImplementation(() => path)
 
       it('outputs package versions about cli and bundled core', async () => {
@@ -448,7 +448,7 @@ describe('Marp CLI', () => {
     })
 
     context('with specified directory', () => {
-      const baseArgs = theme => [filePath, '--theme-set', theme]
+      const baseArgs = (theme) => [filePath, '--theme-set', theme]
 
       it('becomes to be able to use the all css files in directory', async () => {
         for (const name of ['a', 'b', 'c']) {

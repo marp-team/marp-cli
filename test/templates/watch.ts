@@ -41,7 +41,7 @@ describe('Watch mode notifier on browser context', () => {
 
     afterEach(() => delete window['__marpCliWatchWS'])
 
-    it('connects to WebSocket server', done => {
+    it('connects to WebSocket server', (done) => {
       server.on('connection', (_, socket) => {
         expect(socket.url).toBe('/test')
         done()
@@ -53,12 +53,12 @@ describe('Watch mode notifier on browser context', () => {
     it('listens reload event', async () => {
       const send = await new Promise<(data: any) => Promise<void>>(
         (res, rej) => {
-          server.on('error', e => rej(e))
-          server.on('connection', ws =>
+          server.on('error', (e) => rej(e))
+          server.on('connection', (ws) =>
             res(
               (data: any) =>
                 new Promise<void>((resolve, reject) => {
-                  ws.once('error', e => reject(e))
+                  ws.once('error', (e) => reject(e))
                   ws.send(data)
 
                   ws.once('pong', resolve)
@@ -81,17 +81,17 @@ describe('Watch mode notifier on browser context', () => {
       beforeEach(() => jest.useFakeTimers())
       afterEach(() => jest.useRealTimers())
 
-      it('reconnects watcher in 5 sec', async done => {
+      it('reconnects watcher in 5 sec', async (done) => {
         const clientSocket = await new Promise<WebSocket>((res, rej) => {
           let socket: WebSocket
 
-          server.once('error', e => rej(e))
+          server.once('error', (e) => rej(e))
           server.once('connection', () => res(socket))
 
           socket = watch()!
         })
 
-        await new Promise(res => {
+        await new Promise((res) => {
           clientSocket.addEventListener('close', res)
           server.close()
         })

@@ -9,7 +9,7 @@ const mockWsOn = jest.fn()
 
 jest.mock('chokidar', () => ({
   watch: jest.fn(() => ({
-    on: jest.fn(function(this: any) {
+    on: jest.fn(function (this: any) {
       return this
     }),
   })),

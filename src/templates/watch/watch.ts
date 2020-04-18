@@ -13,14 +13,14 @@ const connect = (path: string, reconnect: boolean = false) => {
     )
     setTimeout(() => connect(path, true), reconnectMs)
   })
-  ws.addEventListener('message', e => {
+  ws.addEventListener('message', (e) => {
     if (e.data === 'reload') location.reload()
   })
 
   return ws
 }
 
-export default function() {
+export default function () {
   const wsPath = (window as any).__marpCliWatchWS
   if (wsPath) return connect(wsPath)
 }

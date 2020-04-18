@@ -325,15 +325,17 @@ describe('Converter', () => {
         instance({ output: 'test.pptx', type: ConvertType.pptx, ...opts })
 
       const getPptxDocProps = async (buffer: Buffer) => {
-        const zip = await promisify(yauzl.fromBuffer)(buffer, {
+        // Require to ignore type definition by casting into any :(
+        // https://github.com/DefinitelyTyped/DefinitelyTyped/issues/20497
+        const zip = await (promisify(yauzl.fromBuffer) as any)(buffer, {
           lazyEntries: true,
         })
 
         return await new Promise<Record<string, string>>((res, rej) => {
           const meta: Record<string, string> = {}
 
-          zip.on('error', err => rej(err))
-          zip.on('entry', entry => {
+          zip.on('error', (err) => rej(err))
+          zip.on('entry', (entry) => {
             // Read document property from `docProps/core.xml`
             if (entry.fileName === 'docProps/core.xml') {
               zip.openReadStream(entry, (err, readStream) => {
@@ -341,7 +343,7 @@ describe('Converter', () => {
 
                 const readBuffer: Buffer[] = []
 
-                readStream.on('data', chunk => readBuffer.push(chunk))
+                readStream.on('data', (chunk) => readBuffer.push(chunk))
                 readStream.on('end', () => {
                   const $ = cheerio.load(Buffer.concat(readBuffer).toString())
                   const coreProps = $('cp\\:coreProperties')
@@ -544,7 +546,8 @@ describe('Converter', () => {
         const files = [new File(onePath), new File(twoPath)]
 
         await instance({ output: '-' }).convertFiles(files, {
-          onConverted: result => expect(files.includes(result.file)).toBe(true),
+          onConverted: (result) =>
+            expect(files.includes(result.file)).toBe(true),
         })
 
         expect(write).not.toHaveBeenCalled()

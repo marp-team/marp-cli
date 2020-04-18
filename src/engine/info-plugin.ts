@@ -13,7 +13,7 @@ export const engineInfo = Symbol()
 export default function infoPlugin(md: any) {
   const { marpit } = md
 
-  md.core.ruler.push('marp_cli_info', state => {
+  md.core.ruler.push('marp_cli_info', (state) => {
     if (state.inlineMode) return
 
     const { themeSet, lastGlobalDirectives } = marpit

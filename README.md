@@ -349,7 +349,7 @@ It would be useful to convert with a customized engine for supporting the additi
 const { Marp } = require('@marp-team/marp-core')
 const markdownItMark = require('markdown-it-mark')
 
-module.exports = opts => new Marp(opts).use(markdownItMark)
+module.exports = (opts) => new Marp(opts).use(markdownItMark)
 ```
 
 ```bash
@@ -405,7 +405,7 @@ const container = require('markdown-it-container')
 
 module.exports = {
   // Customize engine on configuration file directly
-  engine: opts => new Marp(opts).use(container, 'custom'),
+  engine: (opts) => new Marp(opts).use(container, 'custom'),
 }
 ```
 

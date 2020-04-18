@@ -28,7 +28,7 @@ export class ResolvedEngine {
     from?: string
   ) {
     let resolved
-    ;(Array.isArray(engine) ? engine : [engine]).some(eng => {
+    ;(Array.isArray(engine) ? engine : [engine]).some((eng) => {
       if (typeof eng === 'string') {
         resolved =
           (from && importFrom.silent(path.dirname(path.resolve(from)), eng)) ||
