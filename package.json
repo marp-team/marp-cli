@@ -75,6 +75,7 @@
     "@types/jest-plugin-context": "^2.9.3",
     "@types/node": "~12.12.36",
     "@types/pug": "^2.0.4",
+    "@types/puppeteer": "^2.0.1",
     "@types/supertest": "^2.0.8",
     "@types/ws": "^7.2.4",
     "@types/yargs": "^15.0.4",
