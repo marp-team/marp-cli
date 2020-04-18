@@ -1,4 +1,4 @@
-import nanoid from 'nanoid'
+import { nanoid } from 'nanoid'
 import { FragmentEvent } from './fragments'
 import { storage } from './utils'
 
@@ -34,9 +34,9 @@ export default function bespokeSync(opts: BespokeSyncOption = {}) {
   }
 
   // Initialize or increase reference count
-  setState(prev => ({ reference: (prev.reference || 0) + 1 }))
+  setState((prev) => ({ reference: (prev.reference || 0) + 1 }))
 
-  return deck => {
+  return (deck) => {
     Object.defineProperty(deck, 'syncKey', {
       value: key,
       enumerable: true,
@@ -54,7 +54,7 @@ export default function bespokeSync(opts: BespokeSyncOption = {}) {
     }, 0)
 
     // Listen "storage" event
-    window.addEventListener('storage', e => {
+    window.addEventListener('storage', (e) => {
       if (e.key === storageKey && e.oldValue && e.newValue) {
         const prev: Partial<BespokeSyncState> = JSON.parse(e.oldValue)
         const current: Partial<BespokeSyncState> = JSON.parse(e.newValue)
