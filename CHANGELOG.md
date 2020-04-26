@@ -5,6 +5,7 @@
 ### Fixed
 
 - Add a trailing slash to the directory links on server index page to avoid broken path resolution ([#221](https://github.com/marp-team/marp-cli/pull/221) by [@n-ari](https://github.com/n-ari))
+- Revert `@rollup/plugin-typescript` to v3 ([#223](https://github.com/marp-team/marp-cli/pull/223))
 
 ## v0.17.4 - 2020-04-18
 
