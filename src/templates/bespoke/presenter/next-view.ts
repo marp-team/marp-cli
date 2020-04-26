@@ -6,12 +6,16 @@ export default function nextView(deck) {
     const [dir, args] = e.data.split(':')
 
     if (dir === 'navigate') {
-      const [idx, fragIdx] = args.split(',')
+      const [sIdx, sFragIdx] = args.split(',')
+      let idx = Number.parseInt(sIdx, 10)
+      let fragment = Number.parseInt(sFragIdx, 10) + 1
 
-      deck.slide(Number.parseInt(idx, 10), {
-        fragment: Number.parseInt(fragIdx, 10),
-      })
-      deck.next()
+      if (fragment >= deck.fragments[idx].length) {
+        idx += 1
+        fragment = 0
+      }
+
+      deck.slide(idx, { fragment })
     }
   }
 
