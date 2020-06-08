@@ -1,4 +1,5 @@
-/** @jest-environment jsdom */
+/** @jest-environment jsdom-fifteen */
+// TODO: Use Jest built-in jsdom environment if https://github.com/jsdom/jsdom/issues/2961 was fixed
 import serverIndex, { showAllKey } from '../../src/server/server-index'
 
 afterEach(() => jest.restoreAllMocks())

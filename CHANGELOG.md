@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Add a trailing slash to the directory links on server index page to avoid broken path resolution ([#221](https://github.com/marp-team/marp-cli/pull/221) by [@n-ari](https://github.com/n-ari))
+
+### Changed
+
+- Upgrade [Marpit v1.6.2](https://github.com/marp-team/marpit/releases/tag/v1.6.2) and [Marp Core v1.2.0](https://github.com/marp-team/marp-core/releases/tag/v1.2.0) ([#229](https://github.com/marp-team/marp-cli/pull/229))
+- Upgrade dependent packages to the latest version ([#229](https://github.com/marp-team/marp-cli/pull/229))
+
 ## v0.17.4 - 2020-04-18
 
 ### Changed

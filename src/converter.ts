@@ -309,9 +309,9 @@ export class Converter {
         data: `data:image/png;base64,${imageFile.buffer!.toString('base64')}`,
       })
 
-      const [img] = slide.relsMedia
-      slide.bkgdImgRid = img.rId
-      slide.data = []
+      const [img] = slide['relsMedia']
+      slide['bkgdImgRid'] = img.rId
+      slide['data'] = []
 
       const notes = tpl.rendered.comments[page - 1].join('\n\n')
       if (notes) slide.addNotes(notes)
