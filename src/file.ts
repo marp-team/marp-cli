@@ -156,7 +156,7 @@ export class File {
 
   private async saveToFile(savePath: string = this.path) {
     await mkdirp(path.dirname(path.resolve(savePath)))
-    await writeFile(savePath, this.buffer)
+    await writeFile(savePath, this.buffer!)
   }
 
   private static stdinBuffer?: Buffer

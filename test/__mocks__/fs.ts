@@ -1,6 +1,6 @@
 import { promisify } from 'util'
 
-const fs = require.requireActual('fs')
+const fs = jest.requireActual('fs')
 
 fs.writeFile[promisify.custom] = (path, data) =>
   new Promise((resolve, reject) =>
