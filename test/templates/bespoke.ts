@@ -1,4 +1,5 @@
-/** @jest-environment jsdom */
+/** @jest-environment jsdom-fifteen */
+// TODO: Use Jest built-in jsdom environment if https://github.com/jsdom/jsdom/issues/2961 was fixed
 import Marp from '@marp-team/marp-core'
 import { Element as MarpitElement } from '@marp-team/marpit'
 import { default as screenfull, Screenfull } from 'screenfull'
