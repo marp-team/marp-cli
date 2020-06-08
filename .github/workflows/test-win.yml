@@ -4,10 +4,13 @@ on:
   - pull_request
   - push
 
+env:
+  YARN_VERSION: '^1.22.4'
+
 jobs:
   validate:
     runs-on: ubuntu-latest
-    if: "! ( contains(github.event.head_commit.message, '[ci skip]') || contains(github.event.head_commit.message, '[skip ci]') )"
+    if: ${{ github.ref == 'refs/heads/master' || !startsWith(github.event.head_commit.message, '[ci skip]') }}
     steps:
       - run: echo "${{ github.event.head_commit.message }}"
 
@@ -23,9 +26,7 @@ jobs:
           - '12.16.1'
 
     steps:
-      - uses: actions/checkout@v1
-        with:
-          fetch-depth: 1
+      - uses: actions/checkout@v2
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
@@ -33,16 +34,15 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: Install yarn
-        run: yarn policies set-version 1.22.0
-
-      - name: Get yarn cache
-        id: yarn-cache
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+        id: yarn
+        run: |
+          cd $HOME && yarn policies set-version $YARN_VERSION
+          echo "::set-output name=cache_dir::$(yarn cache dir)"
 
       - name: Cache yarn
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
-          path: ${{ steps.yarn-cache.outputs.dir }}
+          path: ${{ steps.yarn.outputs.dir }}
           key: yarn_cache-${{ runner.os }}-${{ matrix.node-version }}-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             yarn_cache-${{ runner.os }}-${{ matrix.node-version }}-
@@ -56,7 +56,7 @@ jobs:
         env:
           CI: true
 
-      - uses: actions/upload-artifact@v1
+      - uses: actions/upload-artifact@v2
         with:
           name: coverage
           path: coverage

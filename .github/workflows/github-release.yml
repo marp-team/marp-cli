@@ -5,11 +5,14 @@ on:
     tags:
       - v*
 
+env:
+  YARN_VERSION: '^1.22.4'
+
 jobs:
   github-release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - uses: marp-team/actions@v1
         with:
           task: release
@@ -28,22 +31,24 @@ jobs:
           - macOS-latest
 
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
+      - name: Detect Node version from .nvmrc
+        id: node_version
+        run: echo "::set-output name=nvmrc::$(cat .nvmrc)"
       - name: Use Node.js
         uses: actions/setup-node@v1
         with:
-          node-version: '12.16.1'
-      - name: Install with yarn
-        run: |
-          yarn policies set-version 1.22.0
-          yarn install
+          node-version: ${{ steps.node_version.outputs.nvmrc }}
+      - name: Install yarn
+        run: cd $HOME && yarn policies set-version $YARN_VERSION
+      - run: yarn install
       - name: Build and create standalone binaries
         run: yarn build:standalone
       - name: Create package
         run: yarn standalone:pack
         env:
           MATRIX_OS: ${{ matrix.os }}
-      - uses: actions/upload-artifact@v1
+      - uses: actions/upload-artifact@v2
         with:
           name: assets
           path: dist
