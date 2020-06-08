@@ -167,6 +167,7 @@ export class File {
   ): Promise<string[]> {
     const filepaths = new Set<string>()
     const globs: string[] = []
+    const dirs: string[] = []
 
     // Collect passed files that refers to a real path at first
     for (const p of paths) {
@@ -176,6 +177,9 @@ export class File {
         if (s.isFile()) {
           filepaths.add(path.resolve(p))
           continue
+        } else if (s.isDirectory()) {
+          dirs.push(path.resolve(p))
+          continue
         }
       } catch (e) {}
 
@@ -184,13 +188,12 @@ export class File {
     }
 
     // Find remaining path through globby
-    ;(
-      await globby(globs, {
-        absolute: true,
-        ignore: ['**/node_modules'],
-        ...opts,
-      })
-    ).forEach((p) => filepaths.add(p))
+    const gOpts = { absolute: true, ignore: ['**/node_modules'], ...opts }
+    ;(await globby(globs, gOpts)).forEach((p) => filepaths.add(p))
+
+    for (const cwd of dirs) {
+      ;(await globby('.', { cwd, ...gOpts })).forEach((p) => filepaths.add(p))
+    }
 
     return [...filepaths.values()].map((p) => path.normalize(p))
   }
