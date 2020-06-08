@@ -42,7 +42,7 @@ jobs:
       - name: Cache yarn
         uses: actions/cache@v2
         with:
-          path: ${{ steps.yarn.outputs.dir }}
+          path: ${{ steps.yarn.outputs.cache_dir }}
           key: yarn_cache-${{ runner.os }}-${{ matrix.node-version }}-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             yarn_cache-${{ runner.os }}-${{ matrix.node-version }}-
