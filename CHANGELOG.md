@@ -5,6 +5,7 @@
 ### Fixed
 
 - Add a trailing slash to the directory links on server index page to avoid broken path resolution ([#221](https://github.com/marp-team/marp-cli/pull/221) by [@n-ari](https://github.com/n-ari))
+- Restart CSS animations when switching page in bespoke template ([#222](https://github.com/marp-team/marp-cli/pull/222))
 
 ### Changed
 

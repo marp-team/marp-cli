@@ -5,9 +5,19 @@ export default function bespokeClasses(deck) {
   deck.slides.map((element) => element.classList.add('bespoke-marp-slide'))
 
   deck.on('activate', (e) => {
-    deck.slides.map((element) =>
-      element.classList.remove('bespoke-marp-active')
+    const shouldResetAnimation = !e.slide.classList.contains(
+      'bespoke-marp-active'
     )
+
+    deck.slides.map((element) => {
+      element.classList.remove('bespoke-marp-active')
+    })
     e.slide.classList.add('bespoke-marp-active')
+
+    if (shouldResetAnimation) {
+      e.slide.classList.add('bespoke-marp-active-ready')
+      void document.body.clientHeight
+      e.slide.classList.remove('bespoke-marp-active-ready')
+    }
   })
 }

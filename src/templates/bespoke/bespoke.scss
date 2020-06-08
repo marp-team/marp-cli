@@ -31,6 +31,13 @@ $progressHeight: 5px;
       opacity: 1;
       pointer-events: auto;
       z-index: 0;
+
+      &.bespoke-marp-active-ready {
+        * {
+          /* Reset animation: "none" keyword does not reset animation in Firefox */
+          animation-name: __bespoke_marp__ !important;
+        }
+      }
     }
 
     &[data-bespoke-marp-load='hideable'] {
