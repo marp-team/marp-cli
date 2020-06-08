@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v0.18.0 - 2020-06-08
+
 ### Fixed
 
 - Add a trailing slash to the directory links on server index page to avoid broken path resolution ([#221](https://github.com/marp-team/marp-cli/pull/221) by [@n-ari](https://github.com/n-ari))
