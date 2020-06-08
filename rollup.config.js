@@ -14,7 +14,8 @@ import pugPlugin from 'rollup-plugin-pug'
 import { terser } from 'rollup-plugin-terser'
 import { dependencies } from './package.json'
 
-const external = [...Object.keys(dependencies), 'yargs/yargs']
+const external = (deps) => (id) =>
+  deps.some((dep) => dep === id || id.startsWith(`${dep}/`))
 
 const plugins = (opts = {}) => [
   json({ preferConst: true }),
@@ -43,12 +44,12 @@ const plugins = (opts = {}) => [
 ]
 
 const browser = {
-  external,
+  external: external(Object.keys(dependencies)),
   plugins: plugins({ browser: true }),
 }
 
 const cli = {
-  external: [...builtinModules, ...external],
+  external: external([...builtinModules, ...Object.keys(dependencies)]),
   plugins: plugins(),
 }
 
