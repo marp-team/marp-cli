@@ -209,7 +209,7 @@ describe('Marp CLI', () => {
       jest.spyOn(cli, 'info').mockImplementation()
 
       expect(await marpCli(['--input-dir', files])).toBe(0)
-      expect(writeFile).toHaveBeenCalledTimes(5)
+      expect(writeFile).toHaveBeenCalledTimes(6)
       writeFile.mock.calls.forEach(([fn]) => expect(fn).toMatch(/\.html$/))
     })
 
@@ -246,6 +246,15 @@ describe('Marp CLI', () => {
       )
     })
 
+    context('when the directory path has included glob pattern', () => {
+      it('converts files in specified dir', async () => {
+        jest.spyOn(cli, 'info').mockImplementation()
+
+        expect(await marpCli(['--input-dir', assetFn('_files/(sp)')])).toBe(0)
+        expect(writeFile).toHaveBeenCalledTimes(1)
+      })
+    })
+
     context('when the output folder is specified by -o option', () => {
       it('converts markdowns with keeping folder structure', async () => {
         const args = ['--input-dir', files, '-o', assetFn('dist')]
@@ -253,7 +262,7 @@ describe('Marp CLI', () => {
         jest.spyOn(cli, 'info').mockImplementation()
 
         expect(await marpCli(args)).toBe(0)
-        expect(writeFile).toHaveBeenCalledTimes(5)
+        expect(writeFile).toHaveBeenCalledTimes(6)
 
         const outputFiles = writeFile.mock.calls.map(([fn]) => fn)
         expect(outputFiles).toContain(assetFn('dist/1.html'))
@@ -763,7 +772,7 @@ describe('Marp CLI', () => {
 
       expect(await marpCli([assetFn('_files')])).toBe(0)
       expect(cliInfo.mock.calls.map(([m]) => m)).toContainEqual(
-        expect.stringContaining('5 markdowns')
+        expect.stringContaining('6 markdowns')
       )
     })
 
@@ -788,6 +797,20 @@ describe('Marp CLI', () => {
         expect(await marpCli([assetFn('_files/字')])).toBe(0)
       })
     })
+
+    context(
+      'when glob special chars are included in real directory path',
+      () => {
+        it('finds out markdown files in specified directory correctly', async () => {
+          jest.spyOn(cli, 'info').mockImplementation()
+          jest
+            .spyOn<any, any>(Converter.prototype, 'convertFiles')
+            .mockImplementation(() => [])
+
+          expect(await marpCli([assetFn('_files/(sp)')])).toBe(0)
+        })
+      }
+    )
 
     context('with --server option', () => {
       it('treats passed directory as an input directory of the server', async () => {
