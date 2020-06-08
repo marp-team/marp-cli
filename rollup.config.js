@@ -24,7 +24,7 @@ const plugins = (opts = {}) => [
   }),
   replace({ 'process.env.NODE_ENV': JSON.stringify('production') }),
   commonjs(),
-  typescript(),
+  typescript({ noEmitOnError: false }),
   postcss({
     inject: false,
     plugins: [
