@@ -7,9 +7,9 @@ import { CLIError } from '../src/error'
 jest.mock('path')
 jest.setTimeout(15000)
 
-xdescribe('Preview', () => {
+describe('Preview', () => {
   const previews = new Set<Preview>()
-  const preview = (...args) => {
+  const preview = (...args): Preview => {
     const instance = new Preview(...args)
     previews.add(instance)
 
@@ -17,9 +17,7 @@ xdescribe('Preview', () => {
   }
 
   afterEach(async () => {
-    for (const instance of previews) {
-      if (instance.carlo && !instance.carlo.exited_) await instance.carlo.exit()
-    }
+    await Promise.all([...previews.values()].map((p) => p.exit()))
     previews.clear()
   })
 
@@ -28,8 +26,8 @@ xdescribe('Preview', () => {
       const instance = preview()
       const win = await instance.open('about:blank')
 
-      expect(instance.carlo.windows()).toHaveLength(1)
-      expect(win.pageForTest().url()).toBe('about:blank')
+      expect(await instance.puppeteer?.pages()).toHaveLength(1)
+      expect(win.page.url()).toBe('about:blank')
     })
 
     it('emits launch event', async () => {
@@ -61,14 +59,20 @@ xdescribe('Preview', () => {
 
       const [win, location] = openEvent.mock.calls[0]
       expect(location).toBe('about:blank')
-      expect(win.pageForTest().url()).toBe('about:blank')
+      expect(win.page.url()).toBe('about:blank')
     })
 
     context('with constructor option about window size', () => {
       it('opens window that have specified window size', async () => {
         const instance = preview({ height: 400, width: 200 })
         const win = await instance.open('about:blank')
-        expect(await win.bounds()).toMatchObject({ height: 400, width: 200 })
+
+        expect(
+          await win.page.evaluate(() => ({
+            height: window.innerHeight,
+            width: window.innerWidth,
+          }))
+        ).toMatchObject({ height: 400, width: 200 })
       })
     })
 
@@ -78,7 +82,7 @@ xdescribe('Preview', () => {
         await instance.open('about:blank')
         await instance.open('about:blank')
 
-        expect(instance.carlo.windows()).toHaveLength(2)
+        expect(await instance.puppeteer?.pages()).toHaveLength(2)
       })
 
       it('emits launch event once and opening / open event twice', async () => {
