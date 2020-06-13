@@ -178,9 +178,9 @@ marp --pdf --allow-local-files slide-deck.md
 
 ## Conversion modes
 
-### Watch mode (`--watch` / `-w`)
+### Watch mode (`--watch` / `-w`) <a name="watch-mode"></a>
 
-Marp CLI will observe a change of Markdown / used Theme CSS when passed with `--watch` (`-w`) option. The conversion is triggered whenever the content of file is updated.
+Marp CLI will observe a change of Markdown and using theme CSS when passed with `--watch` (`-w`) option. The conversion will be triggered whenever the content of file is updated.
 
 While you are opening the converted HTML in browser, it would refresh the opened page automatically.
 
@@ -194,7 +194,7 @@ Server mode supports on-demand conversion by HTTP request. We require to pass `-
 
 In this mode, the converted file outputs as the result of accessing to server, and not to disk.
 
-You would get the converted PDF, PNG, and JPEG by adding corresponded query string when requesting. e.g. `http://localhost:8080/deck-a.md?pdf` returns converted PDF.
+You would get the converted PDF, PPTX, PNG, and JPEG by adding corresponded query string when requesting. e.g. `http://localhost:8080/deck-a.md?pdf` returns converted PDF.
 
 #### `index.md` / `PITCHME.md`
 
