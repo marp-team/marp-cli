@@ -157,7 +157,7 @@ describe('Marp CLI', () => {
         expect(error).toBeCalledWith(expect.stringContaining('Usage'))
       })
 
-      xdescribe('Preview option', () => {
+      describe('Preview option', () => {
         it('outputs help about --preview option', async () => {
           expect(await run()).toBe(0)
           expect(error).toBeCalledWith(expect.stringContaining('--preview'))
