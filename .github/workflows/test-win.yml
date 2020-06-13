@@ -23,7 +23,7 @@ jobs:
       matrix:
         node-version:
           - '^10.17.0'
-          - '12.16.1'
+          - '12.18.0'
 
     steps:
       - uses: actions/checkout@v2
