@@ -2,9 +2,17 @@
 
 ## [Unreleased]
 
+### Added
+
+- Recognize `CHROME_ENABLE_EXTENSIONS` environment value for enabling Chrome extensions while converting ([#231](https://github.com/marp-team/marp-cli/issues/231), [#234](https://github.com/marp-team/marp-cli/pull/234))
+
 ### Fixed
 
 - Recover experimental preview window option (`--preview`, `-p`) and back out deprecation ([#211](https://github.com/marp-team/marp-cli/issues/211), [#232](https://github.com/marp-team/marp-cli/pull/232))
+- Show helpful message if the executable Chrome path could not find out ([#220](https://github.com/marp-team/marp-cli/issues/220), [#234](https://github.com/marp-team/marp-cli/pull/234))
+
+### Changed
+
 - Reduce direct dependencies ([#233](https://github.com/marp-team/marp-cli/pull/233))
 
 ## v0.18.0 - 2020-06-08
