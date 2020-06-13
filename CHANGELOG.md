@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Recover experimental preview window option (`--preview`, `-p`) and back out deprecation ([#211](https://github.com/marp-team/marp-cli/issues/211), [#232](https://github.com/marp-team/marp-cli/pull/232))
+
 ## v0.18.0 - 2020-06-08
 
 ### Fixed
