@@ -202,17 +202,14 @@ Marp CLI server will provide the list of served files by default, but you can pl
 
 Place Markdown named `index.md` or `PITCHME.md` ([GitPitch style](https://gitpitch.com/docs/getting-started/pitchme/)) to served directory. It would be redirected just accessing to `http://localhost:8080/`.
 
-<!--
-
-### Preview window (_Experimental:_ `--preview` / `-p`)
+### Preview window (_EXPERIMENTAL:_ `--preview` / `-p`)
 
 When conversions were executed together with `--preview` (`-p`) option, Marp CLI will open preview window(s) to check the converted result immediately.
 
-Unlike opening with browser, you may present deck with the immersive window. [Watch mode](#watch-mode) is enabled automatically.
+Unlike opening with browser, you may present deck with the immersive window.
+[Watch mode](#watch-mode) is automatically enabled while using preview window.
 
 > :information_source: `--preview` option cannot use when you are using Marp CLI through official docker image.
-
--->
 
 ## Template
 
