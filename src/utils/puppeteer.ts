@@ -3,6 +3,7 @@ import { promisify } from 'util'
 import os from 'os'
 import path from 'path'
 import { Launcher } from 'chrome-launcher'
+import { CLIError } from '../error'
 
 const execPromise = promisify(exec)
 
@@ -35,7 +36,7 @@ export const generatePuppeteerDataDirPath = async (
   return path.resolve(os.tmpdir(), name)
 }
 
-export async function generatePuppeteerLaunchArgs() {
+export const generatePuppeteerLaunchArgs = () => {
   const args = new Set<string>()
 
   // Docker environment and WSL environment need to disable sandbox. :(
@@ -54,7 +55,24 @@ export async function generatePuppeteerLaunchArgs() {
     } else {
       ;[executablePath] = Launcher.getInstallations()
     }
+
+    if (!executablePath) {
+      throw new CLIError(
+        'You have to install Google Chrome or Chromium to convert slide deck with current options.'
+      )
+    }
   }
 
-  return { executablePath, args: [...args] }
+  return {
+    executablePath,
+    args: [...args],
+
+    // Workaround to avoid force-extensions policy for Chrome enterprise (SET CHROME_ENABLE_EXTENSIONS=1)
+    // https://github.com/puppeteer/puppeteer/blob/master/docs/troubleshooting.md#chrome-headless-doesnt-launch-on-windows
+    //
+    // @see https://github.com/marp-team/marp-cli/issues/231
+    ignoreDefaultArgs: process.env.CHROME_ENABLE_EXTENSIONS
+      ? ['--disable-extensions']
+      : undefined,
+  }
 }

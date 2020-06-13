@@ -125,16 +125,16 @@ export class Preview extends TypedEventEmitter<Preview.Events> {
   }
 
   private async launch() {
-    const baseArgs = await generatePuppeteerLaunchArgs()
+    const baseArgs = generatePuppeteerLaunchArgs()
 
     this.puppeteerInternal = await puppeteer.launch({
+      ...baseArgs,
       args: [
         ...baseArgs.args,
-        '--app=data:text/html,<title>Marp CLI</title>',
+        `--app=data:text/html,<title>${encodeURIComponent('Marp CLI')}</title>`,
         `--window-size=${this.options.width},${this.options.height}`,
       ],
       defaultViewport: null,
-      executablePath: baseArgs.executablePath,
       headless: process.env.NODE_ENV === 'test',
       userDataDir: await generatePuppeteerDataDirPath('marp-cli-preview'),
     })

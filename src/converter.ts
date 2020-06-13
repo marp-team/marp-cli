@@ -24,11 +24,6 @@ import templates, {
 import { ThemeSet } from './theme'
 import { notifier } from './watcher'
 
-type ResolvedType<T> = T extends Promise<infer U> ? U : never
-type GeneratedPuppeteerLaunchArgs = ResolvedType<
-  ReturnType<typeof generatePuppeteerLaunchArgs>
->
-
 export enum ConvertType {
   html = 'html',
   pdf = 'pdf',
@@ -352,7 +347,7 @@ export class Converter {
     baseFile: File,
     processer: (page: puppeteer.Page, uri: string) => Promise<T>
   ) {
-    const { executablePath } = await Converter.puppeteerLaunchArgs()
+    const { executablePath } = generatePuppeteerLaunchArgs()
 
     const tmpFile: File.TmpFileInterface | undefined = await (() => {
       if (!this.options.allowLocalFiles) return undefined
@@ -443,12 +438,11 @@ export class Converter {
   }
 
   private static browser?: puppeteer.Browser
-  private static cachedPuppeteerLaunchArgs?: GeneratedPuppeteerLaunchArgs
 
   private static async runBrowser() {
     if (!Converter.browser) {
       Converter.browser = await puppeteer.launch({
-        ...(await Converter.puppeteerLaunchArgs()),
+        ...generatePuppeteerLaunchArgs(),
         userDataDir: await generatePuppeteerDataDirPath('marp-cli-conversion'),
       })
       Converter.browser.once('disconnected', () => {
@@ -456,14 +450,5 @@ export class Converter {
       })
     }
     return Converter.browser
-  }
-
-  private static async puppeteerLaunchArgs(): Promise<
-    GeneratedPuppeteerLaunchArgs
-  > {
-    if (!Converter.cachedPuppeteerLaunchArgs) {
-      Converter.cachedPuppeteerLaunchArgs = await generatePuppeteerLaunchArgs()
-    }
-    return Converter.cachedPuppeteerLaunchArgs
   }
 }
