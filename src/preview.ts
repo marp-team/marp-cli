@@ -131,7 +131,7 @@ export class Preview extends TypedEventEmitter<Preview.Events> {
       ...baseArgs,
       args: [
         ...baseArgs.args,
-        '--app=data:text/html,<title>Marp CLI</title>',
+        `--app=data:text/html,<title>${encodeURIComponent('Marp CLI')}</title>`,
         `--window-size=${this.options.width},${this.options.height}`,
       ],
       defaultViewport: null,
