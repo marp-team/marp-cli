@@ -3,6 +3,7 @@ import { promisify } from 'util'
 import os from 'os'
 import path from 'path'
 import { Launcher } from 'chrome-launcher'
+import { CLIError } from '../error'
 
 const execPromise = promisify(exec)
 
@@ -35,7 +36,7 @@ export const generatePuppeteerDataDirPath = async (
   return path.resolve(os.tmpdir(), name)
 }
 
-export async function generatePuppeteerLaunchArgs() {
+export const generatePuppeteerLaunchArgs = () => {
   const args = new Set<string>()
 
   // Docker environment and WSL environment need to disable sandbox. :(
@@ -53,6 +54,12 @@ export async function generatePuppeteerLaunchArgs() {
       executablePath = '/usr/bin/chromium-browser'
     } else {
       ;[executablePath] = Launcher.getInstallations()
+    }
+
+    if (!executablePath) {
+      throw new CLIError(
+        'You have to install Google Chrome or Chromium to convert slide deck with current options.'
+      )
     }
   }
 

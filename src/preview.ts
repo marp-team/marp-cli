@@ -125,7 +125,7 @@ export class Preview extends TypedEventEmitter<Preview.Events> {
   }
 
   private async launch() {
-    const baseArgs = await generatePuppeteerLaunchArgs()
+    const baseArgs = generatePuppeteerLaunchArgs()
 
     this.puppeteerInternal = await puppeteer.launch({
       args: [
