@@ -14,6 +14,7 @@
 ### Changed
 
 - Reduce direct dependencies ([#233](https://github.com/marp-team/marp-cli/pull/233))
+- Upgrade Node and dependent packages to the latest version ([#235](https://github.com/marp-team/marp-cli/pull/235))
 
 ## v0.18.0 - 2020-06-08
 
