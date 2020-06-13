@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v0.18.1 - 2020-06-13
+
 ### Added
 
 - Recognize `CHROME_ENABLE_EXTENSIONS` environment value for enabling Chrome extensions while converting ([#231](https://github.com/marp-team/marp-cli/issues/231), [#234](https://github.com/marp-team/marp-cli/pull/234))
