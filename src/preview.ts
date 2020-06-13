@@ -1,4 +1,6 @@
-import carlo from 'carlo'
+import { EventEmitter } from 'events'
+import { nanoid } from 'nanoid'
+import puppeteer from 'puppeteer-core'
 import { File, FileType } from './file'
 import {
   generatePuppeteerDataDirPath,
@@ -8,77 +10,6 @@ import TypedEventEmitter from './utils/typed-event-emitter'
 import { ConvertType, mimeTypes } from './converter'
 import { CLIError } from './error'
 import favicon from './assets/favicon.png'
-
-export class Preview extends TypedEventEmitter<Preview.Events> {
-  readonly options: Preview.Options
-
-  private carloInternal: any
-
-  constructor(opts: Partial<Preview.Options> = {}) {
-    super()
-    this.options = {
-      height: opts.height || 360,
-      width: opts.width || 640,
-    }
-  }
-
-  get carlo() {
-    return this.carloInternal
-  }
-
-  async open(location: string) {
-    this.emit('opening', location)
-
-    const win = (await this.createWindow()) || (await this.launch())
-    win.on('close', () => this.emit('close', win))
-
-    await win.load(location)
-    this.emit('open', win, location)
-
-    // Override close function to ignore raising error if a target page has already close
-    const { close } = win
-    win.close = async () => {
-      try {
-        return await close.call(win)
-      } catch (e) {
-        if (!e.message.includes('Target closed.')) throw e
-      }
-    }
-
-    return win
-  }
-
-  private async createWindow() {
-    if (!this.carlo) return false
-
-    return await this.carlo.createWindow({
-      height: this.options.height,
-      width: this.options.width,
-    })
-  }
-
-  private async launch() {
-    const baseArgs = await generatePuppeteerLaunchArgs()
-
-    this.carloInternal = await carlo.launch({
-      localDataDir: await generatePuppeteerDataDirPath('marp-cli-carlo'),
-      args: baseArgs.args,
-      height: this.options.height,
-      width: this.options.width,
-      executablePath: baseArgs.executablePath,
-      icon: Buffer.from(favicon.slice(22), 'base64'),
-      title: 'Marp CLI',
-    })
-
-    this.carlo.once('exit', () => {
-      this.emit('exit')
-      this.carloInternal = undefined
-    })
-
-    this.emit('launch')
-    return await this.carlo.mainWindow()
-  }
-}
 
 export namespace Preview {
   export interface Events {
@@ -92,6 +23,148 @@ export namespace Preview {
   export interface Options {
     height: number
     width: number
+  }
+}
+
+export class Preview extends TypedEventEmitter<Preview.Events> {
+  readonly options: Preview.Options
+
+  private puppeteerInternal: puppeteer.Browser | undefined
+
+  constructor(opts: Partial<Preview.Options> = {}) {
+    super()
+    this.options = {
+      height: opts.height || 360,
+      width: opts.width || 640,
+    }
+  }
+
+  get puppeteer(): puppeteer.Browser | undefined {
+    return this.puppeteerInternal
+  }
+
+  async open(location: string) {
+    this.emit('opening', location)
+
+    const win = (await this.createWindow()) || (await this.launch())
+    win.on('close', () => this.emit('close', win))
+
+    await win.load(location)
+    this.emit('open', win, location)
+
+    return win
+  }
+
+  async exit() {
+    if (this.puppeteer) {
+      await this.puppeteer.close()
+
+      this.emit('exit')
+      this.puppeteerInternal = undefined
+    }
+  }
+
+  private createWindowObject(page: puppeteer.Page) {
+    const window = new EventEmitter()
+
+    page.on('close', async () => window.emit('close'))
+
+    return Object.assign(window, {
+      page,
+      close: async () => {
+        try {
+          return await page.close()
+        } catch (e) {
+          // Ignore raising error if a target page has already close
+          if (!e.message.includes('Target closed.')) throw e
+        }
+      },
+      load: async (uri: string) => {
+        await page.goto(uri, { timeout: 0, waitUntil: 'domcontentloaded' })
+        await page
+          .target()
+          .createCDPSession()
+          .then((session) => {
+            session.send('Page.resetNavigationHistory').catch(() => {})
+          })
+      },
+    })
+  }
+
+  private async createWindow() {
+    try {
+      return this.createWindowObject(
+        await new Promise<puppeteer.Page>(async (res, rej) => {
+          const pptr = this.puppeteer
+          if (!pptr) return rej(false)
+
+          const id = nanoid()
+          const idMatcher = (target: puppeteer.Target) => {
+            const url = new URL(target.url())
+
+            if (url.searchParams.get('__marp_cli_id') === id) {
+              pptr.removeListener('targetcreated', idMatcher)
+              res(target.page())
+            }
+          }
+
+          pptr.on('targetcreated', idMatcher)
+
+          for (const page of await pptr.pages()) {
+            await page.evaluate(
+              `window.open('about:blank?__marp_cli_id=${id}', '', 'width=${this.options.width},height=${this.options.height}')`
+            )
+            break
+          }
+        })
+      )
+    } catch (e) {
+      if (!e) return false
+      throw e
+    }
+  }
+
+  private async launch() {
+    const baseArgs = await generatePuppeteerLaunchArgs()
+
+    this.puppeteerInternal = await puppeteer.launch({
+      args: [
+        ...baseArgs.args,
+        '--app=data:text/html,<title>Marp CLI</title>',
+        `--window-size=${this.options.width},${this.options.height}`,
+      ],
+      defaultViewport: null,
+      executablePath: baseArgs.executablePath,
+      headless: process.env.NODE_ENV === 'test',
+      userDataDir: await generatePuppeteerDataDirPath('marp-cli-preview'),
+    })
+
+    // Set Marp icon asynchrnously
+    this.puppeteerInternal
+      .target()
+      .createCDPSession()
+      .then((session) => {
+        session
+          .send('Browser.setDockTile', { image: favicon.slice(22) })
+          .catch(() => {})
+      })
+
+    const handlePageOnClose = async () => {
+      const pages = (await this.puppeteer?.pages()) || []
+      if (pages.length === 0) await this.exit()
+    }
+
+    this.puppeteerInternal.on('targetcreated', (target) => {
+      // NOTE: PDF viewer on headfull Chrome may return `null`.
+      target.page().then((page) => page?.on('close', handlePageOnClose))
+    })
+
+    const [page] = await this.puppeteerInternal.pages()
+    page.on('close', handlePageOnClose)
+
+    this.emit('launch')
+
+    return this.createWindowObject(page)
   }
 }
 

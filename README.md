@@ -178,9 +178,9 @@ marp --pdf --allow-local-files slide-deck.md
 
 ## Conversion modes
 
-### Watch mode (`--watch` / `-w`)
+### Watch mode (`--watch` / `-w`) <a name="watch-mode"></a>
 
-Marp CLI will observe a change of Markdown / used Theme CSS when passed with `--watch` (`-w`) option. The conversion is triggered whenever the content of file is updated.
+Marp CLI will observe a change of Markdown and using theme CSS when passed with `--watch` (`-w`) option. The conversion will be triggered whenever the content of file is updated.
 
 While you are opening the converted HTML in browser, it would refresh the opened page automatically.
 
@@ -194,7 +194,7 @@ Server mode supports on-demand conversion by HTTP request. We require to pass `-
 
 In this mode, the converted file outputs as the result of accessing to server, and not to disk.
 
-You would get the converted PDF, PNG, and JPEG by adding corresponded query string when requesting. e.g. `http://localhost:8080/deck-a.md?pdf` returns converted PDF.
+You would get the converted PDF, PPTX, PNG, and JPEG by adding corresponded query string when requesting. e.g. `http://localhost:8080/deck-a.md?pdf` returns converted PDF.
 
 #### `index.md` / `PITCHME.md`
 
@@ -202,17 +202,14 @@ Marp CLI server will provide the list of served files by default, but you can pl
 
 Place Markdown named `index.md` or `PITCHME.md` ([GitPitch style](https://gitpitch.com/docs/getting-started/pitchme/)) to served directory. It would be redirected just accessing to `http://localhost:8080/`.
 
-<!--
-
-### Preview window (_Experimental:_ `--preview` / `-p`)
+### Preview window (_EXPERIMENTAL:_ `--preview` / `-p`)
 
 When conversions were executed together with `--preview` (`-p`) option, Marp CLI will open preview window(s) to check the converted result immediately.
 
-Unlike opening with browser, you may present deck with the immersive window. [Watch mode](#watch-mode) is enabled automatically.
+Unlike opening with browser, you may present deck with the immersive window.
+[Watch mode](#watch-mode) is automatically enabled while using preview window.
 
 > :information_source: `--preview` option cannot use when you are using Marp CLI through official docker image.
-
--->
 
 ## Template
 
@@ -431,6 +428,7 @@ By default we use configuration file that is placed on current directory, but yo
 | `options`         |           object            |                       | The base options for the constructor of engine                                                         |
 | `output`          |           string            |    `--output` `-o`    | Output file path (or directory when input-dir is passed)                                               |
 | `pdf`             |           boolean           |        `--pdf`        | Convert slide deck into PDF                                                                            |
+| `preview`         |           boolean           |   `--preview` `-p`    | Open preview window _(EXPERIMENTAL)_                                                                   |
 | `server`          |           boolean           |    `--server` `-s`    | Enable server mode                                                                                     |
 | `template`        |     `bare` \| `bespoke`     |     `--template`      | Choose template (`bespoke` by default)                                                                 |
 | `theme`           |           string            |       `--theme`       | Override theme by name or CSS file                                                                     |
