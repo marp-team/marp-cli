@@ -7,9 +7,13 @@ export default function bespokeInactive(timeout = 2000) {
 
       activeTimer = setTimeout(() => {
         deck.parent.classList.add('bespoke-marp-inactive')
+        deck.fire('marp-inactive')
       }, timeout)
 
-      deck.parent.classList.remove('bespoke-marp-inactive')
+      if (deck.parent.classList.contains('bespoke-marp-inactive')) {
+        deck.parent.classList.remove('bespoke-marp-inactive')
+        deck.fire('marp-active')
+      }
     }
 
     document.addEventListener('mousedown', activate)

@@ -2,22 +2,26 @@
 
 export default function bespokeClasses(deck) {
   deck.parent.classList.add('bespoke-marp-parent')
-  deck.slides.map((element) => element.classList.add('bespoke-marp-slide'))
+  deck.slides.forEach((el: HTMLElement) =>
+    el.classList.add('bespoke-marp-slide')
+  )
 
   deck.on('activate', (e) => {
-    const shouldResetAnimation = !e.slide.classList.contains(
-      'bespoke-marp-active'
-    )
+    const slide: HTMLElement = e.slide
+    const shouldResetAnim = !slide.classList.contains('bespoke-marp-active')
 
-    deck.slides.map((element) => {
-      element.classList.remove('bespoke-marp-active')
+    deck.slides.forEach((el: HTMLElement) => {
+      el.classList.remove('bespoke-marp-active')
+      el.setAttribute('aria-hidden', 'true')
     })
-    e.slide.classList.add('bespoke-marp-active')
 
-    if (shouldResetAnimation) {
-      e.slide.classList.add('bespoke-marp-active-ready')
+    slide.classList.add('bespoke-marp-active')
+    slide.removeAttribute('aria-hidden')
+
+    if (shouldResetAnim) {
+      slide.classList.add('bespoke-marp-active-ready')
       void document.body.clientHeight
-      e.slide.classList.remove('bespoke-marp-active-ready')
+      slide.classList.remove('bespoke-marp-active-ready')
     }
   })
 }

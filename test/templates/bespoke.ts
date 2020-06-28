@@ -74,10 +74,17 @@ describe("Bespoke template's browser context", () => {
       expect(slides).toHaveLength(3)
       expect(slides[0].classList.contains('bespoke-marp-active')).toBe(true)
 
+      // a11y
+      expect(slides[0].hasAttribute('aria-hidden')).toBe(false)
+      expect(slides[1].getAttribute('aria-hidden')).toBe('true')
+      expect(slides[2].getAttribute('aria-hidden')).toBe('true')
+
       // Navigate slide
       deck.next()
       expect(slides[0].classList.contains('bespoke-marp-active')).toBe(false)
       expect(slides[1].classList.contains('bespoke-marp-active')).toBe(true)
+      expect(slides[0].getAttribute('aria-hidden')).toBe('true')
+      expect(slides[1].hasAttribute('aria-hidden')).toBe(false)
     })
   })
 
@@ -248,6 +255,17 @@ describe("Bespoke template's browser context", () => {
       expect(parent.className).toContain('bespoke-marp-inactive')
     })
 
+    it('fires marp-inactive event when the slide got inactive', () => {
+      render()
+      const deck = bespoke()
+      const marpInactive = jest.fn()
+      deck.on('marp-inactive', marpInactive)
+
+      expect(marpInactive).not.toBeCalled()
+      jest.advanceTimersByTime(2000)
+      expect(marpInactive).toBeCalled()
+    })
+
     it('resets timer when mouse is activated', () => {
       const parent = render()
       bespoke()
@@ -255,9 +273,7 @@ describe("Bespoke template's browser context", () => {
       jest.advanceTimersByTime(1000)
 
       // Trigger mousedown
-      const mousedown = document.createEvent('MouseEvents')
-      mousedown.initEvent('mousedown', true, true)
-      document.dispatchEvent(mousedown)
+      document.dispatchEvent(new MouseEvent('mousedown'))
 
       jest.advanceTimersByTime(1999)
       expect(parent.className).not.toContain('bespoke-marp-inactive')
@@ -266,10 +282,7 @@ describe("Bespoke template's browser context", () => {
       expect(parent.className).toContain('bespoke-marp-inactive')
 
       // Trigger mousemove
-      const mousemove = document.createEvent('MouseEvents')
-      mousemove.initEvent('mousemove', true, true)
-      document.dispatchEvent(mousemove)
-
+      document.dispatchEvent(new MouseEvent('mousemove'))
       expect(parent.className).not.toContain('bespoke-marp-inactive')
 
       jest.advanceTimersByTime(1999)
@@ -277,6 +290,29 @@ describe("Bespoke template's browser context", () => {
 
       jest.advanceTimersByTime(1)
       expect(parent.className).toContain('bespoke-marp-inactive')
+    })
+
+    it('fires marp-active event when the slide got active', () => {
+      render()
+      const deck = bespoke()
+      const marpActive = jest.fn()
+      deck.on('marp-active', marpActive)
+
+      jest.runAllTimers()
+      expect(marpActive).not.toBeCalled()
+
+      // Trigger mousemove
+      document.dispatchEvent(new MouseEvent('mousemove'))
+      expect(marpActive).toBeCalled()
+
+      // It won't fire too even if mouse is activated while the state of slide is active
+      marpActive.mockClear()
+      document.dispatchEvent(new MouseEvent('mousemove'))
+      expect(marpActive).not.toBeCalled()
+
+      jest.advanceTimersByTime(2000)
+      document.dispatchEvent(new MouseEvent('mousemove'))
+      expect(marpActive).toBeCalled()
     })
   })
 
@@ -494,6 +530,16 @@ describe("Bespoke template's browser context", () => {
         it('moves OSC container in parent element of bespoke', () => {
           const deck = bespoke()
           expect(osc.parentElement).toBe(deck.parent)
+        })
+
+        it('toggles aria-hidden attribute by events emitted by "inactive" plugin', () => {
+          const deck = bespoke()
+
+          deck.fire('marp-inactive')
+          expect(osc.getAttribute('aria-hidden')).toBe('true')
+
+          deck.fire('marp-active')
+          expect(osc.hasAttribute('aria-hidden')).toBe(false)
         })
 
         it('updates page number by navigation', () => {

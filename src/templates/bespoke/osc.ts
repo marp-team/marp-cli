@@ -74,6 +74,9 @@ export default function bespokeOSC(selector: string = '.bespoke-marp-osc') {
       )
     })
 
+    deck.on('marp-active', () => osc.removeAttribute('aria-hidden'))
+    deck.on('marp-inactive', () => osc.setAttribute('aria-hidden', 'true'))
+
     if (screenfull.isEnabled) {
       screenfull.onchange(() =>
         oscElements('fullscreen', (fs) =>
