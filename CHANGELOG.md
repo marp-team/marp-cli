@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Upgrade Node and dependent packages to the latest version ([#237](https://github.com/marp-team/marp-cli/pull/237))
+
 ## v0.18.1 - 2020-06-13
 
 ### Added
