@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v0.18.2 - 2020-06-28
+
 ### Fixed
 
 - Slides with code block always verbalized by screen-reader ([#236](https://github.com/marp-team/marp-cli/issues/236), [#238](https://github.com/marp-team/marp-cli/pull/238))
