@@ -7,11 +7,15 @@ const pathMock: any = {
   reset: () => (mode = undefined),
 }
 
-module.exports = new Proxy(pathMock, {
+const pathProxy = new Proxy(pathMock, {
   get: (target, prop) => {
+    if (prop === '__esModule') return true
+    if (prop === 'default') return pathProxy
     if (prop in target) return target[prop]
     return mode === undefined ? path[prop] : path[mode][prop]
   },
 })
+
+module.exports = pathProxy
 
 afterEach(() => pathMock.reset())

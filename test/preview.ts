@@ -129,7 +129,7 @@ describe('Preview', () => {
 
 describe('#fileToURI', () => {
   context('with passing file', () => {
-    const { posix, win32 } = <any>path
+    const { posix, win32 } = path as any
 
     context('in posix file system', () => {
       it('returns file schema URI', () => {
