@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Slides with code block always verbalized by screen-reader ([#236](https://github.com/marp-team/marp-cli/issues/236), [#238](https://github.com/marp-team/marp-cli/pull/238))
+
 ### Changed
 
 - Upgrade Node and dependent packages to the latest version ([#237](https://github.com/marp-team/marp-cli/pull/237))
