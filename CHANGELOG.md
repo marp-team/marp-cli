@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v0.18.3 - 2020-07-09
+
 ### Fixed
 
 - Fix regression about not working `--engine` option ([#240](https://github.com/marp-team/marp-cli/issues/240), [#242](https://github.com/marp-team/marp-cli/pull/242))
