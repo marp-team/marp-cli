@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Upgrade Marp Core to [v1.2.1](https://github.com/marp-team/marp-core/releases/tag/v1.2.1) ([#243](https://github.com/marp-team/marp-cli/pull/243))
+- Upgrade Node LTS and dependent packages to the latest version ([#243](https://github.com/marp-team/marp-cli/pull/243))
+
 ## v0.18.2 - 2020-06-28
 
 ### Fixed
