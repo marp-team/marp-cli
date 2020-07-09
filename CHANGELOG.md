@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix regression about not working `--engine` option ([#240](https://github.com/marp-team/marp-cli/issues/240), [#242](https://github.com/marp-team/marp-cli/pull/242))
+
 ### Changed
 
 - Upgrade Marp Core to [v1.2.1](https://github.com/marp-team/marp-core/releases/tag/v1.2.1) ([#243](https://github.com/marp-team/marp-cli/pull/243))
