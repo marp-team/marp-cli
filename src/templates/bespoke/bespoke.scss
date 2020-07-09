@@ -171,11 +171,12 @@ $progressHeight: 5px;
 
   // Presenter view
   body[data-bespoke-view='presenter'] {
-    $text-color: #ddd;
+    $text-color: #eee;
 
     background: #161616;
 
     .bespoke-marp-presenter-container {
+      font-family: Helvetica, Arial, sans-serif;
       height: 100%;
       left: 0;
       position: absolute;
@@ -250,6 +251,7 @@ $progressHeight: 5px;
           width: calc(100% - 40px);
           height: calc(100% - 40px);
           box-sizing: border-box;
+          font-size: 1.1em;
           overflow: auto;
           padding-right: 3px;
           white-space: pre-wrap;

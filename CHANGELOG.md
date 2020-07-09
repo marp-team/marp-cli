@@ -5,6 +5,7 @@
 ### Fixed
 
 - Fix regression about not working `--engine` option ([#240](https://github.com/marp-team/marp-cli/issues/240), [#242](https://github.com/marp-team/marp-cli/pull/242))
+- Normalize font family for presenter view and server index ([#241](https://github.com/marp-team/marp-cli/pull/241))
 
 ### Changed
 
