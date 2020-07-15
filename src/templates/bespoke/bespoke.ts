@@ -13,6 +13,7 @@ import bespokeState from './state'
 import bespokeSync from './sync'
 import bespokeTouch from './touch'
 import { getViewMode, popQuery, setQuery, setViewMode, ViewMode } from './utils'
+import bespokeWakeLock from './wake-lock'
 
 const pattern = [ViewMode.Normal, ViewMode.Presenter, ViewMode.Next] as const
 
@@ -48,7 +49,8 @@ export default function bespokeTemplate(
       [[x, _, _], bespokeProgress],
       [[x, x, _], bespokeTouch()],
       [[x, _, _], bespokeOSC()],
-      [[x, x, x], bespokeFragments]
+      [[x, x, x], bespokeFragments],
+      [[x, x, _], bespokeWakeLock]
     )
   )
 
