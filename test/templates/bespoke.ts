@@ -5,6 +5,7 @@ import { Element as MarpitElement } from '@marp-team/marpit'
 import { default as screenfull, Screenfull } from 'screenfull'
 import { Key } from 'ts-keycode-enum'
 import bespoke from '../../src/templates/bespoke/bespoke'
+import { _clearCachedWakeLockApi } from '../../src/templates/bespoke/wake-lock'
 import { classes } from '../../src/templates/bespoke/presenter/presenter-view'
 
 jest.mock('screenfull')
@@ -1170,6 +1171,53 @@ describe("Bespoke template's browser context", () => {
       touch('end')
 
       expect(deck.slide()).toBe(1)
+    })
+  })
+
+  describe('Wake lock', () => {
+    const wakeLockObj = { addEventListener: jest.fn() }
+    const request: jest.Mock = jest.fn()
+
+    beforeEach(() => {
+      jest.spyOn(console, 'debug').mockImplementation()
+
+      request.mockReset().mockResolvedValue(wakeLockObj)
+      wakeLockObj.addEventListener.mockReset()
+      navigator['wakeLock'] = { request }
+
+      _clearCachedWakeLockApi()
+      render()
+    })
+
+    afterEach(() => delete navigator['wakeLock'])
+
+    it('calls requestWakeLock() in wake-lock plugin if Screen Wake Lock API is available', () => {
+      expect(request).not.toBeCalled()
+      bespoke()
+      expect(request).toBeCalledWith('screen')
+    })
+
+    it('prevents to throw error while requesting wake-lock', (done) => {
+      const err = new Error('test')
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation()
+
+      warnSpy.mockImplementation((e) => {
+        expect(e).toStrictEqual(err)
+        done()
+      })
+
+      request.mockRejectedValue(err)
+      bespoke()
+    })
+
+    it('requests to enable wake-lock again when changed the state of visibility', () => {
+      bespoke()
+
+      request.mockClear()
+      expect(request).not.toBeCalled()
+
+      document.dispatchEvent(new Event('visibilitychange'))
+      expect(request).toBeCalled()
     })
   })
 })

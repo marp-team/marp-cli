@@ -1,29 +1,51 @@
-export default function bespokeWakeLock() {
-  if (!('wakeLock' in navigator)) return
+let cachedWakeLockApi: any = undefined
 
-  let wakeLock: any
-  const wakeLockApi: any = navigator['wakeLock']
+type WakeLockObject = EventTarget | null
 
-  const requestWakeLock = async () => {
+export const wakeLockApi: any = () => {
+  if (cachedWakeLockApi === undefined) {
+    cachedWakeLockApi = 'wakeLock' in navigator && navigator['wakeLock']
+  }
+  return cachedWakeLockApi
+}
+
+export const requestWakeLock = async (): Promise<WakeLockObject> => {
+  const api = wakeLockApi()
+
+  if (api) {
     try {
-      wakeLock = await wakeLockApi.request('screen')
+      const wakeLock: EventTarget = await api.request('screen')
       wakeLock.addEventListener('release', () => {
         console.debug('[Marp CLI] Wake Lock was released')
       })
+
       console.debug('[Marp CLI] Wake Lock is active')
+      return wakeLock
     } catch (e) {
       console.warn(e)
     }
   }
 
+  return null
+}
+
+// tslint:disable-next-line:variable-name
+export const _clearCachedWakeLockApi = () => {
+  cachedWakeLockApi = undefined
+}
+
+export default async function bespokeWakeLock() {
+  if (!wakeLockApi()) return
+
+  let wakeLock: WakeLockObject
+
   const handleVisibilityChange = () => {
-    if (wakeLock && document.visibilityState === 'visible') {
-      requestWakeLock()
-    }
+    if (wakeLock && document.visibilityState === 'visible') requestWakeLock()
   }
 
   document.addEventListener('visibilitychange', handleVisibilityChange)
   document.addEventListener('fullscreenchange', handleVisibilityChange)
 
-  requestWakeLock()
+  wakeLock = await requestWakeLock()
+  return wakeLock
 }
