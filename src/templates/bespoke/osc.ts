@@ -2,7 +2,7 @@ import { default as screenfull } from 'screenfull'
 import { storage } from './utils'
 
 export default function bespokeOSC(selector: string = '.bespoke-marp-osc') {
-  const osc = document.querySelector(selector)
+  const osc = document.querySelector<HTMLElement>(selector)
   if (!osc) return () => {}
 
   const oscElements = <T extends HTMLElement = HTMLElement>(
@@ -34,10 +34,10 @@ export default function bespokeOSC(selector: string = '.bespoke-marp-osc') {
 
         switch (bespokeMarpOsc) {
           case 'next':
-            deck.next()
+            deck.next({ fragment: !e.shiftKey })
             break
           case 'prev':
-            deck.prev()
+            deck.prev({ fragment: !e.shiftKey })
             break
           case 'fullscreen':
             if (typeof deck.fullscreen === 'function' && screenfull.isEnabled)
