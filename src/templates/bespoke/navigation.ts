@@ -15,23 +15,19 @@ export default function bespokeNavigation(opts: BespokeNavigationOption = {}) {
 
   return (deck) => {
     document.addEventListener('keydown', (e) => {
-      // Space + Shift | Page Up | LEFT | UP: Previous page
-      if (
-        (e.which === 32 && e.shiftKey) ||
-        e.which === 33 ||
-        e.which === 37 ||
-        e.which === 38
-      )
-        deck.prev()
+      // Space + Shift: Previous page
+      if (e.which === 32 && e.shiftKey) deck.prev()
 
-      // Space | Page Down | RIGHT | DOWN: Next page
-      if (
-        (e.which === 32 && !e.shiftKey) ||
-        e.which === 34 ||
-        e.which === 39 ||
-        e.which === 40
-      )
-        deck.next()
+      // Page Up | LEFT | UP: Previous page (Skip fragments if holding shift)
+      if (e.which === 33 || e.which === 37 || e.which === 38)
+        deck.prev({ fragment: !e.shiftKey })
+
+      // Space: Next page
+      if (e.which === 32 && !e.shiftKey) deck.next()
+
+      // Page Down | RIGHT | DOWN: Next page (Skip fragments if holding shift)
+      if (e.which === 34 || e.which === 39 || e.which === 40)
+        deck.next({ fragment: !e.shiftKey })
 
       // END: Jump to last page
       if (e.which === 35) deck.slide(deck.slides.length - 1, { fragment: -1 })
