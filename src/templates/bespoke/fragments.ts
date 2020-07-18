@@ -66,18 +66,30 @@ export default function bespokeFragments(deck) {
     deck.fire('fragment', fragmentEvent)
   }
 
-  deck.on('next', () => {
-    if (activeSlideHasFragmentByOffset(1)) {
-      activate(activeSlideIdx, activeFragmentIdx + 1)
-      return false
-    }
+  deck.on('next', ({ fragment = true }) => {
+    if (fragment) {
+      if (activeSlideHasFragmentByOffset(1)) {
+        activate(activeSlideIdx, activeFragmentIdx + 1)
+        return false
+      }
 
-    const nextIdx = activeSlideIdx + 1
-    if (deck.fragments[nextIdx]) activate(nextIdx, 0)
+      const nextIdx = activeSlideIdx + 1
+      if (deck.fragments[nextIdx]) activate(nextIdx, 0)
+    } else {
+      const fragmentSize = deck.fragments[activeSlideIdx].length
+
+      if (activeFragmentIdx + 1 < fragmentSize) {
+        activate(activeSlideIdx, fragmentSize - 1)
+        return false
+      }
+
+      const nextFragments = deck.fragments[activeSlideIdx + 1]
+      if (nextFragments) activate(activeSlideIdx + 1, nextFragments.length - 1)
+    }
   })
 
-  deck.on('prev', () => {
-    if (activeSlideHasFragmentByOffset(-1)) {
+  deck.on('prev', ({ fragment = true }) => {
+    if (activeSlideHasFragmentByOffset(-1) && fragment) {
       activate(activeSlideIdx, activeFragmentIdx - 1)
       return false
     }

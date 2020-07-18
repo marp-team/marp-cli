@@ -4,6 +4,7 @@
 
 ### Added
 
+- Skip fragments when navigated page while holding shift key ([#206](https://github.com/marp-team/marp-cli/issues/206), [#248](https://github.com/marp-team/marp-cli/pull/248))
 - Keep awake the display in `bespoke` template if [Screen Wake Lock API](https://web.dev/wakelock/) is available (Chrome >= 84) ([#239](https://github.com/marp-team/marp-cli/issues/239), [#246](https://github.com/marp-team/marp-cli/pull/246))
 - Test against Node 14 (Fermium) ([#251](https://github.com/marp-team/marp-cli/pull/251))
 - Set up GitHub Dependabot for marp-team packages ([#252](https://github.com/marp-team/marp-cli/pull/252))
