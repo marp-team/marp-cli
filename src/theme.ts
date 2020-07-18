@@ -1,8 +1,8 @@
-import { Marpit } from '@marp-team/marpit'
 import fs from 'fs'
-import { hasMagic } from 'globby'
 import path from 'path'
 import { promisify } from 'util'
+import { Marpit } from '@marp-team/marpit'
+import { hasMagic } from 'globby'
 import { warn } from './cli'
 import { File } from './file'
 

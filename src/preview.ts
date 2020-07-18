@@ -1,15 +1,15 @@
 import { EventEmitter } from 'events'
 import { nanoid } from 'nanoid'
 import puppeteer from 'puppeteer-core'
+import favicon from './assets/favicon.png'
+import { ConvertType, mimeTypes } from './converter'
+import { CLIError } from './error'
 import { File, FileType } from './file'
 import {
   generatePuppeteerDataDirPath,
   generatePuppeteerLaunchArgs,
 } from './utils/puppeteer'
 import TypedEventEmitter from './utils/typed-event-emitter'
-import { ConvertType, mimeTypes } from './converter'
-import { CLIError } from './error'
-import favicon from './assets/favicon.png'
 
 export namespace Preview {
   export interface Events {

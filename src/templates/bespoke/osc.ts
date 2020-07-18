@@ -1,7 +1,7 @@
 import { default as screenfull } from 'screenfull'
 import { storage } from './utils'
 
-export default function bespokeOSC(selector: string = '.bespoke-marp-osc') {
+export default function bespokeOSC(selector = '.bespoke-marp-osc') {
   const osc = document.querySelector(selector)
   if (!osc) return () => {}
 

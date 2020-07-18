@@ -1,14 +1,14 @@
 import { EventEmitter } from 'events'
 import fs from 'fs'
-import getStdin from 'get-stdin'
 import path from 'path'
+import getStdin from 'get-stdin'
 import stripAnsi from 'strip-ansi'
-import marpCli from '../src/marp-cli'
 import * as cli from '../src/cli'
 import { Converter, ConvertType } from '../src/converter'
 import { ResolvedEngine } from '../src/engine'
 import { CLIError } from '../src/error'
 import { File } from '../src/file'
+import marpCli from '../src/marp-cli'
 import { Preview } from '../src/preview'
 import { Server } from '../src/server'
 import { ThemeSet } from '../src/theme'
@@ -61,10 +61,10 @@ describe('Marp CLI', () => {
         jest.spyOn(version, 'isMarpCore').mockImplementation(() => true)
 
         expect(await marpCli([cmd])).toBe(0)
-        expect(log).toBeCalledWith(
+        expect(log).toHaveBeenCalledWith(
           expect.stringContaining(`@marp-team/marp-cli v${cliVersion}`)
         )
-        expect(log).toBeCalledWith(
+        expect(log).toHaveBeenCalledWith(
           expect.stringContaining(`@marp-team/marp-core v${coreVersion}`)
         )
       })
@@ -89,7 +89,7 @@ describe('Marp CLI', () => {
 
           it('outputs resolved version as user-installed core', async () => {
             expect(await marpCli([cmd])).toBe(0)
-            expect(log).toBeCalledWith(
+            expect(log).toHaveBeenCalledWith(
               expect.stringContaining(
                 'user-installed @marp-team/marp-core v0.0.0'
               )
@@ -109,7 +109,7 @@ describe('Marp CLI', () => {
 
         it('outputs using engine name and version', async () => {
           expect(await marpCli(cmds)).toBe(0)
-          expect(log).toBeCalledWith(
+          expect(log).toHaveBeenCalledWith(
             expect.stringContaining(`@marp-team/marpit v${marpitVersion}`)
           )
         })
@@ -124,7 +124,7 @@ describe('Marp CLI', () => {
 
         it('outputs project name and version', async () => {
           expect(await marpCli(cmds)).toBe(0)
-          expect(log).toBeCalledWith(
+          expect(log).toHaveBeenCalledWith(
             expect.stringContaining('custom-project v0.1.2')
           )
         })
@@ -135,7 +135,7 @@ describe('Marp CLI', () => {
 
         it('outputs using the customized engine', async () => {
           expect(await marpCli(cmds)).toBe(0)
-          expect(log).toBeCalledWith(
+          expect(log).toHaveBeenCalledWith(
             expect.stringContaining('customized engine')
           )
         })
@@ -154,13 +154,13 @@ describe('Marp CLI', () => {
 
       it('outputs help to stderr', async () => {
         expect(await run()).toBe(0)
-        expect(error).toBeCalledWith(expect.stringContaining('Usage'))
+        expect(error).toHaveBeenCalledWith(expect.stringContaining('Usage'))
       })
 
       describe('Preview option', () => {
         it('outputs help about --preview option', async () => {
           expect(await run()).toBe(0)
-          expect(error).toBeCalledWith(expect.stringContaining('--preview'))
+          expect(error).toHaveBeenCalledWith(expect.stringContaining('--preview'))
         })
 
         context('when CLI is running in an official Docker image', () => {
@@ -169,7 +169,7 @@ describe('Marp CLI', () => {
 
           it('does not output help about --preview option', async () => {
             expect(await run()).toBe(0)
-            expect(error).toBeCalledWith(
+            expect(error).toHaveBeenCalledWith(
               expect.not.stringContaining('--preview')
             )
           })
@@ -284,7 +284,7 @@ describe('Marp CLI', () => {
         expect(info.mock.calls.map(([m]) => m)).toContainEqual(
           expect.stringContaining('http://localhost:8080/')
         )
-        expect(serverStart).toBeCalledTimes(1)
+        expect(serverStart).toHaveBeenCalledTimes(1)
         expect(Watcher.watch).toHaveBeenCalledWith(
           expect.arrayContaining([files]),
           expect.objectContaining({
@@ -304,7 +304,7 @@ describe('Marp CLI', () => {
 
         it('opens preview window through Preview.open()', async () => {
           await run()
-          expect(Preview.prototype.open).toBeCalledTimes(1)
+          expect(Preview.prototype.open).toHaveBeenCalledTimes(1)
         })
 
         context('when CLI is running in an official Docker image', () => {
@@ -315,7 +315,7 @@ describe('Marp CLI', () => {
             const warn = jest.spyOn(cli, 'warn').mockImplementation()
 
             await run()
-            expect(Preview.prototype.open).not.toBeCalled()
+            expect(Preview.prototype.open).not.toHaveBeenCalled()
             expect(warn.mock.calls.map(([m]) => m)).toContainEqual(
               expect.stringContaining('Preview option was ignored')
             )
@@ -430,7 +430,7 @@ describe('Marp CLI', () => {
         expect(
           await marpCli(['--theme-set', themeA, '--theme', 'a', filePath])
         ).toBe(0)
-        expect(convert).toBeCalledTimes(1)
+        expect(convert).toHaveBeenCalledTimes(1)
 
         const { css } = (await convert.mock.results[0].value).rendered
         expect(css).toContain('@theme a')
@@ -447,7 +447,7 @@ describe('Marp CLI', () => {
           observeSpy.mockClear()
 
           expect(await marpCli([...baseArgs, '--theme', name])).toBe(0)
-          expect(convert).toBeCalledTimes(1)
+          expect(convert).toHaveBeenCalledTimes(1)
           expect((await convert.mock.results[0].value).rendered.css).toContain(
             `@theme ${name}`
           )
@@ -465,7 +465,7 @@ describe('Marp CLI', () => {
           observeSpy.mockClear()
 
           expect(await marpCli([...baseArgs(themes), '--theme', name])).toBe(0)
-          expect(convert).toBeCalledTimes(1)
+          expect(convert).toHaveBeenCalledTimes(1)
           expect((await convert.mock.results[0].value).rendered.css).toContain(
             `@theme ${name}`
           )
@@ -480,7 +480,7 @@ describe('Marp CLI', () => {
           const warn = jest.spyOn(console, 'warn').mockImplementation()
 
           expect(await marpCli(baseArgs(dir))).toBe(0)
-          expect(convert).toBeCalledTimes(1)
+          expect(convert).toHaveBeenCalledTimes(1)
           expect(warn).toHaveBeenCalledWith(
             expect.stringContaining('Not found additional theme CSS files')
           )
@@ -715,7 +715,7 @@ describe('Marp CLI', () => {
           const { engine } = require(conf)
 
           expect(await marpCli(['-c', conf, md, '--no-output'])).toBe(0)
-          expect(engine).toBeCalledWith(
+          expect(engine).toHaveBeenCalledWith(
             expect.objectContaining({ customOption: true })
           )
         })
@@ -731,11 +731,11 @@ describe('Marp CLI', () => {
 
       it('opens preview window through Preview.open()', async () => {
         await marpCli([onePath, '-p', '--no-output'])
-        expect(Preview.prototype.open).toBeCalledTimes(1)
+        expect(Preview.prototype.open).toHaveBeenCalledTimes(1)
 
         // Simualte opening event
         previewEmitter.emit('opening', '<location>')
-        expect(warn).toBeCalledWith(
+        expect(warn).toHaveBeenCalledWith(
           expect.stringContaining('Opening <location>')
         )
       })
@@ -743,7 +743,7 @@ describe('Marp CLI', () => {
       context('when PPTX conversion is enabled', () => {
         it('does not open PPTX in preview window', async () => {
           await marpCli([onePath, '-p', '--pptx', '--no-output'])
-          expect(Preview.prototype.open).not.toBeCalled()
+          expect(Preview.prototype.open).not.toHaveBeenCalled()
         }, 30000)
       })
 
@@ -753,8 +753,8 @@ describe('Marp CLI', () => {
 
         it('ignores --preview option with warning', async () => {
           await marpCli([onePath, '--preview', '--no-output'])
-          expect(Preview.prototype.open).not.toBeCalled()
-          expect(warn).toBeCalledWith(
+          expect(Preview.prototype.open).not.toHaveBeenCalled()
+          expect(warn).toHaveBeenCalledWith(
             expect.stringContaining('Preview option was ignored')
           )
         })
@@ -820,7 +820,7 @@ describe('Marp CLI', () => {
         serverStart.mockResolvedValue(0)
 
         await marpCli(['--server', assetFn('_files')])
-        expect(serverStart).toBeCalledTimes(1)
+        expect(serverStart).toHaveBeenCalledTimes(1)
 
         const server: any = serverStart.mock.instances[0]
         const converter: Converter = server.converter
@@ -833,8 +833,8 @@ describe('Marp CLI', () => {
           jest.spyOn(console, 'warn').mockImplementation()
 
           await marpCli(['--server', assetFn('_files'), '--preview'])
-          expect(Preview.prototype.open).toBeCalledTimes(1)
-          expect(Preview.prototype.open).toBeCalledWith(
+          expect(Preview.prototype.open).toHaveBeenCalledTimes(1)
+          expect(Preview.prototype.open).toHaveBeenCalledWith(
             expect.stringMatching(/^http:\/\/localhost:/)
           )
         })
@@ -861,7 +861,7 @@ describe('Marp CLI', () => {
         jest.spyOn(console, 'warn').mockImplementation()
 
         await marpCli([...baseArgs, '--preview', '--no-output'])
-        expect(Preview.prototype.open).toBeCalledTimes(2)
+        expect(Preview.prototype.open).toHaveBeenCalledTimes(2)
       })
     })
   })

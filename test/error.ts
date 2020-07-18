@@ -3,14 +3,14 @@ import { CLIError, error } from '../src/error'
 describe('Error helper', () => {
   describe('#error', () => {
     it('throws CLIError', () => {
-      expect(() => error('EXCEPTION')).toThrowError(
+      expect(() => error('EXCEPTION')).toThrow(
         new CLIError('EXCEPTION', 1)
       )
     })
 
     context('when passing error code as second argument', () => {
       it('throws CLIError with specified errorCode', () => {
-        expect(() => error('with code', 128)).toThrowError(
+        expect(() => error('with code', 128)).toThrow(
           new CLIError('with code', 128)
         )
       })

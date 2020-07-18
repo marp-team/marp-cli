@@ -1,6 +1,6 @@
+import path from 'path'
 import Marp from '@marp-team/marp-core'
 import cheerio from 'cheerio'
-import path from 'path'
 import request from 'supertest'
 import {
   Converter,
@@ -49,7 +49,7 @@ describe('Server', () => {
 
   context('when passed converter has not specified inputDir option', () => {
     it('throws CLIError', () =>
-      expect(() => new Server(converter({ inputDir: undefined }))).toThrowError(
+      expect(() => new Server(converter({ inputDir: undefined }))).toThrow(
         CLIError
       ))
   })
@@ -72,7 +72,7 @@ describe('Server', () => {
       const server = new Server(converter())
       await server.start()
 
-      expect(server.server!.listen).toBeCalledWith(8080)
+      expect(server.server!.listen).toHaveBeenCalledWith(8080)
     })
   })
 
@@ -91,7 +91,7 @@ describe('Server', () => {
         const response = await request(server.server).get('/1.md')
 
         expect(response.status).toBe(200)
-        expect(cvt).toBeCalledTimes(1)
+        expect(cvt).toHaveBeenCalledTimes(1)
 
         const ret = await (cvt.mock.results[0].value as Promise<ConvertResult>)
         expect(response.text).toBe(ret.newFile!.buffer!.toString())
@@ -160,7 +160,7 @@ describe('Server', () => {
           jest.spyOn(converter, 'convertFile').mockRejectedValue(err)
 
           const response = await request(server).get('/1.md')
-          expect(event).toBeCalledWith(err)
+          expect(event).toHaveBeenCalledWith(err)
           expect(response.status).toBe(503)
           expect(response.text).toBe('Error: test')
         })

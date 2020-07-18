@@ -1,6 +1,6 @@
 const reconnectMs = 5000
 
-const connect = (path: string, reconnect: boolean = false) => {
+const connect = (path: string, reconnect = false) => {
   const ws = new WebSocket(path)
 
   ws.addEventListener('open', () => {

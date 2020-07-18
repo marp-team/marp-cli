@@ -1,8 +1,8 @@
 import path from 'path'
 import { ConvertType } from '../src/converter'
+import { CLIError } from '../src/error'
 import { File, FileType } from '../src/file'
 import { Preview, fileToURI } from '../src/preview'
-import { CLIError } from '../src/error'
 
 jest.mock('path')
 jest.setTimeout(15000)
@@ -36,7 +36,7 @@ describe('Preview', () => {
       instance.on('launch', launchEvent)
 
       await instance.open('about:blank')
-      expect(launchEvent).toBeCalledTimes(1)
+      expect(launchEvent).toHaveBeenCalledTimes(1)
     })
 
     it('emits opening event with location', async () => {
@@ -45,8 +45,8 @@ describe('Preview', () => {
       instance.on('opening', openingEvent)
 
       await instance.open('about:blank')
-      expect(openingEvent).toBeCalledTimes(1)
-      expect(openingEvent).toBeCalledWith('about:blank')
+      expect(openingEvent).toHaveBeenCalledTimes(1)
+      expect(openingEvent).toHaveBeenCalledWith('about:blank')
     })
 
     it('emits open event with window instance and location', async () => {
@@ -55,7 +55,7 @@ describe('Preview', () => {
       instance.on('open', openEvent)
 
       await instance.open('about:blank')
-      expect(openEvent).toBeCalledTimes(1)
+      expect(openEvent).toHaveBeenCalledTimes(1)
 
       const [win, location] = openEvent.mock.calls[0]
       expect(location).toBe('about:blank')
@@ -98,9 +98,9 @@ describe('Preview', () => {
         await instance.open('about:blank')
         await instance.open('about:blank')
 
-        expect(launchEvent).toBeCalledTimes(1)
-        expect(openingEvent).toBeCalledTimes(2)
-        expect(openEvent).toBeCalledTimes(2)
+        expect(launchEvent).toHaveBeenCalledTimes(1)
+        expect(openingEvent).toHaveBeenCalledTimes(2)
+        expect(openEvent).toHaveBeenCalledTimes(2)
       })
 
       context('when opened window is closed', () => {
@@ -110,9 +110,9 @@ describe('Preview', () => {
 
           instance.on('close', closeEvent)
           instance.on('exit', () => {
-            expect(closeEvent).toBeCalledTimes(2)
-            expect(closeEvent).toBeCalledWith(win)
-            expect(closeEvent).toBeCalledWith(win2)
+            expect(closeEvent).toHaveBeenCalledTimes(2)
+            expect(closeEvent).toHaveBeenCalledWith(win)
+            expect(closeEvent).toHaveBeenCalledWith(win2)
             done()
           })
 

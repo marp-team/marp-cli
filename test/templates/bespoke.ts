@@ -5,8 +5,8 @@ import { Element as MarpitElement } from '@marp-team/marpit'
 import { default as screenfull, Screenfull } from 'screenfull'
 import { Key } from 'ts-keycode-enum'
 import bespoke from '../../src/templates/bespoke/bespoke'
-import { _clearCachedWakeLockApi } from '../../src/templates/bespoke/wake-lock'
 import { classes } from '../../src/templates/bespoke/presenter/presenter-view'
+import { _clearCachedWakeLockApi } from '../../src/templates/bespoke/wake-lock'
 
 jest.mock('screenfull')
 jest.useFakeTimers()
@@ -192,7 +192,7 @@ describe("Bespoke template's browser context", () => {
       deck.on('fragment', onFragment)
 
       deck.next()
-      expect(onFragment).toBeCalledWith(
+      expect(onFragment).toHaveBeenCalledWith(
         expect.objectContaining({
           index: 0,
           fragmentIndex: 1,
@@ -201,7 +201,7 @@ describe("Bespoke template's browser context", () => {
 
       onFragment.mockClear()
       deck.prev()
-      expect(onFragment).toBeCalledWith(
+      expect(onFragment).toHaveBeenCalledWith(
         expect.objectContaining({
           index: 0,
           fragmentIndex: 0,
@@ -210,7 +210,7 @@ describe("Bespoke template's browser context", () => {
 
       onFragment.mockClear()
       deck.slide(2, { fragment: -1 })
-      expect(onFragment).toBeCalledWith(
+      expect(onFragment).toHaveBeenCalledWith(
         expect.objectContaining({
           index: 2,
           fragmentIndex: 2,
@@ -229,17 +229,17 @@ describe("Bespoke template's browser context", () => {
 
     it('injects deck.fullscreen() to toggle fullscreen', async () => {
       await deck.fullscreen()
-      expect((screenfull as Screenfull).toggle).toBeCalled()
+      expect((screenfull as Screenfull).toggle).toHaveBeenCalled()
     })
 
     it('toggles fullscreen by hitting f key', () => {
       keydown({ which: Key.F })
-      expect((screenfull as Screenfull).toggle).toBeCalled()
+      expect((screenfull as Screenfull).toggle).toHaveBeenCalled()
     })
 
     it('toggles fullscreen by hitting F11 key', () => {
       keydown({ which: Key.F11 })
-      expect((screenfull as Screenfull).toggle).toBeCalled()
+      expect((screenfull as Screenfull).toggle).toHaveBeenCalled()
     })
   })
 
@@ -262,9 +262,9 @@ describe("Bespoke template's browser context", () => {
       const marpInactive = jest.fn()
       deck.on('marp-inactive', marpInactive)
 
-      expect(marpInactive).not.toBeCalled()
+      expect(marpInactive).not.toHaveBeenCalled()
       jest.advanceTimersByTime(2000)
-      expect(marpInactive).toBeCalled()
+      expect(marpInactive).toHaveBeenCalled()
     })
 
     it('resets timer when mouse is activated', () => {
@@ -300,20 +300,20 @@ describe("Bespoke template's browser context", () => {
       deck.on('marp-active', marpActive)
 
       jest.runAllTimers()
-      expect(marpActive).not.toBeCalled()
+      expect(marpActive).not.toHaveBeenCalled()
 
       // Trigger mousemove
       document.dispatchEvent(new MouseEvent('mousemove'))
-      expect(marpActive).toBeCalled()
+      expect(marpActive).toHaveBeenCalled()
 
       // It won't fire too even if mouse is activated while the state of slide is active
       marpActive.mockClear()
       document.dispatchEvent(new MouseEvent('mousemove'))
-      expect(marpActive).not.toBeCalled()
+      expect(marpActive).not.toHaveBeenCalled()
 
       jest.advanceTimersByTime(2000)
       document.dispatchEvent(new MouseEvent('mousemove'))
-      expect(marpActive).toBeCalled()
+      expect(marpActive).toHaveBeenCalled()
     })
   })
 
@@ -585,7 +585,7 @@ describe("Bespoke template's browser context", () => {
           )!
 
           button.click()
-          expect(fullscreen).toBeCalled()
+          expect(fullscreen).toHaveBeenCalled()
         })
 
         it('calls deck.openPresenterView() when clicked presenter view button', () => {
@@ -596,7 +596,7 @@ describe("Bespoke template's browser context", () => {
           )!
 
           button.click()
-          expect(windowOpen).toBeCalled()
+          expect(windowOpen).toHaveBeenCalled()
         })
 
         context('when browser does not support fullscreen', () => {
@@ -668,7 +668,7 @@ describe("Bespoke template's browser context", () => {
           expect(deck.openPresenterView).toBeInstanceOf(Function)
 
           deck.openPresenterView()
-          expect(window.open).toBeCalledWith(
+          expect(window.open).toHaveBeenCalledWith(
             deck.presenterUrl,
             'bespoke-marp-presenter-synckey',
             expect.stringContaining('menubar=no,toolbar=no')
@@ -679,13 +679,13 @@ describe("Bespoke template's browser context", () => {
       it('opens presenter view by hitting p key', () => {
         bespoke()
         keydown({ which: Key.P })
-        expect(window.open).toBeCalled()
+        expect(window.open).toHaveBeenCalled()
 
         // Ignore hitting p key with modifier
         ;(window.open as jest.Mock).mockClear()
 
         keydown({ which: Key.P, ctrlKey: true })
-        expect(window.open).not.toBeCalled()
+        expect(window.open).not.toHaveBeenCalled()
       })
     })
 
@@ -757,7 +757,7 @@ describe("Bespoke template's browser context", () => {
               expect($p(classes.nextContainer).className).toContain('active')
 
               // Send navigate command with current page
-              expect(postMessageSpy).toBeCalledWith('navigate:2,0', '*')
+              expect(postMessageSpy).toHaveBeenCalledWith('navigate:2,0', '*')
             }))
 
           it('sends navigate command to next slide view when navigated slide', () =>
@@ -765,10 +765,10 @@ describe("Bespoke template's browser context", () => {
               const { postMessageSpy } = setupNext()
 
               postMessageSpy.mockClear()
-              expect(postMessageSpy).not.toBeCalled()
+              expect(postMessageSpy).not.toHaveBeenCalled()
 
               deck.next()
-              expect(postMessageSpy).toBeCalledWith('navigate:1,0', '*')
+              expect(postMessageSpy).toHaveBeenCalledWith('navigate:1,0', '*')
             }))
         })
 
@@ -1192,9 +1192,9 @@ describe("Bespoke template's browser context", () => {
     afterEach(() => delete navigator['wakeLock'])
 
     it('calls requestWakeLock() in wake-lock plugin if Screen Wake Lock API is available', () => {
-      expect(request).not.toBeCalled()
+      expect(request).not.toHaveBeenCalled()
       bespoke()
-      expect(request).toBeCalledWith('screen')
+      expect(request).toHaveBeenCalledWith('screen')
     })
 
     it('prevents to throw error while requesting wake-lock', (done) => {
@@ -1214,10 +1214,10 @@ describe("Bespoke template's browser context", () => {
       bespoke()
 
       request.mockClear()
-      expect(request).not.toBeCalled()
+      expect(request).not.toHaveBeenCalled()
 
       document.dispatchEvent(new Event('visibilitychange'))
-      expect(request).toBeCalled()
+      expect(request).toHaveBeenCalled()
     })
   })
 })

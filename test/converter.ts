@@ -1,12 +1,12 @@
-import Marp from '@marp-team/marp-core'
-import { Options } from '@marp-team/marpit'
-import cheerio from 'cheerio'
 import fs from 'fs'
-import { imageSize } from 'image-size'
 import os from 'os'
 import path from 'path'
 import { URL } from 'url'
 import { promisify } from 'util'
+import Marp from '@marp-team/marp-core'
+import { Options } from '@marp-team/marpit'
+import cheerio from 'cheerio'
+import { imageSize } from 'image-size'
 import yauzl from 'yauzl'
 import { Converter, ConvertType, ConverterOption } from '../src/converter'
 import { CLIError } from '../src/error'
@@ -167,10 +167,10 @@ describe('Converter', () => {
             globalDirectives: { url: '[INVALID]' },
           }).convert('---\nurl: https://example.com/\n---')
 
-          expect(warn).toBeCalledWith(
+          expect(warn).toHaveBeenCalledWith(
             expect.stringContaining('Specified canonical URL is ignored')
           )
-          expect(warn).toBeCalledWith(expect.stringContaining('[INVALID]'))
+          expect(warn).toHaveBeenCalledWith(expect.stringContaining('[INVALID]'))
           expect(result).toContain(
             '<link rel="canonical" href="https://example.com/">'
           )
@@ -296,18 +296,18 @@ describe('Converter', () => {
               output: '-',
             }).convertFile(file)
 
-            expect(warn).toBeCalledWith(
+            expect(warn).toHaveBeenCalledWith(
               expect.stringContaining(
                 'Insecure local file accessing is enabled'
               )
             )
-            expect(fileTmp).toBeCalledWith(
+            expect(fileTmp).toHaveBeenCalledWith(
               expect.objectContaining({ extension: '.html' })
             )
-            expect(fileCleanup).toBeCalledWith(
+            expect(fileCleanup).toHaveBeenCalledWith(
               expect.stringContaining(os.tmpdir())
             )
-            expect(fileSave).toBeCalled()
+            expect(fileSave).toHaveBeenCalled()
           },
           puppeteerTimeoutMs
         )
@@ -512,7 +512,7 @@ describe('Converter', () => {
         async () => {
           await converter.convertFile(new File(onePath)) // 2 pages
 
-          expect(write).toBeCalledTimes(2)
+          expect(write).toHaveBeenCalledTimes(2)
           expect(write.mock.calls[0][0]).toBe('c.001.png')
           expect(write.mock.calls[1][0]).toBe('c.002.png')
         },
@@ -547,7 +547,7 @@ describe('Converter', () => {
 
         await instance({ output: '-' }).convertFiles(files, {
           onConverted: (result) =>
-            expect(files.includes(result.file)).toBe(true),
+            expect(files).toContain(result.file),
         })
 
         expect(write).not.toHaveBeenCalled()

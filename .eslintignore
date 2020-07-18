@@ -1,0 +1,6 @@
+bin
+coverage
+lib
+node_modules
+tmp
+types

@@ -1,5 +1,5 @@
-import { Marpit } from '@marp-team/marpit'
 import { URL } from 'url'
+import { Marpit } from '@marp-team/marpit'
 import { warn } from '../cli'
 
 export default function metaPlugin({ marpit }: { marpit: Marpit }) {

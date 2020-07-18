@@ -72,10 +72,10 @@ describe('Watch mode notifier on browser context', () => {
       )
 
       await send('ready')
-      expect(location.reload).not.toBeCalled()
+      expect(location.reload).not.toHaveBeenCalled()
 
       await send('reload')
-      expect(location.reload).toBeCalled()
+      expect(location.reload).toHaveBeenCalled()
     })
 
     context('when closed WebSocket server', () => {
@@ -102,7 +102,7 @@ describe('Watch mode notifier on browser context', () => {
           expect(socket.url).toBe('/test')
 
           ws.on('pong', () => {
-            expect(location.reload).toBeCalled()
+            expect(location.reload).toHaveBeenCalled()
             done()
           })
           ws.ping()

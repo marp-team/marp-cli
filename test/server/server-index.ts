@@ -52,7 +52,7 @@ describe('JavaScript for server index', () => {
         })
 
         expect(() => checkShowAll(true)).not.toThrow()
-        expect(error).toBeCalledWith(exception)
+        expect(error).toHaveBeenCalledWith(exception)
         expect(index.classList.contains('show-all')).toBe(true)
       })
     })

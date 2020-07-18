@@ -1,5 +1,5 @@
-import chokidar from 'chokidar'
 import http from 'http'
+import chokidar from 'chokidar'
 import portfinder from 'portfinder'
 import { File, FileType } from '../src/file'
 import { ThemeSet } from '../src/theme'
@@ -82,16 +82,16 @@ describe('Watcher', () => {
       const del = jest.spyOn(<any>watcher, 'delete').mockImplementation()
 
       onChange('change')
-      expect(conv).toBeCalledWith('change')
+      expect(conv).toHaveBeenCalledWith('change')
 
       onAdd('add')
-      expect(conv).toBeCalledWith('add')
+      expect(conv).toHaveBeenCalledWith('add')
 
       onUnlink('unlink')
-      expect(del).toBeCalledWith('unlink')
+      expect(del).toHaveBeenCalledWith('unlink')
 
       watcher.converter.options.themeSet.onThemeUpdated('theme-update')
-      expect(conv).toBeCalledWith('theme-update')
+      expect(conv).toHaveBeenCalledWith('theme-update')
     })
   })
 
@@ -267,8 +267,8 @@ describe('WatchNotifier', () => {
       it('adds socket to registered set and sends "ready" command', async () => {
         await instance.start()
 
-        expect(mockWsOn).toBeCalledTimes(1)
-        expect(mockWsOn).toBeCalledWith('connection', expect.any(Function))
+        expect(mockWsOn).toHaveBeenCalledTimes(1)
+        expect(mockWsOn).toHaveBeenCalledWith('connection', expect.any(Function))
         expect(instance.listeners.get(testIdentifier)!.size).toBe(0)
 
         const [, connection] = mockWsOn.mock.calls[0]

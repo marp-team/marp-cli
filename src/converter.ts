@@ -3,16 +3,10 @@ import { MarpOptions } from '@marp-team/marp-core'
 import { Marpit, Options as MarpitOptions } from '@marp-team/marpit'
 import chalk from 'chalk'
 import puppeteer from 'puppeteer-core'
-import {
-  generatePuppeteerDataDirPath,
-  generatePuppeteerLaunchArgs,
-  isWSL,
-  resolveWSLPath,
-} from './utils/puppeteer'
 import { silence, warn } from './cli'
 import { Engine } from './engine'
-import metaPlugin from './engine/meta-plugin'
 import infoPlugin, { engineInfo, EngineInfo } from './engine/info-plugin'
+import metaPlugin from './engine/meta-plugin'
 import { error } from './error'
 import { File, FileType } from './file'
 import templates, {
@@ -22,6 +16,12 @@ import templates, {
   TemplateResult,
 } from './templates/'
 import { ThemeSet } from './theme'
+import {
+  generatePuppeteerDataDirPath,
+  generatePuppeteerLaunchArgs,
+  isWSL,
+  resolveWSLPath,
+} from './utils/puppeteer'
 import { notifier } from './watcher'
 
 export enum ConvertType {

@@ -1,10 +1,11 @@
-import express, { Express } from 'express'
 import fs from 'fs'
 import path from 'path'
 import querystring from 'querystring'
-import serveIndex from 'serve-index'
 import url from 'url'
 import { promisify } from 'util'
+import express, { Express } from 'express'
+import serveIndex from 'serve-index'
+import favicon from './assets/favicon.png'
 import {
   Converter,
   ConvertedCallback,
@@ -13,10 +14,9 @@ import {
 } from './converter'
 import { error, CLIError } from './error'
 import { File, markdownExtensions } from './file'
-import TypedEventEmitter from './utils/typed-event-emitter'
-import favicon from './assets/favicon.png'
 import serverIndex from './server/index.pug'
 import style from './server/index.scss'
+import TypedEventEmitter from './utils/typed-event-emitter'
 
 const stat = promisify(fs.stat)
 const readFile = promisify(fs.readFile)
@@ -25,7 +25,7 @@ export class Server extends TypedEventEmitter<Server.Events> {
   readonly converter: Converter
   readonly inputDir: string
   readonly options: Server.Options
-  readonly port: Number
+  readonly port: number
 
   directoryIndex: string[]
   server: Express | undefined

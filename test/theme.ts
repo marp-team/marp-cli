@@ -1,5 +1,5 @@
-import { Marpit } from '@marp-team/marpit'
 import path from 'path'
+import { Marpit } from '@marp-team/marpit'
 import { ThemeSet } from '../src/theme'
 
 afterEach(() => jest.restoreAllMocks())
@@ -115,7 +115,7 @@ describe('ThemeSet', () => {
         themeSet.registerTo(marpit)
 
         expect(marpit.themeSet.size).toBe(0)
-        expect(warn).toBeCalledWith(
+        expect(warn).toHaveBeenCalledWith(
           expect.stringContaining('Cannot register theme CSS')
         )
       })

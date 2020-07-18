@@ -1,7 +1,7 @@
 import { exec } from 'child_process'
-import { promisify } from 'util'
 import os from 'os'
 import path from 'path'
+import { promisify } from 'util'
 import { Launcher } from 'chrome-launcher'
 import { CLIError } from '../error'
 
