@@ -14,6 +14,10 @@
 - Upgrade Marp Core to [v1.2.2](https://github.com/marp-team/marp-core/releases/tag/v1.2.2) ([#253](https://github.com/marp-team/marp-cli/pull/253))
 - Migrate from TSLint to ESLint ([#250](https://github.com/marp-team/marp-cli/pull/250))
 
+### Removed
+
+- Remove Gitpod button ([#254](https://github.com/marp-team/marp-cli/pull/254))
+
 ## v0.18.3 - 2020-07-09
 
 ### Fixed
