@@ -12,25 +12,28 @@ export default function bespokeNavigation({
 }: BespokeNavigationOption = {}) {
   return (deck) => {
     document.addEventListener('keydown', (e) => {
-      // Space + Shift: Previous page
-      if (e.which === 32 && e.shiftKey) deck.prev()
-
-      // Page Up | LEFT | UP: Previous page (Skip fragments if holding shift)
-      if (e.which === 33 || e.which === 37 || e.which === 38)
+      if (e.which === 32 && e.shiftKey) {
+        // Space + Shift: Previous page
+        deck.prev()
+      } else if (e.which === 33 || e.which === 37 || e.which === 38) {
+        // Page Up | LEFT | UP: Previous page (Skip fragments if holding shift)
         deck.prev({ fragment: !e.shiftKey })
-
-      // Space: Next page
-      if (e.which === 32 && !e.shiftKey) deck.next()
-
-      // Page Down | RIGHT | DOWN: Next page (Skip fragments if holding shift)
-      if (e.which === 34 || e.which === 39 || e.which === 40)
+      } else if (e.which === 32 && !e.shiftKey) {
+        // Space: Next page
+        deck.next()
+      } else if (e.which === 34 || e.which === 39 || e.which === 40) {
+        // Page Down | RIGHT | DOWN: Next page (Skip fragments if holding shift)
         deck.next({ fragment: !e.shiftKey })
-
-      // END: Jump to last page
-      if (e.which === 35) deck.slide(deck.slides.length - 1, { fragment: -1 })
-
-      // HOME: Jump to first page
-      if (e.which === 36) deck.slide(0)
+      } else if (e.which === 35) {
+        // END: Jump to last page
+        deck.slide(deck.slides.length - 1, { fragment: -1 })
+      } else if (e.which === 36) {
+        // HOME: Jump to first page
+        deck.slide(0)
+      } else {
+        return
+      }
+      e.preventDefault() // Prevent default action when navigated
     })
 
     let lastWheelNavigationAt = 0
