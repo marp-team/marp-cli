@@ -13,7 +13,7 @@ import {
   ConvertType,
   mimeTypes,
 } from './converter'
-import { error, CLIError } from './error'
+import { CLIError, CLIErrorCode, error } from './error'
 import { File, markdownExtensions } from './file'
 import serverIndex from './server/index.pug'
 import style from './server/index.scss'
@@ -57,7 +57,12 @@ export class Server extends TypedEventEmitter<Server.Events> {
         httpServer.close()
 
         if (err['code'] === 'EADDRINUSE') {
-          rej(new CLIError(err.message))
+          rej(
+            new CLIError(
+              `Listen port ${this.port} is already used in the other process. Try again after closing the relevant process, or specify another port number through PORT env.`,
+              CLIErrorCode.LISTEN_PORT_IS_ALREADY_USED
+            )
+          )
         } else {
           rej(err)
         }

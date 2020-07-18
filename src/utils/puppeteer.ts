@@ -3,7 +3,8 @@ import os from 'os'
 import path from 'path'
 import { promisify } from 'util'
 import { Launcher } from 'chrome-launcher'
-import { CLIError } from '../error'
+import { warn } from '../cli'
+import { CLIErrorCode, error } from '../error'
 
 const execPromise = promisify(exec)
 
@@ -54,12 +55,17 @@ export const generatePuppeteerLaunchArgs = () => {
       // Use already known path within Marp CLI official Docker image
       executablePath = '/usr/bin/chromium-browser'
     } else {
-      ;[executablePath] = Launcher.getInstallations()
+      try {
+        ;[executablePath] = Launcher.getInstallations()
+      } catch (e) {
+        if (e instanceof Error) warn(e.message)
+      }
     }
 
     if (!executablePath) {
-      throw new CLIError(
-        'You have to install Google Chrome or Chromium to convert slide deck with current options.'
+      error(
+        'You have to install Google Chrome or Chromium to convert slide deck with current options.',
+        CLIErrorCode.NOT_FOUND_CHROMIUM
       )
     }
   }

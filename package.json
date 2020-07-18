@@ -28,8 +28,8 @@
   "engines": {
     "node": ">=10"
   },
-  "main": "lib/marp-cli.js",
-  "types": "types/src/marp-cli.d.ts",
+  "main": "lib/index.js",
+  "types": "types/src/index.d.ts",
   "files": [
     "marp-cli.js",
     "lib/",

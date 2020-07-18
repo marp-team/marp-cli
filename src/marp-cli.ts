@@ -20,13 +20,21 @@ enum OptionGroup {
   Marp = 'Marp / Marpit Options:',
 }
 
+interface MarpCLIInternalOptions {
+  readStdin: boolean
+  throwErrorAlways: boolean
+}
+
 const usage = `
 Usage:
   marp [options] <files...>
   marp [options] -I <dir>
 `.trim()
 
-export default async function (argv: string[] = []): Promise<number> {
+const marpCli = async (
+  argv: string[],
+  { readStdin, throwErrorAlways }: MarpCLIInternalOptions
+): Promise<number> => {
   let watcherInstance: Watcher | undefined
 
   try {
@@ -86,7 +94,7 @@ export default async function (argv: string[] = []): Promise<number> {
           type: 'boolean',
         },
         stdin: {
-          default: true,
+          default: readStdin,
           describe: 'Read Markdown from stdin',
           hidden: true, // It is an escape-hatch for advanced user
           group: OptionGroup.Basic,
@@ -329,7 +337,7 @@ export default async function (argv: string[] = []): Promise<number> {
 
     return 0
   } catch (e) {
-    if (!(e instanceof CLIError)) throw e
+    if (throwErrorAlways || !(e instanceof CLIError)) throw e
 
     cli.error(e.message)
 
@@ -343,3 +351,17 @@ export default async function (argv: string[] = []): Promise<number> {
     await Converter.closeBrowser()
   }
 }
+
+export const apiInterface = (argv: string[] = []) =>
+  marpCli(argv, {
+    readStdin: false,
+    throwErrorAlways: true,
+  })
+
+export const cliInterface = (argv: string[] = []) =>
+  marpCli(argv, {
+    readStdin: true,
+    throwErrorAlways: false,
+  })
+
+export default cliInterface

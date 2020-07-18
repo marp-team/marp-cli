@@ -9,7 +9,7 @@ import osLocale from 'os-locale'
 import { info, warn } from './cli'
 import { ConverterOption, ConvertType } from './converter'
 import resolveEngine, { ResolvableEngine, ResolvedEngine } from './engine'
-import { CLIError } from './error'
+import { error } from './error'
 import { TemplateOption } from './templates'
 import { Theme, ThemeSet } from './theme'
 
@@ -213,10 +213,9 @@ export class MarpCLIConfig {
       // Fallback to input arguments in server mode
       if (this.args.server || this.conf.server) {
         if (Array.isArray(this.args._)) {
-          if (this.args._.length > 1)
-            throw new CLIError(
-              'Server mode have to specify just one directory.'
-            )
+          if (this.args._.length > 1) {
+            error('Server mode have to specify just one directory.')
+          }
           if (this.args._.length === 1) return path.resolve(this.args._[0])
         }
       }
@@ -229,10 +228,10 @@ export class MarpCLIConfig {
       stat = await lstat(dir)
     } catch (e) {
       if (e.code !== 'ENOENT') throw e
-      throw new CLIError(`Input directory "${dir}" is not found.`)
+      error(`Input directory "${dir}" is not found.`)
     }
 
-    if (!stat.isDirectory()) throw new CLIError(`"${dir}" is not directory.`)
+    if (!stat.isDirectory()) error(`"${dir}" is not directory.`)
 
     return dir
   }
@@ -250,7 +249,7 @@ export class MarpCLIConfig {
         this.conf = ret.config
       }
     } catch (e) {
-      throw new CLIError(
+      error(
         [
           'Could not find or parse configuration file.',
           e.name !== 'Error' && `(${e.name})`,
@@ -289,9 +288,7 @@ export class MarpCLIConfig {
             theme.advice.insteadOf
           } to make theme CSS available from directory.`
         )
-        throw new CLIError(
-          `Directory cannot pass to theme option. (${theme.path})`
-        )
+        error(`Directory cannot pass to theme option. (${theme.path})`)
       }
 
       if (e.code !== 'ENOENT') throw e
