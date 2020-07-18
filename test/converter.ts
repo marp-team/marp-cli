@@ -92,14 +92,18 @@ describe('Converter', () => {
       expect(rendered.css).toContain('@theme default')
     })
 
-    it('throws CLIError when selected engine is not implemented render() method', () => {
-      const subject = instance(<any>{ engine: function _() {} }).convert(md)
-      expect(subject).rejects.toBeInstanceOf(CLIError)
+    it('throws CLIError when selected engine is not implemented render() method', async () => {
+      const subject = instance({
+        engine: function () {
+          // no ops
+        },
+      } as any).convert(md)
+      await expect(subject).rejects.toBeInstanceOf(CLIError)
     })
 
-    it('throws CLIError when selected template is not found', () => {
+    it('throws CLIError when selected template is not found', async () => {
       const subject = instance({ template: 'not-found' }).convert(md)
-      expect(subject).rejects.toBeInstanceOf(CLIError)
+      await expect(subject).rejects.toBeInstanceOf(CLIError)
     })
 
     it('settings lang attribute of <html> by lang option', async () => {
@@ -118,7 +122,7 @@ describe('Converter', () => {
       expect(disabled.html).toContain('&lt;i&gt;Hello!&lt;/i&gt;')
     })
 
-    context('with globalDirectives option', () => {
+    describe('with globalDirectives option', () => {
       it('overrides theme directive', async () => {
         const { rendered } = await instance({
           globalDirectives: { theme: 'gaia' },
@@ -160,7 +164,7 @@ describe('Converter', () => {
         expect(result).not.toContain('<meta property="og:image"')
       })
 
-      context('when given URL is invalid', () => {
+      describe('when given URL is invalid', () => {
         it('outputs warning and does not override URL', async () => {
           const warn = jest.spyOn(console, 'warn').mockImplementation()
           const { result } = await instance({
@@ -170,7 +174,9 @@ describe('Converter', () => {
           expect(warn).toHaveBeenCalledWith(
             expect.stringContaining('Specified canonical URL is ignored')
           )
-          expect(warn).toHaveBeenCalledWith(expect.stringContaining('[INVALID]'))
+          expect(warn).toHaveBeenCalledWith(
+            expect.stringContaining('[INVALID]')
+          )
           expect(result).toContain(
             '<link rel="canonical" href="https://example.com/">'
           )
@@ -179,7 +185,7 @@ describe('Converter', () => {
     })
 
     for (const type of [ConvertType.pdf, ConvertType.png, ConvertType.jpeg]) {
-      context(`with ${type} convert type`, () => {
+      describe(`with ${type} convert type`, () => {
         it('adds <base> element with specified base path from passed file', async () => {
           const converter = instance({ type })
           const { result } = await converter.convert(md, dummyFile)
@@ -198,25 +204,24 @@ describe('Converter', () => {
       })
     }
 
-    context('with watch mode', () => {
+    describe('with watch mode', () => {
       it('adds script for auto-reload', async () => {
         const converter = instance({ watch: true })
         const hash = WatchNotifier.sha256(process.cwd())
 
         const { result } = await converter.convert(md, dummyFile)
         expect(result).toContain(
-          `<script>window\.__marpCliWatchWS="ws://localhost:37717/${hash}";`
+          `<script>window.__marpCliWatchWS="ws://localhost:37717/${hash}";`
         )
       })
     })
   })
 
   describe('#convertFile', () => {
-    it('rejects Promise when specified file is not found', () => {
+    it('rejects Promise when specified file is not found', () =>
       expect(
-        (<any>instance()).convertFile(new File('_NOT_FOUND_MARKDOWN_'))
-      ).rejects.toBeTruthy()
-    })
+        (instance() as any).convertFile(new File('_NOT_FOUND_MARKDOWN_'))
+      ).rejects.toBeTruthy())
 
     it('converts markdown file and save as html file by default', async () => {
       const write = (<any>fs).__mockWriteFile()
@@ -256,7 +261,7 @@ describe('Converter', () => {
       expect(ret.newFile.type).toBe(FileType.StandardIO)
     })
 
-    context('when convert type is PDF', () => {
+    describe('when convert type is PDF', () => {
       const pdfInstance = (opts = {}) =>
         instance({ ...opts, type: ConvertType.pdf })
 
@@ -271,13 +276,13 @@ describe('Converter', () => {
           expect(write).toHaveBeenCalled()
           expect(write.mock.calls[0][0]).toBe('test.pdf')
           expect(pdf.toString('ascii', 0, 5)).toBe('%PDF-')
-          expect(ret.newFile!.path).toBe('test.pdf')
-          expect(ret.newFile!.buffer).toBe(pdf)
+          expect(ret.newFile?.path).toBe('test.pdf')
+          expect(ret.newFile?.buffer).toBe(pdf)
         },
         puppeteerTimeoutMs
       )
 
-      context('with allowLocalFiles option as true', () => {
+      describe('with allowLocalFiles option as true', () => {
         it(
           'converts with using temporally file',
           async () => {
@@ -314,7 +319,7 @@ describe('Converter', () => {
       })
     })
 
-    context('when convert type is PPTX', () => {
+    describe('when convert type is PPTX', () => {
       let write: jest.Mock
 
       beforeEach(() => {
@@ -383,7 +388,7 @@ describe('Converter', () => {
         puppeteerTimeoutMs
       )
 
-      context('with meta global directives', () => {
+      describe('with meta global directives', () => {
         it(
           'assigns meta info thorugh PptxGenJs',
           async () => {
@@ -405,7 +410,7 @@ describe('Converter', () => {
       })
     })
 
-    context('when convert type is PNG', () => {
+    describe('when convert type is PNG', () => {
       let converter: Converter
       let write: jest.Mock
 
@@ -431,7 +436,7 @@ describe('Converter', () => {
         puppeteerTimeoutMs
       )
 
-      context('with 4:3 size global directive for Marp Core', () => {
+      describe('with 4:3 size global directive for Marp Core', () => {
         const slide43Path = twoPath
 
         it(
@@ -449,7 +454,7 @@ describe('Converter', () => {
       })
     })
 
-    context('when convert type is JPEG', () => {
+    describe('when convert type is JPEG', () => {
       let converter: Converter
       let write: jest.Mock
 
@@ -476,7 +481,7 @@ describe('Converter', () => {
         puppeteerTimeoutMs
       )
 
-      context('with 4:3 size global directive for Marp Core', () => {
+      describe('with 4:3 size global directive for Marp Core', () => {
         const slide43Path = twoPath
 
         it(
@@ -494,7 +499,7 @@ describe('Converter', () => {
       })
     })
 
-    context('when pages option is true', () => {
+    describe('when pages option is true', () => {
       let converter: Converter
       let write: jest.Mock
 
@@ -522,7 +527,7 @@ describe('Converter', () => {
   })
 
   describe('#convertFiles', () => {
-    context('with multiple files', () => {
+    describe('with multiple files', () => {
       it('converts passed files', async () => {
         const write = (<any>fs).__mockWriteFile()
 
@@ -546,8 +551,7 @@ describe('Converter', () => {
         const files = [new File(onePath), new File(twoPath)]
 
         await instance({ output: '-' }).convertFiles(files, {
-          onConverted: (result) =>
-            expect(files).toContain(result.file),
+          onConverted: (result) => expect(files).toContain(result.file),
         })
 
         expect(write).not.toHaveBeenCalled()

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { URL } from 'url'
 import { MarpOptions } from '@marp-team/marp-core'
 import { Marpit, Options as MarpitOptions } from '@marp-team/marpit'
@@ -427,7 +428,9 @@ export class Converter {
             failedFileSet.add(url.href)
           }
         }
-      } catch (e) {}
+      } catch (e) {
+        // No ops
+      }
     })
 
     return { missingFileSet, failedFileSet }

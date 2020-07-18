@@ -12,6 +12,7 @@ let isWsl: boolean | undefined
 let wslTmp: string | undefined
 
 export function isWSL(): boolean {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   if (isWsl === undefined) isWsl = require('is-wsl') as boolean
   return isWsl
 }

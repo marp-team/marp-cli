@@ -62,7 +62,7 @@ describe('Preview', () => {
       expect(win.page.url()).toBe('about:blank')
     })
 
-    context('with constructor option about window size', () => {
+    describe('with constructor option about window size', () => {
       it('opens window that have specified window size', async () => {
         const instance = preview({ height: 400, width: 200 })
         const win = await instance.open('about:blank')
@@ -76,7 +76,7 @@ describe('Preview', () => {
       })
     })
 
-    context('when calling twice', () => {
+    describe('when calling twice', () => {
       it('opens 2 windows', async () => {
         const instance = preview()
         await instance.open('about:blank')
@@ -103,35 +103,38 @@ describe('Preview', () => {
         expect(openEvent).toHaveBeenCalledTimes(2)
       })
 
-      context('when opened window is closed', () => {
-        it('emits close event with closed window', async (done) => {
-          const instance = preview()
-          const closeEvent = jest.fn()
+      describe('when opened window is closed', () => {
+        it('emits close event with closed window', () =>
+          new Promise((done) =>
+            (async () => {
+              const instance = preview()
+              const closeEvent = jest.fn()
 
-          instance.on('close', closeEvent)
-          instance.on('exit', () => {
-            expect(closeEvent).toHaveBeenCalledTimes(2)
-            expect(closeEvent).toHaveBeenCalledWith(win)
-            expect(closeEvent).toHaveBeenCalledWith(win2)
-            done()
-          })
+              instance.on('close', closeEvent)
+              instance.on('exit', () => {
+                expect(closeEvent).toHaveBeenCalledTimes(2)
+                expect(closeEvent).toHaveBeenCalledWith(win)
+                expect(closeEvent).toHaveBeenCalledWith(win2)
+                done()
+              })
 
-          const win = await instance.open('about:blank')
-          const win2 = await instance.open('about:blank')
+              const win = await instance.open('about:blank')
+              const win2 = await instance.open('about:blank')
 
-          await win.close()
-          await win2.close()
-        })
+              await win.close()
+              await win2.close()
+            })()
+          ))
       })
     })
   })
 })
 
 describe('#fileToURI', () => {
-  context('with passing file', () => {
+  describe('with passing file', () => {
     const { posix, win32 } = path as any
 
-    context('in posix file system', () => {
+    describe('in posix file system', () => {
       it('returns file schema URI', () => {
         posix()
         expect(fileToURI(new File('/a/b/c'), ConvertType.html)).toBe(
@@ -140,7 +143,7 @@ describe('#fileToURI', () => {
       })
     })
 
-    context('in Windows file system', () => {
+    describe('in Windows file system', () => {
       it('returns file schema URI', () => {
         win32()
         expect(fileToURI(new File('c:\\abc'), ConvertType.html)).toBe(
@@ -150,7 +153,7 @@ describe('#fileToURI', () => {
     })
   })
 
-  context('with passing standard IO buffer', () => {
+  describe('with passing standard IO buffer', () => {
     const file = () => {
       const fileInstance = new File('')
 
@@ -176,7 +179,7 @@ describe('#fileToURI', () => {
       )
     })
 
-    context('when buffer is not ready', () => {
+    describe('when buffer is not ready', () => {
       it('throws CLIError', () =>
         expect(() => fileToURI(file(), ConvertType.html)).toThrow(CLIError))
     })

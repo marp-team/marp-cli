@@ -5,7 +5,7 @@ module.exports = {
   coveragePathIgnorePatterns: ['/node_modules/', '.*\\.d\\.ts'],
   coverageThreshold: { global: { lines: 95 } },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
-  setupFiles: ['jest-plugin-context/setup', './jest.setup.js'],
+  setupFiles: ['./jest.setup.js'],
   transform: {
     ...jestPreset.transform,
     '^.*\\.s?css$': '<rootDir>/test/_transformers/css.js',
@@ -13,5 +13,5 @@ module.exports = {
     '^.*\\.pug$': '<rootDir>/test/_transformers/pug.js',
   },
   testEnvironment: 'node',
-  testRegex: '(/(test|__tests__)/(?!_).*|(\\.|/)(test|spec))\\.[jt]sx?$',
+  testRegex: '(/(test|__tests__)/(?![_.]).*|(\\.|/)(test|spec))\\.[jt]sx?$',
 }

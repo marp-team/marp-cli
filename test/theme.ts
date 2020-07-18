@@ -34,7 +34,7 @@ describe('ThemeSet', () => {
   })
 
   describe('#load', () => {
-    context('with new file', () => {
+    describe('with new file', () => {
       it('loads theme and add to theme set', async () => {
         const themeSet = await ThemeSet.initialize([])
         expect(themeSet.themes.size).toBe(0)
@@ -44,7 +44,7 @@ describe('ThemeSet', () => {
       })
     })
 
-    context('with already registered file', () => {
+    describe('with already registered file', () => {
       it('reloads theme by Theme#load', async () => {
         const themeSet = await ThemeSet.initialize([themeA])
         expect(themeSet.themes.size).toBe(1)
@@ -59,7 +59,7 @@ describe('ThemeSet', () => {
         expect(load).toHaveBeenCalledTimes(1)
       })
 
-      context('when theme has resolved name', () => {
+      describe('when theme has resolved name', () => {
         it('triggers onThemeUpdated event to observed markdown files', async () => {
           const themeSet = await ThemeSet.initialize([themeA])
           themeSet.registerTo(new Marpit())
@@ -104,7 +104,7 @@ describe('ThemeSet', () => {
       expect(names).toContain('c')
     })
 
-    context('when registered theme is not compatible to Marpit engine', () => {
+    describe('when registered theme is not compatible to Marpit engine', () => {
       const emptyCSS = path.resolve(__dirname, '_files/themes/empty')
 
       it('outputs warning and ignores registration', async () => {

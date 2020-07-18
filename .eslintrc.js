@@ -6,12 +6,13 @@ module.exports = {
     node: true,
   },
   extends: ['eslint:recommended', 'plugin:import/recommended', 'prettier'],
+  parserOptions: { ecmaFeatures: { jsx: true } },
   rules: {
     'import/order': ['error', { alphabetize: { order: 'asc' } }],
   },
-  parserOptions: {
-    ecmaFeatures: {
-      jsx: true,
+  settings: {
+    'import/resolver': {
+      node: { extensions: ['.mjs', '.js', '.jsx', '.json', '.ts', '.tsx'] },
     },
   },
   overrides: [

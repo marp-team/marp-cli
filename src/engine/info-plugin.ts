@@ -27,8 +27,8 @@ export default function infoPlugin(md: any) {
       title: globalDirectives.marpCLITitle,
       url: globalDirectives.marpCLIURL,
       size: {
-        height: themeSet.getThemeProp(theme!, 'heightPixel'),
-        width: themeSet.getThemeProp(theme!, 'widthPixel'),
+        height: themeSet.getThemeProp(theme, 'heightPixel'),
+        width: themeSet.getThemeProp(theme, 'widthPixel'),
       },
       length: 0,
     }

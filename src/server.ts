@@ -1,3 +1,4 @@
+/* eslint-disable import/export, @typescript-eslint/no-namespace */
 import fs from 'fs'
 import path from 'path'
 import querystring from 'querystring'
@@ -40,26 +41,25 @@ export class Server extends TypedEventEmitter<Server.Events> {
 
     this.converter = converter
     this.directoryIndex = opts.directoryIndex || []
-    this.inputDir = converter.options.inputDir!
+    this.inputDir = converter.options.inputDir
     this.options = opts
-    this.port = Number.parseInt(process.env.PORT!, 10) || 8080
+    this.port = Number.parseInt(process.env.PORT!, 10) || 8080 // eslint-disable-line @typescript-eslint/no-non-null-assertion
   }
 
   async start() {
     this.setup()
 
-    return new Promise<void>((resolve, reject) => {
-      const httpServer = this.server!.listen(this.port)
-      httpServer.on('listening', () => {
-        resolve()
-      })
+    return new Promise<void>((res, rej) => {
+      const httpServer = this.server!.listen(this.port) // eslint-disable-line @typescript-eslint/no-non-null-assertion
+
+      httpServer.on('listening', res)
       httpServer.on('error', (err) => {
         httpServer.close()
 
         if (err['code'] === 'EADDRINUSE') {
-          reject(new CLIError(err.message))
+          rej(new CLIError(err.message))
         } else {
-          reject(err)
+          rej(err)
         }
       })
     })

@@ -14,7 +14,9 @@ describe('CLI helpers', () => {
 
     it('passes message with colored header to console.error', () => {
       error('cli-helper')
-      expect(spy).toHaveBeenCalledWith(chalk`{bgRed.white [ ERROR ]} cli-helper`)
+      expect(spy).toHaveBeenCalledWith(
+        chalk`{bgRed.white [ ERROR ]} cli-helper`
+      )
     })
 
     it('calls console.error even if silenced', () => {
@@ -30,7 +32,9 @@ describe('CLI helpers', () => {
 
     it('passes message with colored header to console.warn', () => {
       info('cli-helper')
-      expect(spy).toHaveBeenCalledWith(chalk`{bgCyan.black [  INFO ]} cli-helper`)
+      expect(spy).toHaveBeenCalledWith(
+        chalk`{bgCyan.black [  INFO ]} cli-helper`
+      )
     })
 
     it('does not call console.warn when silenced', () => {
@@ -45,7 +49,9 @@ describe('CLI helpers', () => {
 
     it('passes message with colored header to console.warn', () => {
       warn('cli-helper')
-      expect(spy).toHaveBeenCalledWith(chalk`{bgYellow.black [  WARN ]} cli-helper`)
+      expect(spy).toHaveBeenCalledWith(
+        chalk`{bgYellow.black [  WARN ]} cli-helper`
+      )
     })
 
     it('does not call console.warn when silenced', () => {

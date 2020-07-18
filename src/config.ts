@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import fs from 'fs'
 import path from 'path'
 import { promisify } from 'util'
@@ -81,7 +82,7 @@ export class MarpCLIConfig {
     return conf
   }
 
-  private constructor() {}
+  private constructor() {} // eslint-disable-line @typescript-eslint/no-empty-function
 
   async converterOption(): Promise<ConverterOption> {
     const inputDir = await this.inputDir()

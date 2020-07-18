@@ -1,3 +1,4 @@
+/* eslint-disable import/export, @typescript-eslint/no-namespace */
 import { EventEmitter } from 'events'
 import { nanoid } from 'nanoid'
 import puppeteer from 'puppeteer-core'
@@ -85,7 +86,9 @@ export class Preview extends TypedEventEmitter<Preview.Events> {
           .target()
           .createCDPSession()
           .then((session) => {
-            session.send('Page.resetNavigationHistory').catch(() => {})
+            session.send('Page.resetNavigationHistory').catch(() => {
+              // No ops
+            })
           })
       },
     })
@@ -94,7 +97,7 @@ export class Preview extends TypedEventEmitter<Preview.Events> {
   private async createWindow() {
     try {
       return this.createWindowObject(
-        await new Promise<puppeteer.Page>(async (res, rej) => {
+        await new Promise<puppeteer.Page>((res, rej) => {
           const pptr = this.puppeteer
           if (!pptr) return rej(false)
 
@@ -110,12 +113,15 @@ export class Preview extends TypedEventEmitter<Preview.Events> {
 
           pptr.on('targetcreated', idMatcher)
 
-          for (const page of await pptr.pages()) {
-            await page.evaluate(
-              `window.open('about:blank?__marp_cli_id=${id}', '', 'width=${this.options.width},height=${this.options.height}')`
-            )
-            break
-          }
+          // Open new window with specific identifier
+          ;(async () => {
+            for (const page of await pptr.pages()) {
+              await page.evaluate(
+                `window.open('about:blank?__marp_cli_id=${id}', '', 'width=${this.options.width},height=${this.options.height}')`
+              )
+              break
+            }
+          })()
         })
       )
     } catch (e) {
@@ -146,7 +152,9 @@ export class Preview extends TypedEventEmitter<Preview.Events> {
       .then((session) => {
         session
           .send('Browser.setDockTile', { image: favicon.slice(22) })
-          .catch(() => {})
+          .catch(() => {
+            // No ops
+          })
       })
 
     const handlePageOnClose = async () => {

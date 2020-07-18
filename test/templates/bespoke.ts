@@ -43,7 +43,7 @@ describe("Bespoke template's browser context", () => {
     })
 
     targetDocument.body.innerHTML = html
-    return targetDocument.getElementById('p')!
+    return targetDocument.getElementById('p')! // eslint-disable-line @typescript-eslint/no-non-null-assertion
   }
 
   const replaceLocation = <T extends void | Promise<void>>(
@@ -119,15 +119,15 @@ describe("Bespoke template's browser context", () => {
     it('adds data-bespoke-marp-current-fragment data attribute to current active item', () => {
       const firstItem = parent.querySelector<HTMLElement>(
         '[data-bespoke-marp-fragment]'
-      )!
+      )
 
       deck.next()
-      expect(firstItem.dataset.bespokeMarpFragment).toBe('active')
-      expect(firstItem.dataset.bespokeMarpCurrentFragment).not.toBeUndefined()
+      expect(firstItem?.dataset.bespokeMarpFragment).toBe('active')
+      expect(firstItem?.dataset.bespokeMarpCurrentFragment).not.toBeUndefined()
 
       deck.prev()
-      expect(firstItem.dataset.bespokeMarpFragment).toBe('inactive')
-      expect(firstItem.dataset.bespokeMarpCurrentFragment).toBeUndefined()
+      expect(firstItem?.dataset.bespokeMarpFragment).toBe('inactive')
+      expect(firstItem?.dataset.bespokeMarpCurrentFragment).toBeUndefined()
     })
 
     it('activates all fragments in slide when navigating by prev()', () => {
@@ -338,7 +338,7 @@ describe("Bespoke template's browser context", () => {
 
         keydown(
           { bubbles: true, which: Key.RightArrow },
-          document.getElementById('element')!
+          document.getElementById('element')! // eslint-disable-line @typescript-eslint/no-non-null-assertion
         )
         expect(deck.slide()).toBe(0)
 
@@ -404,7 +404,7 @@ describe("Bespoke template's browser context", () => {
       expect(deck.slide()).toBe(0)
     })
 
-    context('with wheel', () => {
+    describe('with wheel', () => {
       const dispatch = (opts: WheelEventInit = {}, elm: Element = parent) =>
         elm.dispatchEvent(new WheelEvent('wheel', { ...opts, bubbles: true }))
 
@@ -458,7 +458,7 @@ describe("Bespoke template's browser context", () => {
         expect(deck.slide()).toBe(2)
       })
 
-      context('when the target element is scrollable', () => {
+      describe('when the target element is scrollable', () => {
         const overflowAuto = (decl = 'overflow') => {
           const elm = document.createElement('div')
           elm.style[decl] = 'auto'
@@ -511,13 +511,11 @@ describe("Bespoke template's browser context", () => {
 
     beforeEach(() => render())
 
-    context(
-      'when document has an element that has bespoke-marp-osc class',
-      () => {
-        beforeEach(() => {
-          osc = document.createElement('div')
-          osc.className = 'bespoke-marp-osc'
-          osc.innerHTML = `
+    describe('when document has an element that has bespoke-marp-osc class', () => {
+      beforeEach(() => {
+        osc = document.createElement('div')
+        osc.className = 'bespoke-marp-osc'
+        osc.innerHTML = `
             <span data-bespoke-marp-osc="page"></span>
             <button data-bespoke-marp-osc="prev">Prev</button>
             <button data-bespoke-marp-osc="next">Next</button>
@@ -525,124 +523,118 @@ describe("Bespoke template's browser context", () => {
             <button data-bespoke-marp-osc="presenter">Open presenter view</button>
           `
 
-          document.body.appendChild(osc)
-        })
+        document.body.appendChild(osc)
+      })
 
-        it('moves OSC container in parent element of bespoke', () => {
-          const deck = bespoke()
-          expect(osc.parentElement).toBe(deck.parent)
-        })
+      it('moves OSC container in parent element of bespoke', () => {
+        const deck = bespoke()
+        expect(osc.parentElement).toBe(deck.parent)
+      })
 
-        it('toggles aria-hidden attribute by events emitted by "inactive" plugin', () => {
-          const deck = bespoke()
+      it('toggles aria-hidden attribute by events emitted by "inactive" plugin', () => {
+        const deck = bespoke()
 
-          deck.fire('marp-inactive')
-          expect(osc.getAttribute('aria-hidden')).toBe('true')
+        deck.fire('marp-inactive')
+        expect(osc.getAttribute('aria-hidden')).toBe('true')
 
-          deck.fire('marp-active')
-          expect(osc.hasAttribute('aria-hidden')).toBe(false)
-        })
+        deck.fire('marp-active')
+        expect(osc.hasAttribute('aria-hidden')).toBe(false)
+      })
 
-        it('updates page number by navigation', () => {
-          const deck = bespoke()
-          const page = osc.querySelector('[data-bespoke-marp-osc="page"]')!
-          expect(page.textContent).toBe('Page 1 of 3')
+      it('updates page number by navigation', () => {
+        const deck = bespoke()
+        const page = osc.querySelector('[data-bespoke-marp-osc="page"]')
+        expect(page?.textContent).toBe('Page 1 of 3')
 
-          deck.next()
-          expect(page.textContent).toBe('Page 2 of 3')
-        })
+        deck.next()
+        expect(page?.textContent).toBe('Page 2 of 3')
+      })
 
-        it('navigates slide deck when clicked next and prev button', () => {
-          const deck = bespoke()
-          const prev = osc.querySelector<HTMLButtonElement>(
-            'button[data-bespoke-marp-osc="prev"]'
-          )!
-          const next = osc.querySelector<HTMLButtonElement>(
-            'button[data-bespoke-marp-osc="next"]'
-          )!
+      it('navigates slide deck when clicked next and prev button', () => {
+        const deck = bespoke()
+        const prev = osc.querySelector<HTMLButtonElement>(
+          'button[data-bespoke-marp-osc="prev"]'
+        )
+        const next = osc.querySelector<HTMLButtonElement>(
+          'button[data-bespoke-marp-osc="next"]'
+        )
 
-          expect(deck.slide()).toBe(0)
-          expect(prev.disabled).toBe(true)
+        expect(deck.slide()).toBe(0)
+        expect(prev?.disabled).toBe(true)
 
-          next.click()
-          expect(deck.slide()).toBe(1)
-          expect(prev.disabled).toBe(false)
+        next?.click()
+        expect(deck.slide()).toBe(1)
+        expect(prev?.disabled).toBe(false)
 
-          next.click()
-          expect(deck.slide()).toBe(2)
-          expect(next.disabled).toBe(true)
+        next?.click()
+        expect(deck.slide()).toBe(2)
+        expect(next?.disabled).toBe(true)
 
-          prev.click()
-          expect(deck.slide()).toBe(1)
-          expect(next.disabled).toBe(false)
-        })
+        prev?.click()
+        expect(deck.slide()).toBe(1)
+        expect(next?.disabled).toBe(false)
+      })
 
-        it('calls deck.fullscreen() when clicked fullscreen button', () => {
-          const deck = bespoke()
-          const fullscreen = jest.spyOn(deck as any, 'fullscreen')
+      it('calls deck.fullscreen() when clicked fullscreen button', () => {
+        const deck = bespoke()
+        const fullscreen = jest.spyOn(deck as any, 'fullscreen')
+        const button = osc.querySelector<HTMLButtonElement>(
+          'button[data-bespoke-marp-osc="fullscreen"]'
+        )
+
+        button?.click()
+        expect(fullscreen).toHaveBeenCalled()
+      })
+
+      it('calls deck.openPresenterView() when clicked presenter view button', () => {
+        bespoke()
+        const windowOpen = jest.spyOn(window, 'open').mockImplementation()
+        const button = osc.querySelector<HTMLButtonElement>(
+          'button[data-bespoke-marp-osc="presenter"]'
+        )
+
+        button?.click()
+        expect(windowOpen).toHaveBeenCalled()
+      })
+
+      describe('when browser does not support fullscreen', () => {
+        it('hides fullscreen button', () => {
+          jest
+            .spyOn(screenfull as any, 'isEnabled', 'get')
+            .mockImplementation(() => false)
+
+          bespoke()
+
           const button = osc.querySelector<HTMLButtonElement>(
             'button[data-bespoke-marp-osc="fullscreen"]'
-          )!
+          )
 
-          button.click()
-          expect(fullscreen).toHaveBeenCalled()
+          expect(button?.style.display).toBe('none')
         })
+      })
 
-        it('calls deck.openPresenterView() when clicked presenter view button', () => {
-          bespoke()
-          const windowOpen = jest.spyOn(window, 'open').mockImplementation()
-          const button = osc.querySelector<HTMLButtonElement>(
-            'button[data-bespoke-marp-osc="presenter"]'
-          )!
-
-          button.click()
-          expect(windowOpen).toHaveBeenCalled()
-        })
-
-        context('when browser does not support fullscreen', () => {
-          it('hides fullscreen button', () => {
-            jest
-              .spyOn(screenfull as any, 'isEnabled', 'get')
-              .mockImplementation(() => false)
-
-            bespoke()
-
-            const button = osc.querySelector<HTMLButtonElement>(
-              'button[data-bespoke-marp-osc="fullscreen"]'
-            )!
-
-            expect(button.style.display).toBe('none')
+      describe('when localStorage throws error just by getting property', () => {
+        beforeEach(() => {
+          jest.resetModules()
+          jest.spyOn(console, 'warn').mockImplementation()
+          jest.spyOn(window, 'localStorage', 'get').mockImplementation(() => {
+            throw new Error()
           })
         })
 
-        context(
-          'when localStorage throws error just by getting property',
-          () => {
-            beforeEach(() => {
-              jest.resetModules()
-              jest.spyOn(console, 'warn').mockImplementation()
-              jest
-                .spyOn(window, 'localStorage', 'get')
-                .mockImplementation(() => {
-                  throw new Error()
-                })
-            })
+        it('disables OSC button for opening presenter view', async () => {
+          // Whether storage is available will determine while initializing
+          // module, so we have to use isolated bespoke instance.
+          ;(await import('../../src/templates/bespoke/bespoke')).default()
 
-            it('disables OSC button for opening presenter view', async () => {
-              // Whether storage is available will determine while initializing
-              // module, so we have to use isolated bespoke instance.
-              ;(await import('../../src/templates/bespoke/bespoke')).default()
+          const button = osc.querySelector<HTMLButtonElement>(
+            'button[data-bespoke-marp-osc="presenter"]'
+          )
 
-              const button = osc.querySelector<HTMLButtonElement>(
-                'button[data-bespoke-marp-osc="presenter"]'
-              )!
-
-              expect(button.disabled).toBe(true)
-            })
-          }
-        )
-      }
-    )
+          expect(button?.disabled).toBe(true)
+        })
+      })
+    })
   })
 
   describe('Presenter view', () => {
@@ -735,7 +727,7 @@ describe("Bespoke template's browser context", () => {
         }, '\n\n---\n\n* a\n* b'))
 
       describe('Next slide view', () => {
-        context('when next slide frame is loaded', () => {
+        describe('when next slide frame is loaded', () => {
           const setupNext = () => {
             const postMessageSpy = jest.spyOn(
               ($p(classes.next) as any).contentWindow,
@@ -788,20 +780,20 @@ describe("Bespoke template's browser context", () => {
           testPresenterView(({ deck }) => {
             const noteA = document.querySelector(
               '.bespoke-marp-note[data-index="0"]'
-            )!
+            )
             const noteB = document.querySelector(
               '.bespoke-marp-note[data-index="1"]'
-            )!
+            )
 
             expect(noteA).toBeTruthy()
             expect(noteB).toBeTruthy()
 
-            expect(noteA.className).toContain('active')
-            expect(noteB.className).not.toContain('active')
+            expect(noteA?.className).toContain('active')
+            expect(noteB?.className).not.toContain('active')
 
             deck.next()
-            expect(noteA.className).not.toContain('active')
-            expect(noteB.className).toContain('active')
+            expect(noteA?.className).not.toContain('active')
+            expect(noteB?.className).toContain('active')
           }, '<!-- A -->\n\n---\n\n<!-- B -->'))
       })
     })
@@ -818,19 +810,21 @@ describe("Bespoke template's browser context", () => {
           func({ deck, parent })
         })
 
-      it('subscribes navigation in the parent presenter view and navigate to its next page', (done) =>
-        testNextView(({ deck }) => {
-          // https://github.com/jsdom/jsdom/issues/2745
-          jest
-            .spyOn(MessageEvent.prototype, 'origin', 'get')
-            .mockImplementation(() => 'null')
+      it('subscribes navigation in the parent presenter view and navigate to its next page', () =>
+        new Promise((done) =>
+          testNextView(({ deck }) => {
+            // https://github.com/jsdom/jsdom/issues/2745
+            jest
+              .spyOn(MessageEvent.prototype, 'origin', 'get')
+              .mockImplementation(() => 'null')
 
-          window.addEventListener('message', () => {
-            expect(deck.slide()).toBe(2)
-            done()
+            window.addEventListener('message', () => {
+              expect(deck.slide()).toBe(2)
+              done()
+            })
+            window.postMessage('navigate:1,0', '*')
           })
-          window.postMessage('navigate:1,0', '*')
-        }))
+        ))
     })
   })
 
@@ -1004,6 +998,7 @@ describe("Bespoke template's browser context", () => {
           try {
             window.addEventListener('storage', resolve, { once: true })
 
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             foreignFrame.contentWindow!.localStorage.setItem(
               storeKey(key),
               JSON.stringify({ ...getStore(key), ...data })
@@ -1033,7 +1028,7 @@ describe("Bespoke template's browser context", () => {
       })
     })
 
-    context('when the quota of storage has limited', () => {
+    describe('when the quota of storage has limited', () => {
       beforeEach(() => {
         // Eat up to the default quota
         localStorage.clear()
@@ -1044,11 +1039,13 @@ describe("Bespoke template's browser context", () => {
 
       it('does not throw any errors while initialize plugin', () =>
         expect(() =>
-          replaceLocation('/?sync=test', () => bespoke())
+          replaceLocation('/?sync=test', () => {
+            bespoke()
+          })
         ).not.toThrow())
     })
 
-    context('when localStorage throws error just by getting property', () => {
+    describe('when localStorage throws error just by getting property', () => {
       beforeEach(() =>
         jest.spyOn(window, 'localStorage', 'get').mockImplementation(() => {
           throw new Error()
@@ -1057,7 +1054,9 @@ describe("Bespoke template's browser context", () => {
 
       it('does not throw any errors while initialize plugin', () =>
         expect(() =>
-          replaceLocation('/?sync=test', () => bespoke())
+          replaceLocation('/?sync=test', () => {
+            bespoke()
+          })
         ).not.toThrow())
     })
   })
@@ -1197,18 +1196,19 @@ describe("Bespoke template's browser context", () => {
       expect(request).toHaveBeenCalledWith('screen')
     })
 
-    it('prevents to throw error while requesting wake-lock', (done) => {
-      const err = new Error('test')
-      const warnSpy = jest.spyOn(console, 'warn').mockImplementation()
+    it('prevents to throw error while requesting wake-lock', () =>
+      new Promise((done) => {
+        const err = new Error('test')
+        const warnSpy = jest.spyOn(console, 'warn').mockImplementation()
 
-      warnSpy.mockImplementation((e) => {
-        expect(e).toStrictEqual(err)
-        done()
-      })
+        warnSpy.mockImplementation((e) => {
+          expect(e).toStrictEqual(err)
+          done()
+        })
 
-      request.mockRejectedValue(err)
-      bespoke()
-    })
+        request.mockRejectedValue(err)
+        bespoke()
+      }))
 
     it('requests to enable wake-lock again when changed the state of visibility', () => {
       bespoke()
