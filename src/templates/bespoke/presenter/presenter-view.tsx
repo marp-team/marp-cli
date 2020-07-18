@@ -114,14 +114,14 @@ export default function presenterView(deck) {
     const prev = $(classes.infoPagePrev) as HTMLButtonElement
     const next = $(classes.infoPageNext) as HTMLButtonElement
 
-    prev.addEventListener('click', () => {
+    prev.addEventListener('click', (e) => {
       prev.blur()
-      deck.prev()
+      deck.prev({ fragment: !e.shiftKey })
     })
 
-    next.addEventListener('click', () => {
+    next.addEventListener('click', (e) => {
       next.blur()
-      deck.next()
+      deck.next({ fragment: !e.shiftKey })
     })
 
     deck.on('fragment', ({ index, fragments, fragmentIndex }) => {
