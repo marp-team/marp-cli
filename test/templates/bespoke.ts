@@ -33,7 +33,7 @@ describe("Bespoke template's browser context", () => {
     md = defaultMarkdown,
     targetDocument = document
   ): HTMLElement => {
-    let { html, comments } = marp.render(md) // tslint:disable-line: prefer-const
+    let { html, comments } = marp.render(md) // eslint-disable-line prefer-const
 
     comments.forEach((c, i) => {
       if (c.length > 0)

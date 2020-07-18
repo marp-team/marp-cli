@@ -29,7 +29,6 @@ export const requestWakeLock = async (): Promise<WakeLockObject> => {
   return null
 }
 
-// tslint:disable-next-line:variable-name
 export const _clearCachedWakeLockApi = () => {
   cachedWakeLockApi = undefined
 }

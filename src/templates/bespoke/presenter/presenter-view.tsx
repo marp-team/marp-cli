@@ -1,7 +1,6 @@
 /** @jsx h */
 import h from 'vhtml'
 
-// tslint:disable-next-line: variable-name
 const Fragment: any = ({ children }) => h(null, null, ...children)
 
 export const classes = {
@@ -89,9 +88,8 @@ export default function presenterView(deck) {
     })
 
     deck.on('activate', () =>
-      notes.forEach(
-        // tslint:disable-next-line: triple-equals
-        (n) => n.classList.toggle('active', n.dataset.index == deck.slide())
+      notes.forEach((n) =>
+        n.classList.toggle('active', n.dataset.index == deck.slide())
       )
     )
 
