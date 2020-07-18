@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix invalid permission flag in package script ([#256](https://github.com/marp-team/marp-cli/issues/256), [#257](https://github.com/marp-team/marp-cli/pull/257))
+
 ## v0.19.0 - 2020-07-18
 
 ### Added
