@@ -12,6 +12,7 @@
 ### Changed
 
 - Upgrade Marp Core to [v1.2.2](https://github.com/marp-team/marp-core/releases/tag/v1.2.2) ([#253](https://github.com/marp-team/marp-cli/pull/253))
+- Upgrade dependent packages to the latest version ([#255](https://github.com/marp-team/marp-cli/pull/255))
 - Migrate from TSLint to ESLint ([#250](https://github.com/marp-team/marp-cli/pull/250))
 
 ### Removed
