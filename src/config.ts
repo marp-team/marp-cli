@@ -1,16 +1,17 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+import fs from 'fs'
+import path from 'path'
+import { promisify } from 'util'
 import { Marp } from '@marp-team/marp-core'
 import chalk from 'chalk'
 import { cosmiconfig } from 'cosmiconfig'
-import path from 'path'
-import fs from 'fs'
 import osLocale from 'os-locale'
-import { promisify } from 'util'
 import { info, warn } from './cli'
 import { ConverterOption, ConvertType } from './converter'
 import resolveEngine, { ResolvableEngine, ResolvedEngine } from './engine'
 import { CLIError } from './error'
-import { Theme, ThemeSet } from './theme'
 import { TemplateOption } from './templates'
+import { Theme, ThemeSet } from './theme'
 
 const lstat = promisify(fs.lstat)
 
@@ -81,7 +82,7 @@ export class MarpCLIConfig {
     return conf
   }
 
-  private constructor() {}
+  private constructor() {} // eslint-disable-line @typescript-eslint/no-empty-function
 
   async converterOption(): Promise<ConverterOption> {
     const inputDir = await this.inputDir()

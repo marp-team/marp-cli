@@ -1,8 +1,11 @@
 const express = jest.requireActual('express')
 
-express.application.listen = jest.fn((port) => {})
+express.application.listen = jest.fn(() => {
+  // no ops
+})
+
 express.application.listen.mockReturnValue({
-  on: (event, callback) => {
+  on: (_, callback) => {
     callback()
   },
 })

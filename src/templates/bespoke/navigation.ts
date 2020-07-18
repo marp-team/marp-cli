@@ -7,12 +7,9 @@ enum Direction {
   Y = 'Y',
 }
 
-export default function bespokeNavigation(opts: BespokeNavigationOption = {}) {
-  const options: BespokeNavigationOption = {
-    interval: 200,
-    ...opts,
-  }
-
+export default function bespokeNavigation({
+  interval = 200,
+}: BespokeNavigationOption = {}) {
   return (deck) => {
     document.addEventListener('keydown', (e) => {
       // Space + Shift: Previous page
@@ -60,9 +57,9 @@ export default function bespokeNavigation(opts: BespokeNavigationOption = {}) {
 
       wheelIntervalTimer = setTimeout(() => {
         lastWheelDelta = 0
-      }, options.interval!)
+      }, interval)
 
-      const debouncing = Date.now() - lastWheelNavigationAt < options.interval!
+      const debouncing = Date.now() - lastWheelNavigationAt < interval
       const currentWheelDelta = Math.sqrt(e.deltaX ** 2 + e.deltaY ** 2)
       const attenuated = currentWheelDelta <= lastWheelDelta
 

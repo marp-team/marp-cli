@@ -1,7 +1,7 @@
-import { Marpit } from '@marp-team/marpit'
 import path from 'path'
-import pkgUp from 'pkg-up'
+import { Marpit } from '@marp-team/marpit'
 import importFrom from 'import-from'
+import pkgUp from 'pkg-up'
 import { CLIError } from './error'
 
 export type Engine = typeof Marpit
@@ -62,7 +62,7 @@ export class ResolvedEngine {
   // NOTE: It cannot test because of overriding `require` in Jest context.
   private findClassPath(klass) {
     for (const moduleId in require.cache) {
-      const expt = require.cache[moduleId]!.exports
+      const expt = require.cache[moduleId].exports
 
       if (
         expt === klass ||

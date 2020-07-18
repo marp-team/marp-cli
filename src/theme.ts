@@ -1,8 +1,9 @@
-import { Marpit } from '@marp-team/marpit'
+/* eslint-disable import/export, @typescript-eslint/no-namespace */
 import fs from 'fs'
-import { hasMagic } from 'globby'
 import path from 'path'
 import { promisify } from 'util'
+import { Marpit } from '@marp-team/marpit'
+import { hasMagic } from 'globby'
 import { warn } from './cli'
 import { File } from './file'
 
@@ -25,7 +26,7 @@ export class Theme {
   }
 
   get buffer() {
-    return this.readBuffer!
+    return this.readBuffer! // eslint-disable-line @typescript-eslint/no-non-null-assertion
   }
 
   get css() {
@@ -59,7 +60,9 @@ export class ThemeSet {
   /** The key-value pair from file path to instance */
   readonly themes: Map<string, Theme> = new Map()
 
-  onThemeUpdated: (path: string) => void = () => {}
+  onThemeUpdated: (path: string) => void = () => {
+    // No ops
+  }
 
   private observedMarkdowns: Map<string, string | undefined> = new Map()
 
@@ -129,7 +132,9 @@ export class ThemeSet {
 
           if (stat.isFile() || stat.isDirectory() || stat.isSymbolicLink())
             fnForWatch.add(path.resolve(f))
-        } catch (e) {}
+        } catch (e) {
+          // No ops
+        }
       }
     }
 

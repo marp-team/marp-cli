@@ -1,23 +1,23 @@
 import { EventEmitter } from 'events'
 import fs from 'fs'
-import getStdin from 'get-stdin'
 import path from 'path'
+import { version as coreVersion } from '@marp-team/marp-core/package.json'
+import { version as marpitVersion } from '@marp-team/marpit/package.json'
+import getStdin from 'get-stdin'
 import stripAnsi from 'strip-ansi'
-import marpCli from '../src/marp-cli'
+import { version as cliVersion } from '../package.json'
 import * as cli from '../src/cli'
 import { Converter, ConvertType } from '../src/converter'
 import { ResolvedEngine } from '../src/engine'
 import { CLIError } from '../src/error'
 import { File } from '../src/file'
+import marpCli from '../src/marp-cli'
 import { Preview } from '../src/preview'
 import { Server } from '../src/server'
 import { ThemeSet } from '../src/theme'
 import * as version from '../src/version'
 import { Watcher } from '../src/watcher'
 
-const cliVersion = require('../package.json').version
-const coreVersion = require('@marp-team/marp-core/package.json').version
-const marpitVersion = require('@marp-team/marpit/package.json').version
 const previewEmitter = new EventEmitter() as Preview
 
 jest.mock('fs')
@@ -42,7 +42,7 @@ describe('Marp CLI', () => {
   const assetFn = (fn) => path.resolve(__dirname, fn)
 
   for (const cmd of ['--version', '-v'])
-    context(`with ${cmd} option`, () => {
+    describe(`with ${cmd} option`, () => {
       let log: jest.SpyInstance<void, any>
       let findClassPath: jest.SpyInstance
 
@@ -61,44 +61,41 @@ describe('Marp CLI', () => {
         jest.spyOn(version, 'isMarpCore').mockImplementation(() => true)
 
         expect(await marpCli([cmd])).toBe(0)
-        expect(log).toBeCalledWith(
+        expect(log).toHaveBeenCalledWith(
           expect.stringContaining(`@marp-team/marp-cli v${cliVersion}`)
         )
-        expect(log).toBeCalledWith(
+        expect(log).toHaveBeenCalledWith(
           expect.stringContaining(`@marp-team/marp-core v${coreVersion}`)
         )
       })
 
-      context(
-        'when resolved core has unexpected version against bundled',
-        () => {
-          const pkgJson = { name: '@marp-team/marp-core', version: '0.0.0' }
-          const pkgPath = '../node_modules/@marp-team/marp-core/package.json'
+      describe('when resolved core has unexpected version against bundled', () => {
+        const pkgJson = { name: '@marp-team/marp-core', version: '0.0.0' }
+        const pkgPath = '../node_modules/@marp-team/marp-core/package.json'
 
-          beforeEach(() => {
-            jest.spyOn(version, 'isMarpCore').mockImplementation(() => true)
+        beforeEach(() => {
+          jest.spyOn(version, 'isMarpCore').mockImplementation(() => true)
 
-            findClassPath.mockImplementation(() =>
-              assetFn('../node_modules/@marp-team/marp-core/lib/marp.js')
+          findClassPath.mockImplementation(() =>
+            assetFn('../node_modules/@marp-team/marp-core/lib/marp.js')
+          )
+
+          jest.doMock(pkgPath, () => pkgJson)
+        })
+
+        afterEach(() => jest.unmock(pkgPath))
+
+        it('outputs resolved version as user-installed core', async () => {
+          expect(await marpCli([cmd])).toBe(0)
+          expect(log).toHaveBeenCalledWith(
+            expect.stringContaining(
+              'user-installed @marp-team/marp-core v0.0.0'
             )
+          )
+        })
+      })
 
-            jest.doMock(pkgPath, () => pkgJson)
-          })
-
-          afterEach(() => jest.unmock(pkgPath))
-
-          it('outputs resolved version as user-installed core', async () => {
-            expect(await marpCli([cmd])).toBe(0)
-            expect(log).toBeCalledWith(
-              expect.stringContaining(
-                'user-installed @marp-team/marp-core v0.0.0'
-              )
-            )
-          })
-        }
-      )
-
-      context('with specified Marpit engine', () => {
+      describe('with specified Marpit engine', () => {
         const cmds = [cmd, '--engine', '@marp-team/marpit']
 
         beforeEach(() =>
@@ -109,13 +106,13 @@ describe('Marp CLI', () => {
 
         it('outputs using engine name and version', async () => {
           expect(await marpCli(cmds)).toBe(0)
-          expect(log).toBeCalledWith(
+          expect(log).toHaveBeenCalledWith(
             expect.stringContaining(`@marp-team/marpit v${marpitVersion}`)
           )
         })
       })
 
-      context('with custom engine in project', () => {
+      describe('with custom engine in project', () => {
         const cmds = [cmd, '-c', assetFn('_configs/custom-engine/file.js')]
 
         beforeEach(() =>
@@ -124,18 +121,18 @@ describe('Marp CLI', () => {
 
         it('outputs project name and version', async () => {
           expect(await marpCli(cmds)).toBe(0)
-          expect(log).toBeCalledWith(
+          expect(log).toHaveBeenCalledWith(
             expect.stringContaining('custom-project v0.1.2')
           )
         })
       })
 
-      context('with functional engine in config file directly', () => {
+      describe('with functional engine in config file directly', () => {
         const cmds = [cmd, '-c', assetFn('_configs/custom-engine/anonymous.js')]
 
         it('outputs using the customized engine', async () => {
           expect(await marpCli(cmds)).toBe(0)
-          expect(log).toBeCalledWith(
+          expect(log).toHaveBeenCalledWith(
             expect.stringContaining('customized engine')
           )
         })
@@ -143,7 +140,7 @@ describe('Marp CLI', () => {
     })
 
   for (const cmd of [null, '--help', '-h'])
-    context(`with ${cmd || 'empty'} option`, () => {
+    describe(`with ${cmd || 'empty'} option`, () => {
       const run = (...args) => marpCli([...(cmd ? [cmd] : []), ...args])
 
       let error: jest.SpyInstance<ReturnType<Console['error']>, any>
@@ -154,22 +151,24 @@ describe('Marp CLI', () => {
 
       it('outputs help to stderr', async () => {
         expect(await run()).toBe(0)
-        expect(error).toBeCalledWith(expect.stringContaining('Usage'))
+        expect(error).toHaveBeenCalledWith(expect.stringContaining('Usage'))
       })
 
       describe('Preview option', () => {
         it('outputs help about --preview option', async () => {
           expect(await run()).toBe(0)
-          expect(error).toBeCalledWith(expect.stringContaining('--preview'))
+          expect(error).toHaveBeenCalledWith(
+            expect.stringContaining('--preview')
+          )
         })
 
-        context('when CLI is running in an official Docker image', () => {
+        describe('when CLI is running in an official Docker image', () => {
           beforeEach(() => (process.env.IS_DOCKER = '1'))
           afterEach(() => delete process.env.IS_DOCKER)
 
           it('does not output help about --preview option', async () => {
             expect(await run()).toBe(0)
-            expect(error).toBeCalledWith(
+            expect(error).toHaveBeenCalledWith(
               expect.not.stringContaining('--preview')
             )
           })
@@ -177,7 +176,7 @@ describe('Marp CLI', () => {
       })
     })
 
-  context('when passed file is not found', () => {
+  describe('when passed file is not found', () => {
     it('outputs warning and help with exit code 1', async () => {
       const warn = jest.spyOn(console, 'warn').mockImplementation()
       const error = jest.spyOn(console, 'error').mockImplementation()
@@ -188,7 +187,7 @@ describe('Marp CLI', () => {
     })
   })
 
-  context('with --engine option', () => {
+  describe('with --engine option', () => {
     it('prints error and return error code when passed module is invalid', async () => {
       const error = jest.spyOn(console, 'error').mockImplementation()
 
@@ -199,7 +198,7 @@ describe('Marp CLI', () => {
     })
   })
 
-  context('with --input-dir option', () => {
+  describe('with --input-dir option', () => {
     const files = assetFn('_files')
 
     let writeFile: jest.Mock
@@ -246,7 +245,7 @@ describe('Marp CLI', () => {
       )
     })
 
-    context('when the directory path has included glob pattern', () => {
+    describe('when the directory path has included glob pattern', () => {
       it('converts files in specified dir', async () => {
         jest.spyOn(cli, 'info').mockImplementation()
 
@@ -255,7 +254,7 @@ describe('Marp CLI', () => {
       })
     })
 
-    context('when the output folder is specified by -o option', () => {
+    describe('when the output folder is specified by -o option', () => {
       it('converts markdowns with keeping folder structure', async () => {
         const args = ['--input-dir', files, '-o', assetFn('dist')]
 
@@ -272,7 +271,7 @@ describe('Marp CLI', () => {
       })
     })
 
-    context('with --server option', () => {
+    describe('with --server option', () => {
       it('starts listening server and watcher for passed directory', async () => {
         const info = jest.spyOn(cli, 'info')
         info.mockImplementation()
@@ -284,7 +283,7 @@ describe('Marp CLI', () => {
         expect(info.mock.calls.map(([m]) => m)).toContainEqual(
           expect.stringContaining('http://localhost:8080/')
         )
-        expect(serverStart).toBeCalledTimes(1)
+        expect(serverStart).toHaveBeenCalledTimes(1)
         expect(Watcher.watch).toHaveBeenCalledWith(
           expect.arrayContaining([files]),
           expect.objectContaining({
@@ -293,7 +292,7 @@ describe('Marp CLI', () => {
         )
       })
 
-      context('with --preview option', () => {
+      describe('with --preview option', () => {
         const run = () =>
           marpCli(['--input-dir', files, '--server', '--preview'])
 
@@ -304,10 +303,10 @@ describe('Marp CLI', () => {
 
         it('opens preview window through Preview.open()', async () => {
           await run()
-          expect(Preview.prototype.open).toBeCalledTimes(1)
+          expect(Preview.prototype.open).toHaveBeenCalledTimes(1)
         })
 
-        context('when CLI is running in an official Docker image', () => {
+        describe('when CLI is running in an official Docker image', () => {
           beforeEach(() => (process.env.IS_DOCKER = '1'))
           afterEach(() => delete process.env.IS_DOCKER)
 
@@ -315,7 +314,7 @@ describe('Marp CLI', () => {
             const warn = jest.spyOn(cli, 'warn').mockImplementation()
 
             await run()
-            expect(Preview.prototype.open).not.toBeCalled()
+            expect(Preview.prototype.open).not.toHaveBeenCalled()
             expect(warn.mock.calls.map(([m]) => m)).toContainEqual(
               expect.stringContaining('Preview option was ignored')
             )
@@ -324,7 +323,7 @@ describe('Marp CLI', () => {
       })
     })
 
-    context('with specified by configuration file', () => {
+    describe('with specified by configuration file', () => {
       const confFile = assetFn('_configs/input-dir/.marprc.yml')
       const slides = assetFn('_configs/input-dir/slides')
       const distHtml = assetFn('_configs/input-dir/dist/nested/slide.html')
@@ -344,7 +343,7 @@ describe('Marp CLI', () => {
     })
   })
 
-  context('with --theme option', () => {
+  describe('with --theme option', () => {
     let convert: jest.MockInstance<any, any>
     let info: jest.MockInstance<any, any>
 
@@ -356,7 +355,7 @@ describe('Marp CLI', () => {
       ;(<any>fs).__mockWriteFile()
     })
 
-    context('when passed value is theme name', () => {
+    describe('when passed value is theme name', () => {
       it('overrides theme to specified', async () => {
         const args = [assetFn('_files/1.md'), '--theme', 'gaia']
         expect(await marpCli(args)).toBe(0)
@@ -366,7 +365,7 @@ describe('Marp CLI', () => {
       })
     })
 
-    context('when passed value is a file path to theme CSS', () => {
+    describe('when passed value is a file path to theme CSS', () => {
       const cssFile = assetFn('_files/themes/a.css')
 
       it('overrides theme to specified CSS', async () => {
@@ -378,17 +377,17 @@ describe('Marp CLI', () => {
 
         const converter = <Converter>convert.mock.instances[0]
         const { themeSet } = converter.options
-        const theme = themeSet.themes.get(cssFile)!
+        const theme = themeSet.themes.get(cssFile)
 
-        expect(theme.overrideName).not.toBeUndefined()
+        expect(theme?.overrideName).not.toBeUndefined()
         expect(converter.options.globalDirectives.theme).toBe(
-          theme.overrideName
+          theme?.overrideName
         )
-        expect(themeSet.fnForWatch).toContain(cssFile)
+        expect(themeSet?.fnForWatch).toContain(cssFile)
       })
     })
 
-    context('when passed value is a path to directory', () => {
+    describe('when passed value is a path to directory', () => {
       const themesPath = assetFn('_files/themes')
 
       it('prints error with advice and return error code', async () => {
@@ -407,7 +406,7 @@ describe('Marp CLI', () => {
     })
   })
 
-  context('with --theme-set option', () => {
+  describe('with --theme-set option', () => {
     const filePath = assetFn('_files/1.md')
     const themes = assetFn('_files/themes')
     const themeA = assetFn('_files/themes/a.css')
@@ -425,12 +424,12 @@ describe('Marp CLI', () => {
       ;(<any>fs).__mockWriteFile()
     })
 
-    context('with specified single file', () => {
+    describe('with specified single file', () => {
       it('becomes to be able to use specified additional theme', async () => {
         expect(
           await marpCli(['--theme-set', themeA, '--theme', 'a', filePath])
         ).toBe(0)
-        expect(convert).toBeCalledTimes(1)
+        expect(convert).toHaveBeenCalledTimes(1)
 
         const { css } = (await convert.mock.results[0].value).rendered
         expect(css).toContain('@theme a')
@@ -438,7 +437,7 @@ describe('Marp CLI', () => {
       })
     })
 
-    context('with specified multiple files', () => {
+    describe('with specified multiple files', () => {
       const baseArgs = [filePath, '--theme-set', themeB, themeC]
 
       it('becomes to be able to use multiple additional themes', async () => {
@@ -447,7 +446,7 @@ describe('Marp CLI', () => {
           observeSpy.mockClear()
 
           expect(await marpCli([...baseArgs, '--theme', name])).toBe(0)
-          expect(convert).toBeCalledTimes(1)
+          expect(convert).toHaveBeenCalledTimes(1)
           expect((await convert.mock.results[0].value).rendered.css).toContain(
             `@theme ${name}`
           )
@@ -456,8 +455,8 @@ describe('Marp CLI', () => {
       })
     })
 
-    context('with specified directory', () => {
-      const baseArgs = (theme) => [filePath, '--theme-set', theme]
+    describe('with specified directory', () => {
+      const baseArgs = (theme: string) => [filePath, '--theme-set', theme]
 
       it('becomes to be able to use the all css files in directory', async () => {
         for (const name of ['a', 'b', 'c']) {
@@ -465,7 +464,7 @@ describe('Marp CLI', () => {
           observeSpy.mockClear()
 
           expect(await marpCli([...baseArgs(themes), '--theme', name])).toBe(0)
-          expect(convert).toBeCalledTimes(1)
+          expect(convert).toHaveBeenCalledTimes(1)
           expect((await convert.mock.results[0].value).rendered.css).toContain(
             `@theme ${name}`
           )
@@ -473,14 +472,14 @@ describe('Marp CLI', () => {
         }
       })
 
-      context('when CSS file is not found from directory', () => {
+      describe('when CSS file is not found from directory', () => {
         const dir = assetFn('_files/subfolder')
 
         it('outputs warning and continue conversion', async () => {
           const warn = jest.spyOn(console, 'warn').mockImplementation()
 
           expect(await marpCli(baseArgs(dir))).toBe(0)
-          expect(convert).toBeCalledTimes(1)
+          expect(convert).toHaveBeenCalledTimes(1)
           expect(warn).toHaveBeenCalledWith(
             expect.stringContaining('Not found additional theme CSS files')
           )
@@ -489,7 +488,7 @@ describe('Marp CLI', () => {
     })
   })
 
-  context('with passing a file', () => {
+  describe('with passing a file', () => {
     const onePath = assetFn('_files/1.md')
 
     const conversion = async (...cmd: string[]): Promise<Converter> => {
@@ -530,21 +529,21 @@ describe('Marp CLI', () => {
       )
     })
 
-    context('with --pdf option', () => {
+    describe('with --pdf option', () => {
       it('converts file with PDF type', async () => {
         const cmd = [onePath, '--pdf']
         expect((await conversion(...cmd)).options.type).toBe(ConvertType.pdf)
       })
     })
 
-    context('with --pptx option', () => {
+    describe('with --pptx option', () => {
       it('converts file with PPTX type', async () => {
         const cmd = [onePath, '--pptx']
         expect((await conversion(...cmd)).options.type).toBe(ConvertType.pptx)
       })
     })
 
-    context('with --image option', () => {
+    describe('with --image option', () => {
       it('converts file with PNG type by specified png', async () => {
         const cmd = [onePath, '--image', 'png']
         expect((await conversion(...cmd)).options.type).toBe(ConvertType.png)
@@ -560,7 +559,7 @@ describe('Marp CLI', () => {
         expect((await conversion(...cmd)).options.type).toBe(ConvertType.jpeg)
       })
 
-      context('with --jpeg-quality option', () => {
+      describe('with --jpeg-quality option', () => {
         it('converts file with specified JPEG quality', async () => {
           const cmd = [onePath, '--image', 'jpg', '--jpeg-quality', '50']
           expect((await conversion(...cmd)).options.jpegQuality).toBe(50)
@@ -568,7 +567,7 @@ describe('Marp CLI', () => {
       })
     })
 
-    context('with --images option', () => {
+    describe('with --images option', () => {
       it('converts file with PNG type and enabled pages option by specified png', async () => {
         const converter = await conversion(onePath, '--images', 'png')
         expect(converter.options.type).toBe(ConvertType.png)
@@ -582,7 +581,7 @@ describe('Marp CLI', () => {
       })
     })
 
-    context('with -o option', () => {
+    describe('with -o option', () => {
       it('converts file and output to stdout when -o is "-"', async () => {
         const stdout = jest.spyOn(process.stdout, 'write').mockImplementation()
 
@@ -623,7 +622,7 @@ describe('Marp CLI', () => {
       })
     })
 
-    context('with -w option', () => {
+    describe('with -w option', () => {
       it('starts watching by Watcher.watch()', async () => {
         jest.spyOn(cli, 'info').mockImplementation()
         ;(<any>fs).__mockWriteFile()
@@ -633,7 +632,7 @@ describe('Marp CLI', () => {
       })
     })
 
-    context('with configuration file', () => {
+    describe('with configuration file', () => {
       it('uses configuration file found from process.cwd()', async () => {
         const stdout = jest.spyOn(process.stdout, 'write').mockImplementation()
 
@@ -662,7 +661,7 @@ describe('Marp CLI', () => {
         expect(html).toContain('@theme b')
       })
 
-      context('when --config-file / -c option is passed', () => {
+      describe('when --config-file / -c option is passed', () => {
         it('prints error when specified config is not found', async () => {
           const error = jest.spyOn(console, 'error').mockImplementation()
 
@@ -712,17 +711,17 @@ describe('Marp CLI', () => {
 
           const conf = assetFn('_configs/custom-engine/anonymous.js')
           const md = assetFn('_configs/custom-engine/md.md')
-          const { engine } = require(conf)
+          const { engine } = require(conf) // eslint-disable-line @typescript-eslint/no-var-requires
 
           expect(await marpCli(['-c', conf, md, '--no-output'])).toBe(0)
-          expect(engine).toBeCalledWith(
+          expect(engine).toHaveBeenCalledWith(
             expect.objectContaining({ customOption: true })
           )
         })
       })
     })
 
-    context('with --preview / -p option', () => {
+    describe('with --preview / -p option', () => {
       let warn: jest.SpyInstance<ReturnType<Console['warn']>, any>
 
       beforeEach(
@@ -731,30 +730,30 @@ describe('Marp CLI', () => {
 
       it('opens preview window through Preview.open()', async () => {
         await marpCli([onePath, '-p', '--no-output'])
-        expect(Preview.prototype.open).toBeCalledTimes(1)
+        expect(Preview.prototype.open).toHaveBeenCalledTimes(1)
 
         // Simualte opening event
         previewEmitter.emit('opening', '<location>')
-        expect(warn).toBeCalledWith(
+        expect(warn).toHaveBeenCalledWith(
           expect.stringContaining('Opening <location>')
         )
       })
 
-      context('when PPTX conversion is enabled', () => {
+      describe('when PPTX conversion is enabled', () => {
         it('does not open PPTX in preview window', async () => {
           await marpCli([onePath, '-p', '--pptx', '--no-output'])
-          expect(Preview.prototype.open).not.toBeCalled()
+          expect(Preview.prototype.open).not.toHaveBeenCalled()
         }, 30000)
       })
 
-      context('when CLI is running in an official Docker image', () => {
+      describe('when CLI is running in an official Docker image', () => {
         beforeEach(() => (process.env.IS_DOCKER = '1'))
         afterEach(() => delete process.env.IS_DOCKER)
 
         it('ignores --preview option with warning', async () => {
           await marpCli([onePath, '--preview', '--no-output'])
-          expect(Preview.prototype.open).not.toBeCalled()
-          expect(warn).toBeCalledWith(
+          expect(Preview.prototype.open).not.toHaveBeenCalled()
+          expect(warn).toHaveBeenCalledWith(
             expect.stringContaining('Preview option was ignored')
           )
         })
@@ -762,7 +761,7 @@ describe('Marp CLI', () => {
     })
   })
 
-  context('with passing directory', () => {
+  describe('with passing directory', () => {
     it('finds out markdown files recursively', async () => {
       const cliInfo = jest.spyOn(cli, 'info').mockImplementation()
 
@@ -776,7 +775,7 @@ describe('Marp CLI', () => {
       )
     })
 
-    context('when glob special chars are included in real file path', () => {
+    describe('when glob special chars are included in real file path', () => {
       it('finds out a file correctly', async () => {
         jest.spyOn(cli, 'info').mockImplementation()
         jest
@@ -787,7 +786,7 @@ describe('Marp CLI', () => {
       })
     })
 
-    context('when non-ASCII code is included in directory name', () => {
+    describe('when non-ASCII code is included in directory name', () => {
       it('finds out markdown files correctly', async () => {
         jest.spyOn(cli, 'info').mockImplementation()
         jest
@@ -798,21 +797,18 @@ describe('Marp CLI', () => {
       })
     })
 
-    context(
-      'when glob special chars are included in real directory path',
-      () => {
-        it('finds out markdown files in specified directory correctly', async () => {
-          jest.spyOn(cli, 'info').mockImplementation()
-          jest
-            .spyOn<any, any>(Converter.prototype, 'convertFiles')
-            .mockImplementation(() => [])
+    describe('when glob special chars are included in real directory path', () => {
+      it('finds out markdown files in specified directory correctly', async () => {
+        jest.spyOn(cli, 'info').mockImplementation()
+        jest
+          .spyOn<any, any>(Converter.prototype, 'convertFiles')
+          .mockImplementation(() => [])
 
-          expect(await marpCli([assetFn('_files/(sp)')])).toBe(0)
-        })
-      }
-    )
+        expect(await marpCli([assetFn('_files/(sp)')])).toBe(0)
+      })
+    })
 
-    context('with --server option', () => {
+    describe('with --server option', () => {
       it('treats passed directory as an input directory of the server', async () => {
         jest.spyOn(cli, 'info').mockImplementation()
 
@@ -820,7 +816,7 @@ describe('Marp CLI', () => {
         serverStart.mockResolvedValue(0)
 
         await marpCli(['--server', assetFn('_files')])
-        expect(serverStart).toBeCalledTimes(1)
+        expect(serverStart).toHaveBeenCalledTimes(1)
 
         const server: any = serverStart.mock.instances[0]
         const converter: Converter = server.converter
@@ -828,13 +824,13 @@ describe('Marp CLI', () => {
         expect(converter.options.inputDir).toBe(assetFn('_files'))
       })
 
-      context('with --preview option', () => {
+      describe('with --preview option', () => {
         it('opens served address through Preview.open()', async () => {
           jest.spyOn(console, 'warn').mockImplementation()
 
           await marpCli(['--server', assetFn('_files'), '--preview'])
-          expect(Preview.prototype.open).toBeCalledTimes(1)
-          expect(Preview.prototype.open).toBeCalledWith(
+          expect(Preview.prototype.open).toHaveBeenCalledTimes(1)
+          expect(Preview.prototype.open).toHaveBeenCalledWith(
             expect.stringMatching(/^http:\/\/localhost:/)
           )
         })
@@ -842,10 +838,10 @@ describe('Marp CLI', () => {
     })
   })
 
-  context('with passing multiple files', () => {
+  describe('with passing multiple files', () => {
     const baseArgs = [assetFn('_files/1.md'), assetFn('_files/2.mdown')]
 
-    context('with --server option', () => {
+    describe('with --server option', () => {
       it('prints error and return error code', async () => {
         const error = jest.spyOn(console, 'error').mockImplementation()
 
@@ -856,17 +852,17 @@ describe('Marp CLI', () => {
       })
     })
 
-    context('with --preview option', () => {
+    describe('with --preview option', () => {
       it('opens 2 preview windows through Preview.open()', async () => {
         jest.spyOn(console, 'warn').mockImplementation()
 
         await marpCli([...baseArgs, '--preview', '--no-output'])
-        expect(Preview.prototype.open).toBeCalledTimes(2)
+        expect(Preview.prototype.open).toHaveBeenCalledTimes(2)
       })
     })
   })
 
-  context('with passing from stdin', () => {
+  describe('with passing from stdin', () => {
     let cliInfo: jest.SpyInstance
     let stdout: jest.SpyInstance
 
@@ -890,7 +886,7 @@ describe('Marp CLI', () => {
       expect(stdout).toHaveBeenCalledWith(expect.any(Buffer))
     })
 
-    context('with --stdin option as false', () => {
+    describe('with --stdin option as false', () => {
       it('does not convert stdin even if passed', async () => {
         jest.spyOn(console, 'error').mockImplementation()
 

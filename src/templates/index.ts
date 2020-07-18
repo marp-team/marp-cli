@@ -1,7 +1,7 @@
-import { Element, Options, RenderResult } from '@marp-team/marpit'
 import fs from 'fs'
 import path from 'path'
 import { promisify } from 'util'
+import { Element, Options, RenderResult } from '@marp-team/marpit'
 import barePug from './bare/bare.pug'
 import bareScss from './bare/bare.scss'
 import bespokePug from './bespoke/bespoke.pug'
@@ -36,7 +36,7 @@ interface RenderedSize {
 
 export type TemplateOption = TemplateBareOption | TemplateBespokeOption
 
-interface TemplateBareOption {}
+interface TemplateBareOption {} // eslint-disable-line @typescript-eslint/no-empty-interface
 
 interface TemplateBespokeOption {
   osc?: boolean

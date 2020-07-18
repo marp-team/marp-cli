@@ -1,9 +1,9 @@
 import { default as screenfull } from 'screenfull'
 import { storage } from './utils'
 
-export default function bespokeOSC(selector: string = '.bespoke-marp-osc') {
+export default function bespokeOSC(selector = '.bespoke-marp-osc') {
   const osc = document.querySelector<HTMLElement>(selector)
-  if (!osc) return () => {}
+  if (!osc) return () => {} // eslint-disable-line @typescript-eslint/no-empty-function
 
   const oscElements = <T extends HTMLElement = HTMLElement>(
     type: string,

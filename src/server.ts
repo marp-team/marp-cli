@@ -1,10 +1,12 @@
-import express, { Express } from 'express'
+/* eslint-disable import/export, @typescript-eslint/no-namespace */
 import fs from 'fs'
 import path from 'path'
 import querystring from 'querystring'
-import serveIndex from 'serve-index'
 import url from 'url'
 import { promisify } from 'util'
+import express, { Express } from 'express'
+import serveIndex from 'serve-index'
+import favicon from './assets/favicon.png'
 import {
   Converter,
   ConvertedCallback,
@@ -13,10 +15,9 @@ import {
 } from './converter'
 import { error, CLIError } from './error'
 import { File, markdownExtensions } from './file'
-import TypedEventEmitter from './utils/typed-event-emitter'
-import favicon from './assets/favicon.png'
 import serverIndex from './server/index.pug'
 import style from './server/index.scss'
+import TypedEventEmitter from './utils/typed-event-emitter'
 
 const stat = promisify(fs.stat)
 const readFile = promisify(fs.readFile)
@@ -25,7 +26,7 @@ export class Server extends TypedEventEmitter<Server.Events> {
   readonly converter: Converter
   readonly inputDir: string
   readonly options: Server.Options
-  readonly port: Number
+  readonly port: number
 
   directoryIndex: string[]
   server: Express | undefined
@@ -40,26 +41,25 @@ export class Server extends TypedEventEmitter<Server.Events> {
 
     this.converter = converter
     this.directoryIndex = opts.directoryIndex || []
-    this.inputDir = converter.options.inputDir!
+    this.inputDir = converter.options.inputDir
     this.options = opts
-    this.port = Number.parseInt(process.env.PORT!, 10) || 8080
+    this.port = Number.parseInt(process.env.PORT!, 10) || 8080 // eslint-disable-line @typescript-eslint/no-non-null-assertion
   }
 
   async start() {
     this.setup()
 
-    return new Promise<void>((resolve, reject) => {
-      const httpServer = this.server!.listen(this.port)
-      httpServer.on('listening', () => {
-        resolve()
-      })
+    return new Promise<void>((res, rej) => {
+      const httpServer = this.server!.listen(this.port) // eslint-disable-line @typescript-eslint/no-non-null-assertion
+
+      httpServer.on('listening', res)
       httpServer.on('error', (err) => {
         httpServer.close()
 
         if (err['code'] === 'EADDRINUSE') {
-          reject(new CLIError(err.message))
+          rej(new CLIError(err.message))
         } else {
-          reject(err)
+          rej(err)
         }
       })
     })

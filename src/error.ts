@@ -3,7 +3,7 @@ export class CLIError implements Error {
   readonly message: string
   readonly name = 'CLIError'
 
-  constructor(message: string, errorCode: number = 1) {
+  constructor(message: string, errorCode = 1) {
     this.message = message
     this.errorCode = errorCode
   }

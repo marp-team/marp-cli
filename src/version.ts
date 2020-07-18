@@ -1,7 +1,7 @@
 import { Marp } from '@marp-team/marp-core'
 import { version as bundledCoreVer } from '@marp-team/marp-core/package.json'
-import { MarpCLIConfig } from './config'
 import { name, version } from '../package.json'
+import { MarpCLIConfig } from './config'
 
 export const isMarpCore = (klass: any): boolean => klass === Marp
 

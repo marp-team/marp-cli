@@ -1,7 +1,8 @@
-import chokidar from 'chokidar'
+/* eslint-disable import/export, @typescript-eslint/no-namespace */
 import crypto from 'crypto'
 import path from 'path'
-import portfinder from 'portfinder'
+import chokidar from 'chokidar'
+import { getPortPromise } from 'portfinder'
 import { Server as WSServer, ServerOptions } from 'ws'
 import { Converter, ConvertedCallback } from './converter'
 import { File, FileType } from './file'
@@ -86,7 +87,7 @@ export class WatchNotifier {
 
   async port() {
     if (this.portNumber === undefined)
-      this.portNumber = await portfinder.getPortPromise({ port: 37717 })
+      this.portNumber = await getPortPromise({ port: 37717 })
 
     return this.portNumber
   }
@@ -119,6 +120,8 @@ export class WatchNotifier {
 
         if (wsSet !== undefined) {
           this.listeners.set(identifier, wsSet.add(ws))
+
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           ws.on('close', () => this.listeners.get(identifier)!.delete(ws))
 
           ws.send('ready')

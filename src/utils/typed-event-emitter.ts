@@ -13,8 +13,8 @@ export default class TypedEventEmitter<
   removeListener!: <E extends Events<T>>(event: E, listener: T[E]) => this
   off!: <E extends Events<T>>(event: E, listener: T[E]) => this
   removeAllListeners!: (event?: Events<T>) => this
-  listeners!: (event: Events<T>) => Function[]
-  rawListeners!: (event: Events<T>) => Function[]
+  listeners!: (event: Events<T>) => ((...args: unknown[]) => void)[]
+  rawListeners!: (event: Events<T>) => ((...args: unknown[]) => void)[]
   emit!: <E extends Events<T>, F extends T[E]>(
     event: E,
     ...args: F extends (...args: infer R) => any ? R : never

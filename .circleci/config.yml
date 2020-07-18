@@ -75,8 +75,8 @@ commands:
           command: yarn check:ts
 
       - run:
-          name: TSLint
-          command: yarn lint:ts
+          name: ESLint
+          command: yarn lint:js
 
       - run:
           name: stylelint
@@ -144,6 +144,14 @@ jobs:
     steps:
       - test
 
+  test-node14:
+    executor:
+      name: node
+      browser: true
+      version: '14'
+    steps:
+      - test
+
   docker-image-latest:
     executor: docker
     steps:
@@ -166,10 +174,14 @@ workflows:
       - test-node12:
           requires:
             - audit
+      - test-node14:
+          requires:
+            - audit
       - docker-image-latest:
           requires:
             - test-node10
             - test-node12
+            - test-node14
           filters:
             branches:
               only: master
