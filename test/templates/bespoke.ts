@@ -362,17 +362,10 @@ describe("Bespoke template's browser context", () => {
   })
 
   describe('Navigation', () => {
-    let parent: HTMLElement
-    let deck
-
-    beforeEach(() => {
-      parent = render()
-      deck = bespoke()
-
-      jest.clearAllTimers()
-    })
-
     it('navigates page by keyboard', () => {
+      render()
+      const deck = bespoke()
+
       keydown({ which: Key.RightArrow })
       expect(deck.slide()).toBe(1)
 
@@ -404,7 +397,53 @@ describe("Bespoke template's browser context", () => {
       expect(deck.slide()).toBe(0)
     })
 
+    it('skips fragments when holding Shift key', () => {
+      render('* A\n* B\n* C\n\n---\n\n* D\n* E')
+      const deck = bespoke()
+
+      keydown({ which: Key.RightArrow, shiftKey: true })
+      expect(deck.slide()).toBe(0)
+      expect(deck.fragmentIndex).toBe(3)
+
+      keydown({ which: Key.DownArrow, shiftKey: true })
+      expect(deck.slide()).toBe(1)
+      expect(deck.fragmentIndex).toBe(2)
+
+      keydown({ which: Key.LeftArrow, shiftKey: true })
+      expect(deck.slide()).toBe(0)
+      expect(deck.fragmentIndex).toBe(3)
+
+      keydown({ which: Key.RightArrow })
+      expect(deck.slide()).toBe(1)
+      expect(deck.fragmentIndex).toBe(0)
+
+      keydown({ which: Key.PageDown, shiftKey: true })
+      expect(deck.fragmentIndex).toBe(2)
+
+      keydown({ which: Key.UpArrow, shiftKey: true })
+      expect(deck.slide()).toBe(0)
+      expect(deck.fragmentIndex).toBe(3)
+
+      keydown({ which: Key.RightArrow })
+      expect(deck.slide()).toBe(1)
+      expect(deck.fragmentIndex).toBe(0)
+
+      keydown({ which: Key.PageUp, shiftKey: true })
+      expect(deck.slide()).toBe(0)
+      expect(deck.fragmentIndex).toBe(3)
+    })
+
     describe('with wheel', () => {
+      let parent: HTMLElement
+      let deck
+
+      beforeEach(() => {
+        parent = render()
+        deck = bespoke()
+
+        jest.clearAllTimers()
+      })
+
       const dispatch = (opts: WheelEventInit = {}, elm: Element = parent) =>
         elm.dispatchEvent(new WheelEvent('wheel', { ...opts, bubbles: true }))
 
