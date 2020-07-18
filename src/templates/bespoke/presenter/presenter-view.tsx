@@ -1,6 +1,7 @@
 /** @jsx h */
 import h from 'vhtml'
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const Fragment: any = ({ children }) => h(null, null, ...children)
 
 export const classes = {
@@ -16,6 +17,16 @@ export const classes = {
   infoTime: 'bespoke-marp-presenter-info-time',
   infoTimer: 'bespoke-marp-presenter-info-timer',
 } as const
+
+/** Create function to send message to iframe for navigation */
+const createNavigateFunc = (iframe: HTMLIFrameElement) => (
+  index: number,
+  fragmentIndex: number
+) =>
+  iframe.contentWindow?.postMessage(
+    `navigate:${index},${fragmentIndex}`,
+    window.origin === 'null' ? '*' : window.origin
+  )
 
 export default function presenterView(deck) {
   const { title } = document
@@ -56,7 +67,7 @@ export default function presenterView(deck) {
   const $cache: { -readonly [T in keyof typeof classes]?: HTMLElement } = {}
   const $ = (klass: typeof classes[keyof typeof classes]): HTMLElement => {
     $cache[klass] =
-      $cache[klass] || document.querySelector<HTMLElement>(`.${klass}`)!
+      $cache[klass] || document.querySelector<HTMLElement>(`.${klass}`)
 
     return $cache[klass]
   }
@@ -130,13 +141,4 @@ export default function presenterView(deck) {
 
   document.body.appendChild(buildContainer(deck.parent))
   subscribe(deck)
-}
-
-/** Create function to send message to iframe for navigation */
-function createNavigateFunc(iframe: HTMLIFrameElement) {
-  return (index: number, fragmentIndex: number) =>
-    iframe.contentWindow!.postMessage(
-      `navigate:${index},${fragmentIndex}`,
-      window.origin === 'null' ? '*' : window.origin
-    )
 }
