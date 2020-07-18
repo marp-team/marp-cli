@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v0.19.0 - 2020-07-18
+
 ### Added
 
 - Skip fragments when navigated page while holding shift key ([#206](https://github.com/marp-team/marp-cli/issues/206), [#248](https://github.com/marp-team/marp-cli/pull/248))
