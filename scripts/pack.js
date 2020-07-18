@@ -17,7 +17,7 @@ const os = (process.env.MATRIX_OS || 'linux,macos,windows').toLowerCase()
 const packToTarGz = (binary) => {
   const pack = tar.pack()
 
-  pack.entry({ name: binaryName, mode: 755 }, binary)
+  pack.entry({ name: binaryName, mode: 0o755 }, binary)
   pack.finalize()
 
   return pack.pipe(zlib.createGzip())
