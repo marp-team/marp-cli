@@ -5,6 +5,7 @@
 ### Changed
 
 - Keep awake the display in `bespoke` template if [Screen Wake Lock API](https://web.dev/wakelock/) is available (Chrome >= 84) ([#239](https://github.com/marp-team/marp-cli/issues/239), [#246](https://github.com/marp-team/marp-cli/pull/246))
+- Migrate from TSLint to ESLint ([#250](https://github.com/marp-team/marp-cli/pull/250))
 
 ## v0.18.3 - 2020-07-09
 

@@ -1,6 +1,6 @@
-import chokidar from 'chokidar'
 import http from 'http'
-import portfinder from 'portfinder'
+import chokidar from 'chokidar'
+import portfinder = require('portfinder')
 import { File, FileType } from '../src/file'
 import { ThemeSet } from '../src/theme'
 import { Watcher, WatchNotifier, notifier } from '../src/watcher'
@@ -73,30 +73,30 @@ describe('Watcher', () => {
       expect(on).toHaveBeenCalledWith('add', expect.any(Function))
       expect(on).toHaveBeenCalledWith('unlink', expect.any(Function))
 
-      const onChange = on.mock.calls.find(([e]) => e === 'change')![1]
-      const onAdd = on.mock.calls.find(([e]) => e === 'add')![1]
-      const onUnlink = on.mock.calls.find(([e]) => e === 'unlink')![1]
+      const onChange = on.mock.calls.find(([e]) => e === 'change')[1]
+      const onAdd = on.mock.calls.find(([e]) => e === 'add')[1]
+      const onUnlink = on.mock.calls.find(([e]) => e === 'unlink')[1]
 
       // Callbacks
       const conv = jest.spyOn(<any>watcher, 'convert').mockImplementation()
       const del = jest.spyOn(<any>watcher, 'delete').mockImplementation()
 
       onChange('change')
-      expect(conv).toBeCalledWith('change')
+      expect(conv).toHaveBeenCalledWith('change')
 
       onAdd('add')
-      expect(conv).toBeCalledWith('add')
+      expect(conv).toHaveBeenCalledWith('add')
 
       onUnlink('unlink')
-      expect(del).toBeCalledWith('unlink')
+      expect(del).toHaveBeenCalledWith('unlink')
 
       watcher.converter.options.themeSet.onThemeUpdated('theme-update')
-      expect(conv).toBeCalledWith('theme-update')
+      expect(conv).toHaveBeenCalledWith('theme-update')
     })
   })
 
   describe('#convert', () => {
-    context('when passed filename is found from file finder', () => {
+    describe('when passed filename is found from file finder', () => {
       it('converts markdown', async () => {
         const watcher: any = createWatcher()
 
@@ -123,7 +123,7 @@ describe('Watcher', () => {
         expect(watcher.events.onError).toHaveBeenCalledTimes(1)
       })
 
-      context('with notify mode', () => {
+      describe('with notify mode', () => {
         it('does not convert markdown but triggers notifier', async () => {
           const watcher: any = createWatcher({ mode: Watcher.WatchMode.Notify })
 
@@ -134,7 +134,7 @@ describe('Watcher', () => {
       })
     })
 
-    context('when passed filename is found from theme finder', () => {
+    describe('when passed filename is found from theme finder', () => {
       it('reloads theme CSS', async () => {
         const watcher: any = createWatcher()
         const { load } = watcher.converter.options.themeSet
@@ -177,7 +177,7 @@ describe('WatchNotifier', () => {
       expect(finderSpy).toHaveBeenCalledTimes(1)
     })
 
-    context('when 37717 port is using for the other purpose', () => {
+    describe('when 37717 port is using for the other purpose', () => {
       let server: http.Server
 
       beforeEach(
@@ -199,12 +199,12 @@ describe('WatchNotifier', () => {
 
       const listenerSet = instance.listeners.get(testIdentifier)
       expect(listenerSet).toBeInstanceOf(Set)
-      expect(listenerSet!.size).toBe(0)
+      expect(listenerSet?.size).toBe(0)
 
       // Keep the content of set even if called twice
-      listenerSet!.add('test')
-      await instance.register('test')
-      expect(listenerSet!.size).toBe(1)
+      listenerSet?.add('test')
+      await instance?.register('test')
+      expect(listenerSet?.size).toBe(1)
     })
   })
 
@@ -261,20 +261,23 @@ describe('WatchNotifier', () => {
       expect(wss()).not.toBeUndefined()
     })
 
-    context('when client is connected to registered path', () => {
+    describe('when client is connected to registered path', () => {
       beforeEach(() => instance.register('test'))
 
       it('adds socket to registered set and sends "ready" command', async () => {
         await instance.start()
 
-        expect(mockWsOn).toBeCalledTimes(1)
-        expect(mockWsOn).toBeCalledWith('connection', expect.any(Function))
-        expect(instance.listeners.get(testIdentifier)!.size).toBe(0)
+        expect(mockWsOn).toHaveBeenCalledTimes(1)
+        expect(mockWsOn).toHaveBeenCalledWith(
+          'connection',
+          expect.any(Function)
+        )
+        expect(instance.listeners.get(testIdentifier)?.size).toBe(0)
 
         const [, connection] = mockWsOn.mock.calls[0]
         connection(ws, { url: `/${testIdentifier}` })
         expect(ws.send).toHaveBeenCalledWith('ready')
-        expect(instance.listeners.get(testIdentifier)!.has(ws)).toBe(true)
+        expect(instance.listeners.get(testIdentifier)?.has(ws)).toBe(true)
 
         // Remove listener by closing connection
         expect(ws.on).toHaveBeenCalledTimes(1)
@@ -282,7 +285,7 @@ describe('WatchNotifier', () => {
 
         const [, onclose] = ws.on.mock.calls[0]
         onclose()
-        expect(instance.listeners.get(testIdentifier)!.has(ws)).toBe(false)
+        expect(instance.listeners.get(testIdentifier)?.has(ws)).toBe(false)
       })
 
       it('closes client socket immediately when passed invalid URL', async () => {

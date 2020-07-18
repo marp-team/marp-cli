@@ -1,3 +1,4 @@
+/* eslint-disable import/export, @typescript-eslint/no-namespace */
 import fs from 'fs'
 import os from 'os'
 import path from 'path'
@@ -98,7 +99,7 @@ export class File {
         await this.saveToFile()
         break
       case FileType.StandardIO:
-        process.stdout.write(this.buffer!)
+        process.stdout.write(this.buffer!) // eslint-disable-line @typescript-eslint/no-non-null-assertion
     }
   }
 
@@ -116,7 +117,9 @@ export class File {
       cleanup: async () => {
         try {
           await this.cleanup(tmp)
-        } catch (e) {}
+        } catch (e) {
+          // No ops
+        }
       },
       path: tmp,
     }
@@ -156,7 +159,7 @@ export class File {
 
   private async saveToFile(savePath: string = this.path) {
     await mkdirp(path.dirname(path.resolve(savePath)))
-    await writeFile(savePath, this.buffer!)
+    await writeFile(savePath, this.buffer!) // eslint-disable-line @typescript-eslint/no-non-null-assertion
   }
 
   private static stdinBuffer?: Buffer
@@ -181,7 +184,9 @@ export class File {
           dirs.push(path.resolve(p))
           continue
         }
-      } catch (e) {}
+      } catch (e) {
+        // No ops
+      }
 
       // Convert file path to glob pattern (micromatch must use "/" as path separator)
       globs.push(p.split(path.sep).join('/'))
@@ -229,12 +234,9 @@ export class File {
     })
   }
 
-  private static initialize(
-    filepath: string,
-    tap: (instance: File) => void = () => {}
-  ) {
+  private static initialize(filepath: string, tap?: (instance: File) => void) {
     const instance = new this(filepath)
-    tap(instance)
+    tap?.(instance)
     return instance
   }
 }

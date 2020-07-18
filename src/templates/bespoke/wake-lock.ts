@@ -29,7 +29,6 @@ export const requestWakeLock = async (): Promise<WakeLockObject> => {
   return null
 }
 
-// tslint:disable-next-line:variable-name
 export const _clearCachedWakeLockApi = () => {
   cachedWakeLockApi = undefined
 }
@@ -37,7 +36,7 @@ export const _clearCachedWakeLockApi = () => {
 export default async function bespokeWakeLock() {
   if (!wakeLockApi()) return
 
-  let wakeLock: WakeLockObject
+  let wakeLock: WakeLockObject | undefined // eslint-disable-line prefer-const
 
   const handleVisibilityChange = () => {
     if (wakeLock && document.visibilityState === 'visible') requestWakeLock()

@@ -1,6 +1,6 @@
 /** @jest-environment jsdom-fifteen */
 // TODO: Use Jest built-in jsdom environment if https://github.com/jsdom/jsdom/issues/2961 was fixed
-import portfinder from 'portfinder'
+import { getPortPromise } from 'portfinder'
 import { Server } from 'ws'
 import watch from '../../src/templates/watch/watch'
 
@@ -15,7 +15,7 @@ describe('Watch mode notifier on browser context', () => {
   let server: Server
 
   const createWSServer = async () => {
-    const port = await portfinder.getPortPromise({ port: 37717 })
+    const port = await getPortPromise({ port: 37717 })
 
     return new Promise<Server>((res, rej) => {
       try {
@@ -35,21 +35,22 @@ describe('Watch mode notifier on browser context', () => {
 
   afterEach(() => server.close())
 
-  context('when window.__marpCliWatchWS is defined', () => {
+  describe('when window.__marpCliWatchWS is defined', () => {
     beforeEach(() => {
       window['__marpCliWatchWS'] = `ws://localhost:${server.options.port}/test`
     })
 
     afterEach(() => delete window['__marpCliWatchWS'])
 
-    it('connects to WebSocket server', (done) => {
-      server.on('connection', (_, socket) => {
-        expect(socket.url).toBe('/test')
-        done()
-      })
+    it('connects to WebSocket server', () =>
+      new Promise((done) => {
+        server.on('connection', (_, socket) => {
+          expect(socket.url).toBe('/test')
+          done()
+        })
 
-      watch()
-    })
+        watch()
+      }))
 
     it('listens reload event', async () => {
       const send = await new Promise<(data: any) => Promise<void>>(
@@ -72,44 +73,45 @@ describe('Watch mode notifier on browser context', () => {
       )
 
       await send('ready')
-      expect(location.reload).not.toBeCalled()
+      expect(location.reload).not.toHaveBeenCalled()
 
       await send('reload')
-      expect(location.reload).toBeCalled()
+      expect(location.reload).toHaveBeenCalled()
     })
 
-    context('when closed WebSocket server', () => {
+    describe('when closed WebSocket server', () => {
       beforeEach(() => jest.useFakeTimers())
       afterEach(() => jest.useRealTimers())
 
-      it('reconnects watcher in 5 sec', async (done) => {
-        const clientSocket = await new Promise<WebSocket>((res, rej) => {
-          let socket: WebSocket
+      it('reconnects watcher in 5 sec', () =>
+        new Promise((done) =>
+          (async () => {
+            const clientSocket = await new Promise<WebSocket>((res, rej) => {
+              server.once('error', (e) => rej(e))
+              server.once('connection', () => res(socket))
 
-          server.once('error', (e) => rej(e))
-          server.once('connection', () => res(socket))
+              const socket = watch()
+            })
 
-          socket = watch()!
-        })
+            await new Promise((res) => {
+              clientSocket.addEventListener('close', res)
+              server.close()
+            })
 
-        await new Promise((res) => {
-          clientSocket.addEventListener('close', res)
-          server.close()
-        })
+            server = await createWSServer()
+            server.once('connection', (ws, socket) => {
+              expect(socket.url).toBe('/test')
 
-        server = await createWSServer()
-        server.once('connection', (ws, socket) => {
-          expect(socket.url).toBe('/test')
+              ws.on('pong', () => {
+                expect(location.reload).toHaveBeenCalled()
+                done()
+              })
+              ws.ping()
+            })
 
-          ws.on('pong', () => {
-            expect(location.reload).toBeCalled()
-            done()
-          })
-          ws.ping()
-        })
-
-        jest.advanceTimersByTime(5000)
-      })
+            jest.advanceTimersByTime(5000)
+          })()
+        ))
     })
   })
 })

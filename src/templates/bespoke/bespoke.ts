@@ -1,10 +1,10 @@
 import bespoke from 'bespoke'
 import bespokeClasses from './classes'
+import bespokeFragments from './fragments'
+import bespokeFullscreen from './fullscreen'
 import bespokeInactive from './inactive'
 import bespokeInteractive from './interactive'
 import bespokeLoad from './load'
-import bespokeFragments from './fragments'
-import bespokeFullscreen from './fullscreen'
 import bespokeNavigation from './navigation'
 import bespokeOSC from './osc'
 import bespokePresenter from './presenter/'
@@ -17,7 +17,9 @@ import bespokeWakeLock from './wake-lock'
 
 const pattern = [ViewMode.Normal, ViewMode.Presenter, ViewMode.Next] as const
 
-const parse = (...patterns: [[boolean, boolean, boolean], Function][]) => {
+const parse = (
+  ...patterns: [[boolean, boolean, boolean], (...args: unknown[]) => void][]
+) => {
   const idx = pattern.findIndex((v) => getViewMode() === v)
   if (idx < 0) throw new Error('Invalid view')
 
@@ -25,7 +27,7 @@ const parse = (...patterns: [[boolean, boolean, boolean], Function][]) => {
 }
 
 export default function bespokeTemplate(
-  target = document.getElementById('p')!
+  target = document.getElementById('p')! // eslint-disable-line @typescript-eslint/no-non-null-assertion
 ) {
   setViewMode()
 

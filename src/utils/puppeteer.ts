@@ -1,7 +1,7 @@
 import { exec } from 'child_process'
-import { promisify } from 'util'
 import os from 'os'
 import path from 'path'
+import { promisify } from 'util'
 import { Launcher } from 'chrome-launcher'
 import { CLIError } from '../error'
 
@@ -12,6 +12,7 @@ let isWsl: boolean | undefined
 let wslTmp: string | undefined
 
 export function isWSL(): boolean {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   if (isWsl === undefined) isWsl = require('is-wsl') as boolean
   return isWsl
 }

@@ -23,7 +23,7 @@ describe('JavaScript for server index', () => {
     showAll.dispatchEvent(new Event('change', {}))
   }
 
-  context('when check state of #show-all is changed', () => {
+  describe('when check state of #show-all is changed', () => {
     beforeEach(() => serverIndex())
 
     it('toggles .show-all class to #index list', () => {
@@ -42,7 +42,7 @@ describe('JavaScript for server index', () => {
       expect(sessionStorage.getItem(showAllKey)).toBeFalsy()
     })
 
-    context('when sessionStorage reached to quota limit', () => {
+    describe('when sessionStorage reached to quota limit', () => {
       it('logs error but class is applied', () => {
         const error = jest.spyOn(console, 'error').mockImplementation()
         const exception = new DOMException('test', 'QuotaExceededError')
@@ -52,13 +52,13 @@ describe('JavaScript for server index', () => {
         })
 
         expect(() => checkShowAll(true)).not.toThrow()
-        expect(error).toBeCalledWith(exception)
+        expect(error).toHaveBeenCalledWith(exception)
         expect(index.classList.contains('show-all')).toBe(true)
       })
     })
   })
 
-  context('when sessionStorage has a stored state', () => {
+  describe('when sessionStorage has a stored state', () => {
     it('applies checked state', () => {
       sessionStorage.setItem(showAllKey, '1')
       serverIndex()

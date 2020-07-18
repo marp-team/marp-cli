@@ -10,13 +10,10 @@ export interface TouchPoint {
   delta?: number
 }
 
-export default function bespokeTouch(opts: BespokeTouchOption = {}) {
-  const options: BespokeTouchOption = {
-    slope: Math.tan((-35 * Math.PI) / 180), // -35deg
-    swipeThreshold: 30,
-    ...opts,
-  }
-
+export default function bespokeTouch({
+  slope = Math.tan((-35 * Math.PI) / 180), // -35deg
+  swipeThreshold = 30,
+}: BespokeTouchOption = {}) {
   return (deck) => {
     let touchStart: TouchPoint | undefined
     const parent: HTMLElement = deck.parent
@@ -60,8 +57,12 @@ export default function bespokeTouch(opts: BespokeTouchOption = {}) {
       'touchend',
       (e) => {
         if (touchStart) {
-          if (touchStart.delta && touchStart.delta >= options.swipeThreshold!) {
-            let radian = touchStart.radian! - options.slope!
+          if (
+            touchStart.delta &&
+            touchStart.delta >= swipeThreshold &&
+            touchStart.radian
+          ) {
+            let radian = touchStart.radian - slope
             radian = ((radian + Math.PI) % (Math.PI * 2)) - Math.PI
 
             deck[radian < 0 ? 'next' : 'prev']()

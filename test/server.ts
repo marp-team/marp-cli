@@ -1,6 +1,6 @@
+import path from 'path'
 import Marp from '@marp-team/marp-core'
 import cheerio from 'cheerio'
-import path from 'path'
 import request from 'supertest'
 import {
   Converter,
@@ -47,14 +47,14 @@ describe('Server', () => {
     expect(instance.server).toBeUndefined()
   })
 
-  context('when passed converter has not specified inputDir option', () => {
+  describe('when passed converter has not specified inputDir option', () => {
     it('throws CLIError', () =>
-      expect(() => new Server(converter({ inputDir: undefined }))).toThrowError(
+      expect(() => new Server(converter({ inputDir: undefined }))).toThrow(
         CLIError
       ))
   })
 
-  context('when PORT environment variable is specified', () => {
+  describe('when PORT environment variable is specified', () => {
     beforeEach(() => {
       process.env.PORT = '54321'
     })
@@ -72,7 +72,7 @@ describe('Server', () => {
       const server = new Server(converter())
       await server.start()
 
-      expect(server.server!.listen).toBeCalledWith(8080)
+      expect(server.server?.listen).toHaveBeenCalledWith(8080)
     })
   })
 
@@ -84,25 +84,25 @@ describe('Server', () => {
       return server
     }
 
-    context('when there is request to a served markdown file', () => {
+    describe('when there is request to a served markdown file', () => {
       it('triggers conversion and returns the content of converted HTML', async () => {
         const server = setupServer()
         const cvt = jest.spyOn(server.converter, 'convertFile')
         const response = await request(server.server).get('/1.md')
 
         expect(response.status).toBe(200)
-        expect(cvt).toBeCalledTimes(1)
+        expect(cvt).toHaveBeenCalledTimes(1)
 
         const ret = await (cvt.mock.results[0].value as Promise<ConvertResult>)
-        expect(response.text).toBe(ret.newFile!.buffer!.toString())
+        expect(response.text).toBe(ret.newFile?.buffer?.toString())
       })
 
-      context('with listening `converted` event', () => {
+      describe('with listening `converted` event', () => {
         it('emits `converted` event after conversion', async () => {
           let ret: string | undefined
 
           const server = setupServer().on('converted', (converted) => {
-            ret = converted.newFile!.buffer!.toString()
+            ret = converted.newFile?.buffer?.toString()
           })
 
           const response = await request(server.server).get('/1.md')
@@ -110,7 +110,7 @@ describe('Server', () => {
         })
       })
 
-      context('with query parameter', () => {
+      describe('with query parameter', () => {
         it('triggers conversion with corresponded type option', async () => {
           const server = setupServer()
 
@@ -151,7 +151,7 @@ describe('Server', () => {
         })
       })
 
-      context('when error raised while converting', () => {
+      describe('when error raised while converting', () => {
         it('returns 503 with error response and emitting event', async () => {
           const err = new Error('test')
           const event = jest.fn()
@@ -160,14 +160,14 @@ describe('Server', () => {
           jest.spyOn(converter, 'convertFile').mockRejectedValue(err)
 
           const response = await request(server).get('/1.md')
-          expect(event).toBeCalledWith(err)
+          expect(event).toHaveBeenCalledWith(err)
           expect(response.status).toBe(503)
           expect(response.text).toBe('Error: test')
         })
       })
     })
 
-    context('when there is request to served directory', () => {
+    describe('when there is request to served directory', () => {
       it('shows the directory index with assigned class by kind', async () => {
         const server = setupServer()
         const response = await request(server.server).get('/')
@@ -185,7 +185,7 @@ describe('Server', () => {
         expect($('li a[href*="?pptx"]')).toHaveLength(3)
       })
 
-      context('with specified directoryIndex costructor option', () => {
+      describe('with specified directoryIndex costructor option', () => {
         it('serves the found convertible markdown', async () => {
           const server = setupServer({ directoryIndex: ['1.md'] })
           const response = await request(server.server).get('/')
@@ -198,7 +198,7 @@ describe('Server', () => {
       })
     })
 
-    context('when there is request to a static file', () => {
+    describe('when there is request to a static file', () => {
       it('returns the content of static file', async () => {
         const server = setupServer()
         const response = await request(server.server).get('/4.txt')
@@ -208,7 +208,7 @@ describe('Server', () => {
       })
     })
 
-    context('when the requested file is not found', () => {
+    describe('when the requested file is not found', () => {
       it('returns 404', async () => {
         const server = setupServer()
         const response = await request(server.server).get('/__NOT_FOUND__')
@@ -217,7 +217,7 @@ describe('Server', () => {
       })
     })
 
-    context('when the directory traversal attack is detected', () => {
+    describe('when the directory traversal attack is detected', () => {
       it('returns 403', async () => {
         const server = setupServer()
         const response = await request(server.server).get('/../../README.md')
