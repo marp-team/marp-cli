@@ -54,12 +54,6 @@ Do you hate to install Node and Chrome locally? We have [an official Docker imag
 
 [marp-cli-docker]: https://hub.docker.com/r/marpteam/marp-cli/
 
-### Run in Gitpod
-
-You can also build and run `marp-cli` in Gitpod, an online IDE for GitHub:
-
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/marp-team/marp-cli)
-
 ## Install
 
 ### Local installation
