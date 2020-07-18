@@ -6,9 +6,11 @@
 
 - Keep awake the display in `bespoke` template if [Screen Wake Lock API](https://web.dev/wakelock/) is available (Chrome >= 84) ([#239](https://github.com/marp-team/marp-cli/issues/239), [#246](https://github.com/marp-team/marp-cli/pull/246))
 - Test against Node 14 (Fermium) ([#251](https://github.com/marp-team/marp-cli/pull/251))
+- Set up GitHub Dependabot for marp-team packages ([#252](https://github.com/marp-team/marp-cli/pull/252))
 
 ### Changed
 
+- Upgrade Marp Core to [v1.2.2](https://github.com/marp-team/marp-core/releases/tag/v1.2.2) ([#253](https://github.com/marp-team/marp-cli/pull/253))
 - Migrate from TSLint to ESLint ([#250](https://github.com/marp-team/marp-cli/pull/250))
 
 ## v0.18.3 - 2020-07-09

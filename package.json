@@ -132,7 +132,7 @@
     "zip-stream": "^3.0.1"
   },
   "dependencies": {
-    "@marp-team/marp-core": "^1.2.1",
+    "@marp-team/marp-core": "^1.2.2",
     "@marp-team/marpit": "^1.6.2",
     "chokidar": "^3.4.0",
     "chrome-launcher": "^0.13.4",
