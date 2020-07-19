@@ -67,6 +67,7 @@ export const generatePuppeteerLaunchArgs = () => {
   return {
     executablePath,
     args: [...args],
+    pipe: true,
 
     // Workaround to avoid force-extensions policy for Chrome enterprise (SET CHROME_ENABLE_EXTENSIONS=1)
     // https://github.com/puppeteer/puppeteer/blob/master/docs/troubleshooting.md#chrome-headless-doesnt-launch-on-windows
