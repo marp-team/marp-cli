@@ -85,7 +85,7 @@
     "builtin-modules": "^3.1.0",
     "chalk": "^4.1.0",
     "cheerio": "^1.0.0-rc.3",
-    "codecov": "3.7.0",
+    "codecov": "3.7.1",
     "cssnano": "^4.1.10",
     "eslint": "^7.4.0",
     "eslint-config-prettier": "^6.11.0",
