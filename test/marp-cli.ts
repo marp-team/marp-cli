@@ -11,7 +11,7 @@ import { Converter, ConvertType } from '../src/converter'
 import { ResolvedEngine } from '../src/engine'
 import { CLIError } from '../src/error'
 import { File } from '../src/file'
-import marpCli from '../src/marp-cli'
+import marpCli from '../src/marp-cli' // eslint-disable-line import/no-named-as-default
 import { Preview } from '../src/preview'
 import { Server } from '../src/server'
 import { ThemeSet } from '../src/theme'
@@ -21,7 +21,6 @@ import { Watcher } from '../src/watcher'
 const previewEmitter = new EventEmitter() as Preview
 
 jest.mock('fs')
-jest.mock('get-stdin')
 jest.mock('mkdirp')
 jest.mock('../src/preview')
 jest.mock('../src/watcher', () => jest.genMockFromModule('../src/watcher'))

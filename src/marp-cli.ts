@@ -20,8 +20,8 @@ enum OptionGroup {
   Marp = 'Marp / Marpit Options:',
 }
 
-interface MarpCLIInternalOptions {
-  readStdin: boolean
+export interface MarpCLIInternalOptions {
+  stdin: boolean
   throwErrorAlways: boolean
 }
 
@@ -31,9 +31,9 @@ Usage:
   marp [options] -I <dir>
 `.trim()
 
-const marpCli = async (
+export const marpCli = async (
   argv: string[],
-  { readStdin, throwErrorAlways }: MarpCLIInternalOptions
+  { stdin: defaultStdin, throwErrorAlways }: MarpCLIInternalOptions
 ): Promise<number> => {
   let watcherInstance: Watcher | undefined
 
@@ -94,7 +94,7 @@ const marpCli = async (
           type: 'boolean',
         },
         stdin: {
-          default: readStdin,
+          default: defaultStdin,
           describe: 'Read Markdown from stdin',
           hidden: true, // It is an escape-hatch for advanced user
           group: OptionGroup.Basic,
@@ -354,13 +354,13 @@ const marpCli = async (
 
 export const apiInterface = (argv: string[] = []) =>
   marpCli(argv, {
-    readStdin: false,
+    stdin: false,
     throwErrorAlways: true,
   })
 
 export const cliInterface = (argv: string[] = []) =>
   marpCli(argv, {
-    readStdin: true,
+    stdin: true,
     throwErrorAlways: false,
   })
 
