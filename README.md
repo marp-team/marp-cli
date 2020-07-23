@@ -459,6 +459,34 @@ For example, the below configuration will set constructor option for Marp Core a
 
 > :warning: Some options may be overridden by used template.
 
+## API _(EXPERIMENTAL)_
+
+You can use Marp CLI through Node.js [if installed Marp CLI into your local project](#local-installation).
+
+```js
+const { marpCli } = require('@marp-team/marp-cli')
+
+marpCli(['test.md', '--pdf'])
+  .then((exitStatus) => {
+    if (exitStatus > 0) {
+      console.error(`Failure (Exit status: ${exitStatus})`)
+    } else {
+      console.log('Success')
+    }
+  })
+  .catch(console.error)
+```
+
+`marpCli()` accepts an argument of CLI options as array, and returns `Promise` to resolve an expected exit status in CLI. It would be rejected with the instance of `Error` if CLI met an error to suspend the conversion process.
+
+> :warning: _Marp CLI API is still not stable._ Please be aware that currently some observations would continue in background after resolved `Promise` (e.g. Watch mode, server mode, and preview window). We don't yet ensure safe behavior if used them.
+
+### Error handling
+
+We have exported [`CLIError` class and `CLIErrorCode` enum](https://github.com/marp-team/marp-cli/blob/master/src/error.ts) from `@marp-team/marp-cli`, to allow handling for specific errors that have already known by Marp CLI.
+
+If `CLIError` instance was thrown, you can identify the reason why CLI throwed error by checking `errorCode` member.
+
 ## Contributing
 
 Are you interested in contributing? Please see [CONTRIBUTING.md](.github/CONTRIBUTING.md) and [the common contributing guideline for Marp team](https://github.com/marp-team/.github/blob/master/CONTRIBUTING.md).
