@@ -42,7 +42,10 @@ const plugins = (opts = {}) => [
   }),
   pugPlugin({ pugRuntime: 'pug-runtime' }),
   url({ sourceDir: path.join(__dirname, 'lib') }),
-  compact && terser(),
+  compact &&
+    terser({
+      keep_classnames: /^CLIError$/,
+    }),
 ]
 
 const browser = {

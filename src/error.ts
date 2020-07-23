@@ -1,9 +1,10 @@
-export class CLIError implements Error {
+export class CLIError extends Error {
   readonly errorCode: number
   readonly message: string
   readonly name = 'CLIError'
 
   constructor(message: string, errorCode = 1) {
+    super()
     this.message = message
     this.errorCode = errorCode
   }
