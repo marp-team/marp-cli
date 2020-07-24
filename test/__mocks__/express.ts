@@ -1,13 +1,15 @@
+import { EventEmitter } from 'events'
+
 const express = jest.requireActual('express')
 
 express.application.listen = jest.fn(() => {
-  // no ops
-})
+  const serverMock = Object.assign(new EventEmitter(), {
+    close: (callback) => callback(),
+  })
 
-express.application.listen.mockReturnValue({
-  on: (_, callback) => {
-    callback()
-  },
+  setTimeout(() => serverMock.emit('listening'), 0)
+
+  return serverMock
 })
 
 module.exports = express

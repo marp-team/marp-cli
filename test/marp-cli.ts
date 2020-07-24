@@ -11,14 +11,29 @@ import { Converter, ConvertType } from '../src/converter'
 import { ResolvedEngine } from '../src/engine'
 import { CLIError } from '../src/error'
 import { File } from '../src/file'
-import marpCli from '../src/marp-cli' // eslint-disable-line import/no-named-as-default
+import {
+  ObservationHelper,
+  cliInterface as marpCli,
+  waitForObservation,
+} from '../src/marp-cli'
 import { Preview } from '../src/preview'
 import { Server } from '../src/server'
 import { ThemeSet } from '../src/theme'
 import * as version from '../src/version'
 import { Watcher } from '../src/watcher'
 
+const observationHelpers: ObservationHelper[] = []
 const previewEmitter = new EventEmitter() as Preview
+
+const runForObservation = async (argv: string[]) => {
+  const ret = await Promise.race([marpCli(argv), waitForObservation()])
+
+  if (typeof ret !== 'object')
+    throw new Error('runForObservation should observe')
+
+  observationHelpers.push(ret)
+  return ret
+}
 
 jest.mock('fs')
 jest.mock('mkdirp')
@@ -33,6 +48,12 @@ beforeEach(() => {
 })
 
 afterEach(() => {
+  let observationHelper: ObservationHelper | undefined
+
+  while ((observationHelper = observationHelpers.shift())) {
+    observationHelper.stop()
+  }
+
   jest.restoreAllMocks()
   jest.clearAllMocks()
 })
@@ -278,7 +299,7 @@ describe('Marp CLI', () => {
         const serverStart = jest.spyOn<any, any>(Server.prototype, 'start')
         serverStart.mockResolvedValue(0)
 
-        await marpCli(['--input-dir', files, '--server'])
+        await runForObservation(['--input-dir', files, '--server'])
         expect(info.mock.calls.map(([m]) => m)).toContainEqual(
           expect.stringContaining('http://localhost:8080/')
         )
@@ -293,7 +314,7 @@ describe('Marp CLI', () => {
 
       describe('with --preview option', () => {
         const run = () =>
-          marpCli(['--input-dir', files, '--server', '--preview'])
+          runForObservation(['--input-dir', files, '--server', '--preview'])
 
         beforeEach(() => {
           jest.spyOn(cli, 'info').mockImplementation()
@@ -626,7 +647,7 @@ describe('Marp CLI', () => {
         jest.spyOn(cli, 'info').mockImplementation()
         ;(<any>fs).__mockWriteFile()
 
-        expect(await marpCli([onePath, '-w'])).toBe(0)
+        await runForObservation([onePath, '-w'])
         expect(Watcher.watch).toHaveBeenCalledWith([onePath], expect.anything())
       })
     })
@@ -728,7 +749,7 @@ describe('Marp CLI', () => {
       )
 
       it('opens preview window through Preview.open()', async () => {
-        await marpCli([onePath, '-p', '--no-output'])
+        await runForObservation([onePath, '-p', '--no-output'])
         expect(Preview.prototype.open).toHaveBeenCalledTimes(1)
 
         // Simualte opening event
@@ -740,7 +761,7 @@ describe('Marp CLI', () => {
 
       describe('when PPTX conversion is enabled', () => {
         it('does not open PPTX in preview window', async () => {
-          await marpCli([onePath, '-p', '--pptx', '--no-output'])
+          await runForObservation([onePath, '-p', '--pptx', '--no-output'])
           expect(Preview.prototype.open).not.toHaveBeenCalled()
         }, 30000)
       })
@@ -814,7 +835,7 @@ describe('Marp CLI', () => {
         const serverStart = jest.spyOn<any, any>(Server.prototype, 'start')
         serverStart.mockResolvedValue(0)
 
-        await marpCli(['--server', assetFn('_files')])
+        await runForObservation(['--server', assetFn('_files')])
         expect(serverStart).toHaveBeenCalledTimes(1)
 
         const server: any = serverStart.mock.instances[0]
@@ -827,7 +848,7 @@ describe('Marp CLI', () => {
         it('opens served address through Preview.open()', async () => {
           jest.spyOn(console, 'warn').mockImplementation()
 
-          await marpCli(['--server', assetFn('_files'), '--preview'])
+          await runForObservation(['--server', assetFn('_files'), '--preview'])
           expect(Preview.prototype.open).toHaveBeenCalledTimes(1)
           expect(Preview.prototype.open).toHaveBeenCalledWith(
             expect.stringMatching(/^http:\/\/localhost:/)
@@ -855,7 +876,7 @@ describe('Marp CLI', () => {
       it('opens 2 preview windows through Preview.open()', async () => {
         jest.spyOn(console, 'warn').mockImplementation()
 
-        await marpCli([...baseArgs, '--preview', '--no-output'])
+        await runForObservation([...baseArgs, '--preview', '--no-output'])
         expect(Preview.prototype.open).toHaveBeenCalledTimes(2)
       })
     })
