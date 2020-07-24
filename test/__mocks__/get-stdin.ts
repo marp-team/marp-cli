@@ -1,3 +1,3 @@
 module.exports = {
-  buffer: () => Promise.resolve(''),
+  buffer: jest.fn().mockResolvedValue(''),
 }

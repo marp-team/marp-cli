@@ -4,7 +4,7 @@ import { nanoid } from 'nanoid'
 import puppeteer from 'puppeteer-core'
 import favicon from './assets/favicon.png'
 import { ConvertType, mimeTypes } from './converter'
-import { CLIError } from './error'
+import { error } from './error'
 import { File, FileType } from './file'
 import {
   generatePuppeteerDataDirPath,
@@ -188,5 +188,5 @@ export function fileToURI(file: File, type: ConvertType) {
     return `data:${mimeTypes[type]};base64,${file.buffer.toString('base64')}`
   }
 
-  throw new CLIError('Processing file is not convertible to URI for preview.')
+  error('Processing file is not convertible to URI for preview.')
 }

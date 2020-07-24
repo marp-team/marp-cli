@@ -1,5 +1,6 @@
 /* eslint-disable import/export, @typescript-eslint/no-namespace */
 import fs from 'fs'
+import { Server as HttpServer } from 'http'
 import path from 'path'
 import querystring from 'querystring'
 import url from 'url'
@@ -13,7 +14,7 @@ import {
   ConvertType,
   mimeTypes,
 } from './converter'
-import { error, CLIError } from './error'
+import { CLIError, CLIErrorCode, error } from './error'
 import { File, markdownExtensions } from './file'
 import serverIndex from './server/index.pug'
 import style from './server/index.scss'
@@ -29,6 +30,7 @@ export class Server extends TypedEventEmitter<Server.Events> {
   readonly port: number
 
   directoryIndex: string[]
+  httpServer: HttpServer | undefined
   server: Express | undefined
 
   private static script: string | undefined
@@ -50,19 +52,39 @@ export class Server extends TypedEventEmitter<Server.Events> {
     this.setup()
 
     return new Promise<void>((res, rej) => {
-      const httpServer = this.server!.listen(this.port) // eslint-disable-line @typescript-eslint/no-non-null-assertion
+      this.httpServer = this.server!.listen(this.port) // eslint-disable-line @typescript-eslint/no-non-null-assertion
 
-      httpServer.on('listening', res)
-      httpServer.on('error', (err) => {
-        httpServer.close()
+      this.httpServer.on('listening', res)
+      this.httpServer.on('error', (err) =>
+        (async () => {
+          await this.stop()
 
-        if (err['code'] === 'EADDRINUSE') {
-          rej(new CLIError(err.message))
-        } else {
-          rej(err)
-        }
-      })
+          if (err['code'] === 'EADDRINUSE') {
+            rej(
+              new CLIError(
+                `Listen port ${this.port} is already used in the other process. Try again after closing the relevant process, or specify another port number through PORT env.`,
+                CLIErrorCode.LISTEN_PORT_IS_ALREADY_USED
+              )
+            )
+          } else {
+            rej(err)
+          }
+        })()
+      )
     })
+  }
+
+  async stop() {
+    if (this.httpServer) {
+      try {
+        await promisify(this.httpServer.close.bind(this.httpServer))()
+      } catch (e) {
+        if (e instanceof Error && e['code'] !== 'ERR_SERVER_NOT_RUNNING')
+          throw e
+      }
+
+      this.httpServer = undefined
+    }
   }
 
   private async convertMarkdown(

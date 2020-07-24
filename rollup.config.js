@@ -14,6 +14,8 @@ import pugPlugin from 'rollup-plugin-pug'
 import { terser } from 'rollup-plugin-terser'
 import { dependencies } from './package.json'
 
+const compact = !process.env.ROLLUP_WATCH
+
 const external = (deps) => (id) =>
   deps.some((dep) => dep === id || id.startsWith(`${dep}/`))
 
@@ -40,7 +42,10 @@ const plugins = (opts = {}) => [
   }),
   pugPlugin({ pugRuntime: 'pug-runtime' }),
   url({ sourceDir: path.join(__dirname, 'lib') }),
-  !process.env.ROLLUP_WATCH && terser(),
+  compact &&
+    terser({
+      keep_classnames: /^CLIError$/,
+    }),
 ]
 
 const browser = {
@@ -57,21 +62,21 @@ export default [
   {
     ...browser,
     input: 'src/templates/bespoke.js',
-    output: { file: 'lib/bespoke.js', format: 'iife' },
+    output: { compact, file: 'lib/bespoke.js', format: 'iife' },
   },
   {
     ...browser,
     input: 'src/templates/watch.js',
-    output: { file: 'lib/watch.js', format: 'iife' },
+    output: { compact, file: 'lib/watch.js', format: 'iife' },
   },
   {
     ...browser,
     input: 'src/server/server-index.js',
-    output: { file: 'lib/server/server-index.js', format: 'iife' },
+    output: { compact, file: 'lib/server/server-index.js', format: 'iife' },
   },
   {
     ...cli,
-    input: 'src/marp-cli.ts',
-    output: { exports: 'named', file: 'lib/marp-cli.js', format: 'cjs' },
+    input: ['src/marp-cli.ts', 'src/index.ts'],
+    output: { compact, dir: 'lib', exports: 'named', format: 'cjs' },
   },
 ]

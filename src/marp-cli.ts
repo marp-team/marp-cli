@@ -20,13 +20,26 @@ enum OptionGroup {
   Marp = 'Marp / Marpit Options:',
 }
 
+export interface MarpCLIInternalOptions {
+  stdin: boolean
+  throwErrorAlways: boolean
+}
+
+export type ObservationHelper = { stop: () => void }
+
+const resolversForObservation: Array<(helper: ObservationHelper) => void> = []
+
 const usage = `
 Usage:
   marp [options] <files...>
   marp [options] -I <dir>
 `.trim()
 
-export default async function (argv: string[] = []): Promise<number> {
+export const marpCli = async (
+  argv: string[],
+  { stdin: defaultStdin, throwErrorAlways }: MarpCLIInternalOptions
+): Promise<number> => {
+  let server: Server | undefined
   let watcherInstance: Watcher | undefined
 
   try {
@@ -86,7 +99,7 @@ export default async function (argv: string[] = []): Promise<number> {
           type: 'boolean',
         },
         stdin: {
-          default: true,
+          default: defaultStdin,
           describe: 'Read Markdown from stdin',
           hidden: true, // It is an escape-hatch for advanced user
           group: OptionGroup.Basic,
@@ -273,73 +286,105 @@ export default async function (argv: string[] = []): Promise<number> {
 
     // Watch mode / Server mode
     if (cvtOpts.watch) {
-      watcherInstance = watcher(
-        [
-          ...(cvtOpts.inputDir ? [cvtOpts.inputDir] : config.files),
-          ...cvtOpts.themeSet.fnForWatch,
-        ],
-        {
-          converter,
-          finder,
-          events: {
-            onConverted,
-            onError: (e) =>
-              cli.error(`Failed converting Markdown. (${e.message})`),
-          },
-          mode: cvtOpts.server
-            ? Watcher.WatchMode.Notify
-            : Watcher.WatchMode.Convert,
-        }
-      )
+      return await new Promise<number>((res, rej) =>
+        (async () => {
+          watcherInstance = watcher(
+            [
+              ...(cvtOpts.inputDir ? [cvtOpts.inputDir] : config.files),
+              ...cvtOpts.themeSet.fnForWatch,
+            ],
+            {
+              converter,
+              finder,
+              events: {
+                onConverted,
+                onError: (e) =>
+                  cli.error(`Failed converting Markdown. (${e.message})`),
+              },
+              mode: cvtOpts.server
+                ? Watcher.WatchMode.Notify
+                : Watcher.WatchMode.Convert,
+            }
+          )
 
-      // Preview window
-      const preview = new Preview()
-      preview.on('exit', () => process.exit())
-      preview.on('opening', (location: string) => {
-        const loc = location.substr(0, 50)
-        const msg = `[Preview] (EXPERIMENTAL) Opening ${loc}...`
-        cli.info(chalk.cyan(msg))
-      })
+          // Preview window
+          const preview = new Preview()
+          preview.on('exit', () => res(0))
+          preview.on('opening', (location: string) => {
+            const loc = location.substr(0, 50)
+            const msg = `[Preview] (EXPERIMENTAL) Opening ${loc}...`
+            cli.info(chalk.cyan(msg))
+          })
 
-      if (cvtOpts.server) {
-        const server = new Server(converter, {
-          directoryIndex: ['index.md', 'PITCHME.md'], // GitPitch compatible
-        })
-        server.on('converted', onConverted)
-        server.on('error', (e) => cli.error(e.toString()))
+          if (cvtOpts.server) {
+            server = new Server(converter, {
+              directoryIndex: ['index.md', 'PITCHME.md'], // GitPitch compatible
+            })
+            server.on('converted', onConverted)
+            server.on('error', (e) => cli.error(e.toString()))
 
-        await server.start()
+            await server.start()
 
-        const url = `http://localhost:${server.port}`
-        const message = `[Server mode] Start server listened at ${url}/ ...`
+            const url = `http://localhost:${server.port}`
+            const message = `[Server mode] Start server listened at ${url}/ ...`
 
-        cli.info(chalk.green(message))
-        if (cvtOpts.preview) await preview.open(url)
-      } else {
-        cli.info(chalk.green('[Watch mode] Start watching...'))
+            cli.info(chalk.green(message))
+            if (cvtOpts.preview) await preview.open(url)
+          } else {
+            cli.info(chalk.green('[Watch mode] Start watching...'))
 
-        if (cvtOpts.preview) {
-          for (const file of convertedFiles) {
-            if (cvtOpts.type === ConvertType.pptx) continue
-            await preview.open(fileToURI(file, cvtOpts.type))
+            if (cvtOpts.preview) {
+              for (const file of convertedFiles) {
+                if (cvtOpts.type === ConvertType.pptx) continue
+                await preview.open(fileToURI(file, cvtOpts.type))
+              }
+            }
           }
-        }
-      }
+
+          let resolverForObservation:
+            | ((helper: ObservationHelper) => void)
+            | undefined
+
+          while ((resolverForObservation = resolversForObservation.shift())) {
+            resolverForObservation({ stop: () => res(0) })
+          }
+        })().catch(rej)
+      )
     }
 
     return 0
   } catch (e) {
-    if (!(e instanceof CLIError)) throw e
+    if (throwErrorAlways || !(e instanceof CLIError)) throw e
 
     cli.error(e.message)
 
-    // Stop running notifier and watcher to exit process correctly
-    // (NOTE: Don't close in the finally block to keep watching)
-    notifier.stop()
-    if (watcherInstance) watcherInstance.chokidar.close()
-
     return e.errorCode
   } finally {
-    await Converter.closeBrowser()
+    notifier.stop()
+
+    await Promise.all([
+      Converter.closeBrowser(),
+      server?.stop(),
+      watcherInstance?.chokidar.close(),
+    ])
   }
 }
+
+export const waitForObservation = () =>
+  new Promise<ObservationHelper>((res) => {
+    resolversForObservation.push(res)
+  })
+
+export const apiInterface = async (argv: string[] = []) =>
+  marpCli(argv, {
+    stdin: false,
+    throwErrorAlways: true,
+  })
+
+export const cliInterface = (argv: string[] = []) =>
+  marpCli(argv, {
+    stdin: true,
+    throwErrorAlways: false,
+  })
+
+export default cliInterface

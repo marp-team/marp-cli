@@ -2,7 +2,7 @@ import path from 'path'
 import { Marpit } from '@marp-team/marpit'
 import importFrom from 'import-from'
 import pkgUp from 'pkg-up'
-import { CLIError } from './error'
+import { error } from './error'
 
 export type Engine = typeof Marpit
 export type ResolvableEngine = Engine | string
@@ -41,7 +41,7 @@ export class ResolvedEngine {
       return resolved
     })
 
-    if (!resolved) throw new CLIError(`The specified engine has not resolved.`)
+    if (!resolved) error(`The specified engine has not resolved.`)
     return resolved
   }
 
