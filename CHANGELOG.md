@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Added info about [Chocolatey](https://chocolatey.org/packages/marp-cli) and [Scoop](https://github.com/ScoopInstaller/Main/blob/master/bucket/marp.json) packages into Readme ([#263](https://github.com/marp-team/marp-cli/pull/263) by [@zverev-iv](https://github.com/zverev-iv))
+
 ### Fixed
 
 - Fix invalid permission flag in package script ([#256](https://github.com/marp-team/marp-cli/issues/256), [#257](https://github.com/marp-team/marp-cli/pull/257))
