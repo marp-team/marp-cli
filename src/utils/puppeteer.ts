@@ -1,4 +1,5 @@
-import { exec } from 'child_process'
+import { execFile } from 'child_process'
+import { readFileSync } from 'fs'
 import os from 'os'
 import path from 'path'
 import { promisify } from 'util'
@@ -6,20 +7,34 @@ import { Launcher } from 'chrome-launcher'
 import { warn } from '../cli'
 import { CLIErrorCode, error } from '../error'
 
-const execPromise = promisify(exec)
+const execFilePromise = promisify(execFile)
 
 let executablePath: string | undefined | false = false
-let isWsl: boolean | undefined
+let isWsl: number | undefined
 let wslTmp: string | undefined
 
-export function isWSL(): boolean {
+export function isWSL(): number {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  if (isWsl === undefined) isWsl = require('is-wsl') as boolean
+  if (isWsl === undefined) {
+    if (require('is-wsl')) {
+      isWsl = 1
+
+      try {
+        // https://github.com/microsoft/WSL/issues/423#issuecomment-611086412
+        const release = readFileSync('/proc/sys/kernel/osrelease').toString()
+        if (release.includes('WSL2')) isWsl = 2
+      } catch (e) {
+        // no ops
+      }
+    } else {
+      isWsl = 0
+    }
+  }
   return isWsl
 }
 
 export const resolveWSLPath = async (path: string): Promise<string> =>
-  (await execPromise(`wslpath -m ${path.replace(/\\/g, '\\\\')}`)).stdout.trim()
+  (await execFilePromise('wslpath', ['-m', path])).stdout.trim()
 
 export const generatePuppeteerDataDirPath = async (
   name: string
@@ -28,7 +43,7 @@ export const generatePuppeteerDataDirPath = async (
     // In WSL environment, Marp CLI will use Chrome on Windows. Thus, we have to
     // specify Windows path when converting within WSL.
     if (wslTmp === undefined) {
-      const tmpRet = (await execPromise('cmd.exe /c SET TMP')).stdout.trim()
+      const tmpRet = (await execFilePromise('cmd.exe', ['/c', 'SET', 'TMP'])).stdout.trim()
       if (tmpRet.startsWith('TMP=')) wslTmp = tmpRet.slice(4)
     }
     if (wslTmp !== undefined) {
@@ -73,7 +88,7 @@ export const generatePuppeteerLaunchArgs = () => {
   return {
     executablePath,
     args: [...args],
-    pipe: true,
+    pipe: !isWSL(),
 
     // Workaround to avoid force-extensions policy for Chrome enterprise (SET CHROME_ENABLE_EXTENSIONS=1)
     // https://github.com/puppeteer/puppeteer/blob/master/docs/troubleshooting.md#chrome-headless-doesnt-launch-on-windows
