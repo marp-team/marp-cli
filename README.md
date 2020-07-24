@@ -80,6 +80,22 @@ Do you never want to install any dependent tools? we also provide executable bin
 
 **[:fast_forward: Download the latest standalone binary for your OS from release page.](https://github.com/marp-team/marp-cli/releases)**
 
+### Chocolatey (Windows)
+
+You can use [Chocolatey](https://chocolatey.org/):
+
+```sh
+choco install marp-cli
+```
+
+### Scoop (Windows)
+
+You can use [scoop](https://scoop.sh/):
+
+```sh
+scoop install marp
+```
+
 ## Basic usage
 
 ### Convert to HTML
