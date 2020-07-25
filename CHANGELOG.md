@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v0.20.0 - 2020-07-25
+
 ### Added
 
 - Make public improved API interface for Node.js ([#260](https://github.com/marp-team/marp-cli/pull/260))
