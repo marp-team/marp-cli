@@ -12,6 +12,10 @@
 - Fix invalid permission flag in package script ([#256](https://github.com/marp-team/marp-cli/issues/256), [#257](https://github.com/marp-team/marp-cli/pull/257))
 - Get more reliability of connection from Puppeteer to Chrome by using pipe rather than WebSocket ([#259](https://github.com/marp-team/marp-cli/pull/259), [#264](https://github.com/marp-team/marp-cli/pull/264))
 
+### Changed
+
+- Upgrade dependent packages to the latest version ([#265](https://github.com/marp-team/marp-cli/pull/265))
+
 ## v0.19.0 - 2020-07-18
 
 ### Added
