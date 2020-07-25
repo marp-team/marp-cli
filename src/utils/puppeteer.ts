@@ -14,7 +14,6 @@ let isWsl: number | undefined
 let wslTmp: string | undefined
 
 export function isWSL(): number {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
   if (isWsl === undefined) {
     if (require('is-wsl')) {
       isWsl = 1
