@@ -43,7 +43,9 @@ export const generatePuppeteerDataDirPath = async (
     // In WSL environment, Marp CLI will use Chrome on Windows. Thus, we have to
     // specify Windows path when converting within WSL.
     if (wslTmp === undefined) {
-      const tmpRet = (await execFilePromise('cmd.exe', ['/c', 'SET', 'TMP'])).stdout.trim()
+      const tmpRet = (
+        await execFilePromise('cmd.exe', ['/c', 'SET', 'TMP'])
+      ).stdout.trim()
       if (tmpRet.startsWith('TMP=')) wslTmp = tmpRet.slice(4)
     }
     if (wslTmp !== undefined) {
