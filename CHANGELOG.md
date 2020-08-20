@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Upgrade Marp Core to [v1.3.0](https://github.com/marp-team/marp-core/releases/tag/v1.3.0) ([#271](https://github.com/marp-team/marp-cli/pull/271))
+- Improve PDF accessibility by enabling `--export-tagged-pdf` Chromium option ([#269](https://github.com/marp-team/marp-cli/pull/269))
+
 ## v0.20.0 - 2020-07-25
 
 ### Added
