@@ -547,29 +547,29 @@
     "@types/yargs" "^15.0.0"
     chalk "^4.0.0"
 
-"@marp-team/marp-core@^1.2.2":
-  version "1.2.2"
-  resolved "https://registry.yarnpkg.com/@marp-team/marp-core/-/marp-core-1.2.2.tgz#51980401e999c7bd7f626d3f9fe5833e6b0a3d2c"
-  integrity sha512-7F/Gkq6ob83yeIDnFTlJVCKD23byd6fxEifOfMG5t4LS2CZw1oSI0jwPbuvJxYMBxZxKXzJ5eW7/I4tfqLjjDA==
+"@marp-team/marp-core@^1.3.0":
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/@marp-team/marp-core/-/marp-core-1.3.0.tgz#c4ab1304e21a858060bdcef307457414bdcf33a3"
+  integrity sha512-mwB7WhdIk+5XhUR+mpkGSy7umN8OrHUp0lR/AGELDJ1n/L0x/uRtKJaFyDptklRb6HLh5aabMl7hPLjsV72tlw==
   dependencies:
     "@marp-team/marpit" "^1.6.2"
-    "@marp-team/marpit-svg-polyfill" "^1.5.0"
+    "@marp-team/marpit-svg-polyfill" "^1.7.0"
     emoji-regex "^9.0.0"
-    highlight.js "^10.1.1"
-    katex "^0.11.1"
+    highlight.js "^10.1.2"
+    katex "^0.12.0"
     markdown-it-emoji "^1.4.0"
     mathjax-full "^3.0.5"
     postcss "^7.0.32"
     postcss-minify-params "^4.0.2"
     postcss-minify-selectors "^4.0.2"
     postcss-normalize-whitespace "^4.0.2"
-    twemoji "^13.0.0"
-    xss "^1.0.7"
+    twemoji "^13.0.1"
+    xss "^1.0.8"
 
-"@marp-team/marpit-svg-polyfill@^1.5.0":
-  version "1.5.0"
-  resolved "https://registry.yarnpkg.com/@marp-team/marpit-svg-polyfill/-/marpit-svg-polyfill-1.5.0.tgz#420db83762914e2dd0f0019300e2ba703deed0a0"
-  integrity sha512-1JksTIO/Kq3D2FxfoJaBs0Qcq/gvzQqGyEiVNJY+4NfOtUhkGzYyMfGa0ESAkfRCyFZqjrF3WinK+ZILppbJEA==
+"@marp-team/marpit-svg-polyfill@^1.7.0":
+  version "1.7.0"
+  resolved "https://registry.yarnpkg.com/@marp-team/marpit-svg-polyfill/-/marpit-svg-polyfill-1.7.0.tgz#cd4e26f2a66d487bb79db7ea5c651d21e7561d07"
+  integrity sha512-zgxLmO6ndj7DjYQqJ7i5Re62hkHFdx2j5xMa1plKeU3nmmpldXC4iBPTEuw2K/T3RBbgq9Dm2JViThKZSFbAMQ==
 
 "@marp-team/marpit@^1.6.2":
   version "1.6.2"
@@ -3605,7 +3605,7 @@ hex-color-regex@^1.1.0:
   resolved "https://registry.yarnpkg.com/hex-color-regex/-/hex-color-regex-1.1.0.tgz#4c06fccb4602fe2602b3c93df82d7e7dbf1a8a8e"
   integrity sha512-l9sfDFsuqtOqKDsQdqrMRk0U85RZc0RtOR9yPI7mRVOa4FsR/BVnZ0shmQRM96Ji99kYZP/7hn1cedc1+ApsTQ==
 
-highlight.js@^10.1.1:
+highlight.js@^10.1.2:
   version "10.1.2"
   resolved "https://registry.yarnpkg.com/highlight.js/-/highlight.js-10.1.2.tgz#c20db951ba1c22c055010648dfffd7b2a968e00c"
   integrity sha512-Q39v/Mn5mfBlMff9r+zzA+gWxRsCRKwEMvYTiisLr/XUiFI/4puWt0Ojdko3R3JCNWGdOWaA5g/Yxqa23kC5AA==
@@ -4976,10 +4976,10 @@ jszip@^3.4.0:
     readable-stream "~2.3.6"
     set-immediate-shim "~1.0.1"
 
-katex@^0.11.1:
-  version "0.11.1"
-  resolved "https://registry.yarnpkg.com/katex/-/katex-0.11.1.tgz#df30ca40c565c9df01a466a00d53e079e84ffaa2"
-  integrity sha512-5oANDICCTX0NqYIyAiFCCwjQ7ERu3DQG2JFHLbYOf+fXaMoH8eg/zOq5WSYJsKMi/QebW+Eh3gSM+oss1H/bww==
+katex@^0.12.0:
+  version "0.12.0"
+  resolved "https://registry.yarnpkg.com/katex/-/katex-0.12.0.tgz#2fb1c665dbd2b043edcf8a1f5c555f46beaa0cb9"
+  integrity sha512-y+8btoc/CK70XqcHqjxiGWBOeIL8upbS0peTPXTvgrh21n1RiWWcIpSWM+4uXq+IAgNh9YYQWdc7LVDPDAEEAg==
   dependencies:
     commander "^2.19.0"
 
@@ -8426,7 +8426,7 @@ twemoji-parser@13.0.0:
   resolved "https://registry.yarnpkg.com/twemoji-parser/-/twemoji-parser-13.0.0.tgz#bd9d1b98474f1651dc174696b45cabefdfa405af"
   integrity sha512-zMaGdskpH8yKjT2RSE/HwE340R4Fm+fbie4AaqjDa4H/l07YUmAvxkSfNl6awVWNRRQ0zdzLQ8SAJZuY5MgstQ==
 
-twemoji@^13.0.0:
+twemoji@^13.0.1:
   version "13.0.1"
   resolved "https://registry.yarnpkg.com/twemoji/-/twemoji-13.0.1.tgz#57ddc8bd86c8175c11376f5f9ab322a02e739c2d"
   integrity sha512-mrTBq+XpCLM4zm76NJOjLHoQNV9mHdBt3Cba/T5lS1rxn8ArwpqE47mqTocupNlkvcLxoeZJjYSUW0DU5ZwqZg==
@@ -8981,10 +8981,10 @@ xmldom-sre@^0.1.31:
   resolved "https://registry.yarnpkg.com/xmldom-sre/-/xmldom-sre-0.1.31.tgz#10860d5bab2c603144597d04bf2c4980e98067f4"
   integrity sha512-f9s+fUkX04BxQf+7mMWAp5zk61pciie+fFLC9hX9UVvCeJQfNHRHXpeo5MPcR0EUf57PYLdt+ZO4f3Ipk2oZUw==
 
-xss@^1.0.7:
-  version "1.0.7"
-  resolved "https://registry.yarnpkg.com/xss/-/xss-1.0.7.tgz#a554cbd5e909324bd6893fb47fff441ad54e2a95"
-  integrity sha512-A9v7tblGvxu8TWXQC9rlpW96a+LN1lyw6wyhpTmmGW+FwRMactchBR3ROKSi33UPCUcUHSu8s9YP6F+K3Mw//w==
+xss@^1.0.8:
+  version "1.0.8"
+  resolved "https://registry.yarnpkg.com/xss/-/xss-1.0.8.tgz#32feb87feb74b3dcd3d404b7a68ababf10700535"
+  integrity sha512-3MgPdaXV8rfQ/pNn16Eio6VXYPTkqwa0vc7GkiymmY/DqR1SE/7VPAAVZz1GJsJFrllMYO3RHfEaiUGjab6TNw==
   dependencies:
     commander "^2.20.3"
     cssfilter "0.0.10"
