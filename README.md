@@ -411,7 +411,9 @@ module.exports = {
 }
 ```
 
-By default we use configuration file that is placed on current directory, but you may also specify the for configuration file by `--config-file` option (`-c`).
+By default we use configuration file that is placed on current directory, but you may also specify the path for a configuration file by `--config-file` (`--config` / `-c`) option.
+
+If you want to prevent looking up a configuration file, you can pass `--no-config-file` (`--no-config`) option.
 
 ### Options
 
