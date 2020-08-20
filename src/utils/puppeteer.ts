@@ -55,7 +55,7 @@ export const generatePuppeteerDataDirPath = async (
 }
 
 export const generatePuppeteerLaunchArgs = () => {
-  const args = new Set<string>()
+  const args = new Set<string>(['--export-tagged-pdf'])
 
   // Docker environment and WSL environment need to disable sandbox. :(
   if (process.env.IS_DOCKER || isWSL()) args.add('--no-sandbox')
