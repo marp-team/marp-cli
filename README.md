@@ -74,27 +74,22 @@ You can install with `-g` option if you want to use `marp` command globally.
 npm install -g @marp-team/marp-cli
 ```
 
-### Standalone binary _(EXPERIMENTAL)_
+### [Standalone binary][releases]
 
-Do you never want to install any dependent tools? we also provide executable binaries for Linux, macOS, and Windows.
+Do you never want to install any dependent tools? We also provide executable binaries for Linux, macOS, and Windows.
 
-**[:fast_forward: Download the latest standalone binary for your OS from release page.](https://github.com/marp-team/marp-cli/releases)**
+**[:fast_forward: Download the latest standalone binary from release page.][releases]**
 
-#### [Chocolatey](https://chocolatey.org/packages/marp-cli) (Windows)
+Also you can use the package manager to install/update Marp CLI standalone binary.
 
-You can use [Chocolatey](https://chocolatey.org/):
+#### Windows
 
-```sh
-choco install marp-cli
-```
+- **[Chocolatey](https://chocolatey.org/)**: `choco install marp-cli` ([Refer to the package information...](https://chocolatey.org/packages/marp-cli))
+- **[Scoop](https://scoop.sh/)**: `scoop install marp` ([Refer to the manifest in official Main bucket...](https://github.com/ScoopInstaller/Main/blob/master/bucket/marp.json))
 
-#### [Scoop](https://github.com/ScoopInstaller/Main/blob/master/bucket/marp.json) (Windows)
+> _Disclaimer: These packages and manifests are maintained by the others, not Marp team._
 
-You can use [Scoop](https://scoop.sh/):
-
-```sh
-scoop install marp
-```
+[releases]: https://github.com/marp-team/marp-cli/releases
 
 ## Basic usage
 
