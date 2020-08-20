@@ -24,7 +24,7 @@ interface IMarpCLIArguments {
     osc?: boolean
     progress?: boolean
   }
-  configFile?: string
+  configFile?: string | false
   description?: string
   engine?: string
   html?: boolean
@@ -63,13 +63,13 @@ export class MarpCLIConfig {
   confPath?: string
   engine!: ResolvedEngine
 
-  static moduleName = 'marp'
+  static moduleName = 'marp' as const
 
   static async fromArguments(args: IMarpCLIArguments) {
     const conf = new MarpCLIConfig()
     conf.args = args
 
-    await conf.loadConf(args.configFile)
+    if (args.configFile !== false) await conf.loadConf(args.configFile)
 
     conf.engine = await (() => {
       if (conf.args.engine) return resolveEngine(conf.args.engine)
