@@ -202,7 +202,7 @@ Server mode supports on-demand conversion by HTTP request. We require to pass `-
   <img src="https://raw.githubusercontent.com/marp-team/marp-cli/master/docs/images/server-mode.gif" />
 </p>
 
-In this mode, the converted file outputs as the result of accessing to server, and not to disk.
+In this mode, the converted file outputs as the result of accessing to server, and not to disk. You can set the server port by setting the environment variable `PORT`, for example `PORT=5000 marp -s ./slides` would listen on port number 5000.
 
 You would get the converted PDF, PPTX, PNG, and JPEG by adding corresponded query string when requesting. e.g. `http://localhost:8080/deck-a.md?pdf` returns converted PDF.
 
