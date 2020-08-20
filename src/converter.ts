@@ -291,6 +291,11 @@ export class Converter {
     })
     pptx.layout = layoutName
 
+    // TODO: Revert the workaround for regression about custom layout in PptxGenJS v3.3.0
+    // https://github.com/gitbrent/PptxGenJS/issues/826
+    pptx.presLayout['width'] = pptx.presLayout['_sizeW']
+    pptx.presLayout['height'] = pptx.presLayout['_sizeH']
+
     if (tpl.rendered.title) pptx.title = tpl.rendered.title
     if (tpl.rendered.description) pptx.subject = tpl.rendered.description
 
@@ -300,14 +305,9 @@ export class Converter {
       page += 1
 
       const slide = pptx.addSlide()
-
-      slide.addImage({
+      slide.background = {
         data: `data:image/png;base64,${imageFile.buffer!.toString('base64')}`,
-      })
-
-      const [img] = slide['relsMedia']
-      slide['bkgdImgRid'] = img.rId
-      slide['data'] = []
+      }
 
       const notes = tpl.rendered.comments[page - 1].join('\n\n')
       if (notes) slide.addNotes(notes)
