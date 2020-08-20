@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v0.21.0 - 2020-08-20
+
 ### Added
 
 - Handle `--no-config-file` (`--no-config`) option to prevent looking up for a configuration file ([#274](https://github.com/marp-team/marp-cli/pull/274))
