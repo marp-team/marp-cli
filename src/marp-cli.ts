@@ -74,10 +74,16 @@ export const marpCli = async (
           type: 'string',
         },
         'config-file': {
-          alias: 'c',
-          describe: 'Specify path to configuration file',
+          alias: ['config', 'c'],
+          describe: 'Specify path to a configuration file',
           group: OptionGroup.Basic,
           type: 'string',
+        },
+        'no-config-file': {
+          alias: ['no-config'],
+          type: 'boolean',
+          describe: 'Prevent looking up for a configuration file',
+          group: OptionGroup.Basic,
         },
         watch: {
           alias: 'w',

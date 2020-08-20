@@ -667,6 +667,25 @@ describe('Marp CLI', () => {
         expect(html).toContain('<b>html</b>')
       })
 
+      it('prevents looking up for configuration file if --no-config-file option is passed', async () => {
+        const stdout = jest.spyOn(process.stdout, 'write').mockImplementation()
+
+        for (const opt of ['--no-config-file', '--no-config']) {
+          stdout.mockClear()
+
+          jest.spyOn(console, 'warn').mockImplementation()
+          jest
+            .spyOn(process, 'cwd')
+            .mockImplementation(() => assetFn('_configs/basic/'))
+
+          expect(await marpCli(['md.md', opt, '-o', '-'])).toBe(0)
+
+          // html option in a configuration file should not work
+          const html = stdout.mock.calls[0][0].toString()
+          expect(html).toContain('&lt;b&gt;html&lt;/b&gt;')
+        }
+      })
+
       it('uses marp section in package.json that is found in process.cwd()', async () => {
         const stdout = jest.spyOn(process.stdout, 'write').mockImplementation()
 
@@ -681,7 +700,7 @@ describe('Marp CLI', () => {
         expect(html).toContain('@theme b')
       })
 
-      describe('when --config-file / -c option is passed', () => {
+      describe('when --config-file / --config / -c option is passed', () => {
         it('prints error when specified config is not found', async () => {
           const error = jest.spyOn(console, 'error').mockImplementation()
 
@@ -703,7 +722,7 @@ describe('Marp CLI', () => {
           jest.spyOn(console, 'warn').mockImplementation()
 
           const conf = assetFn('_configs/marpit/config.js')
-          expect(await marpCli(['-c', conf, onePath, '-o', '-'])).toBe(0)
+          expect(await marpCli(['--config', conf, onePath, '-o', '-'])).toBe(0)
 
           const html = stdout.mock.calls[0][0].toString()
           expect(html).toContain('@theme a')
