@@ -377,7 +377,7 @@ Marp CLI prefers to use _an installed core by user_ than the bundled. If the cur
 
 ## Configuration file
 
-Marp CLI can be configured options with file, such as `marp.config.js`, `.marprc` (JSON / YAML), and `marp` section of `package.json`. It is useful to configure settings for the whole of project.
+Marp CLI can be configured options with file, such as `marp.config.js`, `marp.config.cjs`, `.marprc` (JSON / YAML), and `marp` section of `package.json`. It is useful to configure settings for the whole of project.
 
 ```javascript
 // package.json

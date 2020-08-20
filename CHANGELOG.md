@@ -6,6 +6,7 @@
 
 - Handle `--no-config-file` (`--no-config`) option to prevent looking up for a configuration file ([#274](https://github.com/marp-team/marp-cli/pull/274))
 - `--config` option aliased to `--config-file` ([#274](https://github.com/marp-team/marp-cli/pull/274))
+- Look up a configuration file with `cjs` extension ([#276](https://github.com/marp-team/marp-cli/pull/276))
 - Add port number instructions in readme for server option ([#275](https://github.com/marp-team/marp-cli/pull/275) by [@nuric](https://github.com/nuric))
 
 ### Changed
@@ -13,6 +14,7 @@
 - Upgrade Marp Core to [v1.3.0](https://github.com/marp-team/marp-core/releases/tag/v1.3.0) ([#271](https://github.com/marp-team/marp-cli/pull/271))
 - Improve PDF accessibility by enabling `--export-tagged-pdf` Chromium option ([#269](https://github.com/marp-team/marp-cli/pull/269))
 - Mark standalone binary as stable ([#273](https://github.com/marp-team/marp-cli/pull/273))
+- Upgrade dependent packages to the latest version ([#276](https://github.com/marp-team/marp-cli/pull/276))
 
 ## v0.20.0 - 2020-07-25
 
