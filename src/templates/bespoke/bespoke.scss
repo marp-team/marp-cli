@@ -23,14 +23,20 @@ $progressHeight: 5px;
 
   // Common visibility control for slides
   svg.bespoke-marp-slide {
-    opacity: 0;
-    pointer-events: none;
+    content-visibility: hidden;
     z-index: -1;
 
+    /* Fallback */
+    pointer-events: none;
+    opacity: 0;
+
     &.bespoke-marp-active {
-      opacity: 1;
-      pointer-events: auto;
+      content-visibility: visible;
       z-index: 0;
+
+      /* Fallback */
+      pointer-events: auto;
+      opacity: 1;
 
       &.bespoke-marp-active-ready {
         * {
@@ -40,11 +46,13 @@ $progressHeight: 5px;
       }
     }
 
-    &[data-bespoke-marp-load='hideable'] {
-      display: none;
+    @supports not (content-visibility: hidden) {
+      &[data-bespoke-marp-load='hideable'] {
+        display: none;
 
-      &.bespoke-marp-active {
-        display: block;
+        &.bespoke-marp-active {
+          display: block;
+        }
       }
     }
   }
