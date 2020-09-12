@@ -326,9 +326,11 @@ export class Converter {
     const { prototype } = this.options.engine
     const opts = { ...options, ...mergeOptions, html }
 
-    const engine = prototype?.hasOwnProperty('constructor')
-      ? new this.options.engine(opts)
-      : (<any>this.options.engine)(opts)
+    const engine =
+      prototype &&
+      Object.prototype.hasOwnProperty.call(prototype, 'constructor')
+        ? new this.options.engine(opts)
+        : (<any>this.options.engine)(opts)
 
     if (typeof engine.render !== 'function')
       error('Specified engine has not implemented render() method.')
