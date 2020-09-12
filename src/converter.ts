@@ -294,19 +294,15 @@ export class Converter {
     if (tpl.rendered.title) pptx.title = tpl.rendered.title
     if (tpl.rendered.description) pptx.subject = tpl.rendered.description
 
-    let page = 0
-
-    for (const imageFile of imageFiles) {
-      page += 1
-
+    imageFiles.forEach((imageFile, page) => {
       const slide = pptx.addSlide()
       slide.background = {
         data: `data:image/png;base64,${imageFile.buffer!.toString('base64')}`,
       }
 
-      const notes = tpl.rendered.comments[page - 1].join('\n\n')
+      const notes = tpl.rendered.comments[page].join('\n\n')
       if (notes) slide.addNotes(notes)
-    }
+    })
 
     const ret = file.convert(this.options.output, { extension: 'pptx' })
     ret.buffer = (await pptx.write('nodebuffer')) as Buffer
