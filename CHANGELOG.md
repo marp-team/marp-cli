@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v0.21.1 - 2020-09-12
+
 ### Fixed
 
 - Fix regression in `--allow-local-files` option with Snapd Chromium ([#201](https://github.com/marp-team/marp-cli/issues/201), [#283](https://github.com/marp-team/marp-cli/pull/283))
