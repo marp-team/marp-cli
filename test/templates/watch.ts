@@ -5,7 +5,7 @@ import { Server } from 'ws'
 import watch from '../../src/templates/watch/watch'
 
 beforeEach(() => {
-  delete window.location
+  delete (window as any).location
   ;(window as any).location = { reload: jest.fn() }
 })
 

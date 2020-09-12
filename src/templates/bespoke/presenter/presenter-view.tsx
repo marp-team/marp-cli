@@ -1,7 +1,6 @@
 /** @jsx h */
 import h from 'vhtml'
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const Fragment: any = ({ children }) => h(null, null, ...children)
 
 export const classes = {
