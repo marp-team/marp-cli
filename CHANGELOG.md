@@ -8,6 +8,7 @@
 
 ### Changed
 
+- Use `content-visibility` CSS property in bespoke template ([#277](https://github.com/marp-team/marp-cli/issues/277), [#285](https://github.com/marp-team/marp-cli/pull/285))
 - Upgrade dependent packages to the latest version ([#284](https://github.com/marp-team/marp-cli/pull/284))
 
 ## v0.21.0 - 2020-08-20

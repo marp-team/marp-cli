@@ -8,5 +8,9 @@ plugins:
 rules:
   at-rule-no-unknown:
     - null
+  property-no-unknown:
+    - true
+    - ignoreProperties:
+        - content-visibility
   scss/at-rule-no-unknown:
     - true
