@@ -106,10 +106,9 @@ export class File {
   async saveTmpFile(
     opts: { extension?: string; home?: boolean } = {}
   ): Promise<File.TmpFileInterface> {
-    const tmp: string = await tmpNamePromise({
-      dir: opts.home ? os.homedir() : undefined,
-      postfix: opts.extension,
-    })
+    let tmp: string = await tmpNamePromise({ postfix: opts.extension })
+
+    if (opts.home) tmp = path.join(os.homedir(), path.basename(tmp))
 
     await this.saveToFile(tmp)
 
