@@ -348,60 +348,54 @@ export class Converter {
     baseFile: File,
     processer: (page: puppeteer.Page, uri: string) => Promise<T>
   ) {
-    let tmpFile: File.TmpFileInterface | undefined
+    const tmpFile: File.TmpFileInterface | undefined = await (() => {
+      if (!this.options.allowLocalFiles) return undefined
+
+      warn(
+        `Insecure local file accessing is enabled for conversion from ${baseFile.relativePath()}.`
+      )
+
+      // Snapd Chromium cannot access from sandbox container to user-land `/tmp`
+      // directory so create tmp file to home directory if in Linux.
+      return baseFile.saveTmpFile({
+        home: process.platform === 'linux',
+        extension: '.html',
+      })
+    })()
+
+    const uri = await (async () => {
+      if (tmpFile) {
+        if (isWSL()) return `file:${await resolveWSLPath(tmpFile.path)}`
+        return `file://${tmpFile.path}`
+      }
+      return `data:text/html;base64,${baseFile.buffer!.toString('base64')}`
+    })()
 
     try {
       const browser = await Converter.runBrowser()
-
-      tmpFile = await (() => {
-        if (!this.options.allowLocalFiles) return undefined
-
-        warn(
-          `Insecure local file accessing is enabled for conversion from ${baseFile.relativePath()}.`
-        )
-
-        // Snapd Chromium cannot access from sandbox container to user-land `/tmp`
-        // directory so create tmp file to home directory if executed Chromium was
-        // placed in `/snap`.
-        const home =
-          process.platform === 'linux' &&
-          browser.process()?.spawnfile.startsWith('/snap/')
-
-        return baseFile.saveTmpFile({ home, extension: '.html' })
-      })()
-
-      const uri = await (async () => {
-        if (tmpFile) {
-          if (isWSL()) return `file:${await resolveWSLPath(tmpFile.path)}`
-          return `file://${tmpFile.path}`
-        }
-        return `data:text/html;base64,${baseFile.buffer!.toString('base64')}`
-      })()
-
       const page = await browser.newPage()
-      const {
-        missingFileSet: missingTracker,
-        failedFileSet: failedTracker,
-      } = this.trackFailedLocalFileAccess(page)
+      const { missingFileSet, failedFileSet } = this.trackFailedLocalFileAccess(
+        page
+      )
 
       try {
         return await processer(page, uri)
       } finally {
-        if (missingTracker.size > 0) {
+        if (missingFileSet.size > 0) {
           warn(
-            `${missingTracker.size > 1 ? 'Some of t' : 'T'}he local file${
-              missingTracker.size > 1 ? 's are' : ' is'
+            `${missingFileSet.size > 1 ? 'Some of t' : 'T'}he local file${
+              missingFileSet.size > 1 ? 's are' : ' is'
             } missing and will be ignored. Make sure the file path${
-              missingTracker.size > 1 ? 's are' : ' is'
+              missingFileSet.size > 1 ? 's are' : ' is'
             } correct.`
           )
         }
-        if (failedTracker.size > 0) {
+        if (failedFileSet.size > 0) {
           warn(
             `Marp CLI has detected accessing to local file${
-              failedTracker.size > 1 ? 's' : ''
+              failedFileSet.size > 1 ? 's' : ''
             }. ${
-              failedTracker.size > 1 ? 'They are' : 'That is'
+              failedFileSet.size > 1 ? 'They are' : 'That is'
             } blocked by security reason. Instead we recommend using assets uploaded to online. (Or you can use ${chalk.yellow(
               '--allow-local-files'
             )} option if you are understood of security risk)`
