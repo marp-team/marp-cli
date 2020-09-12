@@ -38,7 +38,7 @@ const runForObservation = async (argv: string[]) => {
 jest.mock('fs')
 jest.mock('mkdirp')
 jest.mock('../src/preview')
-jest.mock('../src/watcher', () => jest.genMockFromModule('../src/watcher'))
+jest.mock('../src/watcher', () => jest.createMockFromModule('../src/watcher'))
 
 beforeEach(() => {
   previewEmitter.removeAllListeners()
