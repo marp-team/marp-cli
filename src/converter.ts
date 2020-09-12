@@ -348,34 +348,36 @@ export class Converter {
     baseFile: File,
     processer: (page: puppeteer.Page, uri: string) => Promise<T>
   ) {
-    const { executablePath } = generatePuppeteerLaunchArgs()
-
-    const tmpFile: File.TmpFileInterface | undefined = await (() => {
-      if (!this.options.allowLocalFiles) return undefined
-
-      warn(
-        `Insecure local file accessing is enabled for conversion from ${baseFile.relativePath()}.`
-      )
-
-      // Snapd Chromium cannot access from sandbox container to user-land `/tmp`
-      // directory so create tmp file to home directory if executed Chromium was
-      // placed in `/snap`.
-      const home =
-        process.platform === 'linux' && executablePath?.startsWith('/snap/')
-
-      return baseFile.saveTmpFile({ home, extension: '.html' })
-    })()
-
-    const uri = await (async () => {
-      if (tmpFile) {
-        if (isWSL()) return `file:${await resolveWSLPath(tmpFile.path)}`
-        return `file://${tmpFile.path}`
-      }
-      return `data:text/html;base64,${baseFile.buffer!.toString('base64')}`
-    })()
+    let tmpFile: File.TmpFileInterface | undefined
 
     try {
       const browser = await Converter.runBrowser()
+
+      tmpFile = await (() => {
+        if (!this.options.allowLocalFiles) return undefined
+
+        warn(
+          `Insecure local file accessing is enabled for conversion from ${baseFile.relativePath()}.`
+        )
+
+        // Snapd Chromium cannot access from sandbox container to user-land `/tmp`
+        // directory so create tmp file to home directory if executed Chromium was
+        // placed in `/snap`.
+        const home =
+          process.platform === 'linux' &&
+          browser.process()?.spawnfile.startsWith('/snap/')
+
+        return baseFile.saveTmpFile({ home, extension: '.html' })
+      })()
+
+      const uri = await (async () => {
+        if (tmpFile) {
+          if (isWSL()) return `file:${await resolveWSLPath(tmpFile.path)}`
+          return `file://${tmpFile.path}`
+        }
+        return `data:text/html;base64,${baseFile.buffer!.toString('base64')}`
+      })()
+
       const page = await browser.newPage()
       const {
         missingFileSet: missingTracker,
