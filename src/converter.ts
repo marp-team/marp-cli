@@ -341,8 +341,6 @@ export class Converter {
     baseFile: File,
     processer: (page: puppeteer.Page, uri: string) => Promise<T>
   ) {
-    const { executablePath } = generatePuppeteerLaunchArgs()
-
     const tmpFile: File.TmpFileInterface | undefined = await (() => {
       if (!this.options.allowLocalFiles) return undefined
 
@@ -351,12 +349,11 @@ export class Converter {
       )
 
       // Snapd Chromium cannot access from sandbox container to user-land `/tmp`
-      // directory so create tmp file to home directory if executed Chromium was
-      // placed in `/snap`.
-      const home =
-        process.platform === 'linux' && executablePath?.startsWith('/snap/')
-
-      return baseFile.saveTmpFile({ home, extension: '.html' })
+      // directory so create tmp file to home directory if in Linux.
+      return baseFile.saveTmpFile({
+        home: process.platform === 'linux',
+        extension: '.html',
+      })
     })()
 
     const uri = await (async () => {
@@ -370,29 +367,28 @@ export class Converter {
     try {
       const browser = await Converter.runBrowser()
       const page = await browser.newPage()
-      const {
-        missingFileSet: missingTracker,
-        failedFileSet: failedTracker,
-      } = this.trackFailedLocalFileAccess(page)
+      const { missingFileSet, failedFileSet } = this.trackFailedLocalFileAccess(
+        page
+      )
 
       try {
         return await processer(page, uri)
       } finally {
-        if (missingTracker.size > 0) {
+        if (missingFileSet.size > 0) {
           warn(
-            `${missingTracker.size > 1 ? 'Some of t' : 'T'}he local file${
-              missingTracker.size > 1 ? 's are' : ' is'
+            `${missingFileSet.size > 1 ? 'Some of t' : 'T'}he local file${
+              missingFileSet.size > 1 ? 's are' : ' is'
             } missing and will be ignored. Make sure the file path${
-              missingTracker.size > 1 ? 's are' : ' is'
+              missingFileSet.size > 1 ? 's are' : ' is'
             } correct.`
           )
         }
-        if (failedTracker.size > 0) {
+        if (failedFileSet.size > 0) {
           warn(
             `Marp CLI has detected accessing to local file${
-              failedTracker.size > 1 ? 's' : ''
+              failedFileSet.size > 1 ? 's' : ''
             }. ${
-              failedTracker.size > 1 ? 'They are' : 'That is'
+              failedFileSet.size > 1 ? 'They are' : 'That is'
             } blocked by security reason. Instead we recommend using assets uploaded to online. (Or you can use ${chalk.yellow(
               '--allow-local-files'
             )} option if you are understood of security risk)`
