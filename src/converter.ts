@@ -20,9 +20,8 @@ import { ThemeSet } from './theme'
 import {
   generatePuppeteerDataDirPath,
   generatePuppeteerLaunchArgs,
-  isWSL,
-  resolveWSLPath,
 } from './utils/puppeteer'
+import { isWSL, resolveWSLPath } from './utils/wsl'
 import { notifier } from './watcher'
 
 export enum ConvertType {
