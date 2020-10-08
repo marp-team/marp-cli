@@ -142,7 +142,9 @@ export class Preview extends TypedEventEmitter<Preview.Events> {
       ],
       defaultViewport: null,
       headless: process.env.NODE_ENV === 'test',
-      userDataDir: await generatePuppeteerDataDirPath('marp-cli-preview'),
+      userDataDir: await generatePuppeteerDataDirPath('marp-cli-preview', {
+        wsl: !!baseArgs.executablePath?.match(/^\/mnt\/[a-z]\//),
+      }),
     })
 
     // Set Marp icon asynchrnously

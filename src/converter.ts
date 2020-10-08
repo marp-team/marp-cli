@@ -432,9 +432,13 @@ export class Converter {
 
   private static async runBrowser() {
     if (!Converter.browser) {
+      const baseArgs = generatePuppeteerLaunchArgs()
+
       Converter.browser = await puppeteer.launch({
-        ...generatePuppeteerLaunchArgs(),
-        userDataDir: await generatePuppeteerDataDirPath('marp-cli-conversion'),
+        ...baseArgs,
+        userDataDir: await generatePuppeteerDataDirPath('marp-cli-conversion', {
+          wsl: !!baseArgs.executablePath?.match(/^\/mnt\/[a-z]\//),
+        }),
       })
       Converter.browser.once('disconnected', () => {
         Converter.browser = undefined
