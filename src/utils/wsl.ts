@@ -1,4 +1,4 @@
-import { execFile, execFileSync } from 'child_process'
+import { execFile, spawnSync } from 'child_process'
 import { readFileSync } from 'fs'
 import { promisify } from 'util'
 
@@ -6,11 +6,11 @@ const execFilePromise = promisify(execFile)
 
 let isWsl: number | undefined
 
-export const resolveWSLPath = async (path: string): Promise<string> =>
+export const resolveWSLPathToHost = async (path: string): Promise<string> =>
   (await execFilePromise('wslpath', ['-m', path])).stdout.trim()
 
-export const resolveWSLPathSync = (path: string): string =>
-  execFileSync('wslpath', ['-m', path]).trim()
+export const resolveWSLPathToGuestSync = (path: string): string =>
+  spawnSync('wslpath', ['-u', path]).stdout.toString().trim()
 
 export const resolveWindowsEnv = async (
   key: string
@@ -19,15 +19,15 @@ export const resolveWindowsEnv = async (
     await execFilePromise('cmd.exe', ['/c', 'SET', key])
   ).stdout.trim()
 
-  return ret.startsWith(`${key}=`) ? key.slice(key.length + 1) : undefined
+  return ret.startsWith(`${key}=`) ? ret.slice(key.length + 1) : undefined
 }
 
 export const resolveWindowsEnvSync = (key: string): string | undefined => {
-  const ret = execFileSync('cmd.exe', ['/c', 'SET', key]).trim()
-  return ret.startsWith(`${key}=`) ? key.slice(key.length + 1) : undefined
+  const ret = spawnSync('cmd.exe', ['/c', 'SET', key]).stdout.toString().trim()
+  return ret.startsWith(`${key}=`) ? ret.slice(key.length + 1) : undefined
 }
 
-export function isWSL(): number {
+export const isWSL = (): number => {
   if (isWsl === undefined) {
     if (require('is-wsl')) {
       isWsl = 1
@@ -45,3 +45,6 @@ export function isWSL(): number {
   }
   return isWsl
 }
+
+export const isChromeInWSLHost = (chromePath: string | undefined) =>
+  !!(isWSL() && chromePath?.match(/^\/mnt\/[a-z]\//))

@@ -1,6 +1,6 @@
 import { accessSync } from 'fs'
 import path from 'path'
-import { isWSL, resolveWindowsEnvSync } from './wsl'
+import { isWSL, resolveWindowsEnvSync, resolveWSLPathToGuestSync } from './wsl'
 
 const findAccessiblePath = (paths: string[]): string | undefined =>
   paths.find((p) => {
@@ -15,10 +15,12 @@ const findAccessiblePath = (paths: string[]): string | undefined =>
 
 const linux = (): string | undefined => {
   if (isWSL()) {
+    const localAppData = resolveWindowsEnvSync('LOCALAPPDATA')
+
     return win32({
       programFiles: '/mnt/c/Program Files',
       programFilesX86: '/mnt/c/Program Files (x86)',
-      localAppData: resolveWindowsEnvSync('LOCALAPPDATA') || '',
+      localAppData: localAppData ? resolveWSLPathToGuestSync(localAppData) : '',
     })
   }
 

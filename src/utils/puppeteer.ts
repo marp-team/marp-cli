@@ -11,9 +11,9 @@ let wslTmp: string | undefined
 
 export const generatePuppeteerDataDirPath = async (
   name: string,
-  { wsl }: { wsl?: boolean } = {}
+  { wslHost }: { wslHost?: boolean } = {}
 ): Promise<string> => {
-  if (isWSL() && wsl) {
+  if (isWSL() && wslHost) {
     // In WSL environment, Marp CLI will use Chrome on Windows. Thus, we have to
     // specify Windows path when converting within WSL.
     if (wslTmp === undefined) wslTmp = await resolveWindowsEnv('TMP')
@@ -40,7 +40,7 @@ export const generatePuppeteerLaunchArgs = () => {
       executablePath = '/usr/bin/chromium-browser'
     } else {
       try {
-        ;[executablePath] = Launcher.getInstallations()
+        executablePath = Launcher.getFirstInstallation()
       } catch (e) {
         if (e instanceof Error) warn(e.message)
       }
