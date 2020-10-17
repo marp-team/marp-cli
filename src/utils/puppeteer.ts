@@ -52,7 +52,7 @@ export const generatePuppeteerLaunchArgs = () => {
 
       if (!executablePath) {
         error(
-          'You have to install Google Chrome or Chromium to convert slide deck with current options.',
+          'You have to install Google Chrome, Chromium, or Microsoft Edge to convert slide deck with current options.',
           CLIErrorCode.NOT_FOUND_CHROMIUM
         )
       }
