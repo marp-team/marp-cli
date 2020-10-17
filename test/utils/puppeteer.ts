@@ -1,8 +1,10 @@
+import os from 'os'
 import path from 'path'
 import { CLIErrorCode } from '../../src/error'
 
 jest.mock('chrome-launcher')
 jest.mock('../../src/utils/edge-finder')
+jest.mock('../../src/utils/wsl')
 
 const Launcher = (): typeof import('chrome-launcher').Launcher =>
   require('chrome-launcher').Launcher // eslint-disable-line @typescript-eslint/no-var-requires
@@ -16,8 +18,44 @@ const puppeteer = (): typeof import('../../src/utils/puppeteer') =>
 const edgeFinder = (): typeof import('../../src/utils/edge-finder') =>
   require('../../src/utils/edge-finder')
 
+const wsl = (): typeof import('../../src/utils/wsl') =>
+  require('../../src/utils/wsl')
+
 beforeEach(() => jest.resetModules())
 afterEach(() => jest.restoreAllMocks())
+
+describe('#generatePuppeteerDataDirPath', () => {
+  it('returns data dir path for OS specific temporary directory', async () => {
+    const dataDir = await puppeteer().generatePuppeteerDataDirPath('tmp-name')
+    expect(dataDir).toBe(path.resolve(os.tmpdir(), 'tmp-name'))
+  })
+
+  describe('with wslPath option', () => {
+    it('returns regular path if the current environment is not WSL', async () => {
+      expect(
+        await puppeteer().generatePuppeteerDataDirPath('tmp-name', {
+          wslHost: true,
+        })
+      ).toBe(await puppeteer().generatePuppeteerDataDirPath('tmp-name'))
+    })
+
+    it('resolves tmpdir for Windows and returns data dir path for resolved directory', async () => {
+      jest.spyOn(wsl(), 'isWSL').mockImplementation(() => 1)
+
+      const resolveWindowsEnv = jest
+        .spyOn(wsl(), 'resolveWindowsEnv')
+        .mockResolvedValue('C:\\Test\\Tmp')
+
+      const dataDir = await puppeteer().generatePuppeteerDataDirPath(
+        'tmp-name',
+        { wslHost: true }
+      )
+
+      expect(resolveWindowsEnv).toHaveBeenCalledWith('TMP')
+      expect(dataDir).toBe('C:\\Test\\Tmp\\tmp-name')
+    })
+  })
+})
 
 describe('#generatePuppeteerLaunchArgs', () => {
   it('finds out installed Chrome through chrome-launcher', () => {

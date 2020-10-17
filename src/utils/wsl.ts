@@ -1,13 +1,14 @@
 import { execFile, spawnSync } from 'child_process'
 import { readFileSync } from 'fs'
-import { promisify } from 'util'
-
-const execFilePromise = promisify(execFile)
 
 let isWsl: number | undefined
 
 export const resolveWSLPathToHost = async (path: string): Promise<string> =>
-  (await execFilePromise('wslpath', ['-m', path])).stdout.trim()
+  await new Promise<string>((res, rej) => {
+    execFile('wslpath', ['-m', path], (err, stdout) =>
+      err ? rej(err) : res(stdout.trim())
+    )
+  })
 
 export const resolveWSLPathToGuestSync = (path: string): string =>
   spawnSync('wslpath', ['-u', path]).stdout.toString().trim()
@@ -15,9 +16,11 @@ export const resolveWSLPathToGuestSync = (path: string): string =>
 export const resolveWindowsEnv = async (
   key: string
 ): Promise<string | undefined> => {
-  const ret = (
-    await execFilePromise('cmd.exe', ['/c', 'SET', key])
-  ).stdout.trim()
+  const ret = await new Promise<string>((res, rej) => {
+    execFile('cmd.exe', ['/c', 'SET', key], (err, stdout) =>
+      err ? rej(err) : res(stdout.trim())
+    )
+  })
 
   return ret.startsWith(`${key}=`) ? ret.slice(key.length + 1) : undefined
 }
