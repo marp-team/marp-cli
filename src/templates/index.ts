@@ -48,9 +48,11 @@ export interface TemplateResult {
   result: string
 }
 
-export type Template<T = TemplateOption> = (
+export type Template<T = TemplateOption> = ((
   locals: TemplateCoreOption & T
-) => Promise<TemplateResult>
+) => Promise<TemplateResult>) & {
+  printable?: boolean
+}
 
 export const bare: Template<TemplateBareOption> = async (opts) => {
   const rendered = opts.renderer({
@@ -69,6 +71,8 @@ export const bare: Template<TemplateBareOption> = async (opts) => {
     }),
   }
 }
+
+Object.defineProperty(bare, 'printable', { value: true })
 
 export const bespoke: Template<TemplateBespokeOption> = async (opts) => {
   const rendered = opts.renderer({
@@ -92,6 +96,9 @@ export const bespoke: Template<TemplateBespokeOption> = async (opts) => {
     }),
   }
 }
+
+// Sometimes bespoke template cannot render background images since Chrome 85
+Object.defineProperty(bespoke, 'printable', { value: false })
 
 async function libJs(fn: string) {
   return (await readFile(path.resolve(__dirname, fn))).toString()
