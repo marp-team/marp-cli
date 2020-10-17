@@ -1,11 +1,11 @@
-import { accessSync } from 'fs'
+import { accessSync, constants } from 'fs'
 import path from 'path'
 import { isWSL, resolveWindowsEnvSync, resolveWSLPathToGuestSync } from './wsl'
 
-const findAccessiblePath = (paths: string[]): string | undefined =>
+export const findAccessiblePath = (paths: string[]): string | undefined =>
   paths.find((p) => {
     try {
-      accessSync(p)
+      accessSync(p, constants.X_OK)
       return true
     } catch (e) {
       // no ops
