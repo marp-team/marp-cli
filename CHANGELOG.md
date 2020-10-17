@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Added
+
+- Fallback to Microsoft Edge if not installed Chrome ([#199](https://github.com/marp-team/marp-cli/issues/199), [#292](https://github.com/marp-team/marp-cli/pull/292))
+
+### Fixed
+
+- Better support for custom Chrome path via `CHROME_PATH` env in WSL ([#288](https://github.com/marp-team/marp-cli/issues/288), [#292](https://github.com/marp-team/marp-cli/pull/292))
+
 ## v0.21.1 - 2020-09-12
 
 ### Fixed

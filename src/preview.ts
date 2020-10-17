@@ -11,6 +11,7 @@ import {
   generatePuppeteerLaunchArgs,
 } from './utils/puppeteer'
 import TypedEventEmitter from './utils/typed-event-emitter'
+import { isChromeInWSLHost } from './utils/wsl'
 
 export namespace Preview {
   export interface Events {
@@ -142,7 +143,9 @@ export class Preview extends TypedEventEmitter<Preview.Events> {
       ],
       defaultViewport: null,
       headless: process.env.NODE_ENV === 'test',
-      userDataDir: await generatePuppeteerDataDirPath('marp-cli-preview'),
+      userDataDir: await generatePuppeteerDataDirPath('marp-cli-preview', {
+        wslHost: isChromeInWSLHost(baseArgs.executablePath),
+      }),
     })
 
     // Set Marp icon asynchrnously

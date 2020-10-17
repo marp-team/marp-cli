@@ -20,9 +20,8 @@ import { ThemeSet } from './theme'
 import {
   generatePuppeteerDataDirPath,
   generatePuppeteerLaunchArgs,
-  isWSL,
-  resolveWSLPath,
 } from './utils/puppeteer'
+import { isChromeInWSLHost, resolveWSLPathToHost } from './utils/wsl'
 import { notifier } from './watcher'
 
 export enum ConvertType {
@@ -101,8 +100,8 @@ export class Converter {
       !!f && f.type === FileType.File
 
     const resolveBase = async (f: File) =>
-      isWSL()
-        ? `file:${await resolveWSLPath(f.absolutePath)}`
+      isChromeInWSLHost(generatePuppeteerLaunchArgs().executablePath)
+        ? `file:${await resolveWSLPathToHost(f.absolutePath)}`
         : f.absoluteFileScheme
 
     let additionals = ''
@@ -356,16 +355,20 @@ export class Converter {
       })
     })()
 
-    const uri = await (async () => {
-      if (tmpFile) {
-        if (isWSL()) return `file:${await resolveWSLPath(tmpFile.path)}`
-        return `file://${tmpFile.path}`
-      }
-      return `data:text/html;base64,${baseFile.buffer!.toString('base64')}`
-    })()
-
     try {
       const browser = await Converter.runBrowser()
+
+      const uri = await (async () => {
+        if (tmpFile) {
+          if (isChromeInWSLHost(browser.process().spawnfile)) {
+            // Windows Chrome should read file from WSL environment
+            return `file:${await resolveWSLPathToHost(tmpFile.path)}`
+          }
+          return `file://${tmpFile.path}`
+        }
+        return `data:text/html;base64,${baseFile.buffer!.toString('base64')}`
+      })()
+
       const page = await browser.newPage()
       const { missingFileSet, failedFileSet } = this.trackFailedLocalFileAccess(
         page
@@ -433,9 +436,13 @@ export class Converter {
 
   private static async runBrowser() {
     if (!Converter.browser) {
+      const baseArgs = generatePuppeteerLaunchArgs()
+
       Converter.browser = await puppeteer.launch({
-        ...generatePuppeteerLaunchArgs(),
-        userDataDir: await generatePuppeteerDataDirPath('marp-cli-conversion'),
+        ...baseArgs,
+        userDataDir: await generatePuppeteerDataDirPath('marp-cli-conversion', {
+          wslHost: isChromeInWSLHost(baseArgs.executablePath),
+        }),
       })
       Converter.browser.once('disconnected', () => {
         Converter.browser = undefined

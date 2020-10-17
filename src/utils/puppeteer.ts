@@ -1,55 +1,23 @@
-import { execFile } from 'child_process'
-import { readFileSync } from 'fs'
 import os from 'os'
 import path from 'path'
-import { promisify } from 'util'
 import { Launcher } from 'chrome-launcher'
 import { warn } from '../cli'
 import { CLIErrorCode, error } from '../error'
-
-const execFilePromise = promisify(execFile)
+import { findEdgeInstallation } from './edge-finder'
+import { isWSL, resolveWindowsEnv } from './wsl'
 
 let executablePath: string | undefined | false = false
-let isWsl: number | undefined
 let wslTmp: string | undefined
 
-export function isWSL(): number {
-  if (isWsl === undefined) {
-    if (require('is-wsl')) {
-      isWsl = 1
-
-      try {
-        // https://github.com/microsoft/WSL/issues/423#issuecomment-611086412
-        const release = readFileSync('/proc/sys/kernel/osrelease').toString()
-        if (release.includes('WSL2')) isWsl = 2
-      } catch (e) {
-        // no ops
-      }
-    } else {
-      isWsl = 0
-    }
-  }
-  return isWsl
-}
-
-export const resolveWSLPath = async (path: string): Promise<string> =>
-  (await execFilePromise('wslpath', ['-m', path])).stdout.trim()
-
 export const generatePuppeteerDataDirPath = async (
-  name: string
+  name: string,
+  { wslHost }: { wslHost?: boolean } = {}
 ): Promise<string> => {
-  if (isWSL()) {
+  if (isWSL() && wslHost) {
     // In WSL environment, Marp CLI will use Chrome on Windows. Thus, we have to
     // specify Windows path when converting within WSL.
-    if (wslTmp === undefined) {
-      const tmpRet = (
-        await execFilePromise('cmd.exe', ['/c', 'SET', 'TMP'])
-      ).stdout.trim()
-      if (tmpRet.startsWith('TMP=')) wslTmp = tmpRet.slice(4)
-    }
-    if (wslTmp !== undefined) {
-      return path.win32.resolve(wslTmp, name)
-    }
+    if (wslTmp === undefined) wslTmp = await resolveWindowsEnv('TMP')
+    if (wslTmp !== undefined) return path.win32.resolve(wslTmp, name)
   }
   return path.resolve(os.tmpdir(), name)
 }
@@ -72,17 +40,22 @@ export const generatePuppeteerLaunchArgs = () => {
       executablePath = '/usr/bin/chromium-browser'
     } else {
       try {
-        ;[executablePath] = Launcher.getInstallations()
+        executablePath = Launcher.getFirstInstallation()
       } catch (e) {
         if (e instanceof Error) warn(e.message)
       }
     }
 
     if (!executablePath) {
-      error(
-        'You have to install Google Chrome or Chromium to convert slide deck with current options.',
-        CLIErrorCode.NOT_FOUND_CHROMIUM
-      )
+      // Find Edge as fallback (Edge has pre-installed to almost Windows)
+      executablePath = findEdgeInstallation()
+
+      if (!executablePath) {
+        error(
+          'You have to install Google Chrome, Chromium, or Microsoft Edge to convert slide deck with current options.',
+          CLIErrorCode.NOT_FOUND_CHROMIUM
+        )
+      }
     }
   }
 
