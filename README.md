@@ -85,8 +85,8 @@ Also you can use the package manager to install/update Marp CLI standalone binar
 
 #### Windows
 
-- **[Chocolatey](https://chocolatey.org/)**: `choco install marp-cli` ([Refer to the package information...](https://chocolatey.org/packages/marp-cli))
 - **[Scoop](https://scoop.sh/)**: `scoop install marp` ([Refer to the manifest in official Main bucket...](https://github.com/ScoopInstaller/Main/blob/master/bucket/marp.json))
+- **[Chocolatey](https://chocolatey.org/)**: `choco install marp-cli` ([Refer to the package information...](https://chocolatey.org/packages/marp-cli))
 
 > _Disclaimer: These packages and manifests are maintained by the others, not Marp team._
 
