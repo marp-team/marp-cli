@@ -11,6 +11,7 @@ import metaPlugin from './engine/meta-plugin'
 import { error } from './error'
 import { File, FileType } from './file'
 import templates, {
+  bare,
   Template,
   TemplateMeta,
   TemplateOption,
@@ -94,7 +95,13 @@ export class Converter {
     return template
   }
 
-  async convert(markdown: string, file?: File): Promise<TemplateResult> {
+  async convert(
+    markdown: string,
+    file?: File,
+    {
+      fallbackToPrintableTemplate = false,
+    }: { fallbackToPrintableTemplate?: boolean } = {}
+  ): Promise<TemplateResult> {
     const { lang, globalDirectives, type } = this.options
     const isFile = (f: File | undefined): f is File =>
       !!f && f.type === FileType.File
@@ -114,7 +121,10 @@ export class Converter {
       }
     }
 
-    return await this.template({
+    let template = this.template
+    if (fallbackToPrintableTemplate && !template.printable) template = bare
+
+    return await template({
       ...(this.options.templateOption || {}),
       lang,
       base:
@@ -142,24 +152,32 @@ export class Converter {
     file: File,
     opts: ConvertFileOption = {}
   ): Promise<ConvertResult> {
-    const template = await (async (): Promise<TemplateResult> => {
+    let template: TemplateResult
+
+    const useTemplate = async (
+      fallbackToPrintableTemplate?: boolean
+    ): Promise<TemplateResult> => {
       try {
         silence(!!opts.onlyScanning)
-        return await this.convert((await file.load()).toString(), file)
+        return await this.convert((await file.load()).toString(), file, {
+          fallbackToPrintableTemplate,
+        })
       } finally {
         silence(false)
       }
-    })()
+    }
 
     if (!opts.onlyScanning) {
       const files: File[] = []
 
       switch (this.options.type) {
         case ConvertType.pdf:
+          template = await useTemplate(true)
           files.push(await this.convertFileToPDF(template, file))
           break
         case ConvertType.png:
         case ConvertType.jpeg:
+          template = await useTemplate(true)
           files.push(
             ...(await this.convertFileToImage(template, file, {
               pages: this.options.pages,
@@ -169,9 +187,11 @@ export class Converter {
           )
           break
         case ConvertType.pptx:
+          template = await useTemplate(true)
           files.push(await this.convertFileToPPTX(template, file))
           break
         default:
+          template = await useTemplate()
           files.push(this.convertFileToHTML(template, file))
       }
 
@@ -182,6 +202,9 @@ export class Converter {
 
       // #convertFile must return a single file to serve in server
       return { file, template, newFile: files[0] }
+    } else {
+      // Try conversion with specific template to scan using resources
+      template = await useTemplate()
     }
 
     return { file, template }
