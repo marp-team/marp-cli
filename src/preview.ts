@@ -78,6 +78,7 @@ export class Preview extends TypedEventEmitter<Preview.Events> {
           return await page.close()
         } catch (e) {
           // Ignore raising error if a target page has already close
+          /* istanbul ignore next */
           if (!e.message.includes('Target closed.')) throw e
         }
       },
