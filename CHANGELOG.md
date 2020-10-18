@@ -11,6 +11,10 @@
 - Better support for custom Chrome path via `CHROME_PATH` env in WSL ([#288](https://github.com/marp-team/marp-cli/issues/288), [#292](https://github.com/marp-team/marp-cli/pull/292))
 - Apply workaround of printable template fallback, for broken background images caused by regression in Chrome >= 85 ([#293](https://github.com/marp-team/marp-cli/issues/293), [#294](https://github.com/marp-team/marp-cli/pull/294))
 
+### Changed
+
+- Upgrade dependent packages to the latest version ([#295](https://github.com/marp-team/marp-cli/pull/295))
+
 ## v0.21.1 - 2020-09-12
 
 ### Fixed
