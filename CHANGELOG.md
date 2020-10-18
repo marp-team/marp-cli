@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v0.22.0 - 2020-10-18
+
 ### Added
 
 - Fallback to Microsoft Edge if not installed Chrome ([#199](https://github.com/marp-team/marp-cli/issues/199), [#292](https://github.com/marp-team/marp-cli/pull/292))
