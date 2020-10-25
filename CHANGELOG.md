@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## v0.22.0-1 - 2020-10-25
+
+### Added
+
+- `--slide` argument (png export only)
+- `--duration` argument (png export only). Allows exporting an animated PNG. Make sure that your animation (within the slide) lasts at least the time provided in the duration argument.
+
 ## v0.22.0 - 2020-10-18
 
 ### Added
