@@ -24,6 +24,7 @@ import {
 } from './utils/puppeteer'
 import { isChromeInWSLHost, resolveWSLPathToHost } from './utils/wsl'
 import { notifier } from './watcher'
+import UPNG from '@pdf-lib/upng'
 
 export enum ConvertType {
   html = 'html',
@@ -60,6 +61,8 @@ export interface ConverterOption {
   themeSet: ThemeSet
   type: ConvertType
   watch: boolean
+  duration?: number
+  slide?: number
 }
 
 export interface ConvertFileOption {
@@ -71,6 +74,8 @@ export interface ConvertImageOption {
   pages?: boolean | number[]
   quality?: number
   type: ConvertType.png | ConvertType.jpeg
+  duration?: number
+  slide?: number
 }
 
 export interface ConvertResult {
@@ -183,6 +188,8 @@ export class Converter {
               pages: this.options.pages,
               quality: this.options.jpegQuality,
               type: this.options.type,
+              duration: this.options.duration,
+              slide: this.options.slide
             }))
           )
           break
@@ -258,20 +265,74 @@ export class Converter {
       await page.goto(uri, { waitUntil: ['domcontentloaded', 'networkidle0'] })
       await page.emulateMediaType('print')
 
+
       const screenshot = async (pageNumber?: number) => {
+        let expectedOffsetY = ((pageNumber || 1) - 1) * tpl.rendered.size.height
+
         await page.evaluate(
-          `window.scrollTo(0,${
-            ((pageNumber || 1) - 1) * tpl.rendered.size.height
-          })`
+          `window.scrollTo(0,${expectedOffsetY})`
         )
 
         if (opts.type === ConvertType.jpeg)
           return await page.screenshot({ quality: opts.quality, type: 'jpeg' })
 
-        return await page.screenshot({ type: 'png' })
+        if (opts.duration == null)
+          return await page.screenshot({ type: 'png' })
+
+        let timestamp = 0;
+        let session;
+        let images: Buffer[] = [];
+        let tss: number[] = [];
+        let lastTimestamp = 0;
+
+        async function start(page) {
+          session = await page.target().createCDPSession();
+          await session.send('Page.startScreencast');
+          session.on('Page.screencastFrame', ({ data, metadata, sessionId }) => {
+            if (metadata.scrollOffsetY != expectedOffsetY) {
+              // Skip: This is an "invalid" frame. The Y offset does not match the expected
+            } else {
+              if (timestamp == 0)
+                timestamp = metadata.timestamp * 1000;
+              const buffer = Buffer.from(data, 'base64');
+              lastTimestamp = metadata.timestamp * 1000;
+              images.push(buffer);
+              tss.push(lastTimestamp);
+            }
+            session.send('Page.screencastFrameAck', { sessionId }).catch(() => { });
+          });
+        }
+
+        async function stop() {
+          await session.send('Page.stopScreencast');
+        }
+
+        await start(page);
+        while (timestamp == 0 || lastTimestamp - timestamp < opts.duration!) {
+          await page.waitFor(opts.duration! - (lastTimestamp - timestamp))
+        }
+        await stop();
+
+        let apngImgs: ArrayBuffer[] = [];
+        let delays: number[] = [];
+        let ts = timestamp;
+        let w = 0, h = 0;
+        while (images.length > 0) {
+          let img = UPNG.decode(images.shift()!);
+          let current = tss.shift()!;
+          let delay = current - ts;
+          ts = current;
+          apngImgs.push(img.data);
+          delays.push(delay);
+          if (w == 0) w = img.width;
+          if (h == 0) h = img.height;
+        }
+
+        let apng = UPNG.encode(apngImgs, w, h, 0, delays);
+        return Buffer.from(apng);
       }
 
-      if (opts.pages) {
+      if (opts.slide == null && opts.pages) {
         // Multiple images
         for (let page = 1; page <= tpl.rendered.length; page += 1) {
           const ret = file.convert(this.options.output, {
@@ -285,7 +346,7 @@ export class Converter {
       } else {
         // Title image
         const ret = file.convert(this.options.output, { extension: opts.type })
-        ret.buffer = await screenshot()
+        ret.buffer = await screenshot(this.options.slide ?? 1)
 
         files.push(ret)
       }
