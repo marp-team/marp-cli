@@ -21,6 +21,7 @@ import { ThemeSet } from './theme'
 import {
   generatePuppeteerDataDirPath,
   generatePuppeteerLaunchArgs,
+  launchPuppeteer,
 } from './utils/puppeteer'
 import { isChromeInWSLHost, resolveWSLPathToHost } from './utils/wsl'
 import { notifier } from './watcher'
@@ -461,7 +462,7 @@ export class Converter {
     if (!Converter.browser) {
       const baseArgs = generatePuppeteerLaunchArgs()
 
-      Converter.browser = await puppeteer.launch({
+      Converter.browser = await launchPuppeteer({
         ...baseArgs,
         userDataDir: await generatePuppeteerDataDirPath('marp-cli-conversion', {
           wslHost: isChromeInWSLHost(baseArgs.executablePath),

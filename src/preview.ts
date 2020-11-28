@@ -9,6 +9,7 @@ import { File, FileType } from './file'
 import {
   generatePuppeteerDataDirPath,
   generatePuppeteerLaunchArgs,
+  launchPuppeteer,
 } from './utils/puppeteer'
 import TypedEventEmitter from './utils/typed-event-emitter'
 import { isChromeInWSLHost } from './utils/wsl'
@@ -135,7 +136,7 @@ export class Preview extends TypedEventEmitter<Preview.Events> {
   private async launch() {
     const baseArgs = generatePuppeteerLaunchArgs()
 
-    this.puppeteerInternal = await puppeteer.launch({
+    this.puppeteerInternal = await launchPuppeteer({
       ...baseArgs,
       args: [
         ...baseArgs.args,
