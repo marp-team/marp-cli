@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v0.22.1 - 2020-11-28
+
 ### Added
 
 - Support for fallback into Microsoft Edge in Linux ([#296](https://github.com/marp-team/marp-cli/issues/296), [#307](https://github.com/marp-team/marp-cli/pull/307))

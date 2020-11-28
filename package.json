@@ -1,6 +1,6 @@
 {
   "name": "@marp-team/marp-cli",
-  "version": "0.22.0",
+  "version": "0.22.1",
   "description": "A CLI interface for Marp and Marpit based converters",
   "license": "MIT",
   "author": {
@@ -36,7 +36,7 @@
     "types/"
   ],
   "bin": {
-    "marp": "./marp-cli.js"
+    "marp": "marp-cli.js"
   },
   "pkg": {
     "scripts": "lib/**/*.js"
