@@ -1,6 +1,7 @@
 import os from 'os'
 import path from 'path'
 import { Launcher } from 'chrome-launcher'
+import puppeteer from 'puppeteer-core'
 import { warn } from '../cli'
 import { CLIErrorCode, error } from '../error'
 import { findEdgeInstallation } from './edge-finder'
@@ -71,5 +72,24 @@ export const generatePuppeteerLaunchArgs = () => {
     ignoreDefaultArgs: process.env.CHROME_ENABLE_EXTENSIONS
       ? ['--disable-extensions']
       : undefined,
+  }
+}
+
+export const launchPuppeteer = (
+  ...args: Parameters<typeof puppeteer['launch']>
+) => {
+  const { arch } = os
+
+  try {
+    os.arch = () => {
+      // Patch for Apple M1 (arm64)
+      // @see https://github.com/puppeteer/puppeteer/issues/6634
+      if (process.platform === 'darwin' && arch() === 'arm64') return 'x64'
+      return arch()
+    }
+
+    return puppeteer.launch(...args)
+  } finally {
+    os.arch = arch
   }
 }

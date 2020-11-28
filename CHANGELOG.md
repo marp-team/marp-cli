@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Compatibility with Apple Silicon ([#301](https://github.com/marp-team/marp-cli/issues/301), [#305](https://github.com/marp-team/marp-cli/pull/305))
+
 ## v0.22.0 - 2020-10-18
 
 ### Added
