@@ -1,5 +1,4 @@
-/** @jest-environment jsdom-fifteen */
-// TODO: Use Jest built-in jsdom environment if https://github.com/jsdom/jsdom/issues/2961 was fixed
+/** @jest-environment jsdom */
 import { getPortPromise } from 'portfinder'
 import { Server } from 'ws'
 import watch from '../../src/templates/watch/watch'
@@ -43,7 +42,7 @@ describe('Watch mode notifier on browser context', () => {
     afterEach(() => delete window['__marpCliWatchWS'])
 
     it('connects to WebSocket server', () =>
-      new Promise((done) => {
+      new Promise<void>((done) => {
         server.on('connection', (_, socket) => {
           expect(socket.url).toBe('/test')
           done()
@@ -84,13 +83,13 @@ describe('Watch mode notifier on browser context', () => {
       afterEach(() => jest.useRealTimers())
 
       it('reconnects watcher in 5 sec', () =>
-        new Promise((done) =>
+        new Promise<void>((done) =>
           (async () => {
             const clientSocket = await new Promise<WebSocket>((res, rej) => {
               server.once('error', (e) => rej(e))
               server.once('connection', () => res(socket))
 
-              const socket = watch()
+              const socket = watch()! // eslint-disable-line @typescript-eslint/no-non-null-assertion
             })
 
             await new Promise((res) => {
