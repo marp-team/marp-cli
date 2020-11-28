@@ -117,8 +117,22 @@ describe('#findEdgeInstallation', () => {
       Object.defineProperty(process, 'platform', { value: 'linux' })
     })
 
-    it('returns undefined', () => {
-      expect(edgeFinder.findEdgeInstallation()).toBeUndefined()
+    it('finds out the first accessible Edge from specific paths', () => {
+      const findAccessiblePath = jest
+        .spyOn(edgeFinder, 'findAccessiblePath')
+        .mockImplementation(() => '/opt/microsoft/msedge/msedge')
+
+      expect(edgeFinder.findEdgeInstallation()).toBe(
+        '/opt/microsoft/msedge/msedge'
+      )
+      expect(findAccessiblePath.mock.calls[0][0]).toMatchInlineSnapshot(`
+        Array [
+          "/opt/microsoft/msedge-canary/msedge",
+          "/opt/microsoft/msedge-dev/msedge",
+          "/opt/microsoft/msedge-beta/msedge",
+          "/opt/microsoft/msedge/msedge",
+        ]
+      `)
     })
 
     describe('on Windows WSL', () => {
