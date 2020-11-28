@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Support for fallback into Microsoft Edge in Linux ([#296](https://github.com/marp-team/marp-cli/issues/296), [#307](https://github.com/marp-team/marp-cli/pull/307))
+
 ### Fixed
 
 - Compatibility with Apple Silicon ([#301](https://github.com/marp-team/marp-cli/issues/301), [#305](https://github.com/marp-team/marp-cli/pull/305))
