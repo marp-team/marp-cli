@@ -3,7 +3,7 @@ import { promisify } from 'util'
 const fs = jest.requireActual('fs')
 
 fs.writeFile[promisify.custom] = (path, data) =>
-  new Promise((resolve, reject) =>
+  new Promise<void>((resolve, reject) =>
     fs.writeFile(path, data, (e) => (e ? reject(e) : resolve()))
   )
 

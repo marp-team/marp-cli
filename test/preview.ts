@@ -105,7 +105,7 @@ describe('Preview', () => {
 
       describe('when opened window is closed', () => {
         it('emits close event with closed window', () =>
-          new Promise((done) =>
+          new Promise<void>((done) =>
             (async () => {
               const instance = preview()
               const closeEvent = jest.fn()

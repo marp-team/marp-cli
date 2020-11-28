@@ -1,4 +1,4 @@
-const { jestPreset } = require('ts-jest')
+const { defaults: tsjPreset } = require('ts-jest/presets')
 
 module.exports = {
   collectCoverageFrom: ['src/**/*.ts', 'src/**/*.tsx'],
@@ -7,7 +7,7 @@ module.exports = {
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   setupFiles: ['./jest.setup.js'],
   transform: {
-    ...jestPreset.transform,
+    ...tsjPreset.transform,
     '^.*\\.s?css$': '<rootDir>/test/_transformers/css.js',
     '^.*\\.png$': '<rootDir>/test/_transformers/png.js',
     '^.*\\.pug$': '<rootDir>/test/_transformers/pug.js',
