@@ -24,9 +24,12 @@ const linux = (): string | undefined => {
     })
   }
 
-  // TODO: Find out Microsoft Edge for Linux
-  // https://www.microsoftedgeinsider.com/en-us/download?platform=linux
-  return undefined
+  return findAccessiblePath([
+    '/opt/microsoft/msedge-canary/msedge',
+    '/opt/microsoft/msedge-dev/msedge',
+    '/opt/microsoft/msedge-beta/msedge',
+    '/opt/microsoft/msedge/msedge',
+  ])
 }
 
 const darwin = (): string | undefined =>
