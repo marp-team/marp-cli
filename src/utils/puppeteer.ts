@@ -93,3 +93,7 @@ export const launchPuppeteer = (
     os.arch = arch
   }
 }
+
+export const resetExecutablePath = () => {
+  executablePath = false
+}
