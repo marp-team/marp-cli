@@ -9,6 +9,7 @@ import { File, FileType } from './file'
 import { Preview, fileToURI } from './preview'
 import { Server } from './server'
 import templates from './templates'
+import { resetExecutablePath } from './utils/puppeteer'
 import version from './version'
 import watcher, { Watcher, notifier } from './watcher'
 
@@ -384,11 +385,14 @@ export const waitForObservation = () =>
     resolversForObservation.push(res)
   })
 
-export const apiInterface = async (argv: string[] = []) =>
-  marpCli(argv, {
+export const apiInterface = (argv: string[] = []) => {
+  resetExecutablePath()
+
+  return marpCli(argv, {
     stdin: false,
     throwErrorAlways: true,
   })
+}
 
 export const cliInterface = (argv: string[] = []) =>
   marpCli(argv, {
