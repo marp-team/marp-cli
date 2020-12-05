@@ -213,7 +213,10 @@ export const marpCli = async (
         },
       })
 
-    const args = program.argv
+    const args = {
+      ...program.argv,
+      _: program.argv._.map((v) => v.toString()),
+    }
 
     if (args.help) {
       program.showHelp()
