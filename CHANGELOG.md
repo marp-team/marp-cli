@@ -8,6 +8,10 @@
 - Upgrade Node.js to 14 ([#309](https://github.com/marp-team/marp-cli/pull/309))
 - Upgrade dependent packages to the latest version ([#309](https://github.com/marp-team/marp-cli/pull/309))
 
+### Fixed
+
+- Reset cached executable Chrome path if using Marp CLI through API interface ([#310](https://github.com/marp-team/marp-cli/pull/310))
+
 ## v0.22.1 - 2020-11-28
 
 ### Added
