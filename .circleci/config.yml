@@ -32,7 +32,7 @@ commands:
         default: []
       yarn:
         type: string
-        default: '^1.22.4'
+        default: '^1.22.5'
     steps:
       - run:
           name: Upgrade yarn for current user
@@ -40,15 +40,15 @@ commands:
 
       - restore_cache:
           keys:
-            - v2.2-dependencies-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}-{{ .Branch }}
-            - v2.2-dependencies-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}-
-            - v2.2-dependencies-{{ .Environment.CIRCLE_JOB }}-
+            - v2.3-dependencies-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}-{{ .Branch }}
+            - v2.3-dependencies-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}-
+            - v2.3-dependencies-{{ .Environment.CIRCLE_JOB }}-
 
       - run: yarn install
       - steps: << parameters.postinstall >>
 
       - save_cache:
-          key: v2.2-dependencies-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}-{{ .Branch }}
+          key: v2.3-dependencies-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}-{{ .Branch }}
           paths:
             - ~/.cache/yarn
 
@@ -140,7 +140,7 @@ jobs:
     executor:
       name: node
       browser: true
-      version: '12.18.2' # Specify LTS version for development
+      version: '12'
     steps:
       - test
 
@@ -148,7 +148,7 @@ jobs:
     executor:
       name: node
       browser: true
-      version: '14'
+      version: '14.15.1' # Specify LTS version for development
     steps:
       - test
 

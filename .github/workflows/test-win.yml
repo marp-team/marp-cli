@@ -5,7 +5,7 @@ on:
   - push
 
 env:
-  YARN_VERSION: '^1.22.4'
+  YARN_VERSION: '^1.22.5'
 
 jobs:
   validate:
@@ -23,8 +23,8 @@ jobs:
       matrix:
         node-version:
           - '^10.17.0'
-          - '12.18.2'
-          - '^14.5.0'
+          - '^12.20.2'
+          - '14.15.1'
 
     steps:
       - uses: actions/checkout@v2
