@@ -110,7 +110,7 @@ marp slide-deck.md -o output.html
 
 Marp CLI supports converting multiple files by passing multiple paths, directories, and glob patterns. In this case, `--output` option cannot use.
 
-When you want to output the converted result to another directory with keeping the origin directory structure, you can use `--inpur-dir` (`-I`) option. `--output` option would be available for specify the output directory.
+When you want to output the converted result to another directory with keeping the origin directory structure, you can use `--input-dir` (`-I`) option. `--output` option would be available for specify the output directory.
 
 ### Convert to PDF (`--pdf`)
 
