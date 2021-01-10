@@ -18,6 +18,7 @@ export enum CLIErrorCode {
   GENERAL_ERROR = 1,
   NOT_FOUND_CHROMIUM = 2,
   LISTEN_PORT_IS_ALREADY_USED = 3,
+  CANNOT_SPAWN_SNAP_CHROMIUM = 4,
 }
 
 export function error(
