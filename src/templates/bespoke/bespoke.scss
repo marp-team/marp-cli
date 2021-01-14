@@ -317,6 +317,7 @@ $progressHeight: 5px;
         %info-element {
           display: block;
           box-sizing: border-box;
+          flex-basis: 33%;
           padding: 0 10px;
           white-space: nowrap;
           width: 100%;
@@ -359,9 +360,36 @@ $progressHeight: 5px;
         .bespoke-marp-presenter-info-timer {
           @extend %info-element;
 
-          color: #999;
           order: 3;
-          text-align: right;
+          display: flex;
+          flex-wrap: nowrap;
+          justify-content: flex-end;
+          align-items: center;
+
+          .bespoke-marp-presenter-info-timer-text {
+            @extend %info-element;
+
+            color: #999;
+            text-align: right;
+          }
+
+          button {
+            @extend %button;
+            @include button-size(1.5em);
+            margin-left: 10px;
+
+            &.bespoke-marp-presenter-info-timer-start {
+              @extend %button-start;
+            }
+
+            &.bespoke-marp-presenter-info-timer-stop {
+              @extend %button-stop;
+            }
+
+            &.bespoke-marp-presenter-info-timer-restart {
+              @extend %button-restart;
+            }
+          }
         }
       }
     }

@@ -14,8 +14,12 @@ export const classes = {
   infoPageText: 'bespoke-marp-presenter-info-page-text',
   infoPagePrev: 'bespoke-marp-presenter-info-page-prev',
   infoPageNext: 'bespoke-marp-presenter-info-page-next',
+  infoTimerStart: 'bespoke-marp-presenter-info-timer-start',
+  infoTimerStop: 'bespoke-marp-presenter-info-timer-stop',
+  infoTimerRestart: 'bespoke-marp-presenter-info-timer-restart',
   infoTime: 'bespoke-marp-presenter-info-time',
   infoTimer: 'bespoke-marp-presenter-info-timer',
+  infoTimerText: 'bespoke-marp-presenter-info-timer-text',
 } as const
 
 /** Create function to send message to iframe for navigation */
@@ -56,7 +60,18 @@ export default function presenterView(deck) {
             </button>
           </div>
           <time class={classes.infoTime} title="Current time"></time>
-          <div class={classes.infoTimer} title="Elapsed time"></div>
+          <div class={classes.infoTimer}>
+            <div class={classes.infoTimerText} title="Elapsed time"></div>
+            <button class={classes.infoTimerStart} tabindex="-1" title="Start timer">
+              Start timer
+            </button>
+            <button class={classes.infoTimerStop} tabindex="-1" title="Stop timer">
+              Stop timer
+            </button>
+            <button class={classes.infoTimerRestart} tabindex="-1" title="Restart timer">
+              Restart timer
+            </button>
+          </div>
         </div>
       </Fragment>
     )
@@ -113,6 +128,10 @@ export default function presenterView(deck) {
 
     const prev = $(classes.infoPagePrev) as HTMLButtonElement
     const next = $(classes.infoPageNext) as HTMLButtonElement
+    const startTimer = $(classes.infoTimerStart) as HTMLButtonElement
+    const stopTimer = $(classes.infoTimerStop) as HTMLButtonElement
+    const restartTimer = $(classes.infoTimerRestart) as HTMLButtonElement
+    const timer = new Timer();
 
     prev.addEventListener('click', (e) => {
       prev.blur()
@@ -124,6 +143,21 @@ export default function presenterView(deck) {
       deck.next({ fragment: !e.shiftKey })
     })
 
+    startTimer.addEventListener('click', (e) => {
+      startTimer.blur();
+      timer.start();
+    })
+
+    stopTimer.addEventListener('click', (e) => {
+      stopTimer.blur();
+      timer.stop();
+    })
+
+    restartTimer.addEventListener('click', (e) => {
+      restartTimer.blur();
+      timer.restart();
+    })
+
     deck.on('fragment', ({ index, fragments, fragmentIndex }) => {
       prev.disabled = index === 0 && fragmentIndex === 0
       next.disabled =
@@ -131,12 +165,10 @@ export default function presenterView(deck) {
         fragmentIndex === fragments.length - 1
     })
 
-    const timer = new Timer();
-
     // Current time
     const update = () => {
       $(classes.infoTime).textContent = new Date().toLocaleTimeString();
-      $(classes.infoTimer).textContent = new Date(timer.elapsed()).toLocaleTimeString(undefined, { timeZone: "utc" });
+      $(classes.infoTimerText).textContent = new Date(timer.elapsed()).toLocaleTimeString(undefined, { timeZone: "utc" });
     }
 
     update()

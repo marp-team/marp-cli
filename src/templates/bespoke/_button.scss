@@ -57,6 +57,18 @@
   @include _button-icon('../../assets/osc-next.svg');
 }
 
+%button-start {
+  @include _button-icon('../../assets/timer-start.svg');
+}
+
+%button-stop {
+  @include _button-icon('../../assets/timer-stop.svg');
+}
+
+%button-restart {
+  @include _button-icon('../../assets/timer-restart.svg');
+}
+
 %button-fullscreen {
   @include _button-icon('../../assets/osc-fullscreen.svg');
 
