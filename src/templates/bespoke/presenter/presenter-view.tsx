@@ -1,5 +1,6 @@
 /** @jsx h */
 import h from 'vhtml'
+import { Timer } from './timer'
 
 const Fragment: any = ({ children }) => h(null, null, ...children)
 
@@ -55,7 +56,7 @@ export default function presenterView(deck) {
             </button>
           </div>
           <time class={classes.infoTime} title="Current time"></time>
-          <div class={classes.infoTimer}>{/* TODO: Implement timer */}</div>
+          <div class={classes.infoTimer} title="Elapsed time"></div>
         </div>
       </Fragment>
     )
@@ -130,9 +131,13 @@ export default function presenterView(deck) {
         fragmentIndex === fragments.length - 1
     })
 
+    const timer = new Timer();
+
     // Current time
-    const update = () =>
-      ($(classes.infoTime).textContent = new Date().toLocaleTimeString())
+    const update = () => {
+      $(classes.infoTime).textContent = new Date().toLocaleTimeString();
+      $(classes.infoTimer).textContent = new Date(timer.elapsed()).toLocaleTimeString(undefined, { timeZone: "utc" });
+    }
 
     update()
     setInterval(update, 250)
