@@ -1,7 +1,7 @@
 export class Timer {
-  private lastUpdate: number = new Date().getTime()
-  private time: number = 0
-  private isRunning: boolean = true
+  private lastUpdate = new Date().getTime()
+  private time = 0
+  private isRunning = true
 
   private update() {
     if (!this.isRunning) return

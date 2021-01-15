@@ -155,17 +155,17 @@ export default function presenterView(deck) {
       deck.next({ fragment: !e.shiftKey })
     })
 
-    startTimer.addEventListener('click', (e) => {
+    startTimer.addEventListener('click', () => {
       startTimer.blur()
       timer.start()
     })
 
-    stopTimer.addEventListener('click', (e) => {
+    stopTimer.addEventListener('click', () => {
       stopTimer.blur()
       timer.stop()
     })
 
-    restartTimer.addEventListener('click', (e) => {
+    restartTimer.addEventListener('click', () => {
       restartTimer.blur()
       timer.restart()
     })
