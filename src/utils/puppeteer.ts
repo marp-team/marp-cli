@@ -10,6 +10,9 @@ import { isWSL, resolveWindowsEnv } from './wsl'
 let executablePath: string | undefined | false = false
 let wslTmp: string | undefined
 
+const isSnapBrowser = (path: string | undefined) =>
+  !!(process.platform === 'linux' && path?.startsWith('/snap/'))
+
 export const generatePuppeteerDataDirPath = async (
   name: string,
   { wslHost }: { wslHost?: boolean } = {}
@@ -63,7 +66,7 @@ export const generatePuppeteerLaunchArgs = () => {
   return {
     executablePath,
     args: [...args],
-    pipe: !isWSL(),
+    pipe: !(isWSL() || isSnapBrowser(executablePath)),
 
     // Workaround to avoid force-extensions policy for Chrome enterprise (SET CHROME_ENABLE_EXTENSIONS=1)
     // https://github.com/puppeteer/puppeteer/blob/master/docs/troubleshooting.md#chrome-headless-doesnt-launch-on-windows
@@ -75,8 +78,8 @@ export const generatePuppeteerLaunchArgs = () => {
   }
 }
 
-export const launchPuppeteer = (
-  ...args: Parameters<typeof puppeteer['launch']>
+export const launchPuppeteer = async (
+  ...[options]: Parameters<typeof puppeteer['launch']>
 ) => {
   const { arch } = os
 
@@ -88,7 +91,22 @@ export const launchPuppeteer = (
       return arch()
     }
 
-    return puppeteer.launch(...args)
+    return await puppeteer.launch(options)
+  } catch (e) {
+    if (e instanceof Error) {
+      if (
+        options?.executablePath &&
+        isSnapBrowser(options.executablePath) &&
+        /^need to run as root or suid$/im.test(e.message)
+      ) {
+        error(
+          'Marp CLI has detected trying to spawn Chromium browser installed by snap, from the confined environment like another snap app. At least either of Chrome/Chromium or the shell environment must be non snap app.',
+          CLIErrorCode.CANNOT_SPAWN_SNAP_CHROMIUM
+        )
+      }
+    }
+
+    throw e
   } finally {
     os.arch = arch
   }
