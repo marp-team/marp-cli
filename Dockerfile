@@ -11,12 +11,11 @@ RUN apk update && apk upgrade && \
       freetype@edge \
       libstdc++@edge \
       harfbuzz@edge \
-      wqy-zenhei@edge \
       ttf-liberation@edge \
+      font-noto-cjk@edge \
       font-noto-devanagari@edge \
       font-noto-arabic@edge \
       font-noto-bengali@edge \
-      font-ipa@edge \
       nss@edge
 
 RUN addgroup -S marp && adduser -S -g marp marp \
