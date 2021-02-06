@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v0.23.1 - 2021-02-06
+
 ### Changed
 
 - Use Noto CJK font instead of broken font-ipa in Docker image ([#318](https://github.com/marp-team/marp-cli/pull/318))
