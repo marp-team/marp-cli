@@ -2,15 +2,16 @@
 
 ## [Unreleased]
 
-### Fixed
-
-- Throw better error when spawning snap Chromium from another snap app ([#317](https://github.com/marp-team/marp-cli/pull/317))
-
 ### Changed
 
 - Use Noto CJK font instead of broken font-ipa in Docker image ([#318](https://github.com/marp-team/marp-cli/pull/318))
 - Upgrade [Marpit v1.6.4](https://github.com/marp-team/marpit/releases/tag/v1.6.4) and [Marp Core v1.4.1](https://github.com/marp-team/marp-core/releases/tag/v1.4.1) ([#319](https://github.com/marp-team/marp-cli/pull/319))
 - Upgrade dependent packages to the latest version ([#319](https://github.com/marp-team/marp-cli/pull/319))
+- Rename `master` branch to `main` ([#320](https://github.com/marp-team/marp-cli/pull/320))
+
+### Fixed
+
+- Throw better error when spawning snap Chromium from another snap app ([#317](https://github.com/marp-team/marp-cli/pull/317))
 
 ## v0.23.0 - 2020-12-05
 
