@@ -100,7 +100,7 @@ export const launchPuppeteer = async (
         /^need to run as root or suid$/im.test(e.message)
       ) {
         error(
-          'Marp CLI has detected trying to spawn Chromium browser installed by snap, from the confined environment like another snap app. At least either of Chrome/Chromium or terminal must be non snap app.',
+          'Marp CLI has detected trying to spawn Chromium browser installed by snap, from the confined environment like another snap app. At least either of Chrome/Chromium or the shell environment must be non snap app.',
           CLIErrorCode.CANNOT_SPAWN_SNAP_CHROMIUM
         )
       }
