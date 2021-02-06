@@ -3,7 +3,6 @@ import { URL } from 'url'
 import { MarpOptions } from '@marp-team/marp-core'
 import { Marpit, Options as MarpitOptions } from '@marp-team/marpit'
 import chalk from 'chalk'
-import puppeteer from 'puppeteer-core'
 import { silence, warn } from './cli'
 import { Engine } from './engine'
 import infoPlugin, { engineInfo, EngineInfo } from './engine/info-plugin'
@@ -22,6 +21,9 @@ import {
   generatePuppeteerDataDirPath,
   generatePuppeteerLaunchArgs,
   launchPuppeteer,
+  PuppeteerBrowser,
+  PuppeteerPage,
+  PuppeteerRequest,
 } from './utils/puppeteer'
 import { isChromeInWSLHost, resolveWSLPathToHost } from './utils/wsl'
 import { notifier } from './watcher'
@@ -267,9 +269,12 @@ export class Converter {
         )
 
         if (opts.type === ConvertType.jpeg)
-          return await page.screenshot({ quality: opts.quality, type: 'jpeg' })
+          return (await page.screenshot({
+            quality: opts.quality,
+            type: 'jpeg',
+          })) as Buffer
 
-        return await page.screenshot({ type: 'png' })
+        return (await page.screenshot({ type: 'png' })) as Buffer
       }
 
       if (opts.pages) {
@@ -362,7 +367,7 @@ export class Converter {
 
   private async usePuppeteer<T>(
     baseFile: File,
-    processer: (page: puppeteer.Page, uri: string) => Promise<T>
+    processer: (page: PuppeteerPage, uri: string) => Promise<T>
   ) {
     const tmpFile: File.TmpFileInterface | undefined = await (() => {
       if (!this.options.allowLocalFiles) return undefined
@@ -384,7 +389,7 @@ export class Converter {
 
       const uri = await (async () => {
         if (tmpFile) {
-          if (isChromeInWSLHost(browser.process().spawnfile)) {
+          if (isChromeInWSLHost(browser.process()?.spawnfile)) {
             // Windows Chrome should read file from WSL environment
             return `file:${await resolveWSLPathToHost(tmpFile.path)}`
           }
@@ -429,12 +434,12 @@ export class Converter {
   }
 
   private trackFailedLocalFileAccess(
-    page: puppeteer.Page
+    page: PuppeteerPage
   ): { missingFileSet: Set<string>; failedFileSet: Set<string> } {
     const missingFileSet = new Set<string>()
     const failedFileSet = new Set<string>()
 
-    page.on('requestfailed', (req: puppeteer.Request) => {
+    page.on('requestfailed', (req: PuppeteerRequest) => {
       try {
         const url = new URL(req.url())
         if (url.protocol === 'file:') {
@@ -456,7 +461,7 @@ export class Converter {
     if (Converter.browser) await Converter.browser.close()
   }
 
-  private static browser?: puppeteer.Browser
+  private static browser?: PuppeteerBrowser
 
   private static async runBrowser() {
     if (!Converter.browser) {

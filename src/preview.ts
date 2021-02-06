@@ -1,7 +1,6 @@
 /* eslint-disable import/export, @typescript-eslint/no-namespace */
 import { EventEmitter } from 'events'
 import { nanoid } from 'nanoid'
-import puppeteer from 'puppeteer-core'
 import favicon from './assets/favicon.png'
 import { ConvertType, mimeTypes } from './converter'
 import { error } from './error'
@@ -10,6 +9,9 @@ import {
   generatePuppeteerDataDirPath,
   generatePuppeteerLaunchArgs,
   launchPuppeteer,
+  PuppeteerBrowser,
+  PuppeteerPage,
+  PuppeteerTarget,
 } from './utils/puppeteer'
 import TypedEventEmitter from './utils/typed-event-emitter'
 import { isChromeInWSLHost } from './utils/wsl'
@@ -32,7 +34,7 @@ export namespace Preview {
 export class Preview extends TypedEventEmitter<Preview.Events> {
   readonly options: Preview.Options
 
-  private puppeteerInternal: puppeteer.Browser | undefined
+  private puppeteerInternal: PuppeteerBrowser | undefined
 
   constructor(opts: Partial<Preview.Options> = {}) {
     super()
@@ -42,7 +44,7 @@ export class Preview extends TypedEventEmitter<Preview.Events> {
     }
   }
 
-  get puppeteer(): puppeteer.Browser | undefined {
+  get puppeteer(): PuppeteerBrowser | undefined {
     return this.puppeteerInternal
   }
 
@@ -67,7 +69,7 @@ export class Preview extends TypedEventEmitter<Preview.Events> {
     }
   }
 
-  private createWindowObject(page: puppeteer.Page) {
+  private createWindowObject(page: PuppeteerPage) {
     const window = new EventEmitter()
 
     page.on('close', async () => window.emit('close'))
@@ -100,17 +102,17 @@ export class Preview extends TypedEventEmitter<Preview.Events> {
   private async createWindow() {
     try {
       return this.createWindowObject(
-        await new Promise<puppeteer.Page>((res, rej) => {
+        await new Promise<PuppeteerPage>((res, rej) => {
           const pptr = this.puppeteer
           if (!pptr) return rej(false)
 
           const id = nanoid()
-          const idMatcher = (target: puppeteer.Target) => {
+          const idMatcher = (target: PuppeteerTarget) => {
             const url = new URL(target.url())
 
             if (url.searchParams.get('__marp_cli_id') === id) {
-              pptr.removeListener('targetcreated', idMatcher)
-              res(target.page())
+              pptr.off('targetcreated', idMatcher)
+              ;(async () => res((await target.page())!))() // eslint-disable-line @typescript-eslint/no-non-null-assertion
             }
           }
 
@@ -143,7 +145,7 @@ export class Preview extends TypedEventEmitter<Preview.Events> {
         `--app=data:text/html,<title>${encodeURIComponent('Marp CLI')}</title>`,
         `--window-size=${this.options.width},${this.options.height}`,
       ],
-      defaultViewport: null,
+      defaultViewport: null as any,
       headless: process.env.NODE_ENV === 'test',
       userDataDir: await generatePuppeteerDataDirPath('marp-cli-preview', {
         wslHost: isChromeInWSLHost(baseArgs.executablePath),

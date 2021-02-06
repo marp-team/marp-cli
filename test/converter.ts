@@ -354,7 +354,7 @@ describe('Converter', () => {
                   const coreProps = $('cp\\:coreProperties')
 
                   coreProps.children().each((_, elm) => {
-                    meta[elm.tagName] = $(elm).text()
+                    meta[elm['tagName']] = $(elm).text()
                   })
 
                   zip.readEntry()
