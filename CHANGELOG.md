@@ -9,6 +9,8 @@
 ### Changed
 
 - Use Noto CJK font instead of broken font-ipa in Docker image ([#318](https://github.com/marp-team/marp-cli/pull/318))
+- Upgrade [Marpit v1.6.4](https://github.com/marp-team/marpit/releases/tag/v1.6.4) and [Marp Core v1.4.1](https://github.com/marp-team/marp-core/releases/tag/v1.4.1) ([#319](https://github.com/marp-team/marp-cli/pull/319))
+- Upgrade dependent packages to the latest version ([#319](https://github.com/marp-team/marp-cli/pull/319))
 
 ## v0.23.0 - 2020-12-05
 
