@@ -1,8 +1,8 @@
 # @marp-team/marp-cli
 
-[![CircleCI](https://img.shields.io/circleci/project/github/marp-team/marp-cli/master.svg?style=flat-square&logo=circleci)](https://circleci.com/gh/marp-team/marp-cli/)
-[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/marp-team/marp-cli/Test%20for%20Windows/master?style=flat-square&logo=github)](https://github.com/marp-team/marp-cli/actions?query=workflow%3A%22Test+for+Windows%22+branch%3Amaster)
-[![Codecov](https://img.shields.io/codecov/c/github/marp-team/marp-cli/master.svg?style=flat-square&logo=codecov)](https://codecov.io/gh/marp-team/marp-cli)
+[![CircleCI](https://img.shields.io/circleci/project/github/marp-team/marp-cli/main.svg?style=flat-square&logo=circleci)](https://circleci.com/gh/marp-team/marp-cli/)
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/marp-team/marp-cli/Test%20for%20Windows/main?style=flat-square&logo=github)](https://github.com/marp-team/marp-cli/actions?query=workflow%3A%22Test+for+Windows%22+branch%3Amain)
+[![Codecov](https://img.shields.io/codecov/c/github/marp-team/marp-cli/main.svg?style=flat-square&logo=codecov)](https://codecov.io/gh/marp-team/marp-cli)
 [![npm](https://img.shields.io/npm/v/@marp-team/marp-cli.svg?style=flat-square&logo=npm)](https://www.npmjs.com/package/@marp-team/marp-cli)
 [![Docker](https://img.shields.io/docker/pulls/marpteam/marp-cli.svg?logo=docker&style=flat-square)](https://hub.docker.com/r/marpteam/marp-cli/)
 [![LICENSE](https://img.shields.io/github/license/marp-team/marp-cli.svg?style=flat-square)](./LICENSE)
@@ -12,7 +12,7 @@
 It can convert Marp / Marpit Markdown files into static HTML / CSS, PDF, PowerPoint document, and image(s) easily.
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/marp-team/marp-cli/master/docs/images/marp-cli.gif" />
+  <img src="https://raw.githubusercontent.com/marp-team/marp-cli/main/docs/images/marp-cli.gif" />
 </p>
 
 ## Try it now!
@@ -137,7 +137,7 @@ marp slide-deck.md -o converted.pptx
 A created PPTX includes rendered Marp slide pages and the support of [Marpit presenter notes](https://marpit.marp.app/usage?id=presenter-notes). It can open with PowerPoint, Keynote, Google Slides, LibreOffice Impress, and so on...
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/marp-team/marp-cli/master/docs/images/pptx.png" height="300" />
+  <img src="https://raw.githubusercontent.com/marp-team/marp-cli/main/docs/images/pptx.png" height="300" />
 </p>
 
 > :information_source: A converted PPTX consists of pre-rendered images. Please note that contents would not be able to modify or re-use in PowerPoint.
@@ -195,7 +195,7 @@ While you are opening the converted HTML in browser, it would refresh the opened
 Server mode supports on-demand conversion by HTTP request. We require to pass `--server` (`-s`) option and a directory to serve.
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/marp-team/marp-cli/master/docs/images/server-mode.gif" />
+  <img src="https://raw.githubusercontent.com/marp-team/marp-cli/main/docs/images/server-mode.gif" />
 </p>
 
 In this mode, the converted file outputs as the result of accessing to server, and not to disk. You can set the server port by setting the environment variable `PORT`, for example `PORT=5000 marp -s ./slides` would listen on port number 5000.
@@ -293,7 +293,7 @@ Marp CLI prefers CLI option to global directives. You can override metadata valu
 
 ### Override theme
 
-You can override theme you want to use by `--theme` option. For example to use [Gaia](https://github.com/marp-team/marp-core/tree/master/themes#gaia) built-in theme in Marp Core:
+You can override theme you want to use by `--theme` option. For example to use [Gaia](https://github.com/marp-team/marp-core/tree/main/themes#gaia) built-in theme in Marp Core:
 
 ```bash
 marp --theme gaia
@@ -495,7 +495,7 @@ marpCli(['test.md', '--pdf'])
 
 ### Error handling
 
-We have exported [`CLIError` class and `CLIErrorCode` enum](https://github.com/marp-team/marp-cli/blob/master/src/error.ts) from `@marp-team/marp-cli`, to allow handling for specific errors that have already known by Marp CLI.
+We have exported [`CLIError` class and `CLIErrorCode` enum](https://github.com/marp-team/marp-cli/blob/main/src/error.ts) from `@marp-team/marp-cli`, to allow handling for specific errors that have already known by Marp CLI.
 
 If `CLIError` instance was thrown, you can identify the reason why CLI throwed error by checking `errorCode` member.
 

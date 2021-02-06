@@ -186,7 +186,7 @@ workflows:
             - test-node14
           filters:
             branches:
-              only: master
+              only: main
       - docker-image-tag:
           filters:
             branches:
