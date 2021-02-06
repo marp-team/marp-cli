@@ -94,16 +94,7 @@ export const generatePuppeteerLaunchArgs = () => {
 export const launchPuppeteer = async (
   ...[options]: Parameters<typeof puppeteer['launch']>
 ) => {
-  const { arch } = os
-
   try {
-    os.arch = () => {
-      // Patch for Apple M1 (arm64)
-      // @see https://github.com/puppeteer/puppeteer/issues/6634
-      if (process.platform === 'darwin' && arch() === 'arm64') return 'x64'
-      return arch()
-    }
-
     return await puppeteer.launch(options)
   } catch (e) {
     if (e instanceof Error) {
@@ -120,8 +111,6 @@ export const launchPuppeteer = async (
     }
 
     throw e
-  } finally {
-    os.arch = arch
   }
 }
 
