@@ -16,7 +16,6 @@ declare module '*.scss' {
 }
 
 declare module 'puppeteer-core' {
-  // eslint-disable-next-line import/no-unresolved
-  import * as puppeteer from 'puppeteer'
+  import * as puppeteer from 'puppeteer-core/cjs-entry'
   export = puppeteer
 }
