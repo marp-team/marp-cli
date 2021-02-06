@@ -145,7 +145,7 @@ export class Preview extends TypedEventEmitter<Preview.Events> {
         `--app=data:text/html,<title>${encodeURIComponent('Marp CLI')}</title>`,
         `--window-size=${this.options.width},${this.options.height}`,
       ],
-      defaultViewport: undefined,
+      defaultViewport: null as any,
       headless: process.env.NODE_ENV === 'test',
       userDataDir: await generatePuppeteerDataDirPath('marp-cli-preview', {
         wslHost: isChromeInWSLHost(baseArgs.executablePath),
