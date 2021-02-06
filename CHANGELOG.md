@@ -6,6 +6,10 @@
 
 - Throw better error when spawning snap Chromium from another snap app ([#317](https://github.com/marp-team/marp-cli/pull/317))
 
+### Changed
+
+- Use Noto CJK font instead of broken font-ipa in Docker image ([#318](https://github.com/marp-team/marp-cli/pull/318))
+
 ## v0.23.0 - 2020-12-05
 
 ### Changed
