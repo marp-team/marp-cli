@@ -139,7 +139,7 @@
     "globby": "^11.0.2",
     "import-from": "^3.0.0",
     "pptxgenjs": "^3.4.0",
-    "puppeteer-core": "~7.0.4",
+    "puppeteer-core": "7.0.1",
     "serve-index": "^1.9.1",
     "tmp": "^0.2.1",
     "v8-compile-cache": "^2.2.0",
