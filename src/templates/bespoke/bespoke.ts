@@ -59,7 +59,7 @@ export default function bespokeTemplate(
   window.addEventListener('beforeunload', () =>
     setQuery({ sync: deck.syncKey })
   )
-  window.addEventListener('unload', () => deck.destroy())
+  window.addEventListener('pagehide', () => deck.destroy())
 
   return deck
 }
