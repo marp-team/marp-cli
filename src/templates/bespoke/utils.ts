@@ -7,11 +7,15 @@ type QuerySetter = (...args: Parameters<History['pushState']>) => void
 const replacer: QuerySetter = (...args) => history.replaceState(...args)
 const viewAttr = 'data-bespoke-view'
 
-export enum ViewMode {
-  Normal = '',
-  Presenter = 'presenter',
-  Next = 'next',
-}
+export const ViewModeNormal = ''
+export const ViewModePresenter = 'presenter'
+export const ViewModeNext = 'next'
+
+export const viewModes = [
+  ViewModeNormal,
+  ViewModePresenter,
+  ViewModeNext,
+] as const
 
 export const generateURLfromParams = (
   params: URLSearchParams,
@@ -21,17 +25,11 @@ export const generateURLfromParams = (
   return `${protocol}//${host}${pathname}${q ? '?' : ''}${q}${hash}`
 }
 
-export const getViewMode = () => {
-  switch (document.body.getAttribute(viewAttr)) {
-    case ViewMode.Normal:
-      return ViewMode.Normal
-    case ViewMode.Presenter:
-      return ViewMode.Presenter
-    case ViewMode.Next:
-      return ViewMode.Next
-    default:
-      throw new Error('View mode is not assigned.')
-  }
+export const getViewMode = (): typeof viewModes[number] => {
+  const mode: any = document.body.getAttribute(viewAttr)
+  if ((viewModes as readonly string[]).includes(mode)) return mode
+
+  throw new Error('View mode is not assigned.')
 }
 
 export const readQuery = (name: string) =>
@@ -76,15 +74,11 @@ export const setQuery = (
 export const setViewMode = () =>
   document.body.setAttribute(
     viewAttr,
-    ((): ViewMode => {
-      switch (readQuery('view')) {
-        case 'next':
-          return ViewMode.Next
-        case 'presenter':
-          return ViewMode.Presenter
-        default:
-          return ViewMode.Normal
-      }
+    ((): typeof viewModes[number] => {
+      const view = readQuery('view')
+      if (view === ViewModeNext || view === ViewModePresenter) return view
+
+      return ViewModeNormal
     })()
   )
 
