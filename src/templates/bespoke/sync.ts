@@ -1,6 +1,5 @@
-import { nanoid } from 'nanoid'
 import { FragmentEvent } from './fragments'
-import { storage } from './utils'
+import { storage, setHistoryState } from './utils'
 
 export interface BespokeSyncOption {
   key?: string
@@ -13,8 +12,14 @@ export interface BespokeSyncState {
 }
 
 export default function bespokeSync(opts: BespokeSyncOption = {}) {
-  const key = opts.key || nanoid()
+  const key =
+    opts.key ||
+    window.history.state?.marpBespokeSyncKey ||
+    Math.random().toString(36).slice(2)
+
   const storageKey = `bespoke-marp-sync-${key}`
+
+  setHistoryState({ marpBespokeSyncKey: key })
 
   const getState = (): Partial<BespokeSyncState> => {
     const stateJSON = storage.get(storageKey)
@@ -33,10 +38,12 @@ export default function bespokeSync(opts: BespokeSyncOption = {}) {
     return newState
   }
 
-  // Initialize or increase reference count
-  setState((prev) => ({ reference: (prev.reference || 0) + 1 }))
+  const initialize = () =>
+    setState((prev) => ({ reference: (prev.reference || 0) + 1 }))
 
   return (deck) => {
+    initialize()
+
     Object.defineProperty(deck, 'syncKey', {
       value: key,
       enumerable: true,
@@ -73,7 +80,7 @@ export default function bespokeSync(opts: BespokeSyncOption = {}) {
       }
     })
 
-    deck.on('destroy', () => {
+    const destructor = () => {
       const { reference } = getState()
 
       if (reference === undefined || reference <= 1) {
@@ -81,6 +88,16 @@ export default function bespokeSync(opts: BespokeSyncOption = {}) {
       } else {
         setState(() => ({ reference: reference - 1 }))
       }
+    }
+
+    deck.on('destroy', destructor)
+
+    window.addEventListener('pagehide', (e) => {
+      if (e.persisted) {
+        window.removeEventListener('pageshow', initialize)
+        window.addEventListener('pageshow', initialize)
+      }
+      destructor()
     })
   }
 }

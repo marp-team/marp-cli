@@ -20,5 +20,4 @@ export default function nextView(deck) {
   }
 
   window.addEventListener('message', listener)
-  deck.on('destroy', () => window.removeEventListener('message', listener))
 }

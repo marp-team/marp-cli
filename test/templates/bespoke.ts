@@ -15,6 +15,7 @@ beforeAll(() => {
 })
 
 afterEach(() => {
+  window.dispatchEvent(new Event('pagehide'))
   window.dispatchEvent(new Event('unload'))
   jest.restoreAllMocks()
   jest.clearAllTimers()
