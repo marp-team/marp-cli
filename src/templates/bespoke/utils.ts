@@ -27,7 +27,7 @@ export const generateURLfromParams = (
 
 export const getViewMode = (): typeof viewModes[number] => {
   const mode: any = document.body.getAttribute(viewAttr)
-  if ((viewModes as readonly string[]).includes(mode)) return mode
+  if (viewModes.includes(mode)) return mode
 
   throw new Error('View mode is not assigned.')
 }
