@@ -15,15 +15,15 @@ import bespokeTouch from './touch'
 import { getViewMode, popQuery, setViewMode, ViewMode } from './utils'
 import bespokeWakeLock from './wake-lock'
 
-const pattern = [ViewMode.Normal, ViewMode.Presenter, ViewMode.Next] as const
-
 const parse = (
   ...patterns: [
     [normalView: boolean, presnterView: boolean, nextView: boolean],
     (...args: unknown[]) => void
   ][]
 ) => {
-  const idx = pattern.findIndex((v) => getViewMode() === v)
+  const idx = [ViewMode.Normal, ViewMode.Presenter, ViewMode.Next].findIndex(
+    (v) => getViewMode() === v
+  )
   if (idx < 0) throw new Error('Invalid view')
 
   return patterns.map(([pat, plugin]) => pat[idx] && plugin).filter((p) => p)
