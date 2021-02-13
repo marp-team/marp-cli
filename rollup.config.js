@@ -9,10 +9,11 @@ import autoprefixer from 'autoprefixer'
 import builtinModules from 'builtin-modules'
 import cssnano from 'cssnano'
 import postcssUrl from 'postcss-url'
+import license from 'rollup-plugin-license'
 import postcss from 'rollup-plugin-postcss'
 import pugPlugin from 'rollup-plugin-pug'
 import { terser } from 'rollup-plugin-terser'
-import { dependencies } from './package.json'
+import { dependencies, name, version } from './package.json'
 
 const compact = !process.env.ROLLUP_WATCH
 
@@ -45,13 +46,20 @@ const plugins = (opts = {}) => [
   compact &&
     terser({
       keep_classnames: /^CLIError$/,
+      format: { comments: opts.license ? /^!!/ : 'some' },
+    }),
+  opts.license &&
+    license({
+      thirdParty: {
+        output: path.join(__dirname, opts.license),
+      },
     }),
 ]
 
-const browser = {
+const browser = (opts = {}) => ({
   external: external(Object.keys(dependencies)),
-  plugins: plugins({ browser: true }),
-}
+  plugins: plugins({ ...opts, browser: true }),
+})
 
 const cli = {
   external: external([...builtinModules, ...Object.keys(dependencies)]),
@@ -60,17 +68,22 @@ const cli = {
 
 export default [
   {
-    ...browser,
+    ...browser({ license: 'lib/bespoke.js.LICENSE.txt' }),
     input: 'src/templates/bespoke.js',
-    output: { compact, file: 'lib/bespoke.js', format: 'iife' },
+    output: {
+      compact,
+      file: 'lib/bespoke.js',
+      format: 'iife',
+      banner: `/*!! License: https://unpkg.com/${name}@${version}/lib/bespoke.js.LICENSE.txt */\n`,
+    },
   },
   {
-    ...browser,
+    ...browser(),
     input: 'src/templates/watch.js',
     output: { compact, file: 'lib/watch.js', format: 'iife' },
   },
   {
-    ...browser,
+    ...browser(),
     input: 'src/server/server-index.js',
     output: { compact, file: 'lib/server/server-index.js', format: 'iife' },
   },
