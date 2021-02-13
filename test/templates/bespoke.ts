@@ -15,7 +15,9 @@ beforeAll(() => {
 })
 
 afterEach(() => {
-  window.dispatchEvent(new Event('pagehide'))
+  window.dispatchEvent(
+    new PageTransitionEvent('pagehide', { persisted: false })
+  )
   window.dispatchEvent(new Event('unload'))
   jest.restoreAllMocks()
   jest.clearAllTimers()
@@ -1064,6 +1066,25 @@ describe("Bespoke template's browser context", () => {
         deck.next()
         await updateStore('test', { reference: 2 })
         expect(deck.slide()).toBe(2)
+      })
+    })
+
+    describe('when leaved from the slide with bfcache', () => {
+      it('adds event listener for pageshow event to increment reference count', () => {
+        replaceLocation('/?sync=bfcache', () => {
+          bespoke()
+          expect(getStore('bfcache').reference).toBe(1)
+
+          window.dispatchEvent(
+            new PageTransitionEvent('pagehide', { persisted: true })
+          )
+          expect(getStore('bfcache')).toBeNull()
+
+          window.dispatchEvent(
+            new PageTransitionEvent('pageshow', { persisted: true })
+          )
+          expect(getStore('bfcache').reference).toBe(1)
+        })
       })
     })
 

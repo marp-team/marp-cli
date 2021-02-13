@@ -38,8 +38,10 @@ export default function bespokeSync(opts: BespokeSyncOption = {}) {
     return newState
   }
 
-  const initialize = () =>
+  const initialize = () => {
+    window.removeEventListener('pageshow', initialize)
     setState((prev) => ({ reference: (prev.reference || 0) + 1 }))
+  }
 
   return (deck) => {
     initialize()
@@ -90,14 +92,11 @@ export default function bespokeSync(opts: BespokeSyncOption = {}) {
       }
     }
 
-    deck.on('destroy', destructor)
-
-    window.addEventListener('pagehide', (e) => {
-      if (e.persisted) {
-        window.removeEventListener('pageshow', initialize)
-        window.addEventListener('pageshow', initialize)
-      }
+    window.addEventListener('pagehide', (e: PageTransitionEvent) => {
+      if (e.persisted) window.addEventListener('pageshow', initialize)
       destructor()
     })
+
+    deck.on('destroy', destructor)
   }
 }
