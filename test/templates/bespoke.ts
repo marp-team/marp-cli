@@ -970,6 +970,8 @@ describe("Bespoke template's browser context", () => {
     beforeEach(() => render(markdown))
 
     it('defines auto-generated deck.syncKey', () => {
+      jest.spyOn(history, 'state', 'get').mockImplementation(() => null)
+
       const deck = bespoke()
       expect(typeof deck.syncKey).toBe('string')
     })
