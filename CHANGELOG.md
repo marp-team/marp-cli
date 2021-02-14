@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Optimize bespoke template for bfcache ([#323](https://github.com/marp-team/marp-cli/pull/323))
+
 ## v0.23.2 - 2021-02-11
 
 ### Changed
