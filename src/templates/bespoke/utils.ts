@@ -61,8 +61,8 @@ export const setQuery = (
 
   try {
     options.setter(
-      null,
-      document.title,
+      { ...(window.history.state ?? {}) },
+      '',
       generateURLfromParams(params, options.location)
     )
   } catch (e) {
@@ -70,6 +70,9 @@ export const setQuery = (
     console.error(e)
   }
 }
+
+export const setHistoryState = (state: Record<string, any>) =>
+  setQuery({}, { setter: (s, ...r) => replacer({ ...s, ...state }, ...r) })
 
 export const setViewMode = () =>
   document.body.setAttribute(

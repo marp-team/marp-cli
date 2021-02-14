@@ -12,17 +12,14 @@ import bespokeProgress from './progress'
 import bespokeState from './state'
 import bespokeSync from './sync'
 import bespokeTouch from './touch'
-import {
-  getViewMode,
-  popQuery,
-  setQuery,
-  setViewMode,
-  viewModes,
-} from './utils'
+import { getViewMode, popQuery, setViewMode, viewModes } from './utils'
 import bespokeWakeLock from './wake-lock'
 
 const parse = (
-  ...patterns: [[boolean, boolean, boolean], (...args: unknown[]) => void][]
+  ...patterns: [
+    [normalView: boolean, presnterView: boolean, nextView: boolean],
+    (...args: unknown[]) => void
+  ][]
 ) => {
   const idx = viewModes.findIndex((v) => getViewMode() === v)
   if (idx < 0) throw new Error('Invalid view')
@@ -59,11 +56,6 @@ export default function bespokeTemplate(
       [[x, x, _], bespokeWakeLock]
     )
   )
-
-  window.addEventListener('beforeunload', () =>
-    setQuery({ sync: deck.syncKey })
-  )
-  window.addEventListener('unload', () => deck.destroy())
 
   return deck
 }
