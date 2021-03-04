@@ -105,7 +105,7 @@
     "portfinder": "^1.0.28",
     "postcss-url": "^8.0.0",
     "prettier": "^2.2.1",
-    "pug": "^3.0.0",
+    "pug": "^3.0.1",
     "rimraf": "^3.0.2",
     "rollup": "^2.38.5",
     "rollup-plugin-postcss": "^3.1.8",
