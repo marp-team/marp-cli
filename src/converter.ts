@@ -3,6 +3,7 @@ import { URL } from 'url'
 import { MarpOptions } from '@marp-team/marp-core'
 import { Marpit, Options as MarpitOptions } from '@marp-team/marpit'
 import chalk from 'chalk'
+import puppeteer from 'puppeteer-core'
 import { silence, warn } from './cli'
 import { Engine } from './engine'
 import infoPlugin, { engineInfo, EngineInfo } from './engine/info-plugin'
@@ -21,9 +22,6 @@ import {
   generatePuppeteerDataDirPath,
   generatePuppeteerLaunchArgs,
   launchPuppeteer,
-  PuppeteerBrowser,
-  PuppeteerPage,
-  PuppeteerRequest,
 } from './utils/puppeteer'
 import { isChromeInWSLHost, resolveWSLPathToHost } from './utils/wsl'
 import { notifier } from './watcher'
@@ -367,7 +365,7 @@ export class Converter {
 
   private async usePuppeteer<T>(
     baseFile: File,
-    processer: (page: PuppeteerPage, uri: string) => Promise<T>
+    processer: (page: puppeteer.Page, uri: string) => Promise<T>
   ) {
     const tmpFile: File.TmpFileInterface | undefined = await (() => {
       if (!this.options.allowLocalFiles) return undefined
@@ -434,12 +432,12 @@ export class Converter {
   }
 
   private trackFailedLocalFileAccess(
-    page: PuppeteerPage
+    page: puppeteer.Page
   ): { missingFileSet: Set<string>; failedFileSet: Set<string> } {
     const missingFileSet = new Set<string>()
     const failedFileSet = new Set<string>()
 
-    page.on('requestfailed', (req: PuppeteerRequest) => {
+    page.on('requestfailed', (req: puppeteer.HTTPRequest) => {
       try {
         const url = new URL(req.url())
         if (url.protocol === 'file:') {
@@ -461,7 +459,7 @@ export class Converter {
     if (Converter.browser) await Converter.browser.close()
   }
 
-  private static browser?: PuppeteerBrowser
+  private static browser?: puppeteer.Browser
 
   private static async runBrowser() {
     if (!Converter.browser) {
