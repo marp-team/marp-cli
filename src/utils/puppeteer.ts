@@ -7,19 +7,6 @@ import { CLIErrorCode, error } from '../error'
 import { findEdgeInstallation } from './edge-finder'
 import { isWSL, resolveWindowsEnv } from './wsl'
 
-type UnwrapPromise<T> = T extends Promise<infer U> ? U : never
-
-export type PuppeteerBrowser = UnwrapPromise<
-  ReturnType<typeof puppeteer['launch']>
->
-export type PuppeteerPage = UnwrapPromise<
-  ReturnType<PuppeteerBrowser['newPage']>
->
-export type PuppeteerRequest = UnwrapPromise<
-  ReturnType<PuppeteerPage['waitForRequest']>
->
-export type PuppeteerTarget = ReturnType<PuppeteerBrowser['target']>
-
 let executablePath: string | undefined | false = false
 let wslTmp: string | undefined
 
