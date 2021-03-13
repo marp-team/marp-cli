@@ -259,20 +259,26 @@ export class Converter {
       await page.goto(uri, { waitUntil: ['domcontentloaded', 'networkidle0'] })
       await page.emulateMediaType('print')
 
-      const screenshot = async (pageNumber?: number) => {
+      const screenshot = async (pageNumber = 1) => {
+        // for Chrome < 89 (TODO: Remove this script evaluation in future)
         await page.evaluate(
-          `window.scrollTo(0,${
-            ((pageNumber || 1) - 1) * tpl.rendered.size.height
-          })`
+          `window.scrollTo(0,${(pageNumber - 1) * tpl.rendered.size.height})`
         )
+
+        const clip = {
+          x: 0,
+          y: (pageNumber - 1) * tpl.rendered.size.height,
+          ...tpl.rendered.size,
+        } as const
 
         if (opts.type === ConvertType.jpeg)
           return (await page.screenshot({
+            clip,
             quality: opts.quality,
             type: 'jpeg',
           })) as Buffer
 
-        return (await page.screenshot({ type: 'png' })) as Buffer
+        return (await page.screenshot({ clip, type: 'png' })) as Buffer
       }
 
       if (opts.pages) {
