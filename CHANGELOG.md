@@ -6,6 +6,10 @@
 
 - Optimize bespoke template for bfcache ([#323](https://github.com/marp-team/marp-cli/pull/323))
 
+### Changed
+
+- Upgrade dependent packages to the latest version ([#330](https://github.com/marp-team/marp-cli/pull/330))
+
 ## v0.23.2 - 2021-02-11
 
 ### Changed
