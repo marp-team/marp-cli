@@ -25,7 +25,10 @@ const plugins = (opts = {}) => [
     browser: !!opts.browser,
     mainFields: ['module', 'jsnext:main', 'main'],
   }),
-  replace({ 'process.env.NODE_ENV': JSON.stringify('production') }),
+  replace({
+    preventAssignment: true,
+    'process.env.NODE_ENV': JSON.stringify('production'),
+  }),
   commonjs(),
   typescript({ noEmitOnError: false }),
   postcss({
