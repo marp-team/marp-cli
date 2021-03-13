@@ -4,7 +4,13 @@
 
 ### Fixed
 
+- Conversion into multi images/PPTX takes only the first slide if using Chromium >= v89 ([#325](https://github.com/marp-team/marp-cli/issues/325), [#329](https://github.com/marp-team/marp-cli/pull/329))
 - Optimize bespoke template for bfcache ([#323](https://github.com/marp-team/marp-cli/pull/323))
+
+### Changed
+
+- Upgrade Puppeteer to v8 ([#329](https://github.com/marp-team/marp-cli/pull/329))
+- Upgrade dependent packages to the latest version ([#330](https://github.com/marp-team/marp-cli/pull/330))
 
 ## v0.23.2 - 2021-02-11
 
