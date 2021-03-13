@@ -27,7 +27,7 @@ const plugins = (opts = {}) => [
   }),
   replace({
     preventAssignment: true,
-    'process.env.NODE_ENV': JSON.stringify('production')
+    'process.env.NODE_ENV': JSON.stringify('production'),
   }),
   commonjs(),
   typescript({ noEmitOnError: false }),
