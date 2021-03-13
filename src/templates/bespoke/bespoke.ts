@@ -12,7 +12,7 @@ import bespokeProgress from './progress'
 import bespokeState from './state'
 import bespokeSync from './sync'
 import bespokeTouch from './touch'
-import { getViewMode, popQuery, setViewMode, ViewMode } from './utils'
+import { getViewMode, popQuery, setViewMode, viewModes } from './utils'
 import bespokeWakeLock from './wake-lock'
 
 const parse = (
@@ -21,9 +21,7 @@ const parse = (
     (...args: unknown[]) => void
   ][]
 ) => {
-  const idx = [ViewMode.Normal, ViewMode.Presenter, ViewMode.Next].findIndex(
-    (v) => getViewMode() === v
-  )
+  const idx = viewModes.findIndex((v) => getViewMode() === v)
   if (idx < 0) throw new Error('Invalid view')
 
   return patterns.map(([pat, plugin]) => pat[idx] && plugin).filter((p) => p)

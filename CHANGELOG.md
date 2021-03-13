@@ -9,6 +9,7 @@
 
 ### Changed
 
+- Extract licenses of bundled script for bespoke template into another txt ([#324](https://github.com/marp-team/marp-cli/pull/324))
 - Upgrade Puppeteer to v8 ([#329](https://github.com/marp-team/marp-cli/pull/329))
 - Upgrade dependent packages to the latest version ([#330](https://github.com/marp-team/marp-cli/pull/330))
 

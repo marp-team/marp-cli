@@ -14,13 +14,7 @@ export const requestWakeLock = async (): Promise<WakeLockObject> => {
 
   if (api) {
     try {
-      const wakeLock: EventTarget = await api.request('screen')
-      wakeLock.addEventListener('release', () => {
-        console.debug('[Marp CLI] Wake Lock was released')
-      })
-
-      console.debug('[Marp CLI] Wake Lock is active')
-      return wakeLock
+      return await api.request('screen')
     } catch (e) {
       console.warn(e)
     }
