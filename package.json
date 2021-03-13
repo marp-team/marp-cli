@@ -147,6 +147,10 @@
     "ws": "^7.4.4",
     "yargs": "^16.2.0"
   },
+  "resolutions": {
+    "pug": "^3.0.2",
+    "pug-runtime": "^3.0.1"
+  },
   "publishConfig": {
     "access": "public"
   }
