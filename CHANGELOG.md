@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v0.23.3 - 2021-03-14
+
 ### Fixed
 
 - Conversion into multi images/PPTX takes only the first slide if using Chromium >= v89 ([#325](https://github.com/marp-team/marp-cli/issues/325), [#329](https://github.com/marp-team/marp-cli/pull/329))
