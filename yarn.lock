@@ -552,6 +552,19 @@
     markdown-it-front-matter "^0.2.3"
     postcss "^7.0.32"
 
+"@marp-team/marpit@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@marp-team/marpit/-/marpit-2.0.0.tgz#73556c561bafbb199b8717c3ea52c43d2bf66732"
+  integrity sha512-hot9rS0c79IZj9LT8ZzTP1auiq1+Aywdpi2Bm7L/sr/ULCAJANtbOGh0sk8Z1muqjkfNWfmX66z3ic89nPl3Mw==
+  dependencies:
+    color-string "^1.5.5"
+    cssesc "^3.0.0"
+    js-yaml "^4.0.0"
+    lodash.kebabcase "^4.1.1"
+    markdown-it "^12.0.4"
+    markdown-it-front-matter "^0.2.3"
+    postcss "^8.2.8"
+
 "@nodelib/fs.scandir@2.1.4":
   version "2.1.4"
   resolved "https://registry.yarnpkg.com/@nodelib/fs.scandir/-/fs.scandir-2.1.4.tgz#d4b3549a5db5de2683e0c1071ab4f140904bbf69"
@@ -1867,7 +1880,7 @@ color-name@^1.0.0, color-name@~1.1.4:
   resolved "https://registry.yarnpkg.com/color-name/-/color-name-1.1.4.tgz#c2a09a87acbde69543de6f63fa3995c826c536a2"
   integrity sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==
 
-color-string@^1.5.4:
+color-string@^1.5.4, color-string@^1.5.5:
   version "1.5.5"
   resolved "https://registry.yarnpkg.com/color-string/-/color-string-1.5.5.tgz#65474a8f0e7439625f3d27a6a19d89fc45223014"
   integrity sha512-jgIoum0OfQfq9Whcfc2z/VhCNcmQjWbey6qBX0vqt7YICflUmBCh9E9CiQD5GSJ+Uehixm3NUwHVhqUAWRivZg==
