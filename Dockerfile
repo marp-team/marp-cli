@@ -16,7 +16,8 @@ RUN apk update && apk upgrade && \
       font-noto-devanagari@edge \
       font-noto-arabic@edge \
       font-noto-bengali@edge \
-      nss@edge
+      nss@edge \
+      su-exec
 
 RUN addgroup -S marp && adduser -S -g marp marp \
     && mkdir -p /home/marp/app /home/marp/.cli \
@@ -31,6 +32,10 @@ RUN yarn add puppeteer-core@chrome-$(chromium-browser --version | sed -r 's/^Chr
 RUN yarn install && yarn build && rm -rf ./src ./node_modules && yarn install --production && yarn cache clean \
     && node /home/marp/.cli/marp-cli.js --version
 
+USER root
+
+ENV MARPID marp:marp
+
 WORKDIR /home/marp/app
-ENTRYPOINT ["node", "/home/marp/.cli/marp-cli.js"]
+ENTRYPOINT ["/home/marp/.cli/entrypoint"]
 CMD ["--help"]
