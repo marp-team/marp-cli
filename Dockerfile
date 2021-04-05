@@ -34,7 +34,7 @@ RUN yarn install && yarn build && rm -rf ./src ./node_modules && yarn install --
 
 USER root
 
-ENV MARPID marp:marp
+ENV MARP_USER marp:marp
 
 WORKDIR /home/marp/app
 ENTRYPOINT ["/home/marp/.cli/entrypoint"]
