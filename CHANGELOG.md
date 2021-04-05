@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Allow `MARP_USER` env for Docker image to set an explicit UID/GID ([#334](https://github.com/marp-team/marp-cli/pull/334) by [@davebaird](https://github.com/davebaird))
+
 ## v0.23.3 - 2021-03-14
 
 ### Fixed
