@@ -20,9 +20,10 @@ executors:
     working_directory: ~/marp-cli
 
   docker:
-    docker:
-      - image: docker:git
+    machine: true
     working_directory: ~/marp-cli
+    environment:
+      DOCKER_BUILDKIT: 1
 
 commands:
   install:
@@ -108,11 +109,21 @@ commands:
       pass:
         type: env_var_name
         default: DOCKER_PASS
+      machine:
+        type: boolean
+        default: false
     steps:
       - checkout
 
-      - setup_remote_docker:
-          version: '20.10.2'
+      - unless:
+          condition: << parameters.machine >>
+          steps:
+            - setup_remote_docker:
+                version: '20.10.2'
+
+      - run:
+          name: Login to Docker Hub
+          command: docker login -u ${<< parameters.user >>} -p ${<< parameters.pass >>}
 
       - run:
           name: Install Docker buildx
@@ -130,7 +141,6 @@ commands:
       - run:
           name: Build Docker image and push to Docker Hub
           command: |
-            docker login -u ${<< parameters.user >>} -p ${<< parameters.pass >>}
             docker context create builder
             docker buildx create --use builder
             docker buildx build --no-cache --platform linux/amd64,linux/arm64 --push -t marpteam/marp-cli:<< parameters.tag >> .
@@ -171,12 +181,14 @@ jobs:
     executor: docker
     steps:
       - docker:
+          machine: true
           tag: latest
 
   docker-image-tag:
     executor: docker
     steps:
       - docker:
+          machine: true
           tag: $CIRCLE_TAG
 
 workflows:
