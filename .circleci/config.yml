@@ -130,14 +130,6 @@ jobs:
     steps:
       - audit
 
-  test-node10:
-    executor:
-      name: node
-      browser: true
-      version: '10'
-    steps:
-      - test
-
   test-node12:
     executor:
       name: node
@@ -150,9 +142,17 @@ jobs:
     executor:
       name: node
       browser: true
-      version: '14.15.1' # Specify LTS version for development
+      version: '14.16.1' # Specify LTS version for development
     steps:
       - test
+
+  # test-node16:
+  #   executor:
+  #     name: node
+  #     browser: true
+  #     version: '16'
+  #   steps:
+  #     - test
 
   docker-image-latest:
     executor: docker
@@ -170,20 +170,20 @@ workflows:
   test:
     jobs:
       - audit
-      - test-node10:
-          requires:
-            - audit
       - test-node12:
           requires:
             - audit
       - test-node14:
           requires:
             - audit
+      # - test-node16:
+      #     requires:
+      #       - audit
       - docker-image-latest:
           requires:
-            - test-node10
             - test-node12
             - test-node14
+            # - test-node16
           filters:
             branches:
               only: main

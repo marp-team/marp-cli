@@ -337,7 +337,7 @@ export class Converter {
     })
 
     const ret = file.convert(this.options.output, { extension: 'pptx' })
-    ret.buffer = (await pptx.write('nodebuffer')) as Buffer
+    ret.buffer = (await pptx.write({ outputType: 'nodebuffer' })) as Buffer
 
     return ret
   }

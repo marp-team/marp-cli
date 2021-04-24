@@ -1,8 +1,10 @@
 import path from 'path'
-import { buffer as stdinBuffer } from 'get-stdin'
+import getStdin from 'get-stdin'
 import api, { CLIError } from '../src/index'
 import * as marpCli from '../src/marp-cli'
 import * as puppeteerUtil from '../src/utils/puppeteer'
+
+const stdinBuffer = getStdin.buffer
 
 afterEach(() => {
   jest.restoreAllMocks()
