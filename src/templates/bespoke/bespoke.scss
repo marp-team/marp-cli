@@ -1,3 +1,5 @@
+@use './button';
+
 $progressHeight: 5px;
 
 .bespoke-marp-note,
@@ -8,8 +10,6 @@ $progressHeight: 5px;
 }
 
 @media screen {
-  @import './button';
-
   html,
   body {
     height: 100%;
@@ -116,19 +116,19 @@ $progressHeight: 5px;
           @extend %button;
 
           &[data-bespoke-marp-osc='prev'] {
-            @include button-icon(prev);
+            @include button.button-icon(prev);
           }
 
           &[data-bespoke-marp-osc='next'] {
-            @include button-icon(next);
+            @include button.button-icon(next);
           }
 
           &[data-bespoke-marp-osc='fullscreen'] {
-            @include button-icon(fullscreen);
+            @include button.button-icon(fullscreen);
           }
 
           &[data-bespoke-marp-osc='presenter'] {
-            @include button-icon(presenter);
+            @include button.button-icon(presenter);
           }
         }
       }
@@ -324,7 +324,7 @@ $progressHeight: 5px;
 
         button {
           @extend %button;
-          @include button-size(1.5em);
+          @include button.button-size(1.5em);
 
           &.bespoke-marp-presenter-info-page-prev {
             @extend %button-prev;
