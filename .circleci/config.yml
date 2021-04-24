@@ -130,14 +130,6 @@ jobs:
     steps:
       - audit
 
-  test-node10:
-    executor:
-      name: node
-      browser: true
-      version: '10'
-    steps:
-      - test
-
   test-node12:
     executor:
       name: node
