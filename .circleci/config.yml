@@ -110,6 +110,19 @@ commands:
         default: DOCKER_PASS
     steps:
       - checkout
+
+      - setup_remote_docker:
+          version: '20.10.2'
+
+      - run:
+          name: Install Docker buildx
+          command: |
+            docker build --platform=local -o ~ git://github.com/docker/buildx
+            mkdir -p ~/.docker/cli-plugins
+            mv ~/buildx ~/.docker/cli-plugins/docker-buildx
+          environment:
+            DOCKER_BUILDKIT: 1
+
       - run:
           name: Build Docker image and push to Docker Hub
           command: |
