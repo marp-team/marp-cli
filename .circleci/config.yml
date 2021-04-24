@@ -124,6 +124,10 @@ commands:
             DOCKER_BUILDKIT: 1
 
       - run:
+          name: Setup QEMU
+          command: docker run --privileged --rm tonistiigi/binfmt --install all
+
+      - run:
           name: Build Docker image and push to Docker Hub
           command: |
             docker login -u ${<< parameters.user >>} -p ${<< parameters.pass >>}
