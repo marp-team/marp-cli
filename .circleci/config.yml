@@ -20,7 +20,8 @@ executors:
     working_directory: ~/marp-cli
 
   docker:
-    machine: true
+    machine:
+      image: ubuntu-2004:202101-01
     working_directory: ~/marp-cli
     environment:
       DOCKER_BUILDKIT: 1
