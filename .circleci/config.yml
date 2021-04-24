@@ -128,7 +128,7 @@ commands:
           command: |
             docker login -u ${<< parameters.user >>} -p ${<< parameters.pass >>}
             docker context create builder
-            docker buildx create --use
+            docker buildx create --use builder
             docker buildx build --no-cache --platform linux/amd64,linux/arm64 --push -t marpteam/marp-cli:<< parameters.tag >> .
           environment:
             DOCKER_CLI_EXPERIMENTAL: enabled
