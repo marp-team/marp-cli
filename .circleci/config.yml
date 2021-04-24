@@ -112,17 +112,14 @@ commands:
       - checkout
 
       - setup_remote_docker:
-          version: '19.03.13'
+          version: '20.10.2'
 
       - run:
-          name: Build Docker image
-          command: docker build --no-cache -t marpteam/marp-cli:<< parameters.tag >> .
-
-      - run:
-          name: Push to Docker Hub
+          name: Build Docker image and push to Docker Hub
           command: |
             docker login -u ${<< parameters.user >>} -p ${<< parameters.pass >>}
-            docker push marpteam/marp-cli:<< parameters.tag >>
+            docker buildx create --use
+            docker buildx build --no-cache --platform linux/amd64,linux/arm64 --push -t marpteam/marp-cli:<< parameters.tag >> .
 
 jobs:
   audit:

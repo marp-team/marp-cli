@@ -1,9 +1,9 @@
 **/*
 !src/
+!docker-entrypoint
 !LICENSE
 !marp-cli.js
 !package.json
 !rollup.config.js
 !tsconfig.json
 !yarn.lock
-!entrypoint
