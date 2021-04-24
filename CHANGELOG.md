@@ -8,8 +8,8 @@
 
 ### Added
 
+- Build Docker container image for ARM64 ([#328](https://github.com/marp-team/marp-cli/issues/328), [#339](https://github.com/marp-team/marp-cli/pull/339))
 - Allow `MARP_USER` env for Docker image to set an explicit UID/GID ([#334](https://github.com/marp-team/marp-cli/pull/334) by [@davebaird](https://github.com/davebaird))
-- Build Docker container image for ARM64 ([#339](https://github.com/marp-team/marp-cli/pull/339))
 - Test against Node 16 for Windows ([#338](https://github.com/marp-team/marp-cli/pull/338))
 
 ### Changed
