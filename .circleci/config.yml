@@ -110,17 +110,14 @@ commands:
         default: DOCKER_PASS
     steps:
       - checkout
-
-      - setup_remote_docker:
-          version: '20.10.2'
-
       - run:
           name: Build Docker image and push to Docker Hub
           command: |
-            export DOCKER_CLI_EXPERIMENTAL=enabled
             docker login -u ${<< parameters.user >>} -p ${<< parameters.pass >>}
             docker buildx create --use
             docker buildx build --no-cache --platform linux/amd64,linux/arm64 --push -t marpteam/marp-cli:<< parameters.tag >> .
+          environment:
+            DOCKER_CLI_EXPERIMENTAL: enabled
 
 jobs:
   audit:
