@@ -22,7 +22,6 @@ executors:
   docker:
     machine:
       image: ubuntu-2004:202101-01
-    resource_class: large
     working_directory: ~/marp-cli
     environment:
       DOCKER_BUILDKIT: 1
