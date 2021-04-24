@@ -170,9 +170,6 @@ workflows:
   test:
     jobs:
       - audit
-      - test-node10:
-          requires:
-            - audit
       - test-node12:
           requires:
             - audit
@@ -184,7 +181,6 @@ workflows:
       #       - audit
       - docker-image-latest:
           requires:
-            - test-node10
             - test-node12
             - test-node14
             # - test-node16
