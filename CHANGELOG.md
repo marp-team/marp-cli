@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v1.0.0 - 2021-04-24
+
 ### Breaking
 
 - Dropped Node 10 support ([#338](https://github.com/marp-team/marp-cli/pull/338))
