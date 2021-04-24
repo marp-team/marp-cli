@@ -37,5 +37,5 @@ USER root
 ENV MARP_USER marp:marp
 
 WORKDIR /home/marp/app
-ENTRYPOINT ["/home/marp/.cli/entrypoint"]
+ENTRYPOINT ["/home/marp/.cli/docker-entrypoint"]
 CMD ["--help"]
