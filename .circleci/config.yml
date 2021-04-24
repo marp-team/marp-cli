@@ -117,7 +117,7 @@ commands:
       - run:
           name: Install Docker buildx
           command: |
-            docker build --platform=local -o ~ git://github.com/docker/buildx
+            docker build --platform=local --quiet -o ~ git://github.com/docker/buildx
             mkdir -p ~/.docker/cli-plugins
             mv ~/buildx ~/.docker/cli-plugins/docker-buildx
           environment:
@@ -127,6 +127,7 @@ commands:
           name: Build Docker image and push to Docker Hub
           command: |
             docker login -u ${<< parameters.user >>} -p ${<< parameters.pass >>}
+            docker context create builder
             docker buildx create --use
             docker buildx build --no-cache --platform linux/amd64,linux/arm64 --push -t marpteam/marp-cli:<< parameters.tag >> .
           environment:
