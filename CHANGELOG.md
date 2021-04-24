@@ -2,9 +2,19 @@
 
 ## [Unreleased]
 
+### Breaking
+
+- Dropped Node 10 support ([#338](https://github.com/marp-team/marp-cli/pull/338))
+
 ### Added
 
 - Allow `MARP_USER` env for Docker image to set an explicit UID/GID ([#334](https://github.com/marp-team/marp-cli/pull/334) by [@davebaird](https://github.com/davebaird))
+- Test against Node 16 for Windows ([#338](https://github.com/marp-team/marp-cli/pull/338))
+
+### Changed
+
+- Upgrade [Marpit v2.0.0](https://github.com/marp-team/marpit/releases/tag/v2.0.0) and [Marp Core v2.0.0](https://github.com/marp-team/marp-core/releases/tag/v2.0.0) ([#338](https://github.com/marp-team/marp-cli/pull/338))
+- Upgrade Node and dependent packages to the latest version ([#338](https://github.com/marp-team/marp-cli/pull/338))
 
 ## v0.23.3 - 2021-03-14
 
