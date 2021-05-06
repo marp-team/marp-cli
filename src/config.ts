@@ -49,6 +49,7 @@ interface IMarpCLIArguments {
 export type IMarpCLIConfig = Overwrite<
   Omit<IMarpCLIArguments, 'configFile' | '_'>,
   {
+    baseUrl?: string
     engine?: ResolvableEngine | ResolvableEngine[]
     html?: ConverterOption['html']
     lang?: string
@@ -183,6 +184,7 @@ export class MarpCLIConfig {
       type,
       allowLocalFiles:
         this.args.allowLocalFiles ?? this.conf.allowLocalFiles ?? false,
+      baseUrl: this.conf.baseUrl,
       engine: this.engine.klass,
       globalDirectives: {
         description: this.args.description ?? this.conf.description,
