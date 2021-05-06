@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Allow overriding base url through `baseUrl` option ([#343](https://github.com/marp-team/marp-cli/pull/343))
+
 ## v1.0.1 - 2021-04-27
 
 ### Changed
