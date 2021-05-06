@@ -389,10 +389,7 @@ export const waitForObservation = () =>
     resolversForObservation.push(res)
   })
 
-export const apiInterface = (
-  argv: string[] = [],
-  opts: MarpCLIAPIOptions = {}
-) => {
+export const apiInterface = (argv: string[], opts: MarpCLIAPIOptions = {}) => {
   resetExecutablePath()
 
   return marpCli(argv, {
