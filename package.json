@@ -149,6 +149,7 @@
     "yargs": "^16.2.0"
   },
   "resolutions": {
+    "normalize-package-data": "^3.0.2",
     "pug": "^3.0.2",
     "pug-runtime": "^3.0.1"
   },
