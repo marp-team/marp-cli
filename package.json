@@ -91,7 +91,6 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-jest": "^24.3.6",
-    "file-url": "^4.0.0",
     "get-stdin": "^9.0.0",
     "image-size": "^1.0.0",
     "is-wsl": "^2.2.0",
