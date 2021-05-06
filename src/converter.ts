@@ -45,6 +45,7 @@ export const mimeTypes = {
 
 export interface ConverterOption {
   allowLocalFiles: boolean
+  baseUrl?: string
   engine: Engine
   globalDirectives: { theme?: string } & Partial<TemplateMeta>
   html?: MarpOptions['html']
@@ -104,13 +105,21 @@ export class Converter {
     }: { fallbackToPrintableTemplate?: boolean } = {}
   ): Promise<TemplateResult> {
     const { lang, globalDirectives, type } = this.options
+
     const isFile = (f: File | undefined): f is File =>
       !!f && f.type === FileType.File
 
-    const resolveBase = async (f: File) =>
-      isChromeInWSLHost(generatePuppeteerLaunchArgs().executablePath)
-        ? `file:${await resolveWSLPathToHost(f.absolutePath)}`
-        : f.absoluteFileScheme
+    const resolveBase = async (f?: File) => {
+      if (this.options.baseUrl) return this.options.baseUrl
+
+      if (isFile(f) && type !== ConvertType.html) {
+        return isChromeInWSLHost(generatePuppeteerLaunchArgs().executablePath)
+          ? `file:${await resolveWSLPathToHost(f.absolutePath)}`
+          : f.absoluteFileScheme
+      }
+
+      return undefined
+    }
 
     let additionals = ''
 
@@ -128,10 +137,7 @@ export class Converter {
     return await template({
       ...(this.options.templateOption || {}),
       lang,
-      base:
-        isFile(file) && type !== ConvertType.html
-          ? await resolveBase(file)
-          : undefined,
+      base: await resolveBase(file),
       notifyWS:
         isFile(file) && this.options.watch && type === ConvertType.html
           ? await notifier.register(file.absolutePath)

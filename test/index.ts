@@ -14,13 +14,14 @@ afterEach(() => {
 describe('Marp CLI API interface', () => {
   it('runs Marp CLI with specific options', async () => {
     const marpCliSpy = jest.spyOn(marpCli, 'marpCli').mockResolvedValue(0)
-    const ret = await api([])
+    const ret = await api([], { baseUrl: 'https://example.com/' })
 
     expect(ret).toBe(0)
     expect(marpCliSpy).toHaveBeenCalled()
 
     const opts: marpCli.MarpCLIInternalOptions = marpCliSpy.mock.calls[0][1]
 
+    expect(opts.baseUrl).toBe('https://example.com/')
     expect(opts.stdin).toBe(false)
     expect(opts.throwErrorAlways).toBe(true)
   })

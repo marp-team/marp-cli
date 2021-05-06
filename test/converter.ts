@@ -215,6 +215,17 @@ describe('Converter', () => {
         )
       })
     })
+
+    describe('with baseUrl option', () => {
+      it('overrides <base> href attribute to specific URL in every kind of conversion', async () => {
+        for (const type of Object.values(ConvertType)) {
+          const converter = instance({ type, baseUrl: 'https://example.com/' })
+          const { result } = await converter.convert(md, dummyFile)
+
+          expect(result).toContain('<base href="https://example.com/">')
+        }
+      })
+    })
   })
 
   describe('#convertFile', () => {

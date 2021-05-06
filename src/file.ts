@@ -4,7 +4,6 @@ import os from 'os'
 import path from 'path'
 import * as url from 'url'
 import { promisify } from 'util'
-import fileUrl from 'file-url'
 import getStdin from 'get-stdin'
 import globby, { GlobbyOptions } from 'globby'
 import mkdirp from 'mkdirp'
@@ -44,11 +43,7 @@ export class File {
   }
 
   get absoluteFileScheme(): string {
-    if (url.pathToFileURL)
-      return url.pathToFileURL(this.absolutePath).toString()
-
-    // Fallback for Node < v10.12.0
-    return fileUrl(this.absolutePath)
+    return url.pathToFileURL(this.absolutePath).toString()
   }
 
   convert(output: string | false | undefined, opts: FileConvertOption): File {
