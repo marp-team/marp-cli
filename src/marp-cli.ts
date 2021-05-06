@@ -22,9 +22,12 @@ enum OptionGroup {
 }
 
 export interface MarpCLIInternalOptions {
+  baseUrl?: string
   stdin: boolean
   throwErrorAlways: boolean
 }
+
+export type MarpCLIAPIOptions = Pick<MarpCLIInternalOptions, 'baseUrl'>
 
 export type ObservationHelper = { stop: () => void }
 
@@ -38,7 +41,7 @@ Usage:
 
 export const marpCli = async (
   argv: string[],
-  { stdin: defaultStdin, throwErrorAlways }: MarpCLIInternalOptions
+  { baseUrl, stdin: defaultStdin, throwErrorAlways }: MarpCLIInternalOptions
 ): Promise<number> => {
   let server: Server | undefined
   let watcherInstance: Watcher | undefined
@@ -215,6 +218,7 @@ export const marpCli = async (
       })
 
     const args = {
+      baseUrl, // It's not intended using by the consumer so can't set through CLI arguments
       ...program.argv,
       _: program.argv._.map((v) => v.toString()),
     }
@@ -385,10 +389,14 @@ export const waitForObservation = () =>
     resolversForObservation.push(res)
   })
 
-export const apiInterface = (argv: string[] = []) => {
+export const apiInterface = (
+  argv: string[] = [],
+  opts: MarpCLIAPIOptions = {}
+) => {
   resetExecutablePath()
 
   return marpCli(argv, {
+    ...opts,
     stdin: false,
     throwErrorAlways: true,
   })
