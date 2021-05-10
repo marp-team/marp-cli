@@ -143,6 +143,12 @@ export const marpCli = async (
           coerce: (type: string) => (type === 'jpg' ? 'jpeg' : type),
           type: 'string',
         },
+        'image-scale': {
+          defaultDescription: '1 (or 2.5 for PPTX conversion)',
+          describe: 'The scale factor for rendered images',
+          group: OptionGroup.Converter,
+          type: 'number',
+        },
         'jpeg-quality': {
           defaultDescription: '85',
           describe: 'Setting JPEG image quality',

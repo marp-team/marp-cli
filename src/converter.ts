@@ -49,6 +49,7 @@ export interface ConverterOption {
   engine: Engine
   globalDirectives: { theme?: string } & Partial<TemplateMeta>
   html?: MarpOptions['html']
+  imageScale?: number
   inputDir?: string
   lang: string
   options: MarpitOptions
@@ -72,6 +73,7 @@ export interface ConvertFileOption {
 export interface ConvertImageOption {
   pages?: boolean | number[]
   quality?: number
+  scale?: number
   type: ConvertType.png | ConvertType.jpeg
 }
 
@@ -189,13 +191,18 @@ export class Converter {
             ...(await this.convertFileToImage(template, file, {
               pages: this.options.pages,
               quality: this.options.jpegQuality,
+              scale: this.options.imageScale,
               type: this.options.type,
             }))
           )
           break
         case ConvertType.pptx:
           template = await useTemplate(true)
-          files.push(await this.convertFileToPPTX(template, file))
+          files.push(
+            await this.convertFileToPPTX(template, file, {
+              scale: this.options.imageScale ?? 2.5,
+            })
+          )
           break
         default:
           template = await useTemplate()
@@ -261,7 +268,10 @@ export class Converter {
     const files: File[] = []
 
     await this.usePuppeteer(html, async (page, uri) => {
-      await page.setViewport(tpl.rendered.size)
+      await page.setViewport({
+        ...tpl.rendered.size,
+        deviceScaleFactor: opts.scale ?? 1,
+      })
       await page.goto(uri, { waitUntil: ['domcontentloaded', 'networkidle0'] })
       await page.emulateMediaType('print')
 
@@ -310,8 +320,13 @@ export class Converter {
     return files
   }
 
-  private async convertFileToPPTX(tpl: TemplateResult, file: File) {
+  private async convertFileToPPTX(
+    tpl: TemplateResult,
+    file: File,
+    opts: Partial<ConvertImageOption> = {}
+  ) {
     const imageFiles = await this.convertFileToImage(tpl, file, {
+      ...opts,
       pages: true,
       type: ConvertType.png,
     })

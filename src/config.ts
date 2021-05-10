@@ -31,6 +31,7 @@ interface IMarpCLIArguments {
   html?: boolean
   image?: string
   images?: string
+  imageScale?: number
   inputDir?: string
   jpegQuality?: number
   ogImage?: string
@@ -160,6 +161,25 @@ export class MarpCLIConfig {
       return ConvertType.html
     })()
 
+    const imageScale = (() => {
+      const scale = this.args.imageScale ?? this.conf.imageScale
+
+      if (scale) {
+        if (typeof scale !== 'number') {
+          error('Image scale factor must be a number.')
+        }
+        if (scale <= 0) error('Image scale factor cannot set as 0 or less.')
+        if (scale > 10) {
+          warn(
+            `You are setting too large image scale factor (x${scale}). Automatically restricted to x10.`
+          )
+          return 10
+        }
+      }
+
+      return scale
+    })()
+
     const preview = (() => {
       const p = this.args.preview ?? this.conf.preview ?? false
 
@@ -174,6 +194,7 @@ export class MarpCLIConfig {
     })()
 
     return {
+      imageScale,
       inputDir,
       output,
       preview,
