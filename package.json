@@ -44,7 +44,7 @@
   "scripts": {
     "build": "yarn -s clean && rollup -c",
     "build:standalone": "run-s build standalone",
-    "check:audit": "yarn audit",
+    "check:audit": "echo \"[WARNING] Temporally limited yarn audit only to dependencies: https://github.com/marp-team/marp-cli/pull/347\" && yarn audit --groups dependencies",
     "check:format": "yarn -s format -c",
     "check:ts": "tsc --noEmit",
     "clean": "rimraf lib",
