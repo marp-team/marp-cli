@@ -9,6 +9,7 @@
 ### Changed
 
 - Upgrade dependent packages to the latest version ([#347](https://github.com/marp-team/marp-cli/pull/347))
+- Mark preview window as stable ([#348](https://github.com/marp-team/marp-cli/pull/348))
 
 ## v1.0.3 - 2021-05-09
 
