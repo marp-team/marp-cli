@@ -103,7 +103,7 @@ export const marpCli = async (
         },
         preview: {
           alias: 'p',
-          describe: 'Open preview window (EXPERIMENTAL)',
+          describe: 'Open preview window',
           hidden: !!process.env.IS_DOCKER,
           group: OptionGroup.Basic,
           type: 'boolean',
@@ -326,7 +326,7 @@ export const marpCli = async (
           preview.on('exit', () => res(0))
           preview.on('opening', (location: string) => {
             const loc = location.substr(0, 50)
-            const msg = `[Preview] (EXPERIMENTAL) Opening ${loc}...`
+            const msg = `[Preview] Opening ${loc}...`
             cli.info(chalk.cyan(msg))
           })
 
