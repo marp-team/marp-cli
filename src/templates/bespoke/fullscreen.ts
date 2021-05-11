@@ -8,7 +8,7 @@ export default function bespokeFullscreen(deck) {
   document.addEventListener('keydown', (e) => {
     // `f` or F11 without modifier key Alt, Control, and Command
     if (
-      (e.which === 70 || e.which === 122) &&
+      (e.key === 'f' || e.key === 'F11') &&
       !e.altKey &&
       !e.ctrlKey &&
       !e.metaKey &&

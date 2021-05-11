@@ -8,28 +8,30 @@ enum Direction {
 }
 
 export default function bespokeNavigation({
-  interval = 200,
+  interval = 250,
 }: BespokeNavigationOption = {}) {
   return (deck) => {
     document.addEventListener('keydown', (e) => {
-      if (e.which === 32 && e.shiftKey) {
-        // Space + Shift: Previous page
-        deck.prev()
-      } else if (e.which === 33 || e.which === 37 || e.which === 38) {
-        // Page Up | LEFT | UP: Previous page (Skip fragments if holding shift)
-        deck.prev({ fragment: !e.shiftKey })
-      } else if (e.which === 32 && !e.shiftKey) {
-        // Space: Next page
-        deck.next()
-      } else if (e.which === 34 || e.which === 39 || e.which === 40) {
-        // Page Down | RIGHT | DOWN: Next page (Skip fragments if holding shift)
-        deck.next({ fragment: !e.shiftKey })
-      } else if (e.which === 35) {
-        // END: Jump to last page
-        deck.slide(deck.slides.length - 1, { fragment: -1 })
-      } else if (e.which === 36) {
-        // HOME: Jump to first page
-        deck.slide(0)
+      if (e.key === ' ' && e.shiftKey) {
+        deck.prev() // Previous page
+      } else if (
+        e.key === 'ArrowLeft' ||
+        e.key === 'ArrowUp' ||
+        e.key === 'PageUp'
+      ) {
+        deck.prev({ fragment: !e.shiftKey }) // Previous page (Skip fragments if holding shift)
+      } else if (e.key === ' ' && !e.shiftKey) {
+        deck.next() // Next page
+      } else if (
+        e.key === 'ArrowRight' ||
+        e.key === 'ArrowDown' ||
+        e.key === 'PageDown'
+      ) {
+        deck.next({ fragment: !e.shiftKey }) // Next page (Skip fragments if holding shift)
+      } else if (e.key === 'End') {
+        deck.slide(deck.slides.length - 1, { fragment: -1 }) // Jump to last page
+      } else if (e.key === 'Home') {
+        deck.slide(0) // Jump to first page
       } else {
         return
       }
@@ -55,6 +57,42 @@ export default function bespokeNavigation({
 
       e.preventDefault()
 
+      // Prevent too sensitive navigation on trackpad and magic mouse
+      const currentWheelDelta = Math.sqrt(e.deltaX ** 2 + e.deltaY ** 2)
+
+      if (e.wheelDelta !== undefined) {
+        if (e.webkitForce === undefined) {
+          // [Chromium]
+          // Chromium has (a deprecated) wheelDelta value and it is following the
+          // pre-defeind WHEEL_DELTA (=120). It means a required delta for
+          // scrolling 3 lines. We have set a threshold as 40 (required to scroll
+          // 1 line).
+          if (Math.abs(e.wheelDelta) < 40) return
+        }
+
+        // [WebKit]
+        // WebKit's wheelDelta value will just return 3 times numbers from the
+        // standard delta values, so using the standard delta will be better
+        // than depending on deprecated values.
+        //
+        // Both of Chromium and Webkit are starting scroll from 4 pixels by a
+        // event of the mouse wheel notch. If set a threshold to require 1 line
+        // of scroll, the navigation by mouse wheel may be insensitive. So we
+        // have set a threshold as 4 pixels.
+        //
+        // It means Safari is more sensitive to Multi-touch devices than other
+        // browsers.
+        if (e.deltaMode === e.DOM_DELTA_PIXEL && currentWheelDelta < 4) return
+      } else {
+        // [Firefox]
+        // Firefox only has delta values provided by the standard wheel event.
+        //
+        // It will report 36 as the delta of the minimum tick for the regular
+        // mouse wheel because Firefox's default font size is 12px and 36px is
+        // required delta to scroll 3 lines at once.
+        if (e.deltaMode === e.DOM_DELTA_PIXEL && currentWheelDelta < 12) return
+      }
+
       // Suppress momentum scrolling by trackpad
       if (wheelIntervalTimer) clearTimeout(wheelIntervalTimer)
 
@@ -63,7 +101,6 @@ export default function bespokeNavigation({
       }, interval)
 
       const debouncing = Date.now() - lastWheelNavigationAt < interval
-      const currentWheelDelta = Math.sqrt(e.deltaX ** 2 + e.deltaY ** 2)
       const attenuated = currentWheelDelta <= lastWheelDelta
 
       lastWheelDelta = currentWheelDelta

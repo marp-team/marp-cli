@@ -2,7 +2,7 @@
 import Marp from '@marp-team/marp-core'
 import { Element as MarpitElement } from '@marp-team/marpit'
 import { default as screenfull, Screenfull } from 'screenfull'
-import { Key } from 'ts-keycode-enum'
+import { Key } from 'ts-key-enum'
 import bespoke from '../../src/templates/bespoke/bespoke'
 import { classes } from '../../src/templates/bespoke/presenter/presenter-view'
 import { _clearCachedWakeLockApi } from '../../src/templates/bespoke/wake-lock'
@@ -235,12 +235,12 @@ describe("Bespoke template's browser context", () => {
     })
 
     it('toggles fullscreen by hitting f key', () => {
-      keydown({ which: Key.F })
+      keydown({ key: 'f' })
       expect((screenfull as Screenfull).toggle).toHaveBeenCalled()
     })
 
     it('toggles fullscreen by hitting F11 key', () => {
-      keydown({ which: Key.F11 })
+      keydown({ key: Key.F11 })
       expect((screenfull as Screenfull).toggle).toHaveBeenCalled()
     })
   })
@@ -339,12 +339,12 @@ describe("Bespoke template's browser context", () => {
         const deck = bespoke()
 
         keydown(
-          { bubbles: true, which: Key.RightArrow },
+          { bubbles: true, key: Key.ArrowRight },
           document.getElementById('element')! // eslint-disable-line @typescript-eslint/no-non-null-assertion
         )
         expect(deck.slide()).toBe(0)
 
-        keydown({ bubbles: true, which: Key.RightArrow }, deck.slides[0])
+        keydown({ bubbles: true, key: Key.ArrowRight }, deck.slides[0])
         expect(deck.slide()).toBe(1)
       })
     }
@@ -368,34 +368,34 @@ describe("Bespoke template's browser context", () => {
       render()
       const deck = bespoke()
 
-      keydown({ which: Key.RightArrow })
+      keydown({ key: Key.ArrowRight })
       expect(deck.slide()).toBe(1)
 
-      keydown({ which: Key.LeftArrow })
+      keydown({ key: Key.ArrowLeft })
       expect(deck.slide()).toBe(0)
 
-      keydown({ which: Key.Space })
+      keydown({ key: ' ' })
       expect(deck.slide()).toBe(1)
 
-      keydown({ which: Key.Space, shiftKey: true })
+      keydown({ key: ' ', shiftKey: true })
       expect(deck.slide()).toBe(0)
 
-      keydown({ which: Key.PageDown })
+      keydown({ key: Key.PageDown })
       expect(deck.slide()).toBe(1)
 
-      keydown({ which: Key.PageUp })
+      keydown({ key: Key.PageUp })
       expect(deck.slide()).toBe(0)
 
-      keydown({ which: Key.DownArrow })
+      keydown({ key: Key.ArrowDown })
       expect(deck.slide()).toBe(1)
 
-      keydown({ which: Key.UpArrow })
+      keydown({ key: Key.ArrowUp })
       expect(deck.slide()).toBe(0)
 
-      keydown({ which: Key.End })
+      keydown({ key: Key.End })
       expect(deck.slide()).toBe(2)
 
-      keydown({ which: Key.Home })
+      keydown({ key: Key.Home })
       expect(deck.slide()).toBe(0)
     })
 
@@ -403,34 +403,34 @@ describe("Bespoke template's browser context", () => {
       render('* A\n* B\n* C\n\n---\n\n* D\n* E')
       const deck = bespoke()
 
-      keydown({ which: Key.RightArrow, shiftKey: true })
+      keydown({ key: Key.ArrowRight, shiftKey: true })
       expect(deck.slide()).toBe(0)
       expect(deck.fragmentIndex).toBe(3)
 
-      keydown({ which: Key.DownArrow, shiftKey: true })
+      keydown({ key: Key.ArrowDown, shiftKey: true })
       expect(deck.slide()).toBe(1)
       expect(deck.fragmentIndex).toBe(2)
 
-      keydown({ which: Key.LeftArrow, shiftKey: true })
+      keydown({ key: Key.ArrowLeft, shiftKey: true })
       expect(deck.slide()).toBe(0)
       expect(deck.fragmentIndex).toBe(3)
 
-      keydown({ which: Key.RightArrow })
+      keydown({ key: Key.ArrowRight })
       expect(deck.slide()).toBe(1)
       expect(deck.fragmentIndex).toBe(0)
 
-      keydown({ which: Key.PageDown, shiftKey: true })
+      keydown({ key: Key.PageDown, shiftKey: true })
       expect(deck.fragmentIndex).toBe(2)
 
-      keydown({ which: Key.UpArrow, shiftKey: true })
+      keydown({ key: Key.ArrowUp, shiftKey: true })
       expect(deck.slide()).toBe(0)
       expect(deck.fragmentIndex).toBe(3)
 
-      keydown({ which: Key.RightArrow })
+      keydown({ key: Key.ArrowRight })
       expect(deck.slide()).toBe(1)
       expect(deck.fragmentIndex).toBe(0)
 
-      keydown({ which: Key.PageUp, shiftKey: true })
+      keydown({ key: Key.PageUp, shiftKey: true })
       expect(deck.slide()).toBe(0)
       expect(deck.fragmentIndex).toBe(3)
     })
@@ -453,25 +453,25 @@ describe("Bespoke template's browser context", () => {
         const now = jest.spyOn(Date, 'now')
         now.mockImplementation(() => 1000)
 
-        dispatch({ deltaY: 1 })
+        dispatch({ deltaY: 120 })
         expect(deck.slide()).toBe(1)
 
         // Suppress navigation by continuous scrolling
-        dispatch({ deltaY: 3 })
+        dispatch({ deltaY: 240 })
         expect(deck.slide()).toBe(1)
 
         // +300ms
         now.mockImplementation(() => 1300)
         jest.advanceTimersByTime(300)
 
-        dispatch({ deltaY: 1 })
+        dispatch({ deltaY: 120 })
         expect(deck.slide()).toBe(2)
 
         // Backward
         now.mockImplementation(() => 1600)
         jest.advanceTimersByTime(600)
 
-        dispatch({ deltaY: -1 })
+        dispatch({ deltaY: -120 })
         expect(deck.slide()).toBe(1)
       })
 
@@ -495,8 +495,85 @@ describe("Bespoke template's browser context", () => {
         now.mockImplementation(() => 2000)
 
         // Navigate if detected a not attenuated delta
-        dispatch({ deltaX: 10 })
+        dispatch({ deltaX: 100 })
         expect(deck.slide()).toBe(2)
+      })
+
+      it('does not react against the wheel event that only have a slightly wheel delta', () => {
+        expect(deck.slide()).toBe(0)
+
+        dispatch({ deltaX: 1 })
+        expect(deck.slide()).toBe(0)
+
+        dispatch({ deltaX: 10 })
+        expect(deck.slide()).toBe(0)
+
+        dispatch({ deltaX: 12 })
+        expect(deck.slide()).toBe(1)
+      })
+
+      const dispatchEx = (
+        opts: WheelEventInit = {},
+        extra: Record<string, any> = { wheelDelta: undefined }
+      ) =>
+        parent.dispatchEvent(
+          Object.assign(
+            new WheelEvent('wheel', { ...opts, bubbles: true }),
+            extra
+          )
+        )
+
+      describe('when browsing by Chromium', () => {
+        it('does not react against the wheel event that only have a slightly wheel delta', () => {
+          const now = jest.spyOn(Date, 'now')
+          now.mockImplementation(() => 1000)
+
+          expect(deck.slide()).toBe(0)
+
+          dispatchEx({ deltaX: 3 }, { wheelDelta: 30 })
+          expect(deck.slide()).toBe(0)
+
+          dispatchEx({ deltaX: 4 }, { wheelDelta: 40 })
+          expect(deck.slide()).toBe(1)
+
+          now.mockImplementation(() => 1300)
+          jest.advanceTimersByTime(300)
+
+          dispatchEx({ deltaY: -3 }, { wheelDelta: -39 })
+          expect(deck.slide()).toBe(1)
+
+          dispatchEx({ deltaY: -4 }, { wheelDelta: -40 })
+          expect(deck.slide()).toBe(0)
+        })
+      })
+
+      describe('when browsing by Safari', () => {
+        const extraForSafari = (extra: Record<string, any>) => ({
+          ...extra,
+          webkitForce: 0,
+        })
+
+        it('does not react against the wheel event that only have a slightly wheel delta', () => {
+          const now = jest.spyOn(Date, 'now')
+          now.mockImplementation(() => 1000)
+
+          expect(deck.slide()).toBe(0)
+
+          dispatchEx({ deltaX: 1 }, extraForSafari({ wheelDelta: 3 }))
+          expect(deck.slide()).toBe(0)
+
+          dispatchEx({ deltaX: 4 }, extraForSafari({ wheelDelta: 12 }))
+          expect(deck.slide()).toBe(1)
+
+          now.mockImplementation(() => 1300)
+          jest.advanceTimersByTime(300)
+
+          dispatchEx({ deltaY: -3 }, extraForSafari({ wheelDelta: -9 }))
+          expect(deck.slide()).toBe(1)
+
+          dispatchEx({ deltaY: -4 }, extraForSafari({ wheelDelta: -12 }))
+          expect(deck.slide()).toBe(0)
+        })
       })
 
       describe('when the target element is scrollable', () => {
@@ -528,19 +605,19 @@ describe("Bespoke template's browser context", () => {
           const now = jest.spyOn(Date, 'now')
           now.mockImplementation(() => 1000)
 
-          dispatch({ deltaY: 1 }, overflowAutoElement)
+          dispatch({ deltaY: 120 }, overflowAutoElement)
           expect(deck.slide()).toBe(0)
 
-          dispatch({ deltaY: 1 }, notScrollableElement)
+          dispatch({ deltaY: 120 }, notScrollableElement)
           expect(deck.slide()).toBe(1)
 
           now.mockImplementation(() => 2000)
           jest.runAllTimers()
 
-          dispatch({ deltaY: 1 }, overflowYAutoElement)
+          dispatch({ deltaY: 120 }, overflowYAutoElement)
           expect(deck.slide()).toBe(1)
 
-          dispatch({ deltaX: 1 }, overflowYAutoElement)
+          dispatch({ deltaX: 120 }, overflowYAutoElement)
           expect(deck.slide()).toBe(2)
         })
       })
@@ -711,13 +788,13 @@ describe("Bespoke template's browser context", () => {
 
       it('opens presenter view by hitting p key', () => {
         bespoke()
-        keydown({ which: Key.P })
+        keydown({ key: 'p' })
         expect(window.open).toHaveBeenCalled()
 
         // Ignore hitting p key with modifier
         ;(window.open as jest.Mock).mockClear()
 
-        keydown({ which: Key.P, ctrlKey: true })
+        keydown({ key: 'p', ctrlKey: true })
         expect(window.open).not.toHaveBeenCalled()
       })
     })
