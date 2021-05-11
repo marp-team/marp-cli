@@ -453,25 +453,25 @@ describe("Bespoke template's browser context", () => {
         const now = jest.spyOn(Date, 'now')
         now.mockImplementation(() => 1000)
 
-        dispatch({ deltaY: 1 })
+        dispatch({ deltaY: 120 })
         expect(deck.slide()).toBe(1)
 
         // Suppress navigation by continuous scrolling
-        dispatch({ deltaY: 3 })
+        dispatch({ deltaY: 240 })
         expect(deck.slide()).toBe(1)
 
         // +300ms
         now.mockImplementation(() => 1300)
         jest.advanceTimersByTime(300)
 
-        dispatch({ deltaY: 1 })
+        dispatch({ deltaY: 120 })
         expect(deck.slide()).toBe(2)
 
         // Backward
         now.mockImplementation(() => 1600)
         jest.advanceTimersByTime(600)
 
-        dispatch({ deltaY: -1 })
+        dispatch({ deltaY: -120 })
         expect(deck.slide()).toBe(1)
       })
 
@@ -495,9 +495,13 @@ describe("Bespoke template's browser context", () => {
         now.mockImplementation(() => 2000)
 
         // Navigate if detected a not attenuated delta
-        dispatch({ deltaX: 10 })
+        dispatch({ deltaX: 100 })
         expect(deck.slide()).toBe(2)
       })
+
+      it.todo(
+        'does not react against the wheel event that only have a slightly wheel delta'
+      )
 
       describe('when the target element is scrollable', () => {
         const overflowAuto = (decl = 'overflow') => {
@@ -528,19 +532,19 @@ describe("Bespoke template's browser context", () => {
           const now = jest.spyOn(Date, 'now')
           now.mockImplementation(() => 1000)
 
-          dispatch({ deltaY: 1 }, overflowAutoElement)
+          dispatch({ deltaY: 120 }, overflowAutoElement)
           expect(deck.slide()).toBe(0)
 
-          dispatch({ deltaY: 1 }, notScrollableElement)
+          dispatch({ deltaY: 120 }, notScrollableElement)
           expect(deck.slide()).toBe(1)
 
           now.mockImplementation(() => 2000)
           jest.runAllTimers()
 
-          dispatch({ deltaY: 1 }, overflowYAutoElement)
+          dispatch({ deltaY: 120 }, overflowYAutoElement)
           expect(deck.slide()).toBe(1)
 
-          dispatch({ deltaX: 1 }, overflowYAutoElement)
+          dispatch({ deltaX: 120 }, overflowYAutoElement)
           expect(deck.slide()).toBe(2)
         })
       })
