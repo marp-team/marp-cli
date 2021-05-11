@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v1.1.0 - 2021-05-11
+
 ### Added
 
 - `--image-scale` option for setting the scale factor of rendered image(s) ([#349](https://github.com/marp-team/marp-cli/pull/349))
