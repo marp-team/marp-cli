@@ -3,6 +3,7 @@ import fs from 'fs'
 import path from 'path'
 import { version as coreVersion } from '@marp-team/marp-core/package.json'
 import { version as marpitVersion } from '@marp-team/marpit/package.json'
+import { Explorer } from 'cosmiconfig/dist/Explorer'
 import getStdin from 'get-stdin'
 import stripAnsi from 'strip-ansi'
 import { version as cliVersion } from '../package.json'
@@ -598,6 +599,65 @@ describe('Marp CLI', () => {
         const converter = await conversion(onePath, '--images=jpeg')
         expect(converter.options.type).toBe(ConvertType.jpeg)
         expect(converter.options.pages).toBe(true)
+      })
+    })
+
+    describe('with --image-scale option', () => {
+      const conf = assetFn('_configs/marpit/config.js')
+
+      it('converts file with specified scale factor', async () => {
+        const cmd = [onePath, '--image-scale', '3']
+        expect((await conversion(...cmd)).options.imageScale).toBe(3)
+      })
+
+      it('allows a decimal point number', async () => {
+        jest
+          .spyOn(Explorer.prototype, 'load')
+          .mockResolvedValue({ filepath: conf, config: { imageScale: 0.5 } })
+
+        const cmd = [onePath, '--config', conf]
+        expect((await conversion(...cmd)).options.imageScale).toBe(0.5)
+      })
+
+      it('restricts the scale factor up to x10', async () => {
+        const warn = jest.spyOn(console, 'warn').mockImplementation()
+        const cmd = [onePath, '--image-scale', '15']
+
+        expect((await conversion(...cmd)).options.imageScale).toBe(10)
+        expect(warn).toHaveBeenCalledWith(expect.stringContaining('restricted'))
+      })
+
+      it('cannot specify the scale factor to zero', async () => {
+        const cliError = jest.spyOn(cli, 'error').mockImplementation()
+        const cmd = [onePath, '--image-scale', '0']
+
+        expect(await marpCli(cmd)).toBe(1)
+        expect(cliError).toHaveBeenCalledWith(
+          expect.stringContaining('cannot set as 0 or less')
+        )
+      })
+
+      it('cannot specify the scale factor to the negative value', async () => {
+        const cliError = jest.spyOn(cli, 'error').mockImplementation()
+        const cmd = [onePath, '--image-scale', '-1']
+
+        expect(await marpCli(cmd)).toBe(1)
+        expect(cliError).toHaveBeenCalledWith(
+          expect.stringContaining('cannot set as 0 or less')
+        )
+      })
+
+      it('must be a number', async () => {
+        const cliError = jest.spyOn(cli, 'error').mockImplementation()
+
+        jest
+          .spyOn(Explorer.prototype, 'load')
+          .mockResolvedValue({ filepath: conf, config: { imageScale: 'test' } })
+
+        expect(await marpCli([onePath, '-c', conf])).toBe(1)
+        expect(cliError).toHaveBeenCalledWith(
+          expect.stringContaining('must be a number')
+        )
       })
     })
 

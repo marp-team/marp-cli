@@ -170,6 +170,19 @@ marp slide-deck.md -o output.png
 
 It would be useful for creating [Open Graph] image that can specify with [`image` global directive and `--og-image` option](#metadata).
 
+#### Scale factor
+
+You can set the scale factor for rendered image(s) through `--image-scale` option. It is useful for making high-resolution image from the slide.
+
+```bash
+# Generate high-resolution image of the title slide
+marp slide-deck.md -o title-slide@2x.png --image-scale 2
+```
+
+> :information_source: `--image-scale` is not affect to the actual size of presentation.
+>
+> It is also available for PPTX conversion. By default, Marp CLI will use `2.5` as the default scale factor in PPTX to suppress deterioration of slide rendering in full-screen presentation.
+
 ### Security about local files
 
 Because of [the security reason](https://github.com/marp-team/marp-cli/pull/10#user-content-security), **PDF, PPTX and image(s) conversion cannot use local files by default.**
@@ -429,6 +442,7 @@ If you want to prevent looking up a configuration file, you can pass `--no-confi
 | `html`            |      boolean \| object      |       `--html`        | Enable or disable HTML (Configuration file can pass [the whitelist object] if you are using Marp Core) |
 | `image`           |       `png` \| `jpeg`       |       `--image`       | Convert the first slide page into an image file                                                        |
 | `images`          |       `png` \| `jpeg`       |      `--images`       | Convert slide deck into multiple image files                                                           |
+| `imageScale`      |           number            |    `--image-scale`    | The scale factor for rendered images (`1` by default, or `2.5` for PPTX conversion)                    |
 | `inputDir`        |           string            |  `--input-dir` `-I`   | The base directory to find markdown and theme CSS                                                      |
 | `jpegQuality`     |           number            |   `--jpeg-quality`    | Setting JPEG image quality (`85` by default)                                                           |
 | `lang`            |           string            |                       | Define the language of converted HTML                                                                  |
