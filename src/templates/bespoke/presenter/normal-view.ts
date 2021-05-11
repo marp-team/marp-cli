@@ -20,7 +20,7 @@ export default function normalView(deck) {
   if (storage.available)
     document.addEventListener('keydown', (e) => {
       // `p` without modifier key (Alt, Control, and Command)
-      if (e.which === 80 && !e.altKey && !e.ctrlKey && !e.metaKey) {
+      if (e.key === 'p' && !e.altKey && !e.ctrlKey && !e.metaKey) {
         e.preventDefault()
         deck.openPresenterView()
       }

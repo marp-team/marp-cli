@@ -8,28 +8,30 @@ enum Direction {
 }
 
 export default function bespokeNavigation({
-  interval = 200,
+  interval = 250,
 }: BespokeNavigationOption = {}) {
   return (deck) => {
     document.addEventListener('keydown', (e) => {
-      if (e.which === 32 && e.shiftKey) {
-        // Space + Shift: Previous page
-        deck.prev()
-      } else if (e.which === 33 || e.which === 37 || e.which === 38) {
-        // Page Up | LEFT | UP: Previous page (Skip fragments if holding shift)
-        deck.prev({ fragment: !e.shiftKey })
-      } else if (e.which === 32 && !e.shiftKey) {
-        // Space: Next page
-        deck.next()
-      } else if (e.which === 34 || e.which === 39 || e.which === 40) {
-        // Page Down | RIGHT | DOWN: Next page (Skip fragments if holding shift)
-        deck.next({ fragment: !e.shiftKey })
-      } else if (e.which === 35) {
-        // END: Jump to last page
-        deck.slide(deck.slides.length - 1, { fragment: -1 })
-      } else if (e.which === 36) {
-        // HOME: Jump to first page
-        deck.slide(0)
+      if (e.key === ' ' && e.shiftKey) {
+        deck.prev() // Previous page
+      } else if (
+        e.key === 'ArrowLeft' ||
+        e.key === 'ArrowUp' ||
+        e.key === 'PageUp'
+      ) {
+        deck.prev({ fragment: !e.shiftKey }) // Previous page (Skip fragments if holding shift)
+      } else if (e.key === ' ' && !e.shiftKey) {
+        deck.next() // Next page
+      } else if (
+        e.key === 'ArrowRight' ||
+        e.key === 'ArrowDown' ||
+        e.key === 'PageDown'
+      ) {
+        deck.next({ fragment: !e.shiftKey }) // Next page (Skip fragments if holding shift)
+      } else if (e.key === 'End') {
+        deck.slide(deck.slides.length - 1, { fragment: -1 }) // Jump to last page
+      } else if (e.key === 'Home') {
+        deck.slide(0) // Jump to first page
       } else {
         return
       }
@@ -54,6 +56,9 @@ export default function bespokeNavigation({
       if (scrollable) return
 
       e.preventDefault()
+
+      // Prevent too sensitive navigation on trackpad
+      if (Math.abs(e.wheelDelta) < 20) return
 
       // Suppress momentum scrolling by trackpad
       if (wheelIntervalTimer) clearTimeout(wheelIntervalTimer)
