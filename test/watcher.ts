@@ -103,10 +103,8 @@ describe('Watcher', () => {
         await watcher.convert('test.md')
         expect(watcher.converter.convertFiles).toHaveBeenCalledTimes(1)
 
-        const [
-          files,
-          { onConverted },
-        ] = watcher.converter.convertFiles.mock.calls[0]
+        const [files, { onConverted }] =
+          watcher.converter.convertFiles.mock.calls[0]
         expect(files).toContain(file)
 
         // Trigger events
