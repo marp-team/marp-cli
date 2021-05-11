@@ -8,6 +8,7 @@
 
 ### Fixed
 
+- Update bespoke navigation plugin to adjust wheel sensitivity for Multi-touch devices ([#340](https://github.com/marp-team/marp-cli/issues/340), [#345](https://github.com/marp-team/marp-cli/pull/345))
 - Presenter notes are not applied to PPTX correctly ([#346](https://github.com/marp-team/marp-cli/issues/346), [#347](https://github.com/marp-team/marp-cli/pull/347))
 
 ### Changed
