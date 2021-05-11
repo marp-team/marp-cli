@@ -424,9 +424,8 @@ export class Converter {
       })()
 
       const page = await browser.newPage()
-      const { missingFileSet, failedFileSet } = this.trackFailedLocalFileAccess(
-        page
-      )
+      const { missingFileSet, failedFileSet } =
+        this.trackFailedLocalFileAccess(page)
 
       try {
         return await processer(page, uri)
@@ -458,9 +457,10 @@ export class Converter {
     }
   }
 
-  private trackFailedLocalFileAccess(
-    page: puppeteer.Page
-  ): { missingFileSet: Set<string>; failedFileSet: Set<string> } {
+  private trackFailedLocalFileAccess(page: puppeteer.Page): {
+    missingFileSet: Set<string>
+    failedFileSet: Set<string>
+  } {
     const missingFileSet = new Set<string>()
     const failedFileSet = new Set<string>()
 

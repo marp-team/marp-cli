@@ -59,7 +59,7 @@ commands:
       - checkout
       - install:
           postinstall:
-            - run: yarn audit
+            - run: yarn -s check:audit
 
   test:
     steps:
@@ -144,7 +144,7 @@ commands:
           command: |
             docker context create builder
             docker buildx create --use builder
-            docker buildx build --no-cache --platform linux/amd64,linux/arm64 --push -t marpteam/marp-cli:<< parameters.tag >> .
+            docker buildx build --no-cache --platform linux/amd64,linux/arm64 --progress plain --push -t marpteam/marp-cli:<< parameters.tag >> .
           environment:
             DOCKER_CLI_EXPERIMENTAL: enabled
 
