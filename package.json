@@ -149,6 +149,7 @@
     "yargs": "^17.0.1"
   },
   "resolutions": {
+    "cssnano": "^5.0.2",
     "pug": "^3.0.2",
     "pug-runtime": "^3.0.1"
   },
