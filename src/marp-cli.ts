@@ -103,7 +103,7 @@ export const marpCli = async (
         },
         preview: {
           alias: 'p',
-          describe: 'Open preview window (EXPERIMENTAL)',
+          describe: 'Open preview window',
           hidden: !!process.env.IS_DOCKER,
           group: OptionGroup.Basic,
           type: 'boolean',
@@ -142,6 +142,12 @@ export const marpCli = async (
           choices: ['png', 'jpeg'],
           coerce: (type: string) => (type === 'jpg' ? 'jpeg' : type),
           type: 'string',
+        },
+        'image-scale': {
+          defaultDescription: '1 (or 2.5 for PPTX conversion)',
+          describe: 'The scale factor for rendered images',
+          group: OptionGroup.Converter,
+          type: 'number',
         },
         'jpeg-quality': {
           defaultDescription: '85',
@@ -326,7 +332,7 @@ export const marpCli = async (
           preview.on('exit', () => res(0))
           preview.on('opening', (location: string) => {
             const loc = location.substr(0, 50)
-            const msg = `[Preview] (EXPERIMENTAL) Opening ${loc}...`
+            const msg = `[Preview] Opening ${loc}...`
             cli.info(chalk.cyan(msg))
           })
 

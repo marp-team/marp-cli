@@ -7,6 +7,7 @@ import Marp from '@marp-team/marp-core'
 import { Options } from '@marp-team/marpit'
 import cheerio from 'cheerio'
 import { imageSize } from 'image-size'
+import { Page } from 'puppeteer-core/lib/cjs/puppeteer/common/Page'
 import yauzl from 'yauzl'
 import { Converter, ConvertType, ConverterOption } from '../src/converter'
 import { CLIError } from '../src/error'
@@ -53,6 +54,7 @@ describe('Converter', () => {
         allowLocalFiles: true,
         engine: Marp,
         globalDirectives: { theme: 'default' },
+        imageScale: 2,
         lang: 'fr',
         options: <Options>{ html: true },
         server: false,
@@ -383,9 +385,16 @@ describe('Converter', () => {
       it(
         'converts markdown file into PPTX',
         async () => {
+          const setViewport = jest.spyOn(Page.prototype, 'setViewport')
+
           await converter().convertFile(new File(onePath))
           expect(write).toHaveBeenCalled()
           expect(write.mock.calls[0][0]).toBe('test.pptx')
+
+          // It has a different default scale x2.5
+          expect(setViewport).toHaveBeenCalledWith(
+            expect.objectContaining({ deviceScaleFactor: 2.5 })
+          )
 
           // ZIP PK header for Office Open XML
           const pptx: Buffer = write.mock.calls[0][1]
@@ -403,7 +412,10 @@ describe('Converter', () => {
         it(
           'assigns meta info thorugh PptxGenJs',
           async () => {
+            const setViewport = jest.spyOn(Page.prototype, 'setViewport')
+
             await converter({
+              imageScale: 1,
               globalDirectives: {
                 title: 'Test meta',
                 description: 'Test description',
@@ -415,6 +427,11 @@ describe('Converter', () => {
 
             expect(meta['dc:title']).toBe('Test meta')
             expect(meta['dc:subject']).toBe('Test description')
+
+            // Custom scale
+            expect(setViewport).toHaveBeenCalledWith(
+              expect.objectContaining({ deviceScaleFactor: 1 })
+            )
           },
           puppeteerTimeoutMs
         )
@@ -422,25 +439,27 @@ describe('Converter', () => {
     })
 
     describe('when convert type is PNG', () => {
-      let converter: Converter
       let write: jest.Mock
 
       beforeEach(() => {
-        converter = instance({ output: 'a.png', type: ConvertType.png })
         write = (<any>fs).__mockWriteFile()
       })
 
       it(
         'converts markdown file into PNG',
         async () => {
-          await converter.convertFile(new File(onePath))
+          await instance({
+            output: 'a.png',
+            type: ConvertType.png,
+          }).convertFile(new File(onePath))
+
           const png: Buffer = write.mock.calls[0][1]
 
           expect(write).toHaveBeenCalled()
           expect(write.mock.calls[0][0]).toBe('a.png')
           expect(png.toString('ascii', 1, 4)).toBe('PNG')
 
-          const { width, height } = imageSize(png) as any
+          const { width, height } = imageSize(png)
           expect(width).toBe(1280)
           expect(height).toBe(720)
         },
@@ -453,12 +472,36 @@ describe('Converter', () => {
         it(
           'converts into 4:3 PNG',
           async () => {
-            await converter.convertFile(new File(slide43Path))
+            await instance({
+              output: 'a.png',
+              type: ConvertType.png,
+            }).convertFile(new File(slide43Path))
             const png: Buffer = write.mock.calls[0][1]
 
-            const { width, height } = imageSize(png) as any
+            const { width, height } = imageSize(png)
             expect(width).toBe(960)
             expect(height).toBe(720)
+          },
+          puppeteerTimeoutMs
+        )
+      })
+
+      describe('with imageScale option', () => {
+        it(
+          'applies the scale factor to PNG',
+          async () => {
+            await instance({
+              output: 'a.png',
+              type: ConvertType.png,
+              imageScale: 0.5,
+            }).convertFile(new File(onePath))
+
+            const png: Buffer = write.mock.calls[0][1]
+            expect(png).toBeTruthy()
+
+            const { width, height } = imageSize(png)
+            expect(width).toBe(640)
+            expect(height).toBe(360)
           },
           puppeteerTimeoutMs
         )
@@ -466,18 +509,20 @@ describe('Converter', () => {
     })
 
     describe('when convert type is JPEG', () => {
-      let converter: Converter
       let write: jest.Mock
 
       beforeEach(() => {
-        converter = instance({ output: 'b.jpg', type: ConvertType.jpeg })
         write = (<any>fs).__mockWriteFile()
       })
 
       it(
         'converts markdown file into JPEG',
         async () => {
-          await converter.convertFile(new File(onePath))
+          await instance({
+            output: 'b.jpg',
+            type: ConvertType.jpeg,
+          }).convertFile(new File(onePath))
+
           const jpeg: Buffer = write.mock.calls[0][1]
 
           expect(write).toHaveBeenCalled()
@@ -485,7 +530,7 @@ describe('Converter', () => {
           expect(jpeg[0]).toBe(0xff)
           expect(jpeg[1]).toBe(0xd8)
 
-          const { width, height } = imageSize(jpeg) as any
+          const { width, height } = imageSize(jpeg)
           expect(width).toBe(1280)
           expect(height).toBe(720)
         },
@@ -498,12 +543,37 @@ describe('Converter', () => {
         it(
           'converts into 4:3 JPEG',
           async () => {
-            await converter.convertFile(new File(slide43Path))
+            await instance({
+              output: 'b.jpg',
+              type: ConvertType.jpeg,
+            }).convertFile(new File(slide43Path))
+
             const jpeg: Buffer = write.mock.calls[0][1]
 
-            const { width, height } = imageSize(jpeg) as any
+            const { width, height } = imageSize(jpeg)
             expect(width).toBe(960)
             expect(height).toBe(720)
+          },
+          puppeteerTimeoutMs
+        )
+      })
+
+      describe('with imageScale option', () => {
+        it(
+          'applies the scale factor to PNG',
+          async () => {
+            await instance({
+              output: 'b.jpg',
+              type: ConvertType.jpeg,
+              imageScale: 0.5,
+            }).convertFile(new File(onePath))
+
+            const jpeg: Buffer = write.mock.calls[0][1]
+            expect(jpeg).toBeTruthy()
+
+            const { width, height } = imageSize(jpeg)
+            expect(width).toBe(640)
+            expect(height).toBe(360)
           },
           puppeteerTimeoutMs
         )

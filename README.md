@@ -170,6 +170,19 @@ marp slide-deck.md -o output.png
 
 It would be useful for creating [Open Graph] image that can specify with [`image` global directive and `--og-image` option](#metadata).
 
+#### Scale factor
+
+You can set the scale factor for rendered image(s) through `--image-scale` option. It is useful for making high-resolution image from the slide.
+
+```bash
+# Generate high-resolution image of the title slide
+marp slide-deck.md -o title-slide@2x.png --image-scale 2
+```
+
+> :information_source: `--image-scale` is not affect to the actual size of presentation.
+>
+> It is also available for PPTX conversion. By default, Marp CLI will use `2.5` as the default scale factor in PPTX to suppress deterioration of slide rendering in full-screen presentation.
+
 ### Security about local files
 
 Because of [the security reason](https://github.com/marp-team/marp-cli/pull/10#user-content-security), **PDF, PPTX and image(s) conversion cannot use local files by default.**
@@ -208,7 +221,7 @@ Marp CLI server will provide the list of served files by default, but you can pl
 
 Place Markdown named `index.md` or `PITCHME.md` ([GitPitch style](https://gitpitch.com/docs/getting-started/pitchme/)) to served directory. It would be redirected just accessing to `http://localhost:8080/`.
 
-### Preview window (_EXPERIMENTAL:_ `--preview` / `-p`)
+### Preview window (`--preview` / `-p`)
 
 When conversions were executed together with `--preview` (`-p`) option, Marp CLI will open preview window(s) to check the converted result immediately.
 
@@ -429,6 +442,7 @@ If you want to prevent looking up a configuration file, you can pass `--no-confi
 | `html`            |      boolean \| object      |       `--html`        | Enable or disable HTML (Configuration file can pass [the whitelist object] if you are using Marp Core) |
 | `image`           |       `png` \| `jpeg`       |       `--image`       | Convert the first slide page into an image file                                                        |
 | `images`          |       `png` \| `jpeg`       |      `--images`       | Convert slide deck into multiple image files                                                           |
+| `imageScale`      |           number            |    `--image-scale`    | The scale factor for rendered images (`1` by default, or `2.5` for PPTX conversion)                    |
 | `inputDir`        |           string            |  `--input-dir` `-I`   | The base directory to find markdown and theme CSS                                                      |
 | `jpegQuality`     |           number            |   `--jpeg-quality`    | Setting JPEG image quality (`85` by default)                                                           |
 | `lang`            |           string            |                       | Define the language of converted HTML                                                                  |
@@ -436,7 +450,7 @@ If you want to prevent looking up a configuration file, you can pass `--no-confi
 | `options`         |           object            |                       | The base options for the constructor of engine                                                         |
 | `output`          |           string            |    `--output` `-o`    | Output file path (or directory when input-dir is passed)                                               |
 | `pdf`             |           boolean           |        `--pdf`        | Convert slide deck into PDF                                                                            |
-| `preview`         |           boolean           |   `--preview` `-p`    | Open preview window _(EXPERIMENTAL)_                                                                   |
+| `preview`         |           boolean           |   `--preview` `-p`    | Open preview window                                                                                    |
 | `server`          |           boolean           |    `--server` `-s`    | Enable server mode                                                                                     |
 | `template`        |     `bare` \| `bespoke`     |     `--template`      | Choose template (`bespoke` by default)                                                                 |
 | `theme`           |           string            |       `--theme`       | Override theme by name or CSS file                                                                     |

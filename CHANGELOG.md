@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- `--image-scale` option for setting the scale factor of rendered image(s) ([#349](https://github.com/marp-team/marp-cli/pull/349))
+
 ### Fixed
 
 - Presenter notes are not applied to PPTX correctly ([#346](https://github.com/marp-team/marp-cli/issues/346), [#347](https://github.com/marp-team/marp-cli/pull/347))
@@ -9,6 +13,7 @@
 ### Changed
 
 - Upgrade dependent packages to the latest version ([#347](https://github.com/marp-team/marp-cli/pull/347))
+- Mark preview window as stable ([#348](https://github.com/marp-team/marp-cli/pull/348))
 
 ## v1.0.3 - 2021-05-09
 
