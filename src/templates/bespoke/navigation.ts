@@ -58,7 +58,7 @@ export default function bespokeNavigation({
       e.preventDefault()
 
       // Prevent too sensitive navigation on trackpad
-      if (Math.abs(e.wheelDelta) < 20) return
+      if (Math.abs(e.wheelDelta) < 60) return
 
       // Suppress momentum scrolling by trackpad
       if (wheelIntervalTimer) clearTimeout(wheelIntervalTimer)
