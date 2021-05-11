@@ -499,9 +499,82 @@ describe("Bespoke template's browser context", () => {
         expect(deck.slide()).toBe(2)
       })
 
-      it.todo(
-        'does not react against the wheel event that only have a slightly wheel delta'
-      )
+      it('does not react against the wheel event that only have a slightly wheel delta', () => {
+        expect(deck.slide()).toBe(0)
+
+        dispatch({ deltaX: 1 })
+        expect(deck.slide()).toBe(0)
+
+        dispatch({ deltaX: 10 })
+        expect(deck.slide()).toBe(0)
+
+        dispatch({ deltaX: 12 })
+        expect(deck.slide()).toBe(1)
+      })
+
+      const dispatchEx = (
+        opts: WheelEventInit = {},
+        extra: Record<string, any> = { wheelDelta: undefined }
+      ) =>
+        parent.dispatchEvent(
+          Object.assign(
+            new WheelEvent('wheel', { ...opts, bubbles: true }),
+            extra
+          )
+        )
+
+      describe('when browsing by Chromium', () => {
+        it('does not react against the wheel event that only have a slightly wheel delta', () => {
+          const now = jest.spyOn(Date, 'now')
+          now.mockImplementation(() => 1000)
+
+          expect(deck.slide()).toBe(0)
+
+          dispatchEx({ deltaX: 3 }, { wheelDelta: 30 })
+          expect(deck.slide()).toBe(0)
+
+          dispatchEx({ deltaX: 4 }, { wheelDelta: 40 })
+          expect(deck.slide()).toBe(1)
+
+          now.mockImplementation(() => 1300)
+          jest.advanceTimersByTime(300)
+
+          dispatchEx({ deltaY: -3 }, { wheelDelta: -39 })
+          expect(deck.slide()).toBe(1)
+
+          dispatchEx({ deltaY: -4 }, { wheelDelta: -40 })
+          expect(deck.slide()).toBe(0)
+        })
+      })
+
+      describe('when browsing by Safari', () => {
+        const extraForSafari = (extra: Record<string, any>) => ({
+          ...extra,
+          webkitForce: 0,
+        })
+
+        it('does not react against the wheel event that only have a slightly wheel delta', () => {
+          const now = jest.spyOn(Date, 'now')
+          now.mockImplementation(() => 1000)
+
+          expect(deck.slide()).toBe(0)
+
+          dispatchEx({ deltaX: 1 }, extraForSafari({ wheelDelta: 3 }))
+          expect(deck.slide()).toBe(0)
+
+          dispatchEx({ deltaX: 4 }, extraForSafari({ wheelDelta: 12 }))
+          expect(deck.slide()).toBe(1)
+
+          now.mockImplementation(() => 1300)
+          jest.advanceTimersByTime(300)
+
+          dispatchEx({ deltaY: -3 }, extraForSafari({ wheelDelta: -9 }))
+          expect(deck.slide()).toBe(1)
+
+          dispatchEx({ deltaY: -4 }, extraForSafari({ wheelDelta: -12 }))
+          expect(deck.slide()).toBe(0)
+        })
+      })
 
       describe('when the target element is scrollable', () => {
         const overflowAuto = (decl = 'overflow') => {
