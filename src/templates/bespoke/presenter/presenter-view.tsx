@@ -18,14 +18,12 @@ export const classes = {
 } as const
 
 /** Create function to send message to iframe for navigation */
-const createNavigateFunc = (iframe: HTMLIFrameElement) => (
-  index: number,
-  fragmentIndex: number
-) =>
-  iframe.contentWindow?.postMessage(
-    `navigate:${index},${fragmentIndex}`,
-    window.origin === 'null' ? '*' : window.origin
-  )
+const createNavigateFunc =
+  (iframe: HTMLIFrameElement) => (index: number, fragmentIndex: number) =>
+    iframe.contentWindow?.postMessage(
+      `navigate:${index},${fragmentIndex}`,
+      window.origin === 'null' ? '*' : window.origin
+    )
 
 export default function presenterView(deck) {
   const { title } = document

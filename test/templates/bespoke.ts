@@ -175,9 +175,9 @@ describe("Bespoke template's browser context", () => {
       ]
 
       expect(deck.fragmentIndex).toBe(1)
-      expect(
-        fragments.map((f) => f.dataset.bespokeMarpFragment)
-      ).toStrictEqual(['active', 'inactive'])
+      expect(fragments.map((f) => f.dataset.bespokeMarpFragment)).toStrictEqual(
+        ['active', 'inactive']
+      )
     })
 
     it('activates all fragments in slide when navigating by slide() with fragment option as -1', () => {
