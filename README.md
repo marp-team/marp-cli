@@ -208,7 +208,7 @@ Marp CLI server will provide the list of served files by default, but you can pl
 
 Place Markdown named `index.md` or `PITCHME.md` ([GitPitch style](https://gitpitch.com/docs/getting-started/pitchme/)) to served directory. It would be redirected just accessing to `http://localhost:8080/`.
 
-### Preview window (_EXPERIMENTAL:_ `--preview` / `-p`)
+### Preview window (`--preview` / `-p`)
 
 When conversions were executed together with `--preview` (`-p`) option, Marp CLI will open preview window(s) to check the converted result immediately.
 
@@ -436,7 +436,7 @@ If you want to prevent looking up a configuration file, you can pass `--no-confi
 | `options`         |           object            |                       | The base options for the constructor of engine                                                         |
 | `output`          |           string            |    `--output` `-o`    | Output file path (or directory when input-dir is passed)                                               |
 | `pdf`             |           boolean           |        `--pdf`        | Convert slide deck into PDF                                                                            |
-| `preview`         |           boolean           |   `--preview` `-p`    | Open preview window _(EXPERIMENTAL)_                                                                   |
+| `preview`         |           boolean           |   `--preview` `-p`    | Open preview window                                                                                    |
 | `server`          |           boolean           |    `--server` `-s`    | Enable server mode                                                                                     |
 | `template`        |     `bare` \| `bespoke`     |     `--template`      | Choose template (`bespoke` by default)                                                                 |
 | `theme`           |           string            |       `--theme`       | Override theme by name or CSS file                                                                     |
