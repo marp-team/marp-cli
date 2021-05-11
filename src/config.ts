@@ -164,7 +164,7 @@ export class MarpCLIConfig {
     const imageScale = (() => {
       const scale = this.args.imageScale ?? this.conf.imageScale
 
-      if (scale) {
+      if (scale !== undefined) {
         if (typeof scale !== 'number') {
           error('Image scale factor must be a number.')
         }
