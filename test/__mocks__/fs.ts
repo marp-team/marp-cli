@@ -7,7 +7,12 @@ fs.writeFile[promisify.custom] = (path, data) =>
     fs.writeFile(path, data, (e) => (e ? reject(e) : resolve()))
   )
 
-fs.__mockWriteFile = (mockFn = (_, __, callback) => callback()) =>
-  jest.spyOn(fs, 'writeFile').mockImplementation(mockFn)
+fs.__mockWriteFile = (mockFn = (_, __, callback) => callback()) => {
+  jest
+    .spyOn(fs.promises, 'writeFile')
+    .mockImplementation(fs.writeFile[promisify.custom])
+
+  return jest.spyOn(fs, 'writeFile').mockImplementation(mockFn)
+}
 
 module.exports = fs
