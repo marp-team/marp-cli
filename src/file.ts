@@ -6,14 +6,9 @@ import * as url from 'url'
 import { promisify } from 'util'
 import getStdin from 'get-stdin'
 import globby, { GlobbyOptions } from 'globby'
-import mkdirp from 'mkdirp'
 import { tmpName } from 'tmp'
 
-const stat = promisify(fs.stat)
-const readFile = promisify(fs.readFile)
 const tmpNamePromise = promisify(tmpName)
-const unlink = promisify(fs.unlink)
-const writeFile = promisify(fs.writeFile)
 
 export const markdownExtensions = ['md', 'mdown', 'markdown', 'markdn']
 
@@ -80,7 +75,7 @@ export class File {
   }
 
   async load() {
-    this.buffer = this.buffer || (await readFile(this.path))
+    this.buffer = this.buffer || (await fs.promises.readFile(this.path))
     return this.buffer
   }
 
@@ -120,7 +115,7 @@ export class File {
   }
 
   private cleanup(tmpPath: string) {
-    return unlink(tmpPath)
+    return fs.promises.unlink(tmpPath)
   }
 
   private convertName(
@@ -152,8 +147,10 @@ export class File {
   }
 
   private async saveToFile(savePath: string = this.path) {
-    await mkdirp(path.dirname(path.resolve(savePath)))
-    await writeFile(savePath, this.buffer!) // eslint-disable-line @typescript-eslint/no-non-null-assertion
+    await fs.promises.mkdir(path.dirname(path.resolve(savePath)), {
+      recursive: true,
+    })
+    await fs.promises.writeFile(savePath, this.buffer!) // eslint-disable-line @typescript-eslint/no-non-null-assertion
   }
 
   private static stdinBuffer?: Buffer
@@ -169,7 +166,7 @@ export class File {
     // Collect passed files that refers to a real path at first
     for (const p of paths) {
       try {
-        const s: fs.Stats = await stat(p)
+        const s: fs.Stats = await fs.promises.stat(p)
 
         if (s.isFile()) {
           filepaths.add(path.resolve(p))

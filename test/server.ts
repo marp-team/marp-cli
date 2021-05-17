@@ -1,6 +1,7 @@
 import path from 'path'
 import Marp from '@marp-team/marp-core'
 import cheerio from 'cheerio'
+import express from 'express'
 import request from 'supertest'
 import {
   Converter,
@@ -65,6 +66,31 @@ describe('Server', () => {
 
     it('uses specified port number to serve', () =>
       expect(new Server(converter()).port).toBe(54321))
+  })
+
+  describe('when listener has emitted error', () => {
+    const err = new Error('testError')
+
+    beforeEach(() => {
+      ;(express as any).__errorOnListening = err
+    })
+
+    it('throws error', async () => {
+      const server = new Server(converter())
+      await expect(server.start()).rejects.toThrow(err)
+    })
+
+    describe('with EADDRINUSE code', () => {
+      it('throws CLIError', async () => {
+        ;(express as any).__errorOnListening = Object.assign(
+          new Error('EADDRINUSE'),
+          { code: 'EADDRINUSE' }
+        )
+
+        const server = new Server(converter())
+        await expect(server.start()).rejects.toThrow(CLIError)
+      })
+    })
   })
 
   describe('#start', () => {

@@ -20,9 +20,6 @@ import serverIndex from './server/index.pug'
 import style from './server/index.scss'
 import TypedEventEmitter from './utils/typed-event-emitter'
 
-const stat = promisify(fs.stat)
-const readFile = promisify(fs.readFile)
-
 export class Server extends TypedEventEmitter<Server.Events> {
   readonly converter: Converter
   readonly inputDir: string
@@ -114,7 +111,9 @@ export class Server extends TypedEventEmitter<Server.Events> {
   private async loadScript() {
     if (Server.script === undefined) {
       Server.script = (
-        await readFile(path.resolve(__dirname, './server/server-index.js'))
+        await fs.promises.readFile(
+          path.resolve(__dirname, './server/server-index.js')
+        )
       ).toString()
     }
 
@@ -223,7 +222,7 @@ export class Server extends TypedEventEmitter<Server.Events> {
     // Check file stat
     let stats: fs.Stats | undefined
     try {
-      stats = fetchedStats || (await stat(targetPath))
+      stats = fetchedStats || (await fs.promises.stat(targetPath))
       valid = valid && !!stats?.isFile()
     } catch (e) {
       valid = false

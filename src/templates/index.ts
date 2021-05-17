@@ -1,13 +1,10 @@
 import fs from 'fs'
 import path from 'path'
-import { promisify } from 'util'
 import { Element, Options, RenderResult } from '@marp-team/marpit'
 import barePug from './bare/bare.pug'
 import bareScss from './bare/bare.scss'
 import bespokePug from './bespoke/bespoke.pug'
 import bespokeScss from './bespoke/bespoke.scss'
-
-const readFile = promisify(fs.readFile)
 
 type RendererResult = RenderResult &
   TemplateMeta & {
@@ -101,7 +98,7 @@ export const bespoke: Template<TemplateBespokeOption> = async (opts) => {
 Object.defineProperty(bespoke, 'printable', { value: false })
 
 async function libJs(fn: string) {
-  return (await readFile(path.resolve(__dirname, fn))).toString()
+  return (await fs.promises.readFile(path.resolve(__dirname, fn))).toString()
 }
 
 async function watchJs(notifyWS?: string) {

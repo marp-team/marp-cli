@@ -1,14 +1,10 @@
 /* eslint-disable import/export, @typescript-eslint/no-namespace */
 import fs from 'fs'
 import path from 'path'
-import { promisify } from 'util'
 import { Marpit } from '@marp-team/marpit'
 import { hasMagic } from 'globby'
 import { warn } from './cli'
 import { File } from './file'
-
-const lstat = promisify(fs.lstat)
-const readFile = promisify(fs.readFile)
 
 export class Theme {
   readonly filename: string
@@ -36,7 +32,7 @@ export class Theme {
   }
 
   async load() {
-    this.readBuffer = await readFile(this.filename)
+    this.readBuffer = await fs.promises.readFile(this.filename)
   }
 
   private genUniqName() {
@@ -128,7 +124,7 @@ export class ThemeSet {
       // globby's hasMagic (backed by fast-glob) always recognizes "\\" (Windows path separator) as the escape character.
       if (!hasMagic(f.split(path.sep).join('/'))) {
         try {
-          const stat: fs.Stats = await lstat(f)
+          const stat: fs.Stats = await fs.promises.lstat(f)
 
           if (stat.isFile() || stat.isDirectory() || stat.isSymbolicLink())
             fnForWatch.add(path.resolve(f))

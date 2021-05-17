@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import fs from 'fs'
 import path from 'path'
-import { promisify } from 'util'
 import { Marp } from '@marp-team/marp-core'
 import chalk from 'chalk'
 import { cosmiconfig } from 'cosmiconfig'
@@ -12,8 +11,6 @@ import resolveEngine, { ResolvableEngine, ResolvedEngine } from './engine'
 import { error } from './error'
 import { TemplateOption } from './templates'
 import { Theme, ThemeSet } from './theme'
-
-const lstat = promisify(fs.lstat)
 
 type Overwrite<T, U> = Omit<T, Extract<keyof T, keyof U>> & U
 
@@ -248,7 +245,7 @@ export class MarpCLIConfig {
     let stat: fs.Stats
 
     try {
-      stat = await lstat(dir)
+      stat = await fs.promises.lstat(dir)
     } catch (e) {
       if (e.code !== 'ENOENT') throw e
       error(`Input directory "${dir}" is not found.`)
