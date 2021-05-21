@@ -80,7 +80,7 @@ npm install -g @marp-team/marp-cli
 You can use the package manager to install/update Marp CLI easily.
 
 - **macOS**
-  - **[Homebrew](https://brew.sh/)**: `brew install marp-cli` ([Refer to the formulae...](https://github.com/Homebrew/homebrew-core/blob/master/Formula/marp-cli.rb))
+  - **[Homebrew](https://brew.sh/)**: `brew install marp-cli` ([Refer to the formula...](https://github.com/Homebrew/homebrew-core/blob/master/Formula/marp-cli.rb))
 
 * **Windows**
   - **[Scoop](https://scoop.sh/)**: `scoop install marp` ([Refer to the manifest in Main bucket...](https://github.com/ScoopInstaller/Main/blob/master/bucket/marp.json))
