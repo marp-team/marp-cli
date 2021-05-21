@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Added
+
+- Installation guide for Homebrew ([#353](https://github.com/marp-team/marp-cli/pull/353))
+
+### Removed
+
+- Installation guide for not-maintained Chocolatey ([#350](https://github.com/marp-team/marp-cli/pull/350))
+
 ## v1.1.1 - 2021-05-17
 
 ### Changed
