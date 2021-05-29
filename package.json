@@ -144,7 +144,7 @@
     "serve-index": "^1.9.1",
     "tmp": "^0.2.1",
     "v8-compile-cache": "^2.3.0",
-    "ws": "^7.4.5",
+    "ws": "^7.4.6",
     "yargs": "^17.0.1"
   },
   "resolutions": {
