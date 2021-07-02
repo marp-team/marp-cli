@@ -19,7 +19,10 @@ It can convert Marp / Marpit Markdown files into static HTML / CSS, PDF, PowerPo
 
 ### npx
 
-[npx](https://docs.npmjs.com/cli/v7/commands/npx) is the best way if you wanted one-shot Markdown conversion without install. Just run below if you are installed [Node.js](https://nodejs.org/):
+[npx](https://docs.npmjs.com/cli/v7/commands/npx) is the best way if you wanted
+one-shot Markdown conversion without install. Just run below if you have
+installed [Node.js](https://nodejs.org/). Only Node.js version 12 or higher
+works.
 
 ```bash
 # Convert slide deck into HTML
