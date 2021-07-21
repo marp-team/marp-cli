@@ -1,4 +1,4 @@
-FROM node:14.16.1-alpine
+FROM node:14.17.3-alpine
 LABEL maintainer "Marp team"
 
 RUN apk update && apk upgrade && \
