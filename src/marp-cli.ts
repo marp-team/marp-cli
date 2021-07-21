@@ -223,10 +223,11 @@ export const marpCli = async (
         },
       })
 
+    const argvRet = await program.argv
     const args = {
       baseUrl, // It's not intended using by the consumer so can't set through CLI arguments
-      ...program.argv,
-      _: program.argv._.map((v) => v.toString()),
+      ...argvRet,
+      _: argvRet._.map((v) => v.toString()),
     }
 
     if (args.help) {
