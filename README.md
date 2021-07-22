@@ -21,7 +21,7 @@ It can convert Marp / Marpit Markdown files into static HTML / CSS, PDF, PowerPo
 
 [npx (`npm exec`)](https://docs.npmjs.com/cli/v7/commands/npx) is the best way to use the latest Marp CLI if you wanted
 one-shot Markdown conversion _without install_. Just run below if you have
-installed [Node.js](https://nodejs.org/) 12.20 and later.
+installed [Node.js](https://nodejs.org/) 12 and later.
 
 ```bash
 # Convert slide deck into HTML
@@ -79,7 +79,7 @@ We recommend to install Marp CLI into your Node project. You may control the CLI
 npm install --save-dev @marp-team/marp-cli
 ```
 
-Node.js 12.20 and later is required to install Marp CLI. The installed `marp` command is available in [npm-scripts](https://docs.npmjs.com/misc/scripts) or `npx marp`.
+Node.js 12 and later is required to install Marp CLI. The installed `marp` command is available in [npm-scripts](https://docs.npmjs.com/misc/scripts) or `npx marp`.
 
 #### Global installation
 

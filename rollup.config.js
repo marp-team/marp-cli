@@ -1,4 +1,5 @@
 import path from 'path'
+import alias from '@rollup/plugin-alias'
 import commonjs from '@rollup/plugin-commonjs'
 import json from '@rollup/plugin-json'
 import nodeResolve from '@rollup/plugin-node-resolve'
@@ -32,6 +33,9 @@ const plugins = (opts = {}) => [
   }),
   commonjs(),
   typescript({ noEmitOnError: false }),
+  alias({
+    entries: [{ find: /^node:(.+)$/, replacement: '$1' }],
+  }),
   postcss({
     inject: false,
     plugins: [
@@ -65,11 +69,7 @@ const browser = (opts = {}) => ({
 })
 
 const cli = {
-  external: external([
-    ...builtinModules,
-    ...builtinModules.map((m) => `node:${m}`),
-    ...Object.keys(dependencies),
-  ]),
+  external: external([...builtinModules, ...Object.keys(dependencies)]),
   plugins: plugins(),
 }
 
