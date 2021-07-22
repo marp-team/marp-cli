@@ -2,10 +2,14 @@
 
 ## [Unreleased]
 
+### Breaking
+
+- Now required Node.js 12.20 and later ([#365](https://github.com/marp-team/marp-cli/pull/365))
+
 ### Added
 
 - Installation guide for Homebrew ([#353](https://github.com/marp-team/marp-cli/pull/353))
-- Mention Node.js >= 12 requirement in README ([#359](https://github.com/marp-team/marp-cli/issues/359), [#361](https://github.com/marp-team/marp-cli/pull/361) by [@jlevon](https://github.com/jlevon))
+- Mention Node.js >= 12.20 requirement in README ([#359](https://github.com/marp-team/marp-cli/issues/359), [#361](https://github.com/marp-team/marp-cli/pull/361) by [@jlevon](https://github.com/jlevon), [#365](https://github.com/marp-team/marp-cli/pull/365))
 
 ### Changed
 
