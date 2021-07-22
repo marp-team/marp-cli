@@ -65,7 +65,11 @@ const browser = (opts = {}) => ({
 })
 
 const cli = {
-  external: external([...builtinModules, ...Object.keys(dependencies)]),
+  external: external([
+    ...builtinModules,
+    ...builtinModules.map((m) => `node:${m}`),
+    ...Object.keys(dependencies),
+  ]),
   plugins: plugins(),
 }
 
