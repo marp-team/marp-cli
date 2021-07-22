@@ -5,7 +5,7 @@ import path from 'path'
 import * as url from 'url'
 import { promisify } from 'util'
 import getStdin from 'get-stdin'
-import globby, { GlobbyOptions } from 'globby'
+import { globby, Options as GlobbyOptions } from 'globby'
 import { tmpName } from 'tmp'
 
 const tmpNamePromise = promisify(tmpName)

@@ -2,7 +2,7 @@
 import fs from 'fs'
 import path from 'path'
 import { Marpit } from '@marp-team/marpit'
-import { hasMagic } from 'globby'
+import { isDynamicPattern } from 'globby'
 import { warn } from './cli'
 import { File } from './file'
 
@@ -122,7 +122,7 @@ export class ThemeSet {
 
     for (const f of fn) {
       // globby's hasMagic (backed by fast-glob) always recognizes "\\" (Windows path separator) as the escape character.
-      if (!hasMagic(f.split(path.sep).join('/'))) {
+      if (!isDynamicPattern(f.split(path.sep).join('/'))) {
         try {
           const stat: fs.Stats = await fs.promises.lstat(f)
 
