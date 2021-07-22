@@ -5,7 +5,7 @@ import { File, FileType } from '../src/file'
 import { Preview, fileToURI } from '../src/preview'
 
 jest.mock('path')
-jest.setTimeout(60000)
+jest.setTimeout(40000)
 
 describe('Preview', () => {
   const previews = new Set<Preview>()
