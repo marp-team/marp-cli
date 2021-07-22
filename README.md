@@ -19,29 +19,28 @@ It can convert Marp / Marpit Markdown files into static HTML / CSS, PDF, PowerPo
 
 ### npx
 
-[npx](https://docs.npmjs.com/cli/v7/commands/npx) is the best way if you wanted
-one-shot Markdown conversion without install. Just run below if you have
-installed [Node.js](https://nodejs.org/). Only Node.js version 12 or higher
-works.
+[npx (`npm exec`)](https://docs.npmjs.com/cli/v7/commands/npx) is the best way to use the latest Marp CLI if you wanted
+one-shot Markdown conversion _without install_. Just run below if you have
+installed [Node.js](https://nodejs.org/) 12.20 and later.
 
 ```bash
 # Convert slide deck into HTML
-npx @marp-team/marp-cli slide-deck.md
-npx @marp-team/marp-cli slide-deck.md -o output.html
+npx @marp-team/marp-cli@latest slide-deck.md
+npx @marp-team/marp-cli@latest slide-deck.md -o output.html
 
 # Convert slide deck into PDF
-npx @marp-team/marp-cli slide-deck.md --pdf
-npx @marp-team/marp-cli slide-deck.md -o output.pdf
+npx @marp-team/marp-cli@latest slide-deck.md --pdf
+npx @marp-team/marp-cli@latest slide-deck.md -o output.pdf
 
 # Convert slide deck into PowerPoint document (PPTX)
-npx @marp-team/marp-cli slide-deck.md --pptx
-npx @marp-team/marp-cli slide-deck.md -o output.pptx
+npx @marp-team/marp-cli@latest slide-deck.md --pptx
+npx @marp-team/marp-cli@latest slide-deck.md -o output.pptx
 
 # Watch mode
-npx @marp-team/marp-cli -w slide-deck.md
+npx @marp-team/marp-cli@latest -w slide-deck.md
 
 # Server mode (Pass directory to serve)
-npx @marp-team/marp-cli -s ./slides
+npx @marp-team/marp-cli@latest -s ./slides
 ```
 
 > :information_source: You have to install [Google Chrome], [Chromium], or [Microsoft Edge] to convert slide deck into PDF, PPTX, and image(s).
@@ -60,24 +59,6 @@ Do you hate to install Node and Chrome locally? We have [an official Docker imag
 
 ## Install
 
-### Local installation
-
-We recommend to install Marp CLI into your Node project. You may control the CLI (and engine) version exactly.
-
-```bash
-npm install --save-dev @marp-team/marp-cli
-```
-
-The installed `marp` command is available in [npm-scripts](https://docs.npmjs.com/misc/scripts) or `npx marp`.
-
-#### Global installation
-
-You can install with `-g` option if you want to use `marp` command globally.
-
-```bash
-npm install -g @marp-team/marp-cli
-```
-
 ### Use package manager
 
 You can use the package manager to install/update Marp CLI easily.
@@ -89,6 +70,24 @@ You can use the package manager to install/update Marp CLI easily.
   - **[Scoop](https://scoop.sh/)**: `scoop install marp` ([Refer to the manifest in Main bucket...](https://github.com/ScoopInstaller/Main/blob/master/bucket/marp.json))
 
 _Disclaimer: Package manifests are maintained by the community, not Marp team._
+
+### Local installation
+
+We recommend to install Marp CLI into your Node project. You may control the CLI (and engine) version exactly.
+
+```bash
+npm install --save-dev @marp-team/marp-cli
+```
+
+Node.js 12.20 and later is required to install Marp CLI. The installed `marp` command is available in [npm-scripts](https://docs.npmjs.com/misc/scripts) or `npx marp`.
+
+#### Global installation
+
+You can install with `-g` option if you want to use `marp` command globally.
+
+```bash
+npm install -g @marp-team/marp-cli
+```
 
 ### [Standalone binary][releases]
 

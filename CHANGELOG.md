@@ -2,10 +2,22 @@
 
 ## [Unreleased]
 
+### Breaking
+
+- Now required Node.js 12.20 and later ([#365](https://github.com/marp-team/marp-cli/pull/365))
+
 ### Added
 
 - Installation guide for Homebrew ([#353](https://github.com/marp-team/marp-cli/pull/353))
-- Mention Node.js >= 12 requirement in README ([#359](https://github.com/marp-team/marp-cli/issues/359), [#361](https://github.com/marp-team/marp-cli/pull/361) by [@jlevon](https://github.com/jlevon))
+- Mention Node.js >= 12.20 requirement in README ([#359](https://github.com/marp-team/marp-cli/issues/359), [#361](https://github.com/marp-team/marp-cli/pull/361) by [@jlevon](https://github.com/jlevon), [#365](https://github.com/marp-team/marp-cli/pull/365))
+
+### Changed
+
+- Upgrade Marpit to [v2.1.0](https://github.com/marp-team/marpit/releases/tag/v2.1.0) ([#365](https://github.com/marp-team/marp-cli/pull/365))
+  - Follow the latest [CommonMark spec 0.30](https://spec.commonmark.org/0.30/)
+- Upgrade Marp Core to [v2.1.0](https://github.com/marp-team/marp-core/releases/tag/v2.1.0) ([#365](https://github.com/marp-team/marp-cli/pull/365))
+  - [`math` global directive](https://github.com/marp-team/marp-core#math-global-directive) for switching math typesetting library in current Markdown
+- Upgrade dependent packages to the latest ([#365](https://github.com/marp-team/marp-cli/pull/365))
 
 ### Removed
 

@@ -16,7 +16,7 @@ jobs:
       matrix:
         node-version:
           - '^12.20.0'
-          - '14.16.1'
+          - '14.17.3'
           - '^16.0.0'
 
     steps:
@@ -45,8 +45,13 @@ jobs:
       - name: Install dependencies with yarn
         run: yarn install
 
+      # Retry tests up to 3 times due to flaky tests on Windows CI
+      # https://stackoverflow.com/a/59365905
       - name: Jest
-        run: yarn test:coverage --ci -i --reporters=default --reporters=jest-junit
+        run: >-
+          yarn test:coverage --ci -i --reporters=default --reporters=jest-junit ||
+          yarn test:coverage --ci -i --reporters=default --reporters=jest-junit --no-cache ||
+          yarn test:coverage --ci -i --reporters=default --reporters=jest-junit --no-cache
         env:
           CI: true
 
