@@ -45,8 +45,13 @@ jobs:
       - name: Install dependencies with yarn
         run: yarn install
 
+      # Retry tests up to 3 times due to flaky tests on Windows CI
+      # https://stackoverflow.com/a/59365905
       - name: Jest
-        run: yarn test:coverage --ci -i --reporters=default --reporters=jest-junit
+        run: >-
+          yarn test:coverage --ci -i --reporters=default --reporters=jest-junit ||
+          yarn test:coverage --ci -i --reporters=default --reporters=jest-junit ||
+          yarn test:coverage --ci -i --reporters=default --reporters=jest-junit
         env:
           CI: true
 
