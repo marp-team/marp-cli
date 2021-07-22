@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v1.2.0 - 2021-07-22
+
 ### Added
 
 - Installation guide for Homebrew ([#353](https://github.com/marp-team/marp-cli/pull/353))
