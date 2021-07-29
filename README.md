@@ -128,7 +128,7 @@ marp slide-deck.md -o converted.pdf
 
 > :information_source: All kind of conversions except HTML require [Google Chrome], [Chromium], [Microsoft Edge], or a Chromium based browser. When an unexpected problem has occurred while converting, please update your browser to the latest version or try installing [Google Chrome Canary].
 >
-> If you want to use a browser other than [Google Chrome], [Chromium], or [Microsoft Edge], specify the path to a Chromium based browser using the `CHROME_PATH` environment variable. For example: `CHROME_PATH=$(which brave) marp --pdf slide-deck.md`
+> If you want to use a browser other than Google Chrome, Chromium, or Microsoft Edge, specify the path to a Chromium based browser using the `CHROME_PATH` environment variable. For example: `CHROME_PATH=$(which brave) marp --pdf slide-deck.md`
 
 [google chrome canary]: https://www.google.com/chrome/canary/
 
