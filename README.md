@@ -43,7 +43,7 @@ npx @marp-team/marp-cli@latest -w slide-deck.md
 npx @marp-team/marp-cli@latest -s ./slides
 ```
 
-> :information_source: You have to install [Google Chrome], [Chromium], or [Microsoft Edge] to convert slide deck into PDF, PPTX, and image(s).
+> :information_source: You have to install [Google Chrome], [Chromium], [Microsoft Edge], or a Chromium based browser to convert slide deck into PDF, PPTX, and image(s).
 
 [google chrome]: https://www.google.com/chrome/
 [chromium]: https://www.chromium.org/
@@ -119,14 +119,16 @@ When you want to output the converted result to another directory with keeping t
 
 ### Convert to PDF (`--pdf`)
 
-If you passed `--pdf` option or the output filename specified by `--output` (`-o`) option ends with `.pdf`, Marp CLI will try to convert into PDF file by using the installed [Google Chrome], [Chromium], or [Microsoft Edge].
+If you passed `--pdf` option or the output filename specified by `--output` (`-o`) option ends with `.pdf`, Marp CLI will try to convert into PDF file by using [Google Chrome], [Chromium], [Microsoft Edge], or a Chromium based browser.
 
 ```bash
 marp --pdf slide-deck.md
 marp slide-deck.md -o converted.pdf
 ```
 
-> :information_source: All kind of conversions except HTML require [Google Chrome], [Chromium], or [Microsoft Edge]. When an unexpected problem has occurred while converting, please update your Chrome/Chromium to the latest version or try installing [Google Chrome Canary].
+> :information_source: All kind of conversions except HTML require [Google Chrome], [Chromium], [Microsoft Edge], or a Chromium based browser. When an unexpected problem has occurred while converting, please update your browser to the latest version or try installing [Google Chrome Canary].
+>
+> If you want to use a browser other than Google Chrome, Chromium, or Microsoft Edge, specify the path to a Chromium based browser using the `CHROME_PATH` environment variable. For example: `CHROME_PATH=$(which brave) marp --pdf slide-deck.md`
 
 [google chrome canary]: https://www.google.com/chrome/canary/
 
