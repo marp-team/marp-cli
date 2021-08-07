@@ -34,6 +34,7 @@ interface IMarpCLIArguments {
   ogImage?: string
   output?: string | false
   pdf?: boolean
+  pdfNotes?: boolean
   pptx?: boolean
   preview?: boolean
   server?: boolean
@@ -155,6 +156,9 @@ export class MarpCLIConfig {
       if (lowerOutput.endsWith('.jpg') || lowerOutput.endsWith('.jpeg'))
         return ConvertType.jpeg
 
+      // Prefer PDF than HTML if enabled presenter notes for PDF
+      if (this.args.pdfNotes || this.conf.pdfNotes) return ConvertType.pdf
+
       return ConvertType.html
     })()
 
@@ -216,6 +220,7 @@ export class MarpCLIConfig {
       lang: this.conf.lang || (await osLocale()).replace(/@/g, '-'),
       options: this.conf.options || {},
       pages: !!(this.args.images || this.conf.images),
+      pdfNotes: !!(this.args.pdfNotes || this.conf.pdfNotes),
       watch: (this.args.watch ?? this.conf.watch) || preview || server || false,
     }
   }

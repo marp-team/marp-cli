@@ -151,13 +151,13 @@ export const marpCli = async (
         },
         'jpeg-quality': {
           defaultDescription: '85',
-          describe: 'Setting JPEG image quality',
+          describe: 'Set JPEG image quality',
           group: OptionGroup.Converter,
           type: 'number',
         },
         'allow-local-files': {
           describe:
-            'Allow to access local files from Markdown while converting PDF and image (NOT SECURE)',
+            'Allow to access local files from Markdown while converting PDF, PPTX, or image (NOT SECURE)',
           group: OptionGroup.Converter,
           type: 'boolean',
         },
@@ -199,6 +199,11 @@ export const marpCli = async (
           describe: 'Define Open Graph image URL',
           group: OptionGroup.Meta,
           type: 'string',
+        },
+        'pdf-notes': {
+          describe: 'Add presenter notes to PDF as annotations',
+          group: OptionGroup.Meta,
+          type: 'boolean',
         },
         engine: {
           describe: 'Select Marpit based engine by module name or path',
