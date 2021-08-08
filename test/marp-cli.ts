@@ -517,12 +517,17 @@ describe('Marp CLI', () => {
         .spyOn(Converter.prototype, 'convertFiles')
         .mockImplementation()
 
-      jest.spyOn(cli, 'info').mockImplementation()
+      const cliInfo = jest.spyOn(cli, 'info').mockImplementation()
 
-      await marpCli(cmd)
-      expect(cvtFiles).toHaveBeenCalled()
+      try {
+        await marpCli(cmd)
+        expect(cvtFiles).toHaveBeenCalled()
 
-      return <any>cvtFiles.mock.instances[0]
+        return <any>cvtFiles.mock.instances[0]
+      } finally {
+        cvtFiles.mockRestore()
+        cliInfo.mockRestore()
+      }
     }
 
     it('converts file', async () => {
@@ -669,6 +674,17 @@ describe('Marp CLI', () => {
 
         expect(await marpCli([onePath, '-o', '-'])).toBe(0)
         expect(stdout).toHaveBeenCalledTimes(1)
+      })
+
+      it('converts file with HTML type when extension is .html', async () => {
+        // --pdf-notes is required to prefer PDF over HTML in the default type
+        const cmd = [onePath, '--pdf-notes', '-o', 'example.html']
+        expect((await conversion(...cmd)).options.type).toBe(ConvertType.html)
+      })
+
+      it('converts file with HTML type when extension is .htm', async () => {
+        const cmd = [onePath, '--pdf-notes', '-o', 'example.htm']
+        expect((await conversion(...cmd)).options.type).toBe(ConvertType.html)
       })
 
       it('converts file with PDF type when extension is .pdf', async () => {
@@ -856,6 +872,20 @@ describe('Marp CLI', () => {
             expect.stringContaining('Preview option was ignored')
           )
         })
+      })
+    })
+
+    describe('with --pdf-notes option', () => {
+      it('prefers PDF than HTML if not specified conversion type', async () => {
+        const cmd = [onePath, '--pdf-notes']
+        expect((await conversion(...cmd)).options.type).toBe(ConvertType.pdf)
+
+        // This option is actually not for defining conversion type so other
+        // options to set conversion type are always prioritized.
+        const cmdPptx = [onePath, '--pdf-notes', '--pptx']
+        expect((await conversion(...cmdPptx)).options.type).toBe(
+          ConvertType.pptx
+        )
       })
     })
   })

@@ -150,6 +150,8 @@ export class MarpCLIConfig {
 
       // Detect from filename
       const lowerOutput = (output || '').toLowerCase()
+      if (lowerOutput.endsWith('.html') || lowerOutput.endsWith('.htm'))
+        return ConvertType.html
       if (lowerOutput.endsWith('.pdf')) return ConvertType.pdf
       if (lowerOutput.endsWith('.png')) return ConvertType.png
       if (lowerOutput.endsWith('.pptx')) return ConvertType.pptx
