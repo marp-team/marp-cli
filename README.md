@@ -43,7 +43,7 @@ npx @marp-team/marp-cli@latest -w slide-deck.md
 npx @marp-team/marp-cli@latest -s ./slides
 ```
 
-> :information_source: You have to install [Google Chrome], [Chromium], [Microsoft Edge], or a Chromium based browser to convert slide deck into PDF, PPTX, and image(s).
+> :information_source: You have to install [Google Chrome], [Chromium], or [Microsoft Edge] to convert slide deck into PDF, PPTX, and image(s).
 
 [google chrome]: https://www.google.com/chrome/
 [chromium]: https://www.chromium.org/
