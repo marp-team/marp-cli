@@ -132,6 +132,10 @@ marp slide-deck.md -o converted.pdf
 
 [google chrome canary]: https://www.google.com/chrome/canary/
 
+If your slide deck had included [Marpit presenter notes] as HTML comment, you can add note annotations to the lower left by using `--pdf-notes` option together with `--pdf`.
+
+[marpit presenter notes]: https://marpit.marp.app/usage?id=presenter-notes
+
 ### Convert to PowerPoint document (`--pptx`)
 
 Do you want more familiar way to present and share your deck? PPTX conversion to create PowerPoint document is available by passing `--pptx` option or specify the output path with PPTX extension.
@@ -141,7 +145,7 @@ marp --pptx slide-deck.md
 marp slide-deck.md -o converted.pptx
 ```
 
-A created PPTX includes rendered Marp slide pages and the support of [Marpit presenter notes](https://marpit.marp.app/usage?id=presenter-notes). It can open with PowerPoint, Keynote, Google Slides, LibreOffice Impress, and so on...
+A created PPTX includes rendered Marp slide pages and the support of [Marpit presenter notes]. It can open with PowerPoint, Keynote, Google Slides, LibreOffice Impress, and so on...
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/marp-team/marp-cli/main/docs/images/pptx.png" height="300" />
@@ -274,19 +278,19 @@ marp --template bare --engine @marp-team/marpit slide-deck.md
 
 ## Metadata
 
-We recommend setting metadata of the slide deck if you want to host the outputted HTML on the web. To optimize the converted web page for SEO and social sharing, passed meta values will use in `<title>`, `<link>`, and `<meta>` tags.
+Through [global directives] or CLI options, you can set metadata for a converted HTML, PDF, and PPTX slide deck.
 
-| [Global directives] |   CLI option    | Description                           | Metadata                                      |
-| :-----------------: | :-------------: | :------------------------------------ | :-------------------------------------------- |
-|       `title`       |    `--title`    | Define title of the slide deck.       | `<title>`, `og:title`                         |
-|    `description`    | `--description` | Define description of the slide deck. | `<meta name="description">`, `og:description` |
-|        `url`        |     `--url`     | Define [canonical URL].               | `<link rel="canonical">`, `og:url`            |
-|       `image`       |  `--og-image`   | Define [Open Graph] image URL.        | `og:image`                                    |
+| [Global directives] |   CLI option    | Description                     | Available in    |
+| :-----------------: | :-------------: | :------------------------------ | :-------------- |
+|       `title`       |    `--title`    | Define title of the slide deck  | HTML, PDF, PPTX |
+|    `description`    | `--description` | Define description of the slide | HTML, PDF, PPTX |
+|        `url`        |     `--url`     | Define [canonical URL] \*       | HTML            |
+|       `image`       |  `--og-image`   | Define [Open Graph] image URL   | HTML            |
+
+> \*: If could not parse a specified value as valid, the URL will be ignored.
 
 [canonical url]: https://en.wikipedia.org/wiki/Canonical_link_element
 [open graph]: http://ogp.me/
-
-> :information_source: The passed canonical URL will be ignored when cannot parse as valid URL.
 
 ### By [global directives]
 
@@ -457,6 +461,7 @@ If you want to prevent looking up a configuration file, you can pass `--no-confi
 | `options`         |           object            |                       | The base options for the constructor of engine                                                         |
 | `output`          |           string            |    `--output` `-o`    | Output file path (or directory when input-dir is passed)                                               |
 | `pdf`             |           boolean           |        `--pdf`        | Convert slide deck into PDF                                                                            |
+| `pdfNotes`        |           boolean           |     `--pdf-notes`     | Add [presenter notes][marpit presenter notes] to PDF as annotations                                    |
 | `preview`         |           boolean           |   `--preview` `-p`    | Open preview window                                                                                    |
 | `server`          |           boolean           |    `--server` `-s`    | Enable server mode                                                                                     |
 | `template`        |     `bare` \| `bespoke`     |     `--template`      | Choose template (`bespoke` by default)                                                                 |
