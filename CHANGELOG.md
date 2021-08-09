@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Added
+
+- PDF metadata support ([#367](https://github.com/marp-team/marp-cli/issues/367), [#369](https://github.com/marp-team/marp-cli/pull/369))
+- `--pdf-notes` option to add presenter notes into PDF as annotations ([#261](https://github.com/marp-team/marp-cli/issues/261), [#369](https://github.com/marp-team/marp-cli/pull/369))
+
 ## v1.2.0 - 2021-07-22
 
 ### Added
