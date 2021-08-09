@@ -11,9 +11,16 @@ html(lang=lang)
       if image
         meta(property="og:image:alt", content=title)
 
+    if author
+      meta(name="author", content=author)
+      meta(property="article:author", content=author)
+
     if description
       meta(name="description", content=description)
       meta(property="og:description", content=description)
+
+    if keywords && keywords.length > 1
+      meta(name="keywords", content=keywords.join(','))
 
     if url
       link(rel="canonical", href=url)

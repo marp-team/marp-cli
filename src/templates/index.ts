@@ -20,8 +20,10 @@ interface TemplateCoreOption {
 }
 
 export interface TemplateMeta {
+  author: string | undefined
   description: string | undefined
   image: string | undefined
+  keywords: string[] | undefined
   title: string | undefined
   url: string | undefined
 }
