@@ -141,6 +141,7 @@
     "cosmiconfig": "^7.0.0",
     "express": "^4.17.1",
     "import-from": "^4.0.0",
+    "pdf-lib": "^1.16.0",
     "pptxgenjs": "^3.7.1",
     "puppeteer-core": "10.1.0",
     "serve-index": "^1.9.1",

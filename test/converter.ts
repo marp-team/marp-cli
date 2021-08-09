@@ -7,6 +7,7 @@ import Marp from '@marp-team/marp-core'
 import { Options } from '@marp-team/marpit'
 import cheerio from 'cheerio'
 import { imageSize } from 'image-size'
+import { PDFDocument, PDFDict, PDFName, PDFString, PDFHexString } from 'pdf-lib'
 import { Page } from 'puppeteer-core/lib/cjs/puppeteer/common/Page'
 import yauzl from 'yauzl'
 import { Converter, ConvertType, ConverterOption } from '../src/converter'
@@ -275,7 +276,7 @@ describe('Converter', () => {
     })
 
     describe('when convert type is PDF', () => {
-      const pdfInstance = (opts = {}) =>
+      const pdfInstance = (opts: Partial<ConverterOption> = {}) =>
         instance({ ...opts, type: ConvertType.pdf })
 
       it(
@@ -294,6 +295,26 @@ describe('Converter', () => {
         },
         puppeteerTimeoutMs
       )
+
+      describe('with meta global directives', () => {
+        it(
+          'assigns meta info thorugh pdf-lib',
+          async () => {
+            const write = (<any>fs).__mockWriteFile()
+
+            await pdfInstance({
+              output: 'test.pdf',
+              globalDirectives: { title: 'title', description: 'description' },
+            }).convertFile(new File(onePath))
+
+            const pdf = await PDFDocument.load(write.mock.calls[0][1])
+
+            expect(pdf.getTitle()).toBe('title')
+            expect(pdf.getSubject()).toBe('description')
+          },
+          puppeteerTimeoutMs
+        )
+      })
 
       describe('with allowLocalFiles option as true', () => {
         it(
@@ -326,6 +347,33 @@ describe('Converter', () => {
               expect.stringContaining(os.tmpdir())
             )
             expect(fileSave).toHaveBeenCalled()
+          },
+          puppeteerTimeoutMs
+        )
+      })
+
+      describe('with pdfNotes option as true', () => {
+        it(
+          'assigns presenter notes as annotation of PDF',
+          async () => {
+            const write = (<any>fs).__mockWriteFile()
+
+            await pdfInstance({
+              output: 'test.pdf',
+              pdfNotes: true,
+            }).convertFile(new File(threePath))
+
+            const pdf = await PDFDocument.load(write.mock.calls[0][1])
+            const annotaionRef = pdf.getPage(0).node.Annots()?.get(0)
+            const annotation = pdf.context.lookup(annotaionRef, PDFDict)
+
+            const kv = (name: string) => annotation.get(PDFName.of(name))
+
+            expect(kv('Subtype')).toBe(PDFName.of('Text')) // Annotation type
+            expect(kv('Name')).toBe(PDFName.of('Note')) // The kind of icon
+            expect(kv('Contents')).toStrictEqual(
+              PDFHexString.fromText('presenter note')
+            )
           },
           puppeteerTimeoutMs
         )

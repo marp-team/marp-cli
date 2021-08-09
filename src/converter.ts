@@ -26,6 +26,8 @@ import {
 import { isChromeInWSLHost, resolveWSLPathToHost } from './utils/wsl'
 import { notifier } from './watcher'
 
+const CREATED_BY_MARP = 'Created by Marp'
+
 export enum ConvertType {
   html = 'html',
   pdf = 'pdf',
@@ -55,6 +57,7 @@ export interface ConverterOption {
   options: MarpitOptions
   output?: string | false
   pages?: boolean | number[]
+  pdfNotes?: boolean
   preview?: boolean
   jpegQuality?: number
   server?: boolean
@@ -254,6 +257,46 @@ export class Converter {
       return await page.pdf({ printBackground: true, preferCSSPageSize: true })
     })
 
+    // Apply PDF metadata and annotations
+    const creationDate = new Date()
+    const { PDFDocument, PDFHexString, PDFString } = await import('pdf-lib')
+    const pdfDoc = await PDFDocument.load(ret.buffer)
+
+    pdfDoc.setCreator(CREATED_BY_MARP)
+    pdfDoc.setProducer(CREATED_BY_MARP)
+    pdfDoc.setCreationDate(creationDate)
+    pdfDoc.setModificationDate(creationDate)
+
+    if (tpl.rendered.title) pdfDoc.setTitle(tpl.rendered.title)
+    if (tpl.rendered.description) pdfDoc.setSubject(tpl.rendered.description)
+
+    if (this.options.pdfNotes) {
+      const pages = pdfDoc.getPages()
+
+      for (let i = 0, len = pages.length; i < len; i += 1) {
+        const notes = tpl.rendered.comments[i].join('\n\n')
+
+        if (notes) {
+          const noteAnnot = pdfDoc.context.obj({
+            Type: 'Annot',
+            Subtype: 'Text',
+            Rect: [0, 20, 20, 20],
+            Contents: PDFHexString.fromText(notes),
+            // Title: PDFString.of('Author'), // TODO: Set author
+            Name: 'Note',
+            Subj: PDFString.of('Note'),
+            C: [1, 0.92, 0.42], // RGB
+            CA: 0.25, // Alpha
+          })
+
+          pages[i].node.addAnnot(pdfDoc.context.register(noteAnnot))
+        }
+      }
+    }
+
+    // Apply modified PDF to buffer
+    ret.buffer = Buffer.from(await pdfDoc.save())
+
     return ret
   }
 
@@ -334,8 +377,8 @@ export class Converter {
     const pptx = new (await import('pptxgenjs')).default()
     const layoutName = `${tpl.rendered.size.width}x${tpl.rendered.size.height}`
 
-    pptx.author = 'Created by Marp'
-    pptx.company = 'Created by Marp'
+    pptx.author = CREATED_BY_MARP
+    pptx.company = CREATED_BY_MARP
 
     pptx.defineLayout({
       name: layoutName,
