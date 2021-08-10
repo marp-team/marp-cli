@@ -284,6 +284,8 @@ Through [global directives] or CLI options, you can set metadata for a converted
 | :-----------------: | :-------------: | :------------------------------ | :-------------- |
 |       `title`       |    `--title`    | Define title of the slide deck  | HTML, PDF, PPTX |
 |    `description`    | `--description` | Define description of the slide | HTML, PDF, PPTX |
+|      `author`       |   `--author`    | Define author of the slide deck | HTML, PDF, PPTX |
+|     `keywords`      |  `--keywords`   | Define comma-separated keywords | HTML, PDF       |
 |        `url`        |     `--url`     | Define [canonical URL] \*       | HTML            |
 |       `image`       |  `--og-image`   | Define [Open Graph] image URL   | HTML            |
 
@@ -300,6 +302,8 @@ Marp CLI supports _additional [global directives]_ to specify metadata in Markdo
 ---
 title: Marp slide deck
 description: An example slide deck created by Marp CLI
+author: Yuki Hattori
+keywords: marp,marp-cli,slide
 url: https://marp.app/
 image: https://marp.app/og-image.jpg
 ---
@@ -311,7 +315,7 @@ image: https://marp.app/og-image.jpg
 
 ### By CLI option
 
-Marp CLI prefers CLI option to global directives. You can override metadata values by `--title`, `--description`, `--url`, and `--og-image`.
+Marp CLI prefers CLI option to global directives. You can override metadata values by `--title`, `--description`, `--author`, `--keywords`, `--url`, and `--og-image`.
 
 ## Theme
 
@@ -445,6 +449,7 @@ If you want to prevent looking up a configuration file, you can pass `--no-confi
 | Key               |            Type             |      CLI option       | Description                                                                                            |
 | :---------------- | :-------------------------: | :-------------------: | :----------------------------------------------------------------------------------------------------- |
 | `allowLocalFiles` |           boolean           | `--allow-local-files` | Allow to access local files from Markdown while converting PDF _(NOT SECURE)_                          |
+| `author`          |           string            |      `--author`       | Define author of the slide deck                                                                        |
 | `bespoke`         |           object            |                       | Setting options for `bespoke` template                                                                 |
 | ┗ `osc`           |           boolean           |    `--bespoke.osc`    | \[Bespoke\] Use on-screen controller (`true` by default)                                               |
 | ┗ `progress`      |           boolean           | `--bespoke.progress`  | \[Bespoke\] Use progress bar (`false` by default)                                                      |
@@ -456,6 +461,7 @@ If you want to prevent looking up a configuration file, you can pass `--no-confi
 | `imageScale`      |           number            |    `--image-scale`    | The scale factor for rendered images (`1` by default, or `2.5` for PPTX conversion)                    |
 | `inputDir`        |           string            |  `--input-dir` `-I`   | The base directory to find markdown and theme CSS                                                      |
 | `jpegQuality`     |           number            |   `--jpeg-quality`    | Setting JPEG image quality (`85` by default)                                                           |
+| `keywords`        |     string \| string[]      |     `--keywords`      | Define keywords for the slide deck (Accepts comma-separated string and array of string)                |
 | `lang`            |           string            |                       | Define the language of converted HTML                                                                  |
 | `ogImage`         |           string            |     `--og-image`      | Define [Open Graph] image URL                                                                          |
 | `options`         |           object            |                       | The base options for the constructor of engine                                                         |

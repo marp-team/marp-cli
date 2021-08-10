@@ -17,7 +17,7 @@ enum OptionGroup {
   Basic = 'Basic Options:',
   Converter = 'Converter Options:',
   Template = 'Template Options:',
-  Meta = 'Meta Options:',
+  Meta = 'Metadata Options:',
   Marp = 'Marp / Marpit Options:',
 }
 
@@ -187,6 +187,16 @@ export const marpCli = async (
         },
         description: {
           describe: 'Define description of the slide deck',
+          group: OptionGroup.Meta,
+          type: 'string',
+        },
+        author: {
+          describe: 'Define author of the slide deck',
+          group: OptionGroup.Meta,
+          type: 'string',
+        },
+        keywords: {
+          describe: 'Define comma-separated keywords for the slide deck',
           group: OptionGroup.Meta,
           type: 'string',
         },

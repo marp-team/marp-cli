@@ -269,6 +269,9 @@ export class Converter {
 
     if (tpl.rendered.title) pdfDoc.setTitle(tpl.rendered.title)
     if (tpl.rendered.description) pdfDoc.setSubject(tpl.rendered.description)
+    if (tpl.rendered.author) pdfDoc.setAuthor(tpl.rendered.author)
+    if (tpl.rendered.keywords)
+      pdfDoc.setKeywords([tpl.rendered.keywords.join('; ')])
 
     if (this.options.pdfNotes) {
       const pages = pdfDoc.getPages()
@@ -282,7 +285,9 @@ export class Converter {
             Subtype: 'Text',
             Rect: [0, 20, 20, 20],
             Contents: PDFHexString.fromText(notes),
-            // Title: PDFString.of('Author'), // TODO: Set author
+            T: tpl.rendered.author
+              ? PDFHexString.fromText(tpl.rendered.author)
+              : undefined,
             Name: 'Note',
             Subj: PDFString.of('Note'),
             C: [1, 0.92, 0.42], // RGB
@@ -377,7 +382,7 @@ export class Converter {
     const pptx = new (await import('pptxgenjs')).default()
     const layoutName = `${tpl.rendered.size.width}x${tpl.rendered.size.height}`
 
-    pptx.author = CREATED_BY_MARP
+    pptx.author = tpl.rendered.author ?? CREATED_BY_MARP
     pptx.company = CREATED_BY_MARP
 
     pptx.defineLayout({

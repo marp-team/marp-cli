@@ -8,6 +8,7 @@ import osLocale from 'os-locale'
 import { info, warn } from './cli'
 import { ConverterOption, ConvertType } from './converter'
 import resolveEngine, { ResolvableEngine, ResolvedEngine } from './engine'
+import { keywordsAsArray } from './engine/meta-plugin'
 import { error } from './error'
 import { TemplateOption } from './templates'
 import { Theme, ThemeSet } from './theme'
@@ -17,6 +18,7 @@ type Overwrite<T, U> = Omit<T, Extract<keyof T, keyof U>> & U
 interface IMarpCLIArguments {
   _?: string[]
   allowLocalFiles?: boolean
+  author?: string
   baseUrl?: string
   bespoke?: {
     osc?: boolean
@@ -31,6 +33,7 @@ interface IMarpCLIArguments {
   imageScale?: number
   inputDir?: string
   jpegQuality?: number
+  keywords?: string
   ogImage?: string
   output?: string | false
   pdf?: boolean
@@ -51,6 +54,7 @@ export type IMarpCLIConfig = Overwrite<
   {
     engine?: ResolvableEngine | ResolvableEngine[]
     html?: ConverterOption['html']
+    keywords?: string | string[]
     lang?: string
     options?: ConverterOption['options']
     themeSet?: string | string[]
@@ -211,8 +215,10 @@ export class MarpCLIConfig {
       baseUrl: this.args.baseUrl ?? this.conf.baseUrl,
       engine: this.engine.klass,
       globalDirectives: {
+        author: this.args.author ?? this.conf.author,
         description: this.args.description ?? this.conf.description,
         image: this.args.ogImage ?? this.conf.ogImage,
+        keywords: keywordsAsArray(this.args.keywords ?? this.conf.keywords),
         theme: theme instanceof Theme ? theme.name : theme,
         title: this.args.title ?? this.conf.title,
         url: this.args.url ?? this.conf.url,

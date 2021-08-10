@@ -7,7 +7,7 @@ import Marp from '@marp-team/marp-core'
 import { Options } from '@marp-team/marpit'
 import cheerio from 'cheerio'
 import { imageSize } from 'image-size'
-import { PDFDocument, PDFDict, PDFName, PDFString, PDFHexString } from 'pdf-lib'
+import { PDFDocument, PDFDict, PDFName, PDFHexString } from 'pdf-lib'
 import { Page } from 'puppeteer-core/lib/cjs/puppeteer/common/Page'
 import yauzl from 'yauzl'
 import { Converter, ConvertType, ConverterOption } from '../src/converter'
@@ -139,6 +139,8 @@ describe('Converter', () => {
           globalDirectives: {
             title: 'Title',
             description: 'Desc',
+            author: 'Author',
+            keywords: ['a', '"b"', 'c'],
             url: 'https://example.com/canonical',
             image: 'https://example.com/image.jpg',
           },
@@ -146,6 +148,10 @@ describe('Converter', () => {
 
         expect(result).toContain('<title>Title</title>')
         expect(result).toContain('<meta name="description" content="Desc">')
+        expect(result).toContain('<meta name="author" content="Author">')
+        expect(result).toContain(
+          '<meta name="keywords" content="a,&quot;b&quot;,c">'
+        )
         expect(result).toContain(
           '<link rel="canonical" href="https://example.com/canonical">'
         )
@@ -154,15 +160,24 @@ describe('Converter', () => {
         )
       })
 
-      it('allows reset meta values by empty string', async () => {
+      it('allows reset meta values by empty string / array', async () => {
         const { result } = await instance({
-          globalDirectives: { title: '', description: '', url: '', image: '' },
+          globalDirectives: {
+            title: '',
+            description: '',
+            author: '',
+            keywords: [],
+            url: '',
+            image: '',
+          },
         }).convert(
-          '---\ntitle: A\ndescription: B\nurl: https://example.com/\nimage: /hello.jpg\n---'
+          '---\ntitle: A\ndescription: B\nauthor: C\nkeywords: D\nurl: https://example.com/\nimage: /hello.jpg\n---'
         )
 
         expect(result).not.toContain('<title>')
         expect(result).not.toContain('<meta name="description"')
+        expect(result).not.toContain('<meta name="author"')
+        expect(result).not.toContain('<meta name="keywords"')
         expect(result).not.toContain('<link rel="canonical"')
         expect(result).not.toContain('<meta property="og:image"')
       })
@@ -304,13 +319,20 @@ describe('Converter', () => {
 
             await pdfInstance({
               output: 'test.pdf',
-              globalDirectives: { title: 'title', description: 'description' },
+              globalDirectives: {
+                title: 'title',
+                description: 'description',
+                author: 'author',
+                keywords: ['a', 'b', 'c'],
+              },
             }).convertFile(new File(onePath))
 
             const pdf = await PDFDocument.load(write.mock.calls[0][1])
 
             expect(pdf.getTitle()).toBe('title')
             expect(pdf.getSubject()).toBe('description')
+            expect(pdf.getAuthor()).toBe('author')
+            expect(pdf.getKeywords()).toBe('a; b; c')
           },
           puppeteerTimeoutMs
         )
@@ -377,6 +399,24 @@ describe('Converter', () => {
           },
           puppeteerTimeoutMs
         )
+
+        it('sets a comment author to notes if set author global directive', async () => {
+          const write = (<any>fs).__mockWriteFile()
+
+          await pdfInstance({
+            output: 'test.pdf',
+            pdfNotes: true,
+            globalDirectives: { author: 'author' },
+          }).convertFile(new File(threePath))
+
+          const pdf = await PDFDocument.load(write.mock.calls[0][1])
+          const annotaionRef = pdf.getPage(0).node.Annots()?.get(0)
+          const annotation = pdf.context.lookup(annotaionRef, PDFDict)
+
+          expect(annotation.get(PDFName.of('T'))).toStrictEqual(
+            PDFHexString.fromText('author')
+          )
+        })
       })
     })
 
@@ -467,6 +507,7 @@ describe('Converter', () => {
               globalDirectives: {
                 title: 'Test meta',
                 description: 'Test description',
+                author: 'author',
               },
             }).convertFile(new File(onePath))
 
@@ -475,6 +516,7 @@ describe('Converter', () => {
 
             expect(meta['dc:title']).toBe('Test meta')
             expect(meta['dc:subject']).toBe('Test description')
+            expect(meta['dc:creator']).toBe('author')
 
             // Custom scale
             expect(setViewport).toHaveBeenCalledWith(

@@ -1,9 +1,11 @@
 export interface EngineInfo {
-  theme: string | undefined
+  author: string | undefined
   description: string | undefined
   image: string | undefined
+  keywords: string[] | undefined
   length: number
   size: { height: number; width: number }
+  theme: string | undefined
   title: string | undefined
   url: string | undefined
 }
@@ -22,8 +24,10 @@ export default function infoPlugin(md: any) {
 
     const info: EngineInfo = {
       theme,
+      author: globalDirectives.marpCLIAuthor,
       description: globalDirectives.marpCLIDescription,
       image: globalDirectives.marpCLIImage,
+      keywords: globalDirectives.marpCLIKeywords,
       title: globalDirectives.marpCLITitle,
       url: globalDirectives.marpCLIURL,
       size: {
