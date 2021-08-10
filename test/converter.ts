@@ -383,7 +383,6 @@ describe('Converter', () => {
             await pdfInstance({
               output: 'test.pdf',
               pdfNotes: true,
-              globalDirectives: { author: 'author' },
             }).convertFile(new File(threePath))
 
             const pdf = await PDFDocument.load(write.mock.calls[0][1])
@@ -397,10 +396,27 @@ describe('Converter', () => {
             expect(kv('Contents')).toStrictEqual(
               PDFHexString.fromText('presenter note')
             )
-            expect(kv('T')).toStrictEqual(PDFHexString.fromText('author'))
           },
           puppeteerTimeoutMs
         )
+
+        it('sets a comment author to notes if set author global directive', async () => {
+          const write = (<any>fs).__mockWriteFile()
+
+          await pdfInstance({
+            output: 'test.pdf',
+            pdfNotes: true,
+            globalDirectives: { author: 'author' },
+          }).convertFile(new File(threePath))
+
+          const pdf = await PDFDocument.load(write.mock.calls[0][1])
+          const annotaionRef = pdf.getPage(0).node.Annots()?.get(0)
+          const annotation = pdf.context.lookup(annotaionRef, PDFDict)
+
+          expect(annotation.get(PDFName.of('T'))).toStrictEqual(
+            PDFHexString.fromText('author')
+          )
+        })
       })
     })
 
