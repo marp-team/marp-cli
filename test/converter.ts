@@ -383,6 +383,7 @@ describe('Converter', () => {
             await pdfInstance({
               output: 'test.pdf',
               pdfNotes: true,
+              globalDirectives: { author: 'author' },
             }).convertFile(new File(threePath))
 
             const pdf = await PDFDocument.load(write.mock.calls[0][1])
@@ -396,6 +397,7 @@ describe('Converter', () => {
             expect(kv('Contents')).toStrictEqual(
               PDFHexString.fromText('presenter note')
             )
+            expect(kv('T')).toStrictEqual(PDFHexString.fromText('author'))
           },
           puppeteerTimeoutMs
         )
