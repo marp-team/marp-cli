@@ -319,13 +319,20 @@ describe('Converter', () => {
 
             await pdfInstance({
               output: 'test.pdf',
-              globalDirectives: { title: 'title', description: 'description' },
+              globalDirectives: {
+                title: 'title',
+                description: 'description',
+                author: 'author',
+                keywords: ['a', 'b', 'c'],
+              },
             }).convertFile(new File(onePath))
 
             const pdf = await PDFDocument.load(write.mock.calls[0][1])
 
             expect(pdf.getTitle()).toBe('title')
             expect(pdf.getSubject()).toBe('description')
+            expect(pdf.getAuthor()).toBe('author')
+            expect(pdf.getKeywords()).toBe('a; b; c')
           },
           puppeteerTimeoutMs
         )
@@ -482,6 +489,7 @@ describe('Converter', () => {
               globalDirectives: {
                 title: 'Test meta',
                 description: 'Test description',
+                author: 'author',
               },
             }).convertFile(new File(onePath))
 
@@ -490,6 +498,7 @@ describe('Converter', () => {
 
             expect(meta['dc:title']).toBe('Test meta')
             expect(meta['dc:subject']).toBe('Test description')
+            expect(meta['dc:creator']).toBe('author')
 
             // Custom scale
             expect(setViewport).toHaveBeenCalledWith(
