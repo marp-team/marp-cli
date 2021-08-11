@@ -88,6 +88,8 @@ export interface ConvertResult {
 
 export type ConvertedCallback = (result: ConvertResult) => void
 
+const stripBOM = (s: string) => (s.charCodeAt(0) === 0xfeff ? s.slice(1) : s)
+
 export class Converter {
   readonly options: ConverterOption
 
@@ -149,7 +151,7 @@ export class Converter {
           : undefined,
       renderer: (tplOpts) => {
         const engine = this.generateEngine(tplOpts)
-        const ret = engine.render(`${markdown}${additionals}`)
+        const ret = engine.render(stripBOM(`${markdown}${additionals}`))
         const info = engine[engineInfo]
 
         if (isFile(file))
