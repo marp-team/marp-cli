@@ -16,7 +16,8 @@ jest.mock('chokidar', () => ({
 }))
 jest.mock('ws', () => ({
   Server: jest.fn(() => ({
-    close: jest.fn(),
+    clients: [],
+    close: jest.fn((callback) => callback()),
     on: mockWsOn,
   })),
 }))
@@ -228,8 +229,8 @@ describe('WatchNotifier', () => {
       expect(socketB.send).toHaveBeenCalledWith('command')
     })
 
-    it('returns false when WebSocket server is stopped', () => {
-      instance.stop()
+    it('returns false when WebSocket server is stopped', async () => {
+      await instance.stop()
       expect(instance.sendTo('test', 'command')).toBe(false)
       expect(socketA.send).not.toHaveBeenCalled()
       expect(socketB.send).not.toHaveBeenCalled()

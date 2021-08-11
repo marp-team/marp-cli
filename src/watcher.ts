@@ -132,11 +132,21 @@ export class WatchNotifier {
     })
   }
 
-  stop() {
-    if (this.wss !== undefined) {
-      this.wss.close()
-      this.wss = undefined
-    }
+  async stop() {
+    return new Promise<boolean>((resolve) => {
+      if (this.wss !== undefined) {
+        const { wss } = this
+
+        wss.close(() => {
+          for (const ws of wss.clients) ws.terminate()
+          resolve(true)
+        })
+
+        this.wss = undefined
+      } else {
+        resolve(false)
+      }
+    })
   }
 
   static sha256(fn: string) {

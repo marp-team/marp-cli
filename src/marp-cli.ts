@@ -396,9 +396,8 @@ export const marpCli = async (
 
     return e.errorCode
   } finally {
-    notifier.stop()
-
     await Promise.all([
+      notifier.stop(),
       Converter.closeBrowser(),
       server?.stop(),
       watcherInstance?.chokidar.close(),

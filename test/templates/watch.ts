@@ -95,6 +95,9 @@ describe('Watch mode notifier on browser context', () => {
             await new Promise((res) => {
               clientSocket.addEventListener('close', res)
               server.close()
+
+              // ws v8 requires closing the connections manually.
+              for (const ws of server.clients) ws.terminate()
             })
 
             server = await createWSServer()
