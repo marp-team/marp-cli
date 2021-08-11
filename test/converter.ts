@@ -125,6 +125,14 @@ describe('Converter', () => {
       expect(disabled.html).toContain('&lt;i&gt;Hello!&lt;/i&gt;')
     })
 
+    it('strips UTF-8 BOM', async () => {
+      const noBOM = await instance().convert('---\ntitle: test\n---')
+      const BOM = await instance().convert('\ufeff---\ntitle: test\n---')
+
+      expect(BOM.result).toStrictEqual(noBOM.result)
+      expect(BOM.rendered.title).toBe('test')
+    })
+
     describe('with globalDirectives option', () => {
       it('overrides theme directive', async () => {
         const { rendered } = await instance({
