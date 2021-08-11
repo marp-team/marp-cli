@@ -1,6 +1,13 @@
 const { jsWithBabel } = require('ts-jest/presets')
 
-const esModules = ['ansi-regex', 'array-union', 'globby', 'slash', 'strip-ansi']
+const esModules = [
+  'ansi-regex',
+  'array-union',
+  'globby',
+  'os-locale',
+  'slash',
+  'strip-ansi',
+]
 
 module.exports = {
   collectCoverageFrom: ['src/**/*.ts', 'src/**/*.tsx'],
