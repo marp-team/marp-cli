@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v1.3.0 - 2021-08-11
+
 ### Added
 
 - PDF metadata support ([#367](https://github.com/marp-team/marp-cli/issues/367), [#369](https://github.com/marp-team/marp-cli/pull/369))
