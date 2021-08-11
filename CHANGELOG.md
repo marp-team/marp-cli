@@ -8,6 +8,10 @@
 - `--pdf-notes` option to add presenter notes into PDF as annotations ([#261](https://github.com/marp-team/marp-cli/issues/261), [#369](https://github.com/marp-team/marp-cli/pull/369))
 - `author` and `keywords` metadata options / global directives ([#367](https://github.com/marp-team/marp-cli/issues/367), [#370](https://github.com/marp-team/marp-cli/pull/370))
 
+### Changed
+
+- Upgrade dependent packages to the latest version ([#371](https://github.com/marp-team/marp-cli/pull/371))
+
 ## v1.2.0 - 2021-07-22
 
 ### Added
