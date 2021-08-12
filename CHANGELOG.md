@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v1.3.1 - 2021-08-12
+
 ### Fixed
 
 - A regression of PDF conversion in the standalone binary version ([#373](https://github.com/marp-team/marp-cli/issues/373), [#374](https://github.com/marp-team/marp-cli/pull/374))
