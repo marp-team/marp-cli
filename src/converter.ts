@@ -261,7 +261,12 @@ export class Converter {
 
     // Apply PDF metadata and annotations
     const creationDate = new Date()
-    const { PDFDocument, PDFHexString, PDFString } = await import('pdf-lib')
+    const { PDFDocument, PDFHexString, PDFString } = await import(
+      // Use pre-bundled pdf-lib to avoid circular dependency warning. pdf-lib
+      // as an external dependency will make failure in the standalone binary.
+      // @see https://github.com/marp-team/marp-cli/issues/373
+      'pdf-lib/dist/pdf-lib.min.js'
+    )
     const pdfDoc = await PDFDocument.load(ret.buffer)
 
     pdfDoc.setCreator(CREATED_BY_MARP)

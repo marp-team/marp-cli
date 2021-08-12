@@ -14,3 +14,7 @@ declare module '*.scss' {
   const scss: string
   export default scss
 }
+
+declare module 'pdf-lib/dist/pdf-lib.min.js' {
+  export * from 'pdf-lib'
+}
