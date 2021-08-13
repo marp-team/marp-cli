@@ -1,4 +1,5 @@
 /* eslint-disable import/export, @typescript-eslint/no-namespace */
+import EventEmitter from 'events'
 import fs from 'fs'
 import { Server as HttpServer } from 'http'
 import path from 'path'
@@ -7,6 +8,7 @@ import url from 'url'
 import { promisify } from 'util'
 import express, { Express } from 'express'
 import serveIndex from 'serve-index'
+import TypedEmitter from 'typed-emitter'
 import favicon from './assets/favicon.png'
 import {
   Converter,
@@ -18,9 +20,8 @@ import { CLIError, CLIErrorCode, error } from './error'
 import { File, markdownExtensions } from './file'
 import serverIndex from './server/index.pug'
 import style from './server/index.scss'
-import TypedEventEmitter from './utils/typed-event-emitter'
 
-export class Server extends TypedEventEmitter<Server.Events> {
+export class Server extends (EventEmitter as new () => TypedEmitter<Server.Events>) {
   readonly converter: Converter
   readonly inputDir: string
   readonly options: Server.Options

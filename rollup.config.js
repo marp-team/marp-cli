@@ -23,6 +23,12 @@ const external = (deps) => (id) =>
 
 const plugins = (opts = {}) => [
   json({ preferConst: true }),
+  alias({
+    entries: [
+      { find: /^node:(.+)$/, replacement: '$1' },
+      { find: 'jszip', replacement: 'jszip/dist/jszip.min.js' },
+    ],
+  }),
   nodeResolve({
     browser: !!opts.browser,
     mainFields: ['module', 'jsnext:main', 'main'],
@@ -33,9 +39,6 @@ const plugins = (opts = {}) => [
   }),
   commonjs(),
   typescript({ noEmitOnError: false }),
-  alias({
-    entries: [{ find: /^node:(.+)$/, replacement: '$1' }],
-  }),
   postcss({
     inject: false,
     plugins: [

@@ -2,6 +2,7 @@
 import { EventEmitter } from 'events'
 import { nanoid } from 'nanoid'
 import puppeteer from 'puppeteer-core'
+import TypedEmitter from 'typed-emitter'
 import favicon from './assets/favicon.png'
 import { ConvertType, mimeTypes } from './converter'
 import { error } from './error'
@@ -11,7 +12,6 @@ import {
   generatePuppeteerLaunchArgs,
   launchPuppeteer,
 } from './utils/puppeteer'
-import TypedEventEmitter from './utils/typed-event-emitter'
 import { isChromeInWSLHost } from './utils/wsl'
 
 export namespace Preview {
@@ -29,7 +29,7 @@ export namespace Preview {
   }
 }
 
-export class Preview extends TypedEventEmitter<Preview.Events> {
+export class Preview extends (EventEmitter as new () => TypedEmitter<Preview.Events>) {
   readonly options: Preview.Options
 
   private puppeteerInternal: puppeteer.Browser | undefined
