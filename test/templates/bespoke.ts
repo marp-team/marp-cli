@@ -1,13 +1,21 @@
 /** @jest-environment jsdom */
 import Marp from '@marp-team/marp-core'
 import { Element as MarpitElement } from '@marp-team/marpit'
-import { default as screenfull, Screenfull } from 'screenfull'
 import { Key } from 'ts-key-enum'
 import bespoke from '../../src/templates/bespoke/bespoke'
 import { classes } from '../../src/templates/bespoke/presenter/presenter-view'
+import * as utils from '../../src/templates/bespoke/utils'
 import { _clearCachedWakeLockApi } from '../../src/templates/bespoke/wake-lock'
 
-jest.mock('screenfull')
+jest.mock('../../src/templates/bespoke/utils', () => ({
+  ...jest.requireActual<typeof utils>('../../src/templates/bespoke/utils'),
+  fullscreen: {
+    isEnabled: () => true,
+    onChange: jest.fn(),
+    toggle: jest.fn(() => Promise.resolve()),
+  },
+}))
+
 jest.useFakeTimers()
 
 beforeAll(() => {
@@ -231,17 +239,17 @@ describe("Bespoke template's browser context", () => {
 
     it('injects deck.fullscreen() to toggle fullscreen', async () => {
       await deck.fullscreen()
-      expect((screenfull as Screenfull).toggle).toHaveBeenCalled()
+      expect(utils.fullscreen.toggle).toHaveBeenCalled()
     })
 
     it('toggles fullscreen by hitting f key', () => {
       keydown({ key: 'f' })
-      expect((screenfull as Screenfull).toggle).toHaveBeenCalled()
+      expect(utils.fullscreen.toggle).toHaveBeenCalled()
     })
 
     it('toggles fullscreen by hitting F11 key', () => {
       keydown({ key: Key.F11 })
-      expect((screenfull as Screenfull).toggle).toHaveBeenCalled()
+      expect(utils.fullscreen.toggle).toHaveBeenCalled()
     })
   })
 
@@ -718,7 +726,7 @@ describe("Bespoke template's browser context", () => {
       describe('when browser does not support fullscreen', () => {
         it('hides fullscreen button', () => {
           jest
-            .spyOn(screenfull as any, 'isEnabled', 'get')
+            .spyOn(utils.fullscreen, 'isEnabled')
             .mockImplementation(() => false)
 
           bespoke()
