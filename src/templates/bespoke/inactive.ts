@@ -1,3 +1,5 @@
+const inactiveClass = 'bespoke-marp-inactive' as const
+
 export default function bespokeInactive(timeout = 2000) {
   return (deck) => {
     let activeTimer
@@ -6,12 +8,12 @@ export default function bespokeInactive(timeout = 2000) {
       if (activeTimer) clearTimeout(activeTimer)
 
       activeTimer = setTimeout(() => {
-        deck.parent.classList.add('bespoke-marp-inactive')
+        deck.parent.classList.add(inactiveClass)
         deck.fire('marp-inactive')
       }, timeout)
 
-      if (deck.parent.classList.contains('bespoke-marp-inactive')) {
-        deck.parent.classList.remove('bespoke-marp-inactive')
+      if (deck.parent.classList.contains(inactiveClass)) {
+        deck.parent.classList.remove(inactiveClass)
         deck.fire('marp-active')
       }
     }

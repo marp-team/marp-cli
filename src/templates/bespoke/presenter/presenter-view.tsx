@@ -1,20 +1,23 @@
 /** @jsx h */
+/** @jsxFrag Fragment */
 import h from 'vhtml'
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const Fragment: any = ({ children }) => h(null, null, ...children)
 
+export const presenterPrefix = 'bespoke-marp-presenter-' as const
 export const classes = {
-  container: 'bespoke-marp-presenter-container',
-  next: 'bespoke-marp-presenter-next',
-  nextContainer: 'bespoke-marp-presenter-next-container',
-  noteContainer: 'bespoke-marp-presenter-note-container',
-  infoContainer: 'bespoke-marp-presenter-info-container',
-  infoPage: 'bespoke-marp-presenter-info-page',
-  infoPageText: 'bespoke-marp-presenter-info-page-text',
-  infoPagePrev: 'bespoke-marp-presenter-info-page-prev',
-  infoPageNext: 'bespoke-marp-presenter-info-page-next',
-  infoTime: 'bespoke-marp-presenter-info-time',
-  infoTimer: 'bespoke-marp-presenter-info-timer',
+  container: `${presenterPrefix}container`,
+  next: `${presenterPrefix}next`,
+  nextContainer: `${presenterPrefix}next-container`,
+  noteContainer: `${presenterPrefix}note-container`,
+  infoContainer: `${presenterPrefix}info-container`,
+  infoPage: `${presenterPrefix}info-page`,
+  infoPageText: `${presenterPrefix}info-page-text`,
+  infoPagePrev: `${presenterPrefix}info-page-prev`,
+  infoPageNext: `${presenterPrefix}info-page-next`,
+  infoTime: `${presenterPrefix}info-time`,
+  infoTimer: `${presenterPrefix}info-timer`,
 } as const
 
 /** Create function to send message to iframe for navigation */
@@ -37,7 +40,7 @@ export default function presenterView(deck) {
     container.appendChild(deckElement)
     container.insertAdjacentHTML(
       'beforeend',
-      <Fragment>
+      <>
         <div class={classes.nextContainer}>
           <iframe class={classes.next} src="?view=next" />
         </div>
@@ -55,7 +58,7 @@ export default function presenterView(deck) {
           <time class={classes.infoTime} title="Current time"></time>
           <div class={classes.infoTimer}>{/* TODO: Implement timer */}</div>
         </div>
-      </Fragment>
+      </>
     )
 
     return container
