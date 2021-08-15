@@ -1,9 +1,9 @@
 import os from 'os'
 import path from 'path'
-import { Launcher } from 'chrome-launcher'
 import puppeteer from 'puppeteer-core'
 import { warn } from '../cli'
 import { CLIErrorCode, error } from '../error'
+import { findChromeInstallation } from './chrome-finder'
 import { findEdgeInstallation } from './edge-finder'
 import { isWSL, resolveWindowsEnv } from './wsl'
 
@@ -44,7 +44,7 @@ export const generatePuppeteerLaunchArgs = () => {
       executablePath = '/usr/bin/chromium-browser'
     } else {
       try {
-        executablePath = Launcher.getFirstInstallation()
+        executablePath = findChromeInstallation()
       } catch (e) {
         if (e instanceof Error) warn(e.message)
       }

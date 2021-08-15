@@ -1,15 +1,20 @@
 {
+  "extends": "@tsconfig/node12/tsconfig.json",
   "compilerOptions": {
-    "esModuleInterop": true,
     "jsx": "react",
-    "lib": ["es2016", "es2017", "dom"],
+    "lib": [
+      "es2019",
+      "es2020.promise",
+      "es2020.bigint",
+      "es2020.string",
+      "dom"
+    ],
     "module": "esnext",
     "moduleResolution": "node",
     "noImplicitAny": false,
     "resolveJsonModule": true,
     "sourceMap": true,
-    "strict": true,
-    "target": "es2015"
+    "target": "es2019"
   },
   "include": ["src"],
   "exclude": ["**/__mocks__"]

@@ -1,4 +1,5 @@
 import { generateURLfromParams, storage } from '../utils'
+import { presenterPrefix } from './presenter-view'
 
 type BespokeForPresenter = { syncKey: string; [key: string]: any }
 
@@ -34,7 +35,7 @@ function openPresenterView(this: BespokeForPresenter) {
 
   return window.open(
     this.presenterUrl,
-    `bespoke-marp-presenter-${this.syncKey}`,
+    presenterPrefix + this.syncKey,
     `width=${w},height=${h},menubar=no,toolbar=no`
   )
 }

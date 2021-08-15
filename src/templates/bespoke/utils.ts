@@ -4,6 +4,8 @@ type LocationLike = Pick<
 >
 type QuerySetter = (...args: Parameters<History['pushState']>) => void
 
+const d = document
+
 const replacer: QuerySetter = (...args) => history.replaceState(...args)
 const viewAttr = 'data-bespoke-view'
 
@@ -17,6 +19,24 @@ export const viewModes = [
   ViewModeNext,
 ] as const
 
+export const fullscreen = {
+  isEnabled: () => !!(d.fullscreenEnabled || d['webkitFullscreenEnabled']),
+  isFullscreen: () => !!(d.fullscreenElement || d['webkitFullscreenElement']),
+  enter: (target = d.body): void | Promise<void> =>
+    (target.requestFullscreen || target['webkitRequestFullscreen'])?.call(
+      target
+    ),
+  exit: (): void | Promise<void> =>
+    (d.exitFullscreen || d['webkitExitFullscreen'])?.call(d),
+  toggle: async () =>
+    fullscreen.isFullscreen() ? fullscreen.exit() : fullscreen.enter(),
+  onChange: (callback: () => void) => {
+    for (const prefix of ['', 'webkit']) {
+      d.addEventListener(prefix + 'fullscreenchange', callback)
+    }
+  },
+}
+
 export const generateURLfromParams = (
   params: URLSearchParams,
   { protocol, host, pathname, hash }: LocationLike = location
@@ -26,7 +46,7 @@ export const generateURLfromParams = (
 }
 
 export const getViewMode = (): typeof viewModes[number] => {
-  const mode: any = document.body.getAttribute(viewAttr)
+  const mode: any = d.body.getAttribute(viewAttr)
   if (viewModes.includes(mode)) return mode
 
   throw new Error('View mode is not assigned.')
@@ -75,7 +95,7 @@ export const setHistoryState = (state: Record<string, any>) =>
   setQuery({}, { setter: (s, ...r) => replacer({ ...s, ...state }, ...r) })
 
 export const setViewMode = () =>
-  document.body.setAttribute(
+  d.body.setAttribute(
     viewAttr,
     ((): typeof viewModes[number] => {
       const view = readQuery('view')

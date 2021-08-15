@@ -20,7 +20,3 @@ express.application.listen = jest.fn(() => {
 })
 
 module.exports = express
-
-beforeEach(() => {
-  express.__errorOnListening = undefined
-})

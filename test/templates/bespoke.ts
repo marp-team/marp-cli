@@ -1,17 +1,20 @@
 /** @jest-environment jsdom */
 import Marp from '@marp-team/marp-core'
 import { Element as MarpitElement } from '@marp-team/marpit'
-import { default as screenfull, Screenfull } from 'screenfull'
 import { Key } from 'ts-key-enum'
 import bespoke from '../../src/templates/bespoke/bespoke'
 import { classes } from '../../src/templates/bespoke/presenter/presenter-view'
+import * as utils from '../../src/templates/bespoke/utils'
 import { _clearCachedWakeLockApi } from '../../src/templates/bespoke/wake-lock'
 
-jest.mock('screenfull')
 jest.useFakeTimers()
 
 beforeAll(() => {
   ;(global as any).origin = 'null'
+})
+
+beforeEach(() => {
+  jest.spyOn(utils.fullscreen, 'isEnabled').mockImplementation(() => true)
 })
 
 afterEach(() => {
@@ -223,25 +226,27 @@ describe("Bespoke template's browser context", () => {
 
   describe('Fullscreen', () => {
     let deck
+    let toggle: jest.SpyInstance
 
     beforeEach(() => {
       render()
       deck = bespoke()
+      toggle = jest.spyOn(utils.fullscreen, 'toggle')
     })
 
     it('injects deck.fullscreen() to toggle fullscreen', async () => {
       await deck.fullscreen()
-      expect((screenfull as Screenfull).toggle).toHaveBeenCalled()
+      expect(toggle).toHaveBeenCalled()
     })
 
     it('toggles fullscreen by hitting f key', () => {
       keydown({ key: 'f' })
-      expect((screenfull as Screenfull).toggle).toHaveBeenCalled()
+      expect(toggle).toHaveBeenCalled()
     })
 
     it('toggles fullscreen by hitting F11 key', () => {
       keydown({ key: Key.F11 })
-      expect((screenfull as Screenfull).toggle).toHaveBeenCalled()
+      expect(toggle).toHaveBeenCalled()
     })
   })
 
@@ -704,6 +709,22 @@ describe("Bespoke template's browser context", () => {
         expect(fullscreen).toHaveBeenCalled()
       })
 
+      it('toggles exit class for fullscreen button if changed the state of fullscreen', () => {
+        bespoke()
+
+        const button = osc.querySelector<HTMLButtonElement>(
+          'button[data-bespoke-marp-osc="fullscreen"]'
+        )
+        expect(button?.className).not.toContain('exit')
+
+        jest
+          .spyOn(utils.fullscreen, 'isFullscreen')
+          .mockImplementation(() => true)
+
+        document.dispatchEvent(new Event('fullscreenchange'))
+        expect(button?.className).toContain('exit')
+      })
+
       it('calls deck.openPresenterView() when clicked presenter view button', () => {
         bespoke()
         const windowOpen = jest.spyOn(window, 'open').mockImplementation()
@@ -718,7 +739,7 @@ describe("Bespoke template's browser context", () => {
       describe('when browser does not support fullscreen', () => {
         it('hides fullscreen button', () => {
           jest
-            .spyOn(screenfull as any, 'isEnabled', 'get')
+            .spyOn(utils.fullscreen, 'isEnabled')
             .mockImplementation(() => false)
 
           bespoke()

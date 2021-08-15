@@ -2,18 +2,18 @@ import os from 'os'
 import path from 'path'
 import { CLIErrorCode } from '../../src/error'
 
-jest.mock('chrome-launcher')
+jest.mock('../../src/utils/chrome-finder')
 jest.mock('../../src/utils/edge-finder')
 jest.mock('../../src/utils/wsl')
-
-const Launcher = (): typeof import('chrome-launcher').Launcher =>
-  require('chrome-launcher').Launcher // eslint-disable-line @typescript-eslint/no-var-requires
 
 const CLIError = (): typeof import('../../src/error').CLIError =>
   require('../../src/error').CLIError // eslint-disable-line @typescript-eslint/no-var-requires
 
 const puppeteer = (): typeof import('../../src/utils/puppeteer') =>
   require('../../src/utils/puppeteer')
+
+const chromeFinder = (): typeof import('../../src/utils/chrome-finder') =>
+  require('../../src/utils/chrome-finder')
 
 const edgeFinder = (): typeof import('../../src/utils/edge-finder') =>
   require('../../src/utils/edge-finder')
@@ -58,9 +58,9 @@ describe('#generatePuppeteerDataDirPath', () => {
 })
 
 describe('#generatePuppeteerLaunchArgs', () => {
-  it('finds out installed Chrome through chrome-launcher', () => {
+  it('finds out installed Chrome through chrome finder', () => {
     const getFirstInstallation = jest
-      .spyOn(Launcher(), 'getFirstInstallation')
+      .spyOn(chromeFinder(), 'findChromeInstallation')
       .mockImplementation(() => '/usr/bin/chromium')
 
     const args = puppeteer().generatePuppeteerLaunchArgs()
@@ -73,7 +73,7 @@ describe('#generatePuppeteerLaunchArgs', () => {
   })
 
   it('finds out installed Edge as the fallback if not found Chrome', () => {
-    jest.spyOn(Launcher(), 'getFirstInstallation').mockImplementation()
+    jest.spyOn(chromeFinder(), 'findChromeInstallation').mockImplementation()
     jest
       .spyOn(edgeFinder(), 'findEdgeInstallation')
       .mockImplementation(() => '/usr/bin/msedge')
@@ -86,9 +86,11 @@ describe('#generatePuppeteerLaunchArgs', () => {
   it('throws CLIError with specific error code if not found executable path', () => {
     const warn = jest.spyOn(console, 'warn').mockImplementation()
 
-    jest.spyOn(Launcher(), 'getFirstInstallation').mockImplementation(() => {
-      throw new Error('Error in chrome-launcher')
-    })
+    jest
+      .spyOn(chromeFinder(), 'findChromeInstallation')
+      .mockImplementation(() => {
+        throw new Error('Error in chrome finder')
+      })
     jest.spyOn(edgeFinder(), 'findEdgeInstallation').mockImplementation()
 
     expect(puppeteer().generatePuppeteerLaunchArgs).toThrow(
@@ -98,12 +100,12 @@ describe('#generatePuppeteerLaunchArgs', () => {
       )
     )
     expect(warn).toHaveBeenCalledWith(
-      expect.stringContaining('Error in chrome-launcher')
+      expect.stringContaining('Error in chrome finder')
     )
   })
 
   it('uses custom executable path if CHROME_PATH environment value was defined as executable path', () => {
-    jest.dontMock('chrome-launcher')
+    jest.dontMock('../../src/utils/chrome-finder')
 
     try {
       process.env.CHROME_PATH = path.resolve(__dirname, '../../marp-cli.js')

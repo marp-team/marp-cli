@@ -1,5 +1,4 @@
-import { default as screenfull } from 'screenfull'
-import { storage } from './utils'
+import { fullscreen, storage } from './utils'
 
 export default function bespokeOSC(selector = '.bespoke-marp-osc') {
   const osc = document.querySelector<HTMLElement>(selector)
@@ -15,7 +14,7 @@ export default function bespokeOSC(selector = '.bespoke-marp-osc') {
   }
 
   // Hide fullscreen button in not-supported browser (e.g. phone device)
-  if (!screenfull.isEnabled)
+  if (!fullscreen.isEnabled())
     oscElements('fullscreen', (btn) => (btn.style.display = 'none'))
 
   // Disable presenter button if using localStorage is restricted
@@ -40,8 +39,7 @@ export default function bespokeOSC(selector = '.bespoke-marp-osc') {
             deck.prev({ fragment: !e.shiftKey })
             break
           case 'fullscreen':
-            if (typeof deck.fullscreen === 'function' && screenfull.isEnabled)
-              deck.fullscreen()
+            if (typeof deck.fullscreen === 'function') deck.fullscreen()
             break
           case 'presenter':
             deck.openPresenterView()
@@ -77,12 +75,12 @@ export default function bespokeOSC(selector = '.bespoke-marp-osc') {
     deck.on('marp-active', () => osc.removeAttribute('aria-hidden'))
     deck.on('marp-inactive', () => osc.setAttribute('aria-hidden', 'true'))
 
-    if (screenfull.isEnabled) {
-      screenfull.onchange(() =>
+    if (fullscreen.isEnabled()) {
+      fullscreen.onChange(() =>
         oscElements('fullscreen', (fs) =>
           fs.classList.toggle(
             'exit',
-            screenfull.isEnabled && screenfull.isFullscreen
+            fullscreen.isEnabled() && fullscreen.isFullscreen()
           )
         )
       )

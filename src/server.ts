@@ -1,12 +1,14 @@
 /* eslint-disable import/export, @typescript-eslint/no-namespace */
+import EventEmitter from 'events'
 import fs from 'fs'
 import { Server as HttpServer } from 'http'
 import path from 'path'
 import querystring from 'querystring'
 import url from 'url'
 import { promisify } from 'util'
-import express, { Express } from 'express'
+import type { Express, Request, Response } from 'express'
 import serveIndex from 'serve-index'
+import TypedEmitter from 'typed-emitter'
 import favicon from './assets/favicon.png'
 import {
   Converter,
@@ -18,9 +20,8 @@ import { CLIError, CLIErrorCode, error } from './error'
 import { File, markdownExtensions } from './file'
 import serverIndex from './server/index.pug'
 import style from './server/index.scss'
-import TypedEventEmitter from './utils/typed-event-emitter'
 
-export class Server extends TypedEventEmitter<Server.Events> {
+export class Server extends (EventEmitter as new () => TypedEmitter<Server.Events>) {
   readonly converter: Converter
   readonly inputDir: string
   readonly options: Server.Options
@@ -46,7 +47,7 @@ export class Server extends TypedEventEmitter<Server.Events> {
   }
 
   async start() {
-    this.setup()
+    await this.setup()
 
     return new Promise<void>((res, rej) => {
       this.httpServer = this.server!.listen(this.port) // eslint-disable-line @typescript-eslint/no-non-null-assertion
@@ -120,7 +121,7 @@ export class Server extends TypedEventEmitter<Server.Events> {
     return Server.script
   }
 
-  private async preprocess(req: express.Request, res: express.Response) {
+  private async preprocess(req: Request, res: Response) {
     const { pathname, query } = url.parse(req.url)
     if (!pathname) return
 
@@ -166,8 +167,10 @@ export class Server extends TypedEventEmitter<Server.Events> {
     }
   }
 
-  private setup() {
-    this.server = express()
+  private async setup() {
+    const express = await import('express')
+
+    this.server = express.default()
     this.server
       .get('*', (req, res, next) =>
         this.preprocess(req, res).then(() => {
