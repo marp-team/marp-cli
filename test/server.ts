@@ -75,6 +75,10 @@ describe('Server', () => {
       ;(express as any).__errorOnListening = err
     })
 
+    afterEach(() => {
+      ;(express as any).__errorOnListening = undefined
+    })
+
     it('throws error', async () => {
       const server = new Server(converter())
       await expect(server.start()).rejects.toThrow(err)
@@ -103,16 +107,16 @@ describe('Server', () => {
   })
 
   describe('Routing', () => {
-    const setupServer = (opts: Server.Options = {}): Server => {
+    const setupServer = async (opts: Server.Options = {}): Promise<Server> => {
       const server: any = new Server(converter(), opts)
 
-      server.setup() // Setup server without listening
+      await server.setup() // Setup server without listening
       return server
     }
 
     describe('when there is request to a served markdown file', () => {
       it('triggers conversion and returns the content of converted HTML', async () => {
-        const server = setupServer()
+        const server = await setupServer()
         const cvt = jest.spyOn(server.converter, 'convertFile')
         const response = await request(server.server).get('/1.md')
 
@@ -127,7 +131,7 @@ describe('Server', () => {
         it('emits `converted` event after conversion', async () => {
           let ret: string | undefined
 
-          const server = setupServer().on('converted', (converted) => {
+          const server = (await setupServer()).on('converted', (converted) => {
             ret = converted.newFile?.buffer?.toString()
           })
 
@@ -138,7 +142,7 @@ describe('Server', () => {
 
       describe('with query parameter', () => {
         it('triggers conversion with corresponded type option', async () => {
-          const server = setupServer()
+          const server = await setupServer()
 
           jest
             .spyOn<any, any>(server.converter, 'convertFile')
@@ -181,7 +185,7 @@ describe('Server', () => {
         it('returns 503 with error response and emitting event', async () => {
           const err = new Error('test')
           const event = jest.fn()
-          const { server, converter } = setupServer().on('error', event)
+          const { server, converter } = (await setupServer()).on('error', event)
 
           jest.spyOn(converter, 'convertFile').mockRejectedValue(err)
 
@@ -195,7 +199,7 @@ describe('Server', () => {
 
     describe('when there is request to served directory', () => {
       it('shows the directory index with assigned class by kind', async () => {
-        const server = setupServer()
+        const server = await setupServer()
         const response = await request(server.server).get('/')
         expect(response.status).toBe(200)
 
@@ -213,7 +217,7 @@ describe('Server', () => {
 
       describe('with specified directoryIndex costructor option', () => {
         it('serves the found convertible markdown', async () => {
-          const server = setupServer({ directoryIndex: ['1.md'] })
+          const server = await setupServer({ directoryIndex: ['1.md'] })
           const response = await request(server.server).get('/')
 
           expect(response.status).toBe(200)
@@ -226,7 +230,7 @@ describe('Server', () => {
 
     describe('when there is request to a static file', () => {
       it('returns the content of static file', async () => {
-        const server = setupServer()
+        const server = await setupServer()
         const response = await request(server.server).get('/4.txt')
 
         expect(response.status).toBe(200)
@@ -236,7 +240,7 @@ describe('Server', () => {
 
     describe('when the requested file is not found', () => {
       it('returns 404', async () => {
-        const server = setupServer()
+        const server = await setupServer()
         const response = await request(server.server).get('/__NOT_FOUND__')
 
         expect(response.status).toBe(404)
@@ -245,7 +249,7 @@ describe('Server', () => {
 
     describe('when the directory traversal attack is detected', () => {
       it('returns 403', async () => {
-        const server = setupServer()
+        const server = await setupServer()
         const response = await request(server.server).get('/../../README.md')
 
         expect(response.status).toBe(403)
