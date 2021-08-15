@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Reduce dependencies ([#375](https://github.com/marp-team/marp-cli/pull/375))
+
 ## v1.3.1 - 2021-08-12
 
 ### Fixed
