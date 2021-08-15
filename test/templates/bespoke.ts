@@ -7,14 +7,21 @@ import { classes } from '../../src/templates/bespoke/presenter/presenter-view'
 import * as utils from '../../src/templates/bespoke/utils'
 import { _clearCachedWakeLockApi } from '../../src/templates/bespoke/wake-lock'
 
-jest.mock('../../src/templates/bespoke/utils', () => ({
-  ...jest.requireActual<typeof utils>('../../src/templates/bespoke/utils'),
-  fullscreen: {
-    isEnabled: () => true,
-    onChange: jest.fn(),
-    toggle: jest.fn(() => Promise.resolve()),
-  },
-}))
+jest.mock('../../src/templates/bespoke/utils', () => {
+  const original = jest.requireActual<typeof utils>(
+    '../../src/templates/bespoke/utils'
+  )
+
+  return {
+    ...original,
+    fullscreen: {
+      ...original.fullscreen,
+      isEnabled: () => true,
+      isFullscreen: jest.fn(() => false),
+      toggle: jest.fn(original.fullscreen.toggle),
+    },
+  }
+})
 
 jest.useFakeTimers()
 
@@ -710,6 +717,22 @@ describe("Bespoke template's browser context", () => {
 
         button?.click()
         expect(fullscreen).toHaveBeenCalled()
+      })
+
+      it('toggles exit class for fullscreen button if changed the state of fullscreen', () => {
+        bespoke()
+
+        const button = osc.querySelector<HTMLButtonElement>(
+          'button[data-bespoke-marp-osc="fullscreen"]'
+        )
+        expect(button?.className).not.toContain('exit')
+
+        jest
+          .spyOn(utils.fullscreen, 'isFullscreen')
+          .mockImplementation(() => true)
+
+        document.dispatchEvent(new Event('fullscreenchange'))
+        expect(button?.className).toContain('exit')
       })
 
       it('calls deck.openPresenterView() when clicked presenter view button', () => {
