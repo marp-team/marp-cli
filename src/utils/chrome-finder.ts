@@ -23,6 +23,7 @@ export const findChromeInstallation = () => {
       case 'wsl':
         return wsl()
     }
+    /* istanbul ignore next */
     return []
   })()
 
