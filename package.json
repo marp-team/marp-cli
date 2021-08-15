@@ -94,6 +94,7 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.24.0",
     "eslint-plugin-jest": "^24.4.0",
+    "express": "^4.17.1",
     "get-stdin": "^9.0.0",
     "globby": "^12.0.0",
     "image-size": "^1.0.0",
@@ -142,13 +143,12 @@
     "@marp-team/marpit": "^2.1.0",
     "chokidar": "^3.5.2",
     "cosmiconfig": "^7.0.0",
-    "express": "^4.17.1",
     "import-from": "^4.0.0",
     "puppeteer-core": "10.2.0",
     "serve-index": "^1.9.1",
     "tmp": "^0.2.1",
     "v8-compile-cache": "^2.3.0",
-    "ws": "^8.0.0",
+    "ws": "^8.1.0",
     "yargs": "^17.1.0"
   },
   "resolutions": {
