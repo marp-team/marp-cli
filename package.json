@@ -120,7 +120,6 @@
     "rollup-plugin-pug": "^1.1.1",
     "rollup-plugin-terser": "^7.0.2",
     "sass": "^1.37.5",
-    "screenfull": "^5.1.0",
     "strip-ansi": "^7.0.0",
     "stylelint": "^13.13.1",
     "stylelint-config-prettier": "^8.0.2",

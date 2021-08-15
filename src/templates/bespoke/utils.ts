@@ -17,6 +17,26 @@ export const viewModes = [
   ViewModeNext,
 ] as const
 
+export const fullscreen = {
+  isEnabled: () =>
+    !!(document.fullscreenEnabled || document['webkitFullscreenEnabled']),
+  isFullscreen: () =>
+    !!(document.fullscreenElement || document['webkitFullscreenElement']),
+  enter: (target = document.body): void | Promise<void> =>
+    (target.requestFullscreen || target['webkitRequestFullscreen'])?.call(
+      target
+    ),
+  exit: (target = document): void | Promise<void> =>
+    (target.exitFullscreen || target['webkitExitFullscreen'])?.call(target),
+  toggle: async () =>
+    fullscreen.isFullscreen() ? fullscreen.exit() : fullscreen.enter(),
+  onChange: (callback: () => void) => {
+    for (const prefix of ['', 'webkit']) {
+      document.addEventListener(prefix + 'fullscreenchange', callback)
+    }
+  },
+}
+
 export const generateURLfromParams = (
   params: URLSearchParams,
   { protocol, host, pathname, hash }: LocationLike = location
