@@ -7,26 +7,14 @@ import { classes } from '../../src/templates/bespoke/presenter/presenter-view'
 import * as utils from '../../src/templates/bespoke/utils'
 import { _clearCachedWakeLockApi } from '../../src/templates/bespoke/wake-lock'
 
-jest.mock('../../src/templates/bespoke/utils', () => {
-  const original = jest.requireActual<typeof utils>(
-    '../../src/templates/bespoke/utils'
-  )
-
-  return {
-    ...original,
-    fullscreen: {
-      ...original.fullscreen,
-      isEnabled: () => true,
-      isFullscreen: jest.fn(() => false),
-      toggle: jest.fn(original.fullscreen.toggle),
-    },
-  }
-})
-
 jest.useFakeTimers()
 
 beforeAll(() => {
   ;(global as any).origin = 'null'
+})
+
+beforeEach(() => {
+  jest.spyOn(utils.fullscreen, 'isEnabled').mockImplementation(() => true)
 })
 
 afterEach(() => {
@@ -238,25 +226,27 @@ describe("Bespoke template's browser context", () => {
 
   describe('Fullscreen', () => {
     let deck
+    let toggle: jest.SpyInstance
 
     beforeEach(() => {
       render()
       deck = bespoke()
+      toggle = jest.spyOn(utils.fullscreen, 'toggle')
     })
 
     it('injects deck.fullscreen() to toggle fullscreen', async () => {
       await deck.fullscreen()
-      expect(utils.fullscreen.toggle).toHaveBeenCalled()
+      expect(toggle).toHaveBeenCalled()
     })
 
     it('toggles fullscreen by hitting f key', () => {
       keydown({ key: 'f' })
-      expect(utils.fullscreen.toggle).toHaveBeenCalled()
+      expect(toggle).toHaveBeenCalled()
     })
 
     it('toggles fullscreen by hitting F11 key', () => {
       keydown({ key: Key.F11 })
-      expect(utils.fullscreen.toggle).toHaveBeenCalled()
+      expect(toggle).toHaveBeenCalled()
     })
   })
 
