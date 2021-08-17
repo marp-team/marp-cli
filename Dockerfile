@@ -29,7 +29,8 @@ ENV IS_DOCKER true
 WORKDIR /home/marp/.cli
 COPY --chown=marp:marp . /home/marp/.cli/
 RUN yarn add puppeteer-core@chrome-$(chromium-browser --version | sed -r 's/^Chromium ([0-9]+).+$/\1/') || true
-RUN yarn install && yarn build && rm -rf ./src ./node_modules && yarn install --production && yarn cache clean \
+RUN yarn install --frozen-lockfile && yarn build && \
+    rm -rf ./src ./node_modules && yarn install --production --frozen-lockfile && yarn cache clean \
     && node /home/marp/.cli/marp-cli.js --version
 
 USER root
