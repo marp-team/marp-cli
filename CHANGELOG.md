@@ -5,6 +5,9 @@
 ### Changed
 
 - Reduce dependencies ([#375](https://github.com/marp-team/marp-cli/pull/375))
+- Upgrade Marpit to [v2.1.1](https://github.com/marp-team/marpit/releases/tag/v2.1.1) ([#378](https://github.com/marp-team/marp-cli/pull/378))
+- Upgrade Marp Core to [v2.1.1](https://github.com/marp-team/marp-core/releases/tag/v2.1.1) ([#378](https://github.com/marp-team/marp-cli/pull/378))
+- Upgrade dependent packages to the latest version ([#378](https://github.com/marp-team/marp-cli/pull/378))
 
 ## v1.3.1 - 2021-08-12
 
