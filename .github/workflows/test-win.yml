@@ -43,7 +43,7 @@ jobs:
             yarn_cache-${{ runner.os }}-
 
       - name: Install dependencies with yarn
-        run: yarn install
+        run: yarn install --frozen-lockfile
 
       # Retry tests up to 3 times due to flaky tests on Windows CI
       # https://stackoverflow.com/a/59365905

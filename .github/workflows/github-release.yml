@@ -41,7 +41,7 @@ jobs:
           node-version: ${{ steps.node_version.outputs.nvmrc }}
       - name: Install yarn
         run: cd $HOME && yarn policies set-version $YARN_VERSION
-      - run: yarn install
+      - run: yarn install --frozen-lockfile
       - name: Build and create standalone binaries
         run: yarn build:standalone
       - name: Create package
