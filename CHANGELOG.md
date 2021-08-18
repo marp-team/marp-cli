@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v1.3.2 - 2021-08-18
+
 ### Fixed
 
 - Create HTML for Puppeteer-based conversion in official Docker image into `/tmp` instead of home directory ([#360](https://github.com/marp-team/marp-cli/issues/360), [#379](https://github.com/marp-team/marp-cli/pull/379))
