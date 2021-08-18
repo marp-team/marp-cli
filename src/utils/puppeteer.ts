@@ -37,6 +37,9 @@ export const generatePuppeteerLaunchArgs = () => {
   if (process.env.IS_DOCKER || process.env.CI)
     args.add('--disable-features=VizDisplayCompositor')
 
+  // Enable DocumentTransition API
+  if (!process.env.CI) args.add('--enable-blink-features=DocumentTransition')
+
   // Resolve Chrome path to execute
   if (executablePath === false) {
     if (process.env.IS_DOCKER) {

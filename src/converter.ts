@@ -8,6 +8,7 @@ import { silence, warn } from './cli'
 import { Engine } from './engine'
 import infoPlugin, { engineInfo, EngineInfo } from './engine/info-plugin'
 import metaPlugin from './engine/meta-plugin'
+import transitionPlugin from './engine/transition-plugin'
 import { error } from './error'
 import { File, FileType } from './file'
 import templates, {
@@ -437,7 +438,7 @@ export class Converter {
     if (html !== undefined) engine.markdown.set({ html })
 
     // Marpit plugins
-    engine.use(metaPlugin).use(infoPlugin)
+    engine.use(metaPlugin).use(infoPlugin).use(transitionPlugin)
 
     // Additional themes
     this.options.themeSet.registerTo(engine)
