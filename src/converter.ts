@@ -458,9 +458,10 @@ export class Converter {
       )
 
       // Snapd Chromium cannot access from sandbox container to user-land `/tmp`
-      // directory so create tmp file to home directory if in Linux.
+      // directory so create tmp file to home directory if in Linux. (There is
+      // an exception for an official docker image)
       return baseFile.saveTmpFile({
-        home: process.platform === 'linux',
+        home: process.platform === 'linux' && !process.env.IS_DOCKER,
         extension: '.html',
       })
     })()
