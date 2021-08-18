@@ -23,6 +23,7 @@ interface IMarpCLIArguments {
   bespoke?: {
     osc?: boolean
     progress?: boolean
+    transition?: boolean
   }
   configFile?: string | false
   description?: string
@@ -102,14 +103,41 @@ export class MarpCLIConfig {
       return undefined
     })()
 
+    const preview = (() => {
+      const p = this.args.preview ?? this.conf.preview ?? false
+
+      if (p && process.env.IS_DOCKER) {
+        warn(
+          `Preview window cannot show in an official docker image. Preview option was ignored.`
+        )
+        return false
+      }
+
+      return p
+    })()
+
     const template = this.args.template || this.conf.template || 'bespoke'
     const templateOption: TemplateOption = (() => {
       if (template === 'bespoke') {
         const bespoke = this.conf.bespoke || {}
+        const transition = this.args.bespoke?.transition ?? bespoke.transition
+
+        if (transition) {
+          info(
+            'An EXPERIMENTAL transition support for bespoke template is enabled. ' +
+              'It is using the shared element transition API proposal and it is not stable. ' +
+              (preview
+                ? ''
+                : `Recommend to use with ${chalk.yellow`--preview`} option for trying transition. `) +
+              // TODO: Update URL to an issue about experimental transition support.
+              `Track the latest information in ${chalk.blueBright`https://github.com/marp-team/marp-cli/issues/`}.`
+          )
+        }
 
         return {
           osc: this.args.bespoke?.osc ?? bespoke.osc,
           progress: this.args.bespoke?.progress ?? bespoke.progress,
+          transition,
         }
       }
       return {}
@@ -185,19 +213,6 @@ export class MarpCLIConfig {
       }
 
       return scale
-    })()
-
-    const preview = (() => {
-      const p = this.args.preview ?? this.conf.preview ?? false
-
-      if (p && process.env.IS_DOCKER) {
-        warn(
-          `Preview window cannot show in an official docker image. Preview option was ignored.`
-        )
-        return false
-      }
-
-      return p
     })()
 
     return {

@@ -180,6 +180,13 @@ export const marpCli = async (
           group: OptionGroup.Template,
           type: 'boolean',
         },
+        'bespoke.transition': {
+          describe:
+            '[Bespoke] Enable transition support with the shared element transition API (EXPERIMENTAL)',
+          defaultDescription: 'false',
+          group: OptionGroup.Template,
+          type: 'boolean',
+        },
         title: {
           describe: 'Define title of the slide deck',
           group: OptionGroup.Meta,
