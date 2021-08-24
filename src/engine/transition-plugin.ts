@@ -28,7 +28,7 @@ export default function transitionPlugin(md: MarkdownIt & { marpit: Marpit }) {
     if (typeof value !== 'string') return {}
 
     const transition = transitions[value]
-    if (!transition) return {}
+    if (!transition) return { transition: undefined, transitionBack: undefined }
 
     const transitionBack: string | undefined = inverted[transition]
     return { transition, ...(transitionBack ? { transitionBack } : {}) }
