@@ -4,6 +4,7 @@ import { nanoid } from 'nanoid'
 import puppeteer from 'puppeteer-core'
 import TypedEmitter from 'typed-emitter'
 import favicon from './assets/favicon.png'
+import macDockIcon from './assets/mac-dock-icon.png'
 import { ConvertType, mimeTypes } from './converter'
 import { error } from './error'
 import { File, FileType } from './file'
@@ -26,6 +27,12 @@ export namespace Preview {
   export interface Options {
     height: number
     width: number
+  }
+
+  export interface Window extends EventEmitter {
+    page: puppeteer.Page
+    close: () => Promise<void>
+    load: (uri: string) => Promise<void>
   }
 }
 
@@ -67,7 +74,7 @@ export class Preview extends (EventEmitter as new () => TypedEmitter<Preview.Eve
     }
   }
 
-  private createWindowObject(page: puppeteer.Page) {
+  private createWindowObject(page: puppeteer.Page): Preview.Window {
     const window = new EventEmitter()
 
     page.on('close', async () => window.emit('close'))
@@ -77,7 +84,7 @@ export class Preview extends (EventEmitter as new () => TypedEmitter<Preview.Eve
       close: async () => {
         try {
           return await page.close()
-        } catch (e) {
+        } catch (e: any) {
           // Ignore raising error if a target page has already close
           /* istanbul ignore next */
           if (!e.message.includes('Target closed.')) throw e
@@ -133,7 +140,7 @@ export class Preview extends (EventEmitter as new () => TypedEmitter<Preview.Eve
     }
   }
 
-  private async launch() {
+  private async launch(): Promise<Preview.Window> {
     const baseArgs = generatePuppeteerLaunchArgs()
 
     this.puppeteerInternal = await launchPuppeteer({
@@ -156,7 +163,12 @@ export class Preview extends (EventEmitter as new () => TypedEmitter<Preview.Eve
       .createCDPSession()
       .then((session) => {
         session
-          .send('Browser.setDockTile', { image: favicon.slice(22) })
+          .send('Browser.setDockTile', {
+            image:
+              process.platform === 'darwin'
+                ? macDockIcon.slice(22)
+                : favicon.slice(22),
+          })
           .catch(() => {
             // No ops
           })
@@ -173,11 +185,19 @@ export class Preview extends (EventEmitter as new () => TypedEmitter<Preview.Eve
     })
 
     const [page] = await this.puppeteerInternal.pages()
-    page.on('close', handlePageOnClose)
 
+    let windowObject: Preview.Window | undefined
+
+    if (process.platform === 'darwin') {
+      // An initial app window is not using in macOS for correct handling activation from Dock
+      windowObject = (await this.createWindow()) || undefined
+      await page.close()
+    }
+
+    page.on('close', handlePageOnClose)
     this.emit('launch')
 
-    return this.createWindowObject(page)
+    return windowObject || this.createWindowObject(page)
   }
 }
 
