@@ -3,7 +3,6 @@ import { EventEmitter } from 'events'
 import { nanoid } from 'nanoid'
 import puppeteer from 'puppeteer-core'
 import TypedEmitter from 'typed-emitter'
-import favicon from './assets/favicon.png'
 import macDockIcon from './assets/mac-dock-icon.png'
 import { ConvertType, mimeTypes } from './converter'
 import { error } from './error'
@@ -157,18 +156,13 @@ export class Preview extends (EventEmitter as new () => TypedEmitter<Preview.Eve
       }),
     })
 
-    // Set Marp icon asynchrnously
+    // Set Marp icon asynchrnously (only for macOS)
     this.puppeteerInternal
       .target()
       .createCDPSession()
       .then((session) => {
         session
-          .send('Browser.setDockTile', {
-            image:
-              process.platform === 'darwin'
-                ? macDockIcon.slice(22)
-                : favicon.slice(22),
-          })
+          .send('Browser.setDockTile', { image: macDockIcon.slice(22) })
           .catch(() => {
             // No ops
           })
