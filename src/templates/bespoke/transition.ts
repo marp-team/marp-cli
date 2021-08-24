@@ -79,8 +79,8 @@ export default function bespokeTransition(deck) {
         condition: (e) =>
           e.index + 1 < deck.slides.length &&
           !(
-            (e.fragment ?? true) &&
-            currentFragment.fragmentIndex + 1 < currentFragment.fragments.length
+            currentFragment.fragmentIndex + 1 <
+            currentFragment.fragments.length
           ),
       }
     )
