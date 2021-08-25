@@ -52,7 +52,10 @@ const plugins = (opts = {}) => [
     ],
   }),
   pugPlugin({ pugRuntime: 'pug-runtime' }),
-  url({ sourceDir: path.join(__dirname, 'lib') }),
+  url({
+    sourceDir: path.join(__dirname, 'lib'),
+    limit: 30720,
+  }),
   compact &&
     terser({
       keep_classnames: /^CLIError$/,

@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Improve an activation behavior from dock in preview mode on macOS ([#380](https://github.com/marp-team/marp-cli/pull/380))
+
+### Changed
+
+- Update Dock icon in preview mode on macOS to suit for macOS Big Sur ([#380](https://github.com/marp-team/marp-cli/pull/380))
+
 ## v1.3.2 - 2021-08-18
 
 ### Fixed
