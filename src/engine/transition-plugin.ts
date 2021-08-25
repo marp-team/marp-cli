@@ -10,6 +10,7 @@ const inverted = {
   'cover-right': 'cover-left',
   'cover-up': 'cover-down',
   'cover-down': 'cover-up',
+  fade: 'fade',
   explode: 'implode',
   implode: 'explode',
 }
