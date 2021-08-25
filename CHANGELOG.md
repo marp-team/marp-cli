@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Improve the behavior of preview mode on macOS ([#380](https://github.com/marp-team/marp-cli/pull/380))
+
 ## v1.3.2 - 2021-08-18
 
 ### Fixed
