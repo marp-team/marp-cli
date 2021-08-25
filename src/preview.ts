@@ -182,6 +182,7 @@ export class Preview extends (EventEmitter as new () => TypedEmitter<Preview.Eve
 
     let windowObject: Preview.Window | undefined
 
+    /* istanbul ignore next */
     if (process.platform === 'darwin') {
       // An initial app window is not using in macOS for correct handling activation from Dock
       windowObject = (await this.createWindow()) || undefined
