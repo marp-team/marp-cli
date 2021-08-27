@@ -283,7 +283,7 @@ describe('Converter', () => {
           template: 'bespoke',
           templateOption: { transition: true },
         }).convert(
-          '<!-- transition: reveal -->\n\n---\n\n---\n\n<!-- transition: false -->'
+          '<!-- transition: reveal -->\n\n---\n\n<!-- transition: {"invalid-format":"will-be-ignored"} -->\n\n---\n\n<!-- transition: false -->'
         )
 
         const $ = cheerio.load(toggleResult)
