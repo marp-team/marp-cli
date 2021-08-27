@@ -1380,4 +1380,81 @@ describe("Bespoke template's browser context", () => {
       expect(request).toHaveBeenCalled()
     })
   })
+
+  describe('[Experimental] Transition', () => {
+    let documentTransition: Record<string, jest.Mock>
+
+    const transitionMd = `<!-- transition: fade -->\n\n` + defaultMarkdown
+
+    beforeEach(() => {
+      documentTransition = {
+        prepare: jest.fn(async () => {
+          /* mock */
+        }),
+        start: jest.fn(async () => {
+          /* mock */
+        }),
+      }
+
+      Object.assign(document, { documentTransition })
+    })
+
+    afterEach(() => delete document['documentTransition'])
+
+    it('does not handle transitions if not defined transition effects in Markdown', () => {
+      render()
+
+      const deck = bespoke()
+      expect(deck.slide()).toBe(0)
+
+      deck.next()
+      expect(deck.slide()).toBe(1)
+      expect(documentTransition.prepare).not.toHaveBeenCalled()
+      expect(documentTransition.start).not.toHaveBeenCalled()
+
+      deck.prev()
+      expect(deck.slide()).toBe(0)
+      expect(documentTransition.prepare).not.toHaveBeenCalled()
+      expect(documentTransition.start).not.toHaveBeenCalled()
+    })
+
+    it('handle transitions if defined transition effects in Markdown', async () => {
+      const parent = render(transitionMd)
+
+      parent.querySelectorAll('section').forEach((section) => {
+        section.dataset.transition = 'cover-left'
+        section.dataset.transitionBack = 'cover-right'
+      })
+
+      const deck = bespoke()
+      expect(deck.slide()).toBe(0)
+
+      // Forward
+      deck.next()
+      expect(deck.slide()).toBe(0) // Prevent navigation while prepare phase
+      expect(documentTransition.prepare).toHaveBeenCalledWith(
+        expect.objectContaining({ rootTransition: 'cover-left' })
+      )
+
+      await documentTransition.prepare.mock.results[0].value
+
+      expect(deck.slide()).toBe(1)
+      expect(documentTransition.start).toHaveBeenCalled()
+
+      // Back
+      documentTransition.prepare.mockClear()
+      documentTransition.start.mockClear()
+
+      deck.prev()
+      expect(deck.slide()).toBe(1) // Prevent navigation while prepare phase
+      expect(documentTransition.prepare).toHaveBeenCalledWith(
+        expect.objectContaining({ rootTransition: 'cover-right' })
+      )
+
+      await documentTransition.prepare.mock.results[0].value
+
+      expect(deck.slide()).toBe(0)
+      expect(documentTransition.start).toHaveBeenCalled()
+    })
+  })
 })
