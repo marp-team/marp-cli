@@ -125,12 +125,11 @@ export class MarpCLIConfig {
         if (transition) {
           info(
             'An EXPERIMENTAL transition support for bespoke template is enabled. ' +
-              'It is using the shared element transition API proposal and it is not stable. ' +
+              'It is using the shared element transition API proposal and it is not yet stable. ' +
               (preview
                 ? ''
-                : `Recommend to use with ${chalk.yellow`--preview`} option for trying transition. `) +
-              // TODO: Update URL to an issue about experimental transition support.
-              `Track the latest information in ${chalk.blueBright`https://github.com/marp-team/marp-cli/issues/`}.`
+                : `Recommend to use with ${chalk.yellow`--preview`} option for trying transitions. `) +
+              `Track the latest information at ${chalk.blueBright`https://github.com/marp-team/marp-cli/issues/382`}.`
           )
         }
 
