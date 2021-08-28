@@ -533,9 +533,9 @@ describe('Converter', () => {
           expect(write).toHaveBeenCalled()
           expect(write.mock.calls[0][0]).toBe('test.pptx')
 
-          // It has a different default scale x2.5
+          // It has a different default scale x2
           expect(setViewport).toHaveBeenCalledWith(
-            expect.objectContaining({ deviceScaleFactor: 2.5 })
+            expect.objectContaining({ deviceScaleFactor: 2 })
           )
 
           // ZIP PK header for Office Open XML
