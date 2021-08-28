@@ -144,7 +144,7 @@ export const marpCli = async (
           type: 'string',
         },
         'image-scale': {
-          defaultDescription: '1 (or 2.5 for PPTX conversion)',
+          defaultDescription: '1 (or 2 for PPTX conversion)',
           describe: 'The scale factor for rendered images',
           group: OptionGroup.Converter,
           type: 'number',

@@ -207,7 +207,7 @@ export class Converter {
           template = await useTemplate(true)
           files.push(
             await this.convertFileToPPTX(template, file, {
-              scale: this.options.imageScale ?? 2.5,
+              scale: this.options.imageScale ?? 2,
             })
           )
           break
