@@ -1,6 +1,6 @@
 interface TransitionCallbackOption {
   back?: boolean
-  condition?: (e: any) => boolean
+  condition: (e: any) => boolean
 }
 
 export default function bespokeTransition(deck) {
@@ -12,10 +12,7 @@ export default function bespokeTransition(deck) {
   deck.transitionPreparing = false
 
   const transitionCallback =
-    (
-      fn: (e: any) => void,
-      { back, condition }: TransitionCallbackOption = {}
-    ) =>
+    (fn: (e: any) => void, { back, condition }: TransitionCallbackOption) =>
     (e: any) => {
       const current = deck.slides[deck.slide()]
       const section = current.querySelector('section[data-transition]')
@@ -40,7 +37,7 @@ export default function bespokeTransition(deck) {
           return true
         }
       } else {
-        if (!(condition?.(e) ?? true)) return true
+        if (!condition(e)) return true
 
         deck.transitionPreparing = documentTransition
           .prepare({
