@@ -182,7 +182,7 @@ export const marpCli = async (
         },
         'bespoke.transition': {
           describe:
-            '[Bespoke] Enable transition support with the shared element transition API (EXPERIMENTAL)',
+            '[Bespoke] Enable transitions powered by Shared Element Transitions API (EXPERIMENTAL)',
           defaultDescription: 'false',
           group: OptionGroup.Template,
           type: 'boolean',
