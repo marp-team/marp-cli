@@ -12,6 +12,7 @@ import bespokeProgress from './progress'
 import bespokeState from './state'
 import bespokeSync from './sync'
 import bespokeTouch from './touch'
+import bespokeTransition from './transition'
 import { getViewMode, popQuery, setViewMode, viewModes } from './utils'
 import bespokeWakeLock from './wake-lock'
 
@@ -52,6 +53,7 @@ export default function bespokeTemplate(
       [[x, _, _], bespokeProgress],
       [[x, x, _], bespokeTouch()],
       [[x, _, _], bespokeOSC()],
+      [[x, _, _], bespokeTransition],
       [[x, x, x], bespokeFragments],
       [[x, x, _], bespokeWakeLock]
     )

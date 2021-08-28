@@ -252,6 +252,52 @@ describe('Converter', () => {
         }
       })
     })
+
+    describe('Template specifics', () => {
+      it('uses bespoke template specific Marpit plugins if enabled transition option', async () => {
+        // Footer directive is for testing the condition about inline mode
+        const transitionMd = '<!-- transition: cover -->\n<!-- footer: test -->'
+
+        // Disabled
+        const { result: disabledResult } = await instance({
+          template: 'bespoke',
+          templateOption: { transition: false },
+        }).convert(transitionMd)
+
+        expect(disabledResult).not.toContain('data-transition="cover-left"')
+        expect(disabledResult).not.toContain(
+          'data-transition-back="cover-right"'
+        )
+
+        // Enabled
+        const { result: enabledResult } = await instance({
+          template: 'bespoke',
+          templateOption: { transition: true },
+        }).convert(transitionMd)
+
+        expect(enabledResult).toContain('data-transition="cover-left"')
+        expect(enabledResult).toContain('data-transition-back="cover-right"')
+
+        // Turn on and off
+        const { result: toggleResult } = await instance({
+          template: 'bespoke',
+          templateOption: { transition: true },
+        }).convert(
+          '<!-- transition: reveal -->\n\n---\n\n<!-- transition: {"invalid-format":"will-be-ignored"} -->\n\n---\n\n<!-- transition: false -->'
+        )
+
+        const $ = cheerio.load(toggleResult)
+        const sections = $('section')
+
+        expect(sections).toHaveLength(3)
+        expect($(sections[0]).attr('data-transition')).toBe('reveal-left')
+        expect($(sections[0]).attr('data-transition-back')).toBe('reveal-right')
+        expect($(sections[1]).attr('data-transition')).toBe('reveal-left')
+        expect($(sections[1]).attr('data-transition-back')).toBe('reveal-right')
+        expect($(sections[2]).attr('data-transition')).toBeUndefined()
+        expect($(sections[2]).attr('data-transition-back')).toBeUndefined()
+      })
+    })
   })
 
   describe('#convertFile', () => {

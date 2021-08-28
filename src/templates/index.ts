@@ -1,6 +1,7 @@
 import fs from 'fs'
 import path from 'path'
-import { Element, Options, RenderResult } from '@marp-team/marpit'
+import { Element, Marpit, Options, RenderResult } from '@marp-team/marpit'
+import transitionPlugin from '../engine/transition-plugin'
 import barePug from './bare/bare.pug'
 import bareScss from './bare/bare.scss'
 import bespokePug from './bespoke/bespoke.pug'
@@ -12,11 +13,15 @@ type RendererResult = RenderResult &
     size: RenderedSize
   }
 
+interface TemplateRendererOptions extends Options {
+  modifier?: (marpit: Marpit) => void
+}
+
 interface TemplateCoreOption {
   base?: string
   lang: string
   notifyWS?: string
-  renderer: (tplOpts: Options) => RendererResult
+  renderer: (tplOpts: TemplateRendererOptions) => RendererResult
 }
 
 export interface TemplateMeta {
@@ -40,6 +45,7 @@ interface TemplateBareOption {} // eslint-disable-line @typescript-eslint/no-emp
 interface TemplateBespokeOption {
   osc?: boolean
   progress?: boolean
+  transition?: boolean
 }
 
 export interface TemplateResult {
@@ -78,6 +84,9 @@ export const bespoke: Template<TemplateBespokeOption> = async (opts) => {
     container: new Element('div', { id: 'p' }),
     inlineSVG: true,
     slideContainer: [],
+    modifier: (marpit) => {
+      if (opts.transition) marpit.use(transitionPlugin)
+    },
   })
 
   return {
