@@ -9,6 +9,7 @@
 ### Fixed
 
 - Improve an activation behavior from dock in preview mode on macOS ([#380](https://github.com/marp-team/marp-cli/pull/380))
+- Optimize the size of runtime script for bespoke template ([#383](https://github.com/marp-team/marp-cli/pull/383))
 
 ### Changed
 
