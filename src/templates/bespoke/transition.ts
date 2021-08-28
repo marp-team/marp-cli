@@ -1,30 +1,35 @@
+import { classPrefix } from './utils'
+
 interface TransitionCallbackOption {
   back?: boolean
-  condition: (e: any) => boolean
+  cond: (e: any) => boolean
 }
 
-export default function bespokeTransition(deck) {
+const transitionApply = '_tA' as const
+const transitionPreparing = '_tP' as const
+
+const bespokeTransition = (deck) => {
   const documentTransition: any = document['documentTransition']
   if (!documentTransition) return
 
   let currentFragment: any
 
-  deck.transitionPreparing = false
+  deck[transitionPreparing] = false
 
   const transitionCallback =
-    (fn: (e: any) => void, { back, condition }: TransitionCallbackOption) =>
+    (fn: (e: any) => void, { back, cond }: TransitionCallbackOption) =>
     (e: any) => {
       const current = deck.slides[deck.slide()]
       const section = current.querySelector('section[data-transition]')
 
       if (!section) return true
 
-      const osc = document.querySelector('.bespoke-marp-osc')
+      const osc = document.querySelector(`.${classPrefix}osc`)
       const sharedElements = osc ? [osc] : undefined
 
-      if (deck.transitionPreparing) {
-        if (e.transitionApply) {
-          deck.transitionPreparing = false
+      if (deck[transitionPreparing]) {
+        if (e[transitionApply]) {
+          deck[transitionPreparing] = false
 
           try {
             documentTransition.start({ sharedElements }).catch(() => {
@@ -37,9 +42,9 @@ export default function bespokeTransition(deck) {
           return true
         }
       } else {
-        if (!condition(e)) return true
+        if (!cond(e)) return true
 
-        deck.transitionPreparing = documentTransition
+        deck[transitionPreparing] = documentTransition
           .prepare({
             rootTransition:
               e.back || back
@@ -56,9 +61,9 @@ export default function bespokeTransition(deck) {
 
   deck.on(
     'prev',
-    transitionCallback((e) => deck.prev({ ...e, transitionApply: true }), {
+    transitionCallback((e) => deck.prev({ ...e, [transitionApply]: true }), {
       back: true,
-      condition: (e) =>
+      cond: (e) =>
         e.index > 0 &&
         !((e.fragment ?? true) && currentFragment.fragmentIndex > 0),
     })
@@ -66,8 +71,8 @@ export default function bespokeTransition(deck) {
 
   deck.on(
     'next',
-    transitionCallback((e) => deck.next({ ...e, transitionApply: true }), {
-      condition: (e) =>
+    transitionCallback((e) => deck.next({ ...e, [transitionApply]: true }), {
+      cond: (e) =>
         e.index + 1 < deck.slides.length &&
         !(currentFragment.fragmentIndex + 1 < currentFragment.fragments.length),
     })
@@ -77,9 +82,9 @@ export default function bespokeTransition(deck) {
     deck.on(
       'slide',
       transitionCallback(
-        (e) => deck.slide(e.index, { ...e, transitionApply: true }),
+        (e) => deck.slide(e.index, { ...e, [transitionApply]: true }),
         {
-          condition: (e) => {
+          cond: (e) => {
             const currentIndex = deck.slide()
             if (e.index === currentIndex) return false
 
@@ -95,3 +100,5 @@ export default function bespokeTransition(deck) {
     currentFragment = e
   })
 }
+
+export default bespokeTransition

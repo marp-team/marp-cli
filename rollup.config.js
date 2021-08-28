@@ -60,6 +60,8 @@ const plugins = (opts = {}) => [
     terser({
       keep_classnames: /^CLIError$/,
       format: { comments: opts.license ? /^!!/ : 'some' },
+      ecma: 2019,
+      compress: { passes: 2 },
     }),
   opts.license &&
     license({

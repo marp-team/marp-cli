@@ -11,7 +11,7 @@ export interface BespokeSyncState {
   fragmentIndex: number
 }
 
-export default function bespokeSync(opts: BespokeSyncOption = {}) {
+const bespokeSync = (opts: BespokeSyncOption = {}) => {
   const key =
     opts.key ||
     window.history.state?.marpBespokeSyncKey ||
@@ -100,3 +100,5 @@ export default function bespokeSync(opts: BespokeSyncOption = {}) {
     deck.on('destroy', destructor)
   }
 }
+
+export default bespokeSync

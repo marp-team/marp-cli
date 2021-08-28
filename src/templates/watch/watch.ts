@@ -20,7 +20,9 @@ const connect = (path: string, reconnect = false) => {
   return ws
 }
 
-export default function () {
+const watch = () => {
   const wsPath = (window as any).__marpCliWatchWS
   if (wsPath) return connect(wsPath)
 }
+
+export default watch

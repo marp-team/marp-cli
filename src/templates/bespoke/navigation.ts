@@ -2,15 +2,32 @@ export interface BespokeNavigationOption {
   interval?: number
 }
 
-enum Direction {
-  X = 'X',
-  Y = 'Y',
+type Direction = 'X' | 'Y'
+
+const isScrollable = (elm: HTMLElement, dir: Direction): boolean =>
+  hasScrollableArea(elm, dir) &&
+  hasScrollableOverflow(getComputedStyle(elm), dir)
+
+const hasScrollableArea = (elm: HTMLElement, dir: Direction) => {
+  const length = dir === 'X' ? 'Width' : 'Height'
+  return elm[`client${length}`] < elm[`scroll${length}`]
 }
 
-export default function bespokeNavigation({
-  interval = 250,
-}: BespokeNavigationOption = {}) {
-  return (deck) => {
+const hasScrollableOverflow = (style: CSSStyleDeclaration, dir: Direction) => {
+  const { overflow } = style
+  const overflowDir = style[`overflow${dir}`]
+
+  return (
+    overflow === 'auto' ||
+    overflow === 'scroll' ||
+    overflowDir === 'auto' ||
+    overflowDir === 'scroll'
+  )
+}
+
+const bespokeNavigation =
+  ({ interval = 250 }: BespokeNavigationOption = {}) =>
+  (deck) => {
     document.addEventListener('keydown', (e) => {
       if (e.key === ' ' && e.shiftKey) {
         deck.prev() // Previous page
@@ -51,8 +68,8 @@ export default function bespokeNavigation({
         if (elm?.parentElement) detectScrollable(elm.parentElement, dir)
       }
 
-      if (e.deltaX !== 0) detectScrollable(<HTMLElement>e.target, Direction.X)
-      if (e.deltaY !== 0) detectScrollable(<HTMLElement>e.target, Direction.Y)
+      if (e.deltaX !== 0) detectScrollable(<HTMLElement>e.target, 'X')
+      if (e.deltaY !== 0) detectScrollable(<HTMLElement>e.target, 'Y')
       if (scrollable) return
 
       e.preventDefault()
@@ -119,28 +136,5 @@ export default function bespokeNavigation({
       lastWheelNavigationAt = Date.now()
     })
   }
-}
 
-function isScrollable(elm: HTMLElement, dir: Direction): boolean {
-  return (
-    hasScrollableArea(elm, dir) &&
-    hasScrollableOverflow(getComputedStyle(elm), dir)
-  )
-}
-
-function hasScrollableArea(elm: HTMLElement, dir: Direction) {
-  const length = dir === Direction.X ? 'Width' : 'Height'
-  return elm[`client${length}`] < elm[`scroll${length}`]
-}
-
-function hasScrollableOverflow(style: CSSStyleDeclaration, dir: Direction) {
-  const { overflow } = style
-  const overflowDir = style[`overflow${dir}`]
-
-  return (
-    overflow === 'auto' ||
-    overflow === 'scroll' ||
-    overflowDir === 'auto' ||
-    overflowDir === 'scroll'
-  )
-}
+export default bespokeNavigation

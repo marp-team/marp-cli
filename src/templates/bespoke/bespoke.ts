@@ -18,46 +18,43 @@ import bespokeWakeLock from './wake-lock'
 
 const parse = (
   ...patterns: [
-    [normalView: boolean, presnterView: boolean, nextView: boolean],
+    [normalView: 1 | 0, presnterView: 1 | 0, nextView: 1 | 0],
     (...args: unknown[]) => void
   ][]
 ) => {
-  const idx = viewModes.findIndex((v) => getViewMode() === v)
-  if (idx < 0) throw new Error('Invalid view')
-
-  return patterns.map(([pat, plugin]) => pat[idx] && plugin).filter((p) => p)
+  const i = viewModes.findIndex((v) => getViewMode() === v)
+  return patterns.map(([pat, plugin]) => pat[i] && plugin).filter((p) => p)
 }
 
-export default function bespokeTemplate(
+const bespokeTemplate = (
   target = document.getElementById('p')! // eslint-disable-line @typescript-eslint/no-non-null-assertion
-) {
+) => {
   setViewMode()
 
   const key = popQuery('sync') || undefined
-  const _ = false
-  const x = true
-
   const deck = bespoke.from(
     target,
     parse(
       //   P  N
-      [[x, x, _], bespokeSync({ key })],
-      [[x, x, x], bespokePresenter(target)],
-      [[x, x, _], bespokeInteractive],
-      [[x, x, x], bespokeClasses],
-      [[x, _, _], bespokeInactive()],
-      [[x, x, x], bespokeLoad],
-      [[x, x, x], bespokeState({ history: false })],
-      [[x, x, _], bespokeNavigation()],
-      [[x, x, _], bespokeFullscreen],
-      [[x, _, _], bespokeProgress],
-      [[x, x, _], bespokeTouch()],
-      [[x, _, _], bespokeOSC()],
-      [[x, _, _], bespokeTransition],
-      [[x, x, x], bespokeFragments],
-      [[x, x, _], bespokeWakeLock]
+      [[1, 1, 0], bespokeSync({ key })],
+      [[1, 1, 1], bespokePresenter(target)],
+      [[1, 1, 0], bespokeInteractive],
+      [[1, 1, 1], bespokeClasses],
+      [[1, 0, 0], bespokeInactive()],
+      [[1, 1, 1], bespokeLoad],
+      [[1, 1, 1], bespokeState({ history: false })],
+      [[1, 1, 0], bespokeNavigation()],
+      [[1, 1, 0], bespokeFullscreen],
+      [[1, 0, 0], bespokeProgress],
+      [[1, 1, 0], bespokeTouch()],
+      [[1, 0, 0], bespokeOSC()],
+      [[1, 0, 0], bespokeTransition],
+      [[1, 1, 1], bespokeFragments],
+      [[1, 1, 0], bespokeWakeLock]
     )
   )
 
   return deck
 }
+
+export default bespokeTemplate

@@ -1,20 +1,30 @@
-import { fullscreen, storage } from './utils'
+import { storage, dataAttrPrefix, classPrefix, toggleAriaHidden } from './utils'
+import {
+  isEnabled as isFullscreenEnabled,
+  onChange as onFullscreenChange,
+  isFullscreen,
+} from './utils/fullscreen'
 
-export default function bespokeOSC(selector = '.bespoke-marp-osc') {
+const bespokeOSC = (selector = `.${classPrefix}osc`) => {
   const osc = document.querySelector<HTMLElement>(selector)
-  if (!osc) return () => {} // eslint-disable-line @typescript-eslint/no-empty-function
+
+  if (!osc) {
+    return () => {
+      /* empty */
+    }
+  }
 
   const oscElements = <T extends HTMLElement = HTMLElement>(
     type: string,
     callback: (element: T, index?: number) => void
   ) => {
     osc
-      .querySelectorAll<T>(`[data-bespoke-marp-osc=${JSON.stringify(type)}]`)
+      .querySelectorAll<T>(`[${dataAttrPrefix}osc=${JSON.stringify(type)}]`)
       .forEach(callback)
   }
 
   // Hide fullscreen button in not-supported browser (e.g. phone device)
-  if (!fullscreen.isEnabled())
+  if (!isFullscreenEnabled())
     oscElements('fullscreen', (btn) => (btn.style.display = 'none'))
 
   // Disable presenter button if using localStorage is restricted
@@ -28,21 +38,18 @@ export default function bespokeOSC(selector = '.bespoke-marp-osc') {
     osc.addEventListener('click', (e) => {
       if (e.target instanceof HTMLElement) {
         const { bespokeMarpOsc } = e.target.dataset
-
         if (bespokeMarpOsc) e.target.blur()
 
-        switch (bespokeMarpOsc) {
-          case 'next':
-            deck.next({ fragment: !e.shiftKey })
-            break
-          case 'prev':
-            deck.prev({ fragment: !e.shiftKey })
-            break
-          case 'fullscreen':
-            if (typeof deck.fullscreen === 'function') deck.fullscreen()
-            break
-          case 'presenter':
-            deck.openPresenterView()
+        const navOpts = { fragment: !e.shiftKey }
+
+        if (bespokeMarpOsc === 'next') {
+          deck.next(navOpts)
+        } else if (bespokeMarpOsc === 'prev') {
+          deck.prev(navOpts)
+        } else if (bespokeMarpOsc === 'fullscreen') {
+          deck?.fullscreen()
+        } else if (bespokeMarpOsc === 'presenter') {
+          deck.openPresenterView()
         }
       }
     })
@@ -72,18 +79,17 @@ export default function bespokeOSC(selector = '.bespoke-marp-osc') {
       )
     })
 
-    deck.on('marp-active', () => osc.removeAttribute('aria-hidden'))
-    deck.on('marp-inactive', () => osc.setAttribute('aria-hidden', 'true'))
+    deck.on('marp-active', () => toggleAriaHidden(osc, false))
+    deck.on('marp-inactive', () => toggleAriaHidden(osc, true))
 
-    if (fullscreen.isEnabled()) {
-      fullscreen.onChange(() =>
+    if (isFullscreenEnabled()) {
+      onFullscreenChange(() =>
         oscElements('fullscreen', (fs) =>
-          fs.classList.toggle(
-            'exit',
-            fullscreen.isEnabled() && fullscreen.isFullscreen()
-          )
+          fs.classList.toggle('exit', isFullscreenEnabled() && isFullscreen())
         )
       )
     }
   }
 }
+
+export default bespokeOSC

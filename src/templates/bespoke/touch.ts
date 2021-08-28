@@ -10,11 +10,15 @@ export interface TouchPoint {
   delta?: number
 }
 
-export default function bespokeTouch({
-  slope = Math.tan((-35 * Math.PI) / 180), // -35deg
-  swipeThreshold = 30,
-}: BespokeTouchOption = {}) {
-  return (deck) => {
+const { PI, abs, sqrt, atan2 } = Math
+const passiveEventOpts = { passive: true } as const
+
+const bespokeTouch =
+  ({
+    slope = -0.7, // about -35deg = Math.tan((-35 * Math.PI) / 180)
+    swipeThreshold = 30,
+  }: BespokeTouchOption = {}) =>
+  (deck) => {
     let touchStart: TouchPoint | undefined
     const parent: HTMLElement = deck.parent
 
@@ -29,11 +33,10 @@ export default function bespokeTouch({
 
     parent.addEventListener(
       'touchstart',
-      (e) => {
-        touchStart =
-          e.touches.length === 1 ? touchPoint(e.touches[0]) : undefined
+      ({ touches }) => {
+        touchStart = touches.length === 1 ? touchPoint(touches[0]) : undefined
       },
-      { passive: true }
+      passiveEventOpts
     )
 
     parent.addEventListener('touchmove', (e) => {
@@ -45,8 +48,8 @@ export default function bespokeTouch({
           const x = current.x - touchStart.x
           const y = current.y - touchStart.y
 
-          touchStart.delta = Math.sqrt(Math.abs(x) ** 2 + Math.abs(y) ** 2)
-          touchStart.radian = Math.atan2(x, y)
+          touchStart.delta = sqrt(abs(x) ** 2 + abs(y) ** 2)
+          touchStart.radian = atan2(x, y)
         } else {
           touchStart = undefined
         }
@@ -62,8 +65,7 @@ export default function bespokeTouch({
             touchStart.delta >= swipeThreshold &&
             touchStart.radian
           ) {
-            let radian = touchStart.radian - slope
-            radian = ((radian + Math.PI) % (Math.PI * 2)) - Math.PI
+            const radian = ((touchStart.radian - slope + PI) % (PI * 2)) - PI
 
             deck[radian < 0 ? 'next' : 'prev']()
             e.stopPropagation()
@@ -71,7 +73,8 @@ export default function bespokeTouch({
           touchStart = undefined
         }
       },
-      { passive: true }
+      passiveEventOpts
     )
   }
-}
+
+export default bespokeTouch

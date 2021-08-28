@@ -6,7 +6,7 @@ type BespokeForPresenter = { syncKey: string; [key: string]: any }
 const validateDeck = (deck: any): deck is BespokeForPresenter =>
   deck.syncKey && typeof deck.syncKey === 'string'
 
-export default function normalView(deck) {
+const normalView = (deck) => {
   if (!validateDeck(deck))
     throw new Error(
       'The current instance of Bespoke.js is invalid for Marp bespoke presenter plugin.'
@@ -30,8 +30,9 @@ export default function normalView(deck) {
 
 /** Open new window for presenter view. */
 function openPresenterView(this: BespokeForPresenter) {
-  const w = Math.max(Math.floor(window.innerWidth * 0.85), 640)
-  const h = Math.max(Math.floor(window.innerHeight * 0.85), 360)
+  const { max, floor } = Math
+  const w = max(floor(window.innerWidth * 0.85), 640)
+  const h = max(floor(window.innerHeight * 0.85), 360)
 
   return window.open(
     this.presenterUrl,
@@ -49,3 +50,5 @@ function presenterUrl(this: BespokeForPresenter) {
 
   return generateURLfromParams(params)
 }
+
+export default normalView

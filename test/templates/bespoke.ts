@@ -4,7 +4,7 @@ import { Element as MarpitElement } from '@marp-team/marpit'
 import { Key } from 'ts-key-enum'
 import bespoke from '../../src/templates/bespoke/bespoke'
 import { classes } from '../../src/templates/bespoke/presenter/presenter-view'
-import * as utils from '../../src/templates/bespoke/utils'
+import * as fullscreen from '../../src/templates/bespoke/utils/fullscreen'
 import { _clearCachedWakeLockApi } from '../../src/templates/bespoke/wake-lock'
 
 jest.useFakeTimers()
@@ -14,7 +14,7 @@ beforeAll(() => {
 })
 
 beforeEach(() => {
-  jest.spyOn(utils.fullscreen, 'isEnabled').mockImplementation(() => true)
+  jest.spyOn(fullscreen, 'isEnabled').mockImplementation(() => true)
 })
 
 afterEach(() => {
@@ -231,7 +231,7 @@ describe("Bespoke template's browser context", () => {
     beforeEach(() => {
       render()
       deck = bespoke()
-      toggle = jest.spyOn(utils.fullscreen, 'toggle')
+      toggle = jest.spyOn(fullscreen, 'toggle')
     })
 
     it('injects deck.fullscreen() to toggle fullscreen', async () => {
@@ -717,9 +717,7 @@ describe("Bespoke template's browser context", () => {
         )
         expect(button?.className).not.toContain('exit')
 
-        jest
-          .spyOn(utils.fullscreen, 'isFullscreen')
-          .mockImplementation(() => true)
+        jest.spyOn(fullscreen, 'isFullscreen').mockImplementation(() => true)
 
         document.dispatchEvent(new Event('fullscreenchange'))
         expect(button?.className).toContain('exit')
@@ -738,9 +736,7 @@ describe("Bespoke template's browser context", () => {
 
       describe('when browser does not support fullscreen', () => {
         it('hides fullscreen button', () => {
-          jest
-            .spyOn(utils.fullscreen, 'isEnabled')
-            .mockImplementation(() => false)
+          jest.spyOn(fullscreen, 'isEnabled').mockImplementation(() => false)
 
           bespoke()
 
