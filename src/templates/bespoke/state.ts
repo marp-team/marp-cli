@@ -9,7 +9,7 @@ const coerceInt = (ns: string) => {
   return Number.isNaN(coerced) ? null : coerced
 }
 
-export default function bespokeState(opts: BespokeStateOption = {}) {
+const bespokeState = (opts: BespokeStateOption = {}) => {
   const options: BespokeStateOption = { history: true, ...opts }
 
   return (deck) => {
@@ -27,12 +27,10 @@ export default function bespokeState(opts: BespokeStateOption = {}) {
     }
 
     const activateSlide = (index: number, fragment: number | null) => {
+      const { min, max } = Math
       const { fragments, slides } = deck
-      const idx = Math.max(0, Math.min(index, slides.length - 1))
-      const frag = Math.max(
-        0,
-        Math.min(fragment || 0, fragments[idx].length - 1)
-      )
+      const idx = max(0, min(index, slides.length - 1))
+      const frag = max(0, min(fragment || 0, fragments[idx].length - 1))
 
       if (idx !== deck.slide() || frag !== deck.fragmentIndex)
         deck.slide(idx, { fragment: frag })
@@ -78,3 +76,5 @@ export default function bespokeState(opts: BespokeStateOption = {}) {
     }, 0)
   }
 }
+
+export default bespokeState

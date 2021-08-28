@@ -1,5 +1,5 @@
 /** @jest-environment jsdom */
-import { fullscreen } from '../../../src/templates/bespoke/utils'
+import * as fullscreen from '../../../../src/templates/bespoke/utils/fullscreen'
 
 afterEach(() => jest.restoreAllMocks())
 

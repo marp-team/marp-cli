@@ -62,7 +62,7 @@ afterEach(() => {
 describe('Marp CLI', () => {
   const assetFn = (fn) => path.resolve(__dirname, fn)
 
-  for (const cmd of ['--version', '-v'])
+  for (const cmd of ['--version', '-v']) {
     describe(`with ${cmd} option`, () => {
       let log: jest.SpyInstance<void, any>
       let findClassPath: jest.SpyInstance
@@ -159,8 +159,9 @@ describe('Marp CLI', () => {
         })
       })
     })
+  }
 
-  for (const cmd of [null, '--help', '-h'])
+  for (const cmd of [null, '--help', '-h']) {
     describe(`with ${cmd || 'empty'} option`, () => {
       const run = (...args) => marpCli([...(cmd ? [cmd] : []), ...args])
 
@@ -196,6 +197,7 @@ describe('Marp CLI', () => {
         })
       })
     })
+  }
 
   describe('when passed file is not found', () => {
     it('outputs warning and help with exit code 1', async () => {
@@ -506,6 +508,39 @@ describe('Marp CLI', () => {
           )
         })
       })
+    })
+  })
+
+  describe('with experimental --bespoke.transition option', () => {
+    let warn: jest.SpyInstance
+
+    beforeEach(() => {
+      jest.spyOn(console, 'error').mockImplementation()
+      warn = jest.spyOn(console, 'warn').mockImplementation()
+    })
+
+    const matcher = expect.stringContaining(
+      'transition support for bespoke template is enabled'
+    )
+    const previewRecommendation = expect.stringContaining('--preview')
+
+    it('outputs an information of transitions experiment with recommendation of preview option', async () => {
+      await marpCli(['--template=bespoke', '--bespoke.transition'])
+
+      expect(warn).toHaveBeenCalledWith(matcher)
+      expect(warn).toHaveBeenCalledWith(previewRecommendation)
+    })
+
+    it('hides recommendation of preview option if enabled with preview mode', async () => {
+      await marpCli(['--template=bespoke', '--bespoke.transition', '--preview'])
+
+      expect(warn).toHaveBeenCalledWith(matcher)
+      expect(warn).not.toHaveBeenCalledWith(previewRecommendation)
+    })
+
+    it('does not output an information if template is not bespoke template', async () => {
+      await marpCli(['--template=bare', '--bespoke.transition'])
+      expect(warn).not.toHaveBeenCalledWith(matcher)
     })
   })
 

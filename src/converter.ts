@@ -151,6 +151,8 @@ export class Converter {
           : undefined,
       renderer: (tplOpts) => {
         const engine = this.generateEngine(tplOpts)
+        tplOpts.modifier?.(engine)
+
         const ret = engine.render(stripBOM(`${markdown}${additionals}`))
         const info = engine[engineInfo]
 

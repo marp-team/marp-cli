@@ -1,3 +1,5 @@
+import { dataAttrPrefix } from './utils'
+
 export interface FragmentEvent {
   slide: any[]
   index: number
@@ -5,10 +7,8 @@ export interface FragmentEvent {
   fragmentIndex: number
 }
 
-const dataAttrPrefix = 'data-bespoke-marp-' as const
-
 // Based on https://github.com/bespokejs/bespoke-bullets
-export default function bespokeFragments(deck) {
+const bespokeFragments = (deck) => {
   let activeSlideIdx = 0
   let activeFragmentIdx = 0
 
@@ -38,7 +38,7 @@ export default function bespokeFragments(deck) {
 
           fragment.setAttribute(
             `${dataAttrPrefix}fragment`,
-            active ? 'active' : 'inactive'
+            `${active ? '' : 'in'}active`
           )
 
           const dataAttrCurrentFragment = `${dataAttrPrefix}current-fragment`
@@ -123,3 +123,5 @@ export default function bespokeFragments(deck) {
 
   activate(0, 0)
 }
+
+export default bespokeFragments
