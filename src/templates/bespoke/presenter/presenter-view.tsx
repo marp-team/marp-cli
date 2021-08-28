@@ -1,11 +1,12 @@
 /** @jsx h */
 /** @jsxFrag Fragment */
 import h from 'vhtml'
+import { classPrefix } from '../utils'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const Fragment: any = ({ children }) => h(null, null, ...children)
 
-export const presenterPrefix = 'bespoke-marp-presenter-' as const
+export const presenterPrefix = `${classPrefix}presenter-` as const
 export const classes = {
   container: `${presenterPrefix}container`,
   next: `${presenterPrefix}next`,
@@ -28,7 +29,7 @@ const createNavigateFunc =
       window.origin === 'null' ? '*' : window.origin
     )
 
-export default function presenterView(deck) {
+const presenterView = (deck) => {
   const { title } = document
   document.title = `[Presenter view]${title ? ` - ${title}` : ''}`
 
@@ -142,3 +143,5 @@ export default function presenterView(deck) {
   document.body.appendChild(buildContainer(deck.parent))
   subscribe(deck)
 }
+
+export default presenterView

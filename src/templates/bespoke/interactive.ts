@@ -9,7 +9,7 @@ const interactiveNodes = [
   'VIDEO',
 ]
 
-export default function bespokeInteractive(deck) {
+const bespokeInteractive = (deck) => {
   ;(deck.parent as HTMLElement).addEventListener('keydown', (e) => {
     if (!e.target) return
 
@@ -22,3 +22,5 @@ export default function bespokeInteractive(deck) {
       e.stopPropagation()
   })
 }
+
+export default bespokeInteractive

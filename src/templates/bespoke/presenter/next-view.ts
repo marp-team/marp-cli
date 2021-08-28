@@ -1,4 +1,4 @@
-export default function nextView(deck) {
+const nextView = (deck) => {
   // Listen "navigate" message from parent
   const listener = (e: MessageEvent) => {
     if (e.origin !== window.origin) return
@@ -21,3 +21,5 @@ export default function nextView(deck) {
 
   window.addEventListener('message', listener)
 }
+
+export default nextView

@@ -1,8 +1,8 @@
-import { fullscreen } from './utils'
+import { isEnabled, toggle } from './utils/fullscreen'
 
-export default function bespokeFullscreen(deck) {
+const bespokeFullscreen = (deck) => {
   deck.fullscreen = () => {
-    if (fullscreen.isEnabled()) fullscreen.toggle()
+    if (isEnabled()) toggle()
   }
 
   document.addEventListener('keydown', (e) => {
@@ -12,10 +12,12 @@ export default function bespokeFullscreen(deck) {
       !e.altKey &&
       !e.ctrlKey &&
       !e.metaKey &&
-      fullscreen.isEnabled()
+      isEnabled()
     ) {
       deck.fullscreen()
       e.preventDefault()
     }
   })
 }
+
+export default bespokeFullscreen

@@ -4,10 +4,9 @@ type LocationLike = Pick<
 >
 type QuerySetter = (...args: Parameters<History['pushState']>) => void
 
-const d = document
+const body = document.body
 
 const replacer: QuerySetter = (...args) => history.replaceState(...args)
-const viewAttr = 'data-bespoke-view'
 
 export const ViewModeNormal = ''
 export const ViewModePresenter = 'presenter'
@@ -19,23 +18,8 @@ export const viewModes = [
   ViewModeNext,
 ] as const
 
-export const fullscreen = {
-  isEnabled: () => !!(d.fullscreenEnabled || d['webkitFullscreenEnabled']),
-  isFullscreen: () => !!(d.fullscreenElement || d['webkitFullscreenElement']),
-  enter: (target = d.body): void | Promise<void> =>
-    (target.requestFullscreen || target['webkitRequestFullscreen'])?.call(
-      target
-    ),
-  exit: (): void | Promise<void> =>
-    (d.exitFullscreen || d['webkitExitFullscreen'])?.call(d),
-  toggle: async () =>
-    fullscreen.isFullscreen() ? fullscreen.exit() : fullscreen.enter(),
-  onChange: (callback: () => void) => {
-    for (const prefix of ['', 'webkit']) {
-      d.addEventListener(prefix + 'fullscreenchange', callback)
-    }
-  },
-}
+export const classPrefix = 'bespoke-marp-'
+export const dataAttrPrefix = `data-${classPrefix}` as const
 
 export const generateURLfromParams = (
   params: URLSearchParams,
@@ -45,12 +29,8 @@ export const generateURLfromParams = (
   return `${protocol}//${host}${pathname}${q ? '?' : ''}${q}${hash}`
 }
 
-export const getViewMode = (): typeof viewModes[number] => {
-  const mode: any = d.body.getAttribute(viewAttr)
-  if (viewModes.includes(mode)) return mode
-
-  throw new Error('View mode is not assigned.')
-}
+export const getViewMode = () =>
+  body.dataset.bespokeView as typeof viewModes[number]
 
 export const readQuery = (name: string) =>
   new URLSearchParams(location.search).get(name)
@@ -94,28 +74,23 @@ export const setQuery = (
 export const setHistoryState = (state: Record<string, any>) =>
   setQuery({}, { setter: (s, ...r) => replacer({ ...s, ...state }, ...r) })
 
-export const setViewMode = () =>
-  d.body.setAttribute(
-    viewAttr,
-    ((): typeof viewModes[number] => {
-      const view = readQuery('view')
-      if (view === ViewModeNext || view === ViewModePresenter) return view
+export const setViewMode = () => {
+  const view = readQuery('view')
 
-      return ViewModeNormal
-    })()
-  )
+  body.dataset.bespokeView =
+    view === ViewModeNext || view === ViewModePresenter ? view : ViewModeNormal
+}
 
 export const storage = (() => {
   const available = (() => {
+    const key = 'bespoke-marp' as const
+
     try {
-      localStorage.setItem('bespoke-marp', 'bespoke-marp')
-      localStorage.removeItem('bespoke-marp')
+      localStorage.setItem(key, key)
+      localStorage.removeItem(key)
 
       return true
     } catch (e) {
-      console.warn(
-        'Warning: Using localStorage is restricted in the current host so some features may not work.'
-      )
       return false
     }
   })()
@@ -147,3 +122,13 @@ export const storage = (() => {
     },
   }
 })()
+
+export const toggleAriaHidden = (element: HTMLElement, value: boolean) => {
+  const key = 'aria-hidden' as const
+
+  if (value) {
+    element.setAttribute(key, 'true')
+  } else {
+    element.removeAttribute(key)
+  }
+}

@@ -27,7 +27,7 @@ export const _clearCachedWakeLockApi = () => {
   cachedWakeLockApi = undefined
 }
 
-export default async function bespokeWakeLock() {
+const bespokeWakeLock = async () => {
   if (!wakeLockApi()) return
 
   let wakeLock: WakeLockObject | undefined // eslint-disable-line prefer-const
@@ -36,9 +36,12 @@ export default async function bespokeWakeLock() {
     if (wakeLock && document.visibilityState === 'visible') requestWakeLock()
   }
 
-  document.addEventListener('visibilitychange', handleVisibilityChange)
-  document.addEventListener('fullscreenchange', handleVisibilityChange)
+  for (const event of ['visibilitychange', 'fullscreenchange'] as const) {
+    document.addEventListener(event, handleVisibilityChange)
+  }
 
   wakeLock = await requestWakeLock()
   return wakeLock
 }
+
+export default bespokeWakeLock

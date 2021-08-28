@@ -1,31 +1,36 @@
+import { classPrefix, toggleAriaHidden } from './utils'
+
 // Based on https://github.com/bespokejs/bespoke-classes
-
-const prefix = 'bespoke-marp-' as const
-
-export default function bespokeClasses(deck) {
-  deck.parent.classList.add(`${prefix}parent`)
-  deck.slides.forEach((el: HTMLElement) => el.classList.add(`${prefix}slide`))
+const bespokeClasses = (deck) => {
+  deck.parent.classList.add(`${classPrefix}parent`)
+  deck.slides.forEach((el: HTMLElement) =>
+    el.classList.add(`${classPrefix}slide`)
+  )
 
   deck.on('activate', (e) => {
-    const activeClass = `${prefix}active` as const
+    const activeClass = `${classPrefix}active` as const
 
     const slide: HTMLElement = e.slide
-    const shouldResetAnim = !slide.classList.contains(activeClass)
+    const slideClasses = slide.classList
+
+    const shouldResetAnim = !slideClasses.contains(activeClass)
 
     deck.slides.forEach((el: HTMLElement) => {
       el.classList.remove(activeClass)
-      el.setAttribute('aria-hidden', 'true')
+      toggleAriaHidden(el, true)
     })
 
-    slide.classList.add(activeClass)
-    slide.removeAttribute('aria-hidden')
+    slideClasses.add(activeClass)
+    toggleAriaHidden(slide, false)
 
     if (shouldResetAnim) {
       const activeReadyClass = `${activeClass}-ready` as const
 
-      slide.classList.add(activeReadyClass)
+      slideClasses.add(activeReadyClass)
       void document.body.clientHeight
-      slide.classList.remove(activeReadyClass)
+      slideClasses.remove(activeReadyClass)
     }
   })
 }
+
+export default bespokeClasses

@@ -1,27 +1,35 @@
-const inactiveClass = 'bespoke-marp-inactive' as const
+import { classPrefix } from './utils'
 
-export default function bespokeInactive(timeout = 2000) {
-  return (deck) => {
+const inactiveClass = `${classPrefix}inactive` as const
+
+const bespokeInactive =
+  (timeout = 2000) =>
+  ({ parent, fire: _fire }: any) => {
+    const classes = parent.classList
+    const fireActiveEvent = (isActive?: boolean) =>
+      _fire(`marp-${isActive ? '' : 'in'}active`)
+
     let activeTimer
 
-    function activate() {
+    const activate = () => {
       if (activeTimer) clearTimeout(activeTimer)
 
       activeTimer = setTimeout(() => {
-        deck.parent.classList.add(inactiveClass)
-        deck.fire('marp-inactive')
+        classes.add(inactiveClass)
+        fireActiveEvent()
       }, timeout)
 
-      if (deck.parent.classList.contains(inactiveClass)) {
-        deck.parent.classList.remove(inactiveClass)
-        deck.fire('marp-active')
+      if (classes.contains(inactiveClass)) {
+        classes.remove(inactiveClass)
+        fireActiveEvent(true)
       }
     }
 
-    document.addEventListener('mousedown', activate)
-    document.addEventListener('mousemove', activate)
-    document.addEventListener('touchend', activate)
+    for (const ev of ['mousedown', 'mousemove', 'touchend'] as const) {
+      document.addEventListener(ev, activate)
+    }
 
     setTimeout(activate, 0)
   }
-}
+
+export default bespokeInactive

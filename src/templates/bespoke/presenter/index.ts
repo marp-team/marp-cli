@@ -8,7 +8,7 @@ import nextView from './next-view'
 import normalView from './normal-view'
 import presenterView from './presenter-view'
 
-export default function bespokePresenter(target: HTMLElement) {
+const bespokePresenter = (target: HTMLElement) => {
   const mode = getViewMode()
 
   // Append blank slide to next view
@@ -20,3 +20,5 @@ export default function bespokePresenter(target: HTMLElement) {
     [ViewModeNext]: nextView,
   }[mode]
 }
+
+export default bespokePresenter
