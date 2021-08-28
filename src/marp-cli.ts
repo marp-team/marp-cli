@@ -228,7 +228,7 @@ export const marpCli = async (
           type: 'string',
         },
         html: {
-          describe: 'Enable or disable HTML tag',
+          describe: 'Enable or disable HTML tags',
           group: OptionGroup.Marp,
           type: 'boolean',
         },
