@@ -6,14 +6,15 @@
 
 - Experimental transitions for bespoke template ([#382](https://github.com/marp-team/marp-cli/issues/382), [#381](https://github.com/marp-team/marp-cli/pull/381))
 
+### Changed
+
+- Update Dock icon in preview mode on macOS to suit for Big Sur ([#380](https://github.com/marp-team/marp-cli/pull/380))
+- Update an icon of presenter view in bespoke template ([#384](https://github.com/marp-team/marp-cli/pull/384))
+
 ### Fixed
 
 - Improve an activation behavior from dock in preview mode on macOS ([#380](https://github.com/marp-team/marp-cli/pull/380))
 - Optimize the size of runtime script for bespoke template ([#383](https://github.com/marp-team/marp-cli/pull/383))
-
-### Changed
-
-- Update Dock icon in preview mode on macOS to suit for Big Sur ([#380](https://github.com/marp-team/marp-cli/pull/380))
 
 ## v1.3.2 - 2021-08-18
 
