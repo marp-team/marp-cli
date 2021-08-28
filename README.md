@@ -192,7 +192,7 @@ marp slide-deck.md -o title-slide@2x.png --image-scale 2
 
 > :information_source: `--image-scale` is not affect to the actual size of presentation.
 >
-> It is also available for PPTX conversion. By default, Marp CLI will use `2.5` as the default scale factor in PPTX to suppress deterioration of slide rendering in full-screen presentation.
+> It is also available for PPTX conversion. By default, Marp CLI will use `2` as the default scale factor in PPTX to suppress deterioration of slide rendering in full-screen presentation.
 
 ### Security about local files
 
@@ -462,7 +462,7 @@ If you want to prevent looking up a configuration file, you can pass `--no-confi
 | `html`            |      boolean \| object      |        `--html`        | Enable or disable HTML tags (Configuration file can pass [the whitelist object] if you are using Marp Core) |
 | `image`           |       `png` \| `jpeg`       |       `--image`        | Convert the first slide page into an image file                                                             |
 | `images`          |       `png` \| `jpeg`       |       `--images`       | Convert slide deck into multiple image files                                                                |
-| `imageScale`      |           number            |    `--image-scale`     | The scale factor for rendered images (`1` by default, or `2.5` for PPTX conversion)                         |
+| `imageScale`      |           number            |    `--image-scale`     | The scale factor for rendered images (`1` by default, or `2` for PPTX conversion)                           |
 | `inputDir`        |           string            |   `--input-dir` `-I`   | The base directory to find markdown and theme CSS                                                           |
 | `jpegQuality`     |           number            |    `--jpeg-quality`    | Setting JPEG image quality (`85` by default)                                                                |
 | `keywords`        |     string \| string[]      |      `--keywords`      | Define keywords for the slide deck (Accepts comma-separated string and array of string)                     |

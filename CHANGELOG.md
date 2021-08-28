@@ -10,6 +10,7 @@
 
 - Update Dock icon in preview mode on macOS to suit for Big Sur ([#380](https://github.com/marp-team/marp-cli/pull/380))
 - Update an icon of presenter view in bespoke template ([#384](https://github.com/marp-team/marp-cli/pull/384))
+- Adjust default image scale for PPTX from `2.5` to `2` ([#385](https://github.com/marp-team/marp-cli/pull/385))
 
 ### Fixed
 
