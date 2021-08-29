@@ -79,7 +79,7 @@ describe('Marp CLI', () => {
 
       it('outputs package versions about cli and bundled core', async () => {
         // isMarpCore does not return correct result in Windows environment
-        jest.spyOn(version, 'isMarpCore').mockImplementation(() => true)
+        jest.spyOn(version, 'isMarpCore').mockResolvedValue(true)
 
         expect(await marpCli([cmd])).toBe(0)
         expect(log).toHaveBeenCalledWith(
@@ -95,9 +95,9 @@ describe('Marp CLI', () => {
         const pkgPath = '../node_modules/@marp-team/marp-core/package.json'
 
         beforeEach(() => {
-          jest.spyOn(version, 'isMarpCore').mockImplementation(() => true)
+          jest.spyOn(version, 'isMarpCore').mockResolvedValue(true)
 
-          findClassPath.mockImplementation(() =>
+          mockEnginePath(
             assetFn('../node_modules/@marp-team/marp-core/lib/marp.js')
           )
 

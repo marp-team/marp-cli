@@ -5,41 +5,72 @@ import pkgUp from 'pkg-up'
 import { error } from './error'
 
 export type Engine = typeof Marpit
-export type ResolvableEngine = Engine | string
+export type ResolvableEngine = Engine | DelayedEngineResolver | string
+
+const delayedEngineResolverSymbol = Symbol('delayedEngineResolver')
+
+type DelayedEngineResolver = {
+  [delayedEngineResolverSymbol]: () => Promise<Engine>
+}
+
+const delayedEngineResolver = (
+  fn: () => Promise<Engine>
+): DelayedEngineResolver => ({ [delayedEngineResolverSymbol]: fn })
 
 export class ResolvedEngine {
   klass: Engine
   package?: Record<string, any>
+
+  private static _defaultEngine: ResolvedEngine | undefined
 
   static async resolve(
     engine: ResolvableEngine | ResolvableEngine[],
     from?: string
   ): Promise<ResolvedEngine> {
     const resolvedEngine = new ResolvedEngine(
-      ResolvedEngine.resolveModule(engine, from)
+      await ResolvedEngine.resolveModule(engine, from)
     )
 
     await resolvedEngine.resolvePackage()
     return resolvedEngine
   }
 
-  private static resolveModule(
+  static async resolveDefaultEngine(): Promise<ResolvedEngine> {
+    if (
+      ResolvedEngine._defaultEngine === undefined ||
+      process.env.NODE_ENV === 'test'
+    ) {
+      ResolvedEngine._defaultEngine = await ResolvedEngine.resolve([
+        '@marp-team/marp-core',
+        delayedEngineResolver(
+          async () => (await import('@marp-team/marp-core')).Marp
+        ),
+      ])
+    }
+    return ResolvedEngine._defaultEngine
+  }
+
+  private static async resolveModule(
     engine: ResolvableEngine | ResolvableEngine[],
     from?: string
   ) {
     let resolved
-    ;(Array.isArray(engine) ? engine : [engine]).some((eng) => {
+
+    for (const eng of ([] as ResolvableEngine[]).concat(engine)) {
       if (typeof eng === 'string') {
         resolved =
           (from && importFrom.silent(path.dirname(path.resolve(from)), eng)) ||
           importFrom.silent(process.cwd(), eng)
 
         if (resolved?.__esModule) resolved = resolved.default
+      } else if (typeof eng === 'object' && eng[delayedEngineResolverSymbol]) {
+        resolved = await eng[delayedEngineResolverSymbol]()
       } else {
         resolved = eng
       }
-      return resolved
-    })
+
+      if (resolved) break
+    }
 
     if (!resolved) error(`The specified engine has not resolved.`)
     return resolved
@@ -73,5 +104,3 @@ export class ResolvedEngine {
     return undefined
   }
 }
-
-export default ResolvedEngine.resolve

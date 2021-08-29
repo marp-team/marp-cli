@@ -1,13 +1,12 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import fs from 'fs'
 import path from 'path'
-import { Marp } from '@marp-team/marp-core'
 import chalk from 'chalk'
 import { cosmiconfig } from 'cosmiconfig'
 import { osLocale } from 'os-locale'
 import { info, warn } from './cli'
 import { ConverterOption, ConvertType } from './converter'
-import resolveEngine, { ResolvableEngine, ResolvedEngine } from './engine'
+import { ResolvableEngine, ResolvedEngine } from './engine'
 import { keywordsAsArray } from './engine/meta-plugin'
 import { error } from './error'
 import { TemplateOption } from './templates'
@@ -77,11 +76,11 @@ export class MarpCLIConfig {
     if (args.configFile !== false) await conf.loadConf(args.configFile)
 
     conf.engine = await (() => {
-      if (conf.args.engine) return resolveEngine(conf.args.engine)
+      if (conf.args.engine) return ResolvedEngine.resolve(conf.args.engine)
       if (conf.conf.engine)
-        return resolveEngine(conf.conf.engine, conf.confPath)
+        return ResolvedEngine.resolve(conf.conf.engine, conf.confPath)
 
-      return resolveEngine(['@marp-team/marp-core', Marp])
+      return ResolvedEngine.resolveDefaultEngine()
     })()
 
     return conf
