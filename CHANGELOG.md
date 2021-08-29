@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v1.4.0 - 2021-08-29
+
 ### Added
 
 - Experimental transitions for bespoke template ([#382](https://github.com/marp-team/marp-cli/issues/382), [#381](https://github.com/marp-team/marp-cli/pull/381))
