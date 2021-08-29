@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { URL } from 'url'
-import { MarpOptions } from '@marp-team/marp-core'
+import type { MarpOptions } from '@marp-team/marp-core'
 import { Marpit, Options as MarpitOptions } from '@marp-team/marpit'
 import chalk from 'chalk'
 import puppeteer from 'puppeteer-core'
 import { silence, warn } from './cli'
-import { Engine } from './engine'
+import { Engine, ResolvedEngine } from './engine'
 import infoPlugin, { engineInfo, EngineInfo } from './engine/info-plugin'
 import metaPlugin from './engine/meta-plugin'
 import { error } from './error'
@@ -149,8 +149,8 @@ export class Converter {
         isFile(file) && this.options.watch && type === ConvertType.html
           ? await notifier.register(file.absolutePath)
           : undefined,
-      renderer: (tplOpts) => {
-        const engine = this.generateEngine(tplOpts)
+      renderer: async (tplOpts) => {
+        const engine = await this.generateEngine(tplOpts)
         tplOpts.modifier?.(engine)
 
         const ret = engine.render(stripBOM(`${markdown}${additionals}`))
@@ -420,28 +420,41 @@ export class Converter {
     return ret
   }
 
-  private generateEngine(
+  private async generateEngine(
     mergeOptions: MarpitOptions
-  ): Marpit & { [engineInfo]: EngineInfo | undefined } {
+  ): Promise<Marpit & { [engineInfo]?: EngineInfo }> {
     const { html, options } = this.options
     const { prototype } = this.options.engine
     const opts = { ...options, ...mergeOptions, html }
 
-    const engine =
+    let engine: any
+
+    if (
       prototype &&
       Object.prototype.hasOwnProperty.call(prototype, 'constructor')
-        ? new this.options.engine(opts)
-        : (<any>this.options.engine)(opts)
+    ) {
+      engine = new this.options.engine(opts)
+    } else {
+      // Expose "marp" getter to allow accessing a bundled Marp Core instance
+      const defaultEngine = await ResolvedEngine.resolveDefaultEngine()
+
+      Object.defineProperty(opts, 'marp', {
+        get: () => new defaultEngine.klass(opts),
+      })
+
+      engine = (this.options.engine as any)(opts)
+    }
 
     if (typeof engine.render !== 'function')
       error('Specified engine has not implemented render() method.')
 
+    // Enable HTML tags
     if (html !== undefined) engine.markdown.set({ html })
 
     // Marpit plugins
     engine.use(metaPlugin).use(infoPlugin)
 
-    // Additional themes
+    // Themes
     this.options.themeSet.registerTo(engine)
 
     return engine

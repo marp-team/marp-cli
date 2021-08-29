@@ -3,7 +3,7 @@ import os from 'os'
 import path from 'path'
 import { URL } from 'url'
 import { promisify } from 'util'
-import Marp from '@marp-team/marp-core'
+import { Marp } from '@marp-team/marp-core'
 import { Options } from '@marp-team/marpit'
 import cheerio from 'cheerio'
 import { imageSize } from 'image-size'
@@ -131,6 +131,52 @@ describe('Converter', () => {
 
       expect(BOM.result).toStrictEqual(noBOM.result)
       expect(BOM.rendered.title).toBe('test')
+    })
+
+    describe('with functional engine', () => {
+      // A functional engine should be a pure function that its prototype has
+      // no constructor property. Jest function mock has a constructor
+      // property so we have to wrap it.
+      const createFunctionalEngine = (fn: (opts: any) => any) => {
+        const spy = jest.fn(fn)
+        return { func: ((opts: any) => spy(opts)) as any, spy }
+      }
+
+      it('exposes Marp / Marpit options to an argument of functional engine', async () => {
+        const engine = createFunctionalEngine((opts) => new Marp(opts))
+
+        await instance({
+          engine: engine.func,
+          options: { printable: false },
+        }).convert(md)
+
+        expect(engine.spy.mock.calls[0][0]).toMatchObject({
+          printable: false,
+        })
+      })
+
+      it('exposes marp getter to allow using built-in Marp Core instance with current options', async () => {
+        const plugin = jest.fn()
+        const engine = createFunctionalEngine(({ marp }) => marp.use(plugin))
+
+        await instance({
+          engine: engine.func,
+          options: { printable: false },
+        }).convert(md)
+
+        expect(engine.spy.mock.calls[0][0]).toHaveProperty(
+          'marp',
+          expect.any(Marp)
+        )
+
+        expect(engine.spy.mock.calls[0][0].marp.options).toMatchObject({
+          printable: false,
+        })
+
+        expect(plugin).toHaveBeenCalledWith(
+          expect.objectContaining({ marpit: expect.any(Marp) })
+        )
+      })
     })
 
     describe('with globalDirectives option', () => {

@@ -21,7 +21,9 @@ interface TemplateCoreOption {
   base?: string
   lang: string
   notifyWS?: string
-  renderer: (tplOpts: TemplateRendererOptions) => RendererResult
+  renderer: (
+    tplOpts: TemplateRendererOptions
+  ) => RendererResult | Promise<RendererResult>
 }
 
 export interface TemplateMeta {
@@ -60,7 +62,7 @@ export type Template<T = TemplateOption> = ((
 }
 
 export const bare: Template<TemplateBareOption> = async (opts) => {
-  const rendered = opts.renderer({
+  const rendered = await opts.renderer({
     container: [],
     inlineSVG: true,
     slideContainer: [],
@@ -80,14 +82,20 @@ export const bare: Template<TemplateBareOption> = async (opts) => {
 Object.defineProperty(bare, 'printable', { value: true })
 
 export const bespoke: Template<TemplateBespokeOption> = async (opts) => {
-  const rendered = opts.renderer({
+  const rendererOptions = {
     container: new Element('div', { id: 'p' }),
     inlineSVG: true,
     slideContainer: [],
-    modifier: (marpit) => {
+  }
+
+  // Hide template-specific modifier from options which have exposed to the functional engine
+  Object.defineProperty(rendererOptions, 'modifier', {
+    value: (marpit) => {
       if (opts.transition) marpit.use(transitionPlugin)
     },
   })
+
+  const rendered = await opts.renderer(rendererOptions)
 
   return {
     rendered,
