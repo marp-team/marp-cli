@@ -372,29 +372,44 @@ Notice that Marpit has not provided theme. It would be good to include inline st
 
 ### Functional engine
 
-When you specify the path to JavaScript file in `--engine` option, you may use more customized engine by JS.
+When you specified the path to JavaScript file in `--engine` option, you may use more customized engine by a JavaScript function.
 
-It would be useful to convert with a customized engine for supporting the additional syntax that is out of Marp Markdown specification.
+#### Spec
+
+The functional engine should export a function with one parameter, which is a constructor option of Marpit. The function must return an instance of Marpit-based engine made by the passed parameter.
+
+```javascript
+module.exports = function (constructorOption) {
+  return new MarpitBasedEngine(constructorOption)
+}
+```
+
+Marp CLI also exposes `marp` getter property to the parameter. It returns a prepared instance of the built-in Marp Core engine, so you can apply several customizations to Marp engine with simple declarations.
+
+```javascript
+module.exports = ({ marp }) => marp.use(marpPlugin).use(andMorePlugin)
+```
+
+It allows converting Markdown with additional syntaxes that were provided by Marp (or compatible markdown-it) plugins.
 
 #### Example: [markdown-it-mark](https://github.com/markdown-it/markdown-it-mark)
 
 ```javascript
 // engine.js
-const { Marp } = require('@marp-team/marp-core')
 const markdownItMark = require('markdown-it-mark')
 
-module.exports = (opts) => new Marp(opts).use(markdownItMark)
+module.exports = ({ marp }) => marp.use(markdownItMark)
 ```
 
 ```bash
-# Install Marp Core and markdown-it-mark
-npm install @marp-team/marp-core markdown-it-mark --save-dev
+# Install markdown-it-mark
+npm install markdown-it-mark --save
 
 # Specify the path to functional engine
 marp --engine ./engine.js slide-deck.md
 ```
 
-The customized engine would convert `==marked==` to `<mark>marked</mark>`.
+The customized engine will convert `==marked==` to `<mark>marked</mark>`.
 
 ### Confirm engine version
 
@@ -434,12 +449,11 @@ pdf: true
 
 ```javascript
 // marp.config.js
-const { Marp } = require('@marp-team/marp-core')
-const container = require('markdown-it-container')
+const markdownItContainer = require('markdown-it-container')
 
 module.exports = {
   // Customize engine on configuration file directly
-  engine: (opts) => new Marp(opts).use(container, 'custom'),
+  engine: ({ marp }) => marp.use(markdownItContainer, 'custom'),
 }
 ```
 
@@ -491,7 +505,9 @@ The advanced options that cannot specify through CLI options can be configured b
 
 `options` can set the base options for the constructor of the used engine. You can fine-tune constructor options for [Marp Core](https://github.com/marp-team/marp-core#constructor-options) / [Marpit](https://marpit-api.marp.app/marpit).
 
-For example, the below configuration will set constructor option for Marp Core as specified:
+##### Example
+
+The below configuration will set constructor option for Marp Core as specified:
 
 - Disables [Marp Core's line breaks conversion](https://github.com/marp-team/marp-core#marp-markdown) (`\n` to `<br />`) to match for CommonMark, by passing [markdown-it's `breaks` option](https://markdown-it.github.io/markdown-it/#MarkdownIt.new) as `false`.
 - Disable minification for rendered theme CSS to make debug your style easily, by passing [`minifyCSS`](https://github.com/marp-team/marp-core#minifycss-boolean) as `false`.

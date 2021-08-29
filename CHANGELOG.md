@@ -5,6 +5,7 @@
 ### Added
 
 - Experimental transitions for bespoke template ([#382](https://github.com/marp-team/marp-cli/issues/382), [#381](https://github.com/marp-team/marp-cli/pull/381))
+- Expose Marp Core instance to functional engine via `marp` getter ([#386](https://github.com/marp-team/marp-cli/pull/386)))
 
 ### Changed
 
