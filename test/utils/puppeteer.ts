@@ -6,8 +6,6 @@ jest.mock('../../src/utils/chrome-finder')
 jest.mock('../../src/utils/edge-finder')
 jest.mock('../../src/utils/wsl')
 
-const isDocker = (): typeof import('is-docker') => require('is-docker')
-
 const CLIError = (): typeof import('../../src/error').CLIError =>
   require('../../src/error').CLIError // eslint-disable-line @typescript-eslint/no-var-requires
 
@@ -16,6 +14,9 @@ const puppeteer = (): typeof import('../../src/utils/puppeteer') =>
 
 const chromeFinder = (): typeof import('../../src/utils/chrome-finder') =>
   require('../../src/utils/chrome-finder')
+
+const docker = (): typeof import('../../src/utils/docker') =>
+  require('../../src/utils/docker')
 
 const edgeFinder = (): typeof import('../../src/utils/edge-finder') =>
   require('../../src/utils/edge-finder')
@@ -120,7 +121,7 @@ describe('#generatePuppeteerLaunchArgs', () => {
   })
 
   it('uses specific settings if running within a Docker container', () => {
-    jest.spyOn(isDocker(), 'default').mockImplementation(() => true)
+    jest.spyOn(docker(), 'isDocker').mockImplementation(() => true)
     jest
       .spyOn(chromeFinder(), 'findChromeInstallation')
       .mockImplementation(() => '/usr/bin/chromium')

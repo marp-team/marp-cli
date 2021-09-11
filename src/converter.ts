@@ -3,7 +3,6 @@ import { URL } from 'url'
 import type { MarpOptions } from '@marp-team/marp-core'
 import { Marpit, Options as MarpitOptions } from '@marp-team/marpit'
 import chalk from 'chalk'
-import isDocker from 'is-docker'
 import puppeteer from 'puppeteer-core'
 import { silence, warn } from './cli'
 import { Engine, ResolvedEngine } from './engine'
@@ -19,6 +18,7 @@ import templates, {
   TemplateResult,
 } from './templates/'
 import { ThemeSet } from './theme'
+import { isOfficialImage } from './utils/docker'
 import {
   generatePuppeteerDataDirPath,
   generatePuppeteerLaunchArgs,
@@ -473,10 +473,10 @@ export class Converter {
       )
 
       // Snapd Chromium cannot access from sandbox container to user-land `/tmp`
-      // directory so create tmp file to home directory if in Linux. (There is
-      // an exception for an official docker image)
+      // directory so always create tmp file to home directory if in Linux.
+      // (There is an exception for an official docker image)
       return baseFile.saveTmpFile({
-        home: process.platform === 'linux' && !isDocker(),
+        home: process.platform === 'linux' && !isOfficialImage(),
         extension: '.html',
       })
     })()

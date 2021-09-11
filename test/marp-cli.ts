@@ -5,7 +5,6 @@ import { version as coreVersion } from '@marp-team/marp-core/package.json'
 import { version as marpitVersion } from '@marp-team/marpit/package.json'
 import { Explorer } from 'cosmiconfig/dist/Explorer'
 import getStdin from 'get-stdin'
-import * as isDocker from 'is-docker'
 import stripAnsi from 'strip-ansi'
 import { version as cliVersion } from '../package.json'
 import * as cli from '../src/cli'
@@ -21,6 +20,7 @@ import {
 import { Preview } from '../src/preview'
 import { Server } from '../src/server'
 import { ThemeSet } from '../src/theme'
+import * as docker from '../src/utils/docker'
 import * as version from '../src/version'
 import { Watcher } from '../src/watcher'
 
@@ -185,9 +185,9 @@ describe('Marp CLI', () => {
           )
         })
 
-        describe('when CLI is running in Docker container', () => {
+        describe('when CLI is running in an official Docker image', () => {
           it('does not output help about --preview option', async () => {
-            jest.spyOn(isDocker, 'default').mockImplementation(() => true)
+            jest.spyOn(docker, 'isOfficialImage').mockImplementation(() => true)
 
             expect(await run()).toBe(0)
             expect(error).toHaveBeenCalledWith(
@@ -331,7 +331,7 @@ describe('Marp CLI', () => {
 
         describe('when CLI is running in an official Docker image', () => {
           it('ignores --preview option with warning', async () => {
-            jest.spyOn(isDocker, 'default').mockImplementation(() => true)
+            jest.spyOn(docker, 'isOfficialImage').mockImplementation(() => true)
             const warn = jest.spyOn(cli, 'warn').mockImplementation()
 
             await run()
@@ -896,7 +896,7 @@ describe('Marp CLI', () => {
 
       describe('when CLI is running in an official Docker image', () => {
         it('ignores --preview option with warning', async () => {
-          jest.spyOn(isDocker, 'default').mockImplementation(() => true)
+          jest.spyOn(docker, 'isOfficialImage').mockImplementation(() => true)
           await marpCli([onePath, '--preview', '--no-output'])
 
           expect(Preview.prototype.open).not.toHaveBeenCalled()

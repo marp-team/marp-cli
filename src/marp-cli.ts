@@ -1,5 +1,4 @@
 import chalk from 'chalk'
-import isDocker from 'is-docker'
 import { Argv } from 'yargs'
 import yargs from 'yargs/yargs'
 import * as cli from './cli'
@@ -10,6 +9,7 @@ import { File, FileType } from './file'
 import { Preview, fileToURI } from './preview'
 import { Server } from './server'
 import templates from './templates'
+import { isOfficialImage } from './utils/docker'
 import { resetExecutablePath } from './utils/puppeteer'
 import version from './version'
 import watcher, { Watcher, notifier } from './watcher'
@@ -105,7 +105,7 @@ export const marpCli = async (
         preview: {
           alias: 'p',
           describe: 'Open preview window',
-          hidden: isDocker(),
+          hidden: isOfficialImage(),
           group: OptionGroup.Basic,
           type: 'boolean',
         },
