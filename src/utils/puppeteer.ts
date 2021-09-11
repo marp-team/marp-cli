@@ -43,10 +43,12 @@ export const generatePuppeteerLaunchArgs = () => {
 
   // Resolve Chrome path to execute
   if (executablePath === false) {
+    let findChromeError: Error | undefined
+
     try {
       executablePath = findChromeInstallation()
     } catch (e) {
-      if (e instanceof Error) warn(e.message)
+      if (e instanceof Error) findChromeError = e
     }
 
     if (!executablePath) {
@@ -54,6 +56,8 @@ export const generatePuppeteerLaunchArgs = () => {
       executablePath = findEdgeInstallation()
 
       if (!executablePath) {
+        if (findChromeError) warn(findChromeError.message)
+
         error(
           'You have to install Google Chrome, Chromium, or Microsoft Edge to convert slide deck with current options.',
           CLIErrorCode.NOT_FOUND_CHROMIUM
