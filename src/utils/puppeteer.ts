@@ -42,6 +42,8 @@ export const generatePuppeteerLaunchArgs = () => {
 
   // Resolve Chrome path to execute
   if (executablePath === false) {
+    let findChromeError: Error | undefined
+
     if (process.env.IS_DOCKER) {
       // Use already known path within Marp CLI official Docker image
       executablePath = '/usr/bin/chromium-browser'
@@ -49,7 +51,7 @@ export const generatePuppeteerLaunchArgs = () => {
       try {
         executablePath = findChromeInstallation()
       } catch (e) {
-        if (e instanceof Error) warn(e.message)
+        if (e instanceof Error) findChromeError = e
       }
     }
 
@@ -58,6 +60,8 @@ export const generatePuppeteerLaunchArgs = () => {
       executablePath = findEdgeInstallation()
 
       if (!executablePath) {
+        if (findChromeError) warn(findChromeError.message)
+
         error(
           'You have to install Google Chrome, Chromium, or Microsoft Edge to convert slide deck with current options.',
           CLIErrorCode.NOT_FOUND_CHROMIUM
