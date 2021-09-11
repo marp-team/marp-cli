@@ -5,6 +5,7 @@ import { version as coreVersion } from '@marp-team/marp-core/package.json'
 import { version as marpitVersion } from '@marp-team/marpit/package.json'
 import { Explorer } from 'cosmiconfig/dist/Explorer'
 import getStdin from 'get-stdin'
+import * as isDocker from 'is-docker'
 import stripAnsi from 'strip-ansi'
 import { version as cliVersion } from '../package.json'
 import * as cli from '../src/cli'
@@ -184,11 +185,10 @@ describe('Marp CLI', () => {
           )
         })
 
-        describe('when CLI is running in an official Docker image', () => {
-          beforeEach(() => (process.env.IS_DOCKER = '1'))
-          afterEach(() => delete process.env.IS_DOCKER)
-
+        describe('when CLI is running in Docker container', () => {
           it('does not output help about --preview option', async () => {
+            jest.spyOn(isDocker, 'default').mockImplementation(() => true)
+
             expect(await run()).toBe(0)
             expect(error).toHaveBeenCalledWith(
               expect.not.stringContaining('--preview')
@@ -330,10 +330,8 @@ describe('Marp CLI', () => {
         })
 
         describe('when CLI is running in an official Docker image', () => {
-          beforeEach(() => (process.env.IS_DOCKER = '1'))
-          afterEach(() => delete process.env.IS_DOCKER)
-
           it('ignores --preview option with warning', async () => {
+            jest.spyOn(isDocker, 'default').mockImplementation(() => true)
             const warn = jest.spyOn(cli, 'warn').mockImplementation()
 
             await run()
@@ -897,11 +895,10 @@ describe('Marp CLI', () => {
       })
 
       describe('when CLI is running in an official Docker image', () => {
-        beforeEach(() => (process.env.IS_DOCKER = '1'))
-        afterEach(() => delete process.env.IS_DOCKER)
-
         it('ignores --preview option with warning', async () => {
+          jest.spyOn(isDocker, 'default').mockImplementation(() => true)
           await marpCli([onePath, '--preview', '--no-output'])
+
           expect(Preview.prototype.open).not.toHaveBeenCalled()
           expect(warn).toHaveBeenCalledWith(
             expect.stringContaining('Preview option was ignored')

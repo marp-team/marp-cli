@@ -1,4 +1,5 @@
 import chalk from 'chalk'
+import isDocker from 'is-docker'
 import { Argv } from 'yargs'
 import yargs from 'yargs/yargs'
 import * as cli from './cli'
@@ -104,7 +105,7 @@ export const marpCli = async (
         preview: {
           alias: 'p',
           describe: 'Open preview window',
-          hidden: !!process.env.IS_DOCKER,
+          hidden: isDocker(),
           group: OptionGroup.Basic,
           type: 'boolean',
         },

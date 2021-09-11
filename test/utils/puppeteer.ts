@@ -117,19 +117,6 @@ describe('#generatePuppeteerLaunchArgs', () => {
     }
   })
 
-  it('uses specific settings if running in the official Docker image', () => {
-    try {
-      process.env.IS_DOCKER = 'true'
-
-      const args = puppeteer().generatePuppeteerLaunchArgs()
-      expect(args.executablePath).toBe('/usr/bin/chromium-browser')
-      expect(args.args).toContain('--no-sandbox')
-      expect(args.args).toContain('--disable-features=VizDisplayCompositor')
-    } finally {
-      delete process.env.IS_DOCKER
-    }
-  })
-
   it("ignores puppeteer's --disable-extensions option if defined CHROME_ENABLE_EXTENSIONS environment value", () => {
     try {
       process.env.CHROME_ENABLE_EXTENSIONS = 'true'

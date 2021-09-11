@@ -24,7 +24,7 @@ RUN addgroup -S marp && adduser -S -g marp marp \
     && chown -R marp:marp /home/marp
 
 USER marp
-ENV IS_DOCKER true
+ENV CHROME_PATH /usr/bin/chromium-browser
 
 WORKDIR /home/marp/.cli
 COPY --chown=marp:marp . /home/marp/.cli/

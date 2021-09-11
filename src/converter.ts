@@ -3,6 +3,7 @@ import { URL } from 'url'
 import type { MarpOptions } from '@marp-team/marp-core'
 import { Marpit, Options as MarpitOptions } from '@marp-team/marpit'
 import chalk from 'chalk'
+import isDocker from 'is-docker'
 import puppeteer from 'puppeteer-core'
 import { silence, warn } from './cli'
 import { Engine, ResolvedEngine } from './engine'
@@ -475,7 +476,7 @@ export class Converter {
       // directory so create tmp file to home directory if in Linux. (There is
       // an exception for an official docker image)
       return baseFile.saveTmpFile({
-        home: process.platform === 'linux' && !process.env.IS_DOCKER,
+        home: process.platform === 'linux' && !isDocker(),
         extension: '.html',
       })
     })()

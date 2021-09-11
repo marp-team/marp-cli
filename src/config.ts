@@ -3,6 +3,7 @@ import fs from 'fs'
 import path from 'path'
 import chalk from 'chalk'
 import { cosmiconfig } from 'cosmiconfig'
+import isDocker from 'is-docker'
 import { osLocale } from 'os-locale'
 import { info, warn } from './cli'
 import { ConverterOption, ConvertType } from './converter'
@@ -105,7 +106,7 @@ export class MarpCLIConfig {
     const preview = (() => {
       const p = this.args.preview ?? this.conf.preview ?? false
 
-      if (p && process.env.IS_DOCKER) {
+      if (p && isDocker()) {
         warn(
           `Preview window cannot show in an official docker image. Preview option was ignored.`
         )
