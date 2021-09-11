@@ -6,6 +6,8 @@ jest.mock('../../src/utils/chrome-finder')
 jest.mock('../../src/utils/edge-finder')
 jest.mock('../../src/utils/wsl')
 
+const isDocker = (): typeof import('is-docker') => require('is-docker')
+
 const CLIError = (): typeof import('../../src/error').CLIError =>
   require('../../src/error').CLIError // eslint-disable-line @typescript-eslint/no-var-requires
 
@@ -115,6 +117,17 @@ describe('#generatePuppeteerLaunchArgs', () => {
     } finally {
       delete process.env.CHROME_PATH
     }
+  })
+
+  it('uses specific settings if running within a Docker container', () => {
+    jest.spyOn(isDocker(), 'default').mockImplementation(() => true)
+    jest
+      .spyOn(chromeFinder(), 'findChromeInstallation')
+      .mockImplementation(() => '/usr/bin/chromium')
+
+    const args = puppeteer().generatePuppeteerLaunchArgs()
+    expect(args.args).toContain('--no-sandbox')
+    expect(args.args).toContain('--disable-features=VizDisplayCompositor')
   })
 
   it("ignores puppeteer's --disable-extensions option if defined CHROME_ENABLE_EXTENSIONS environment value", () => {
