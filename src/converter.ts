@@ -18,6 +18,7 @@ import templates, {
   TemplateResult,
 } from './templates/'
 import { ThemeSet } from './theme'
+import { isOfficialImage } from './utils/docker'
 import {
   generatePuppeteerDataDirPath,
   generatePuppeteerLaunchArgs,
@@ -472,10 +473,10 @@ export class Converter {
       )
 
       // Snapd Chromium cannot access from sandbox container to user-land `/tmp`
-      // directory so create tmp file to home directory if in Linux. (There is
-      // an exception for an official docker image)
+      // directory so always create tmp file to home directory if in Linux.
+      // (There is an exception for an official docker image)
       return baseFile.saveTmpFile({
-        home: process.platform === 'linux' && !process.env.IS_DOCKER,
+        home: process.platform === 'linux' && !isOfficialImage(),
         extension: '.html',
       })
     })()

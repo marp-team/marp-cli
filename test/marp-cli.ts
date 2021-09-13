@@ -20,6 +20,7 @@ import {
 import { Preview } from '../src/preview'
 import { Server } from '../src/server'
 import { ThemeSet } from '../src/theme'
+import * as docker from '../src/utils/docker'
 import * as version from '../src/version'
 import { Watcher } from '../src/watcher'
 
@@ -185,10 +186,9 @@ describe('Marp CLI', () => {
         })
 
         describe('when CLI is running in an official Docker image', () => {
-          beforeEach(() => (process.env.IS_DOCKER = '1'))
-          afterEach(() => delete process.env.IS_DOCKER)
-
           it('does not output help about --preview option', async () => {
+            jest.spyOn(docker, 'isOfficialImage').mockImplementation(() => true)
+
             expect(await run()).toBe(0)
             expect(error).toHaveBeenCalledWith(
               expect.not.stringContaining('--preview')
@@ -330,10 +330,8 @@ describe('Marp CLI', () => {
         })
 
         describe('when CLI is running in an official Docker image', () => {
-          beforeEach(() => (process.env.IS_DOCKER = '1'))
-          afterEach(() => delete process.env.IS_DOCKER)
-
           it('ignores --preview option with warning', async () => {
+            jest.spyOn(docker, 'isOfficialImage').mockImplementation(() => true)
             const warn = jest.spyOn(cli, 'warn').mockImplementation()
 
             await run()
@@ -897,11 +895,10 @@ describe('Marp CLI', () => {
       })
 
       describe('when CLI is running in an official Docker image', () => {
-        beforeEach(() => (process.env.IS_DOCKER = '1'))
-        afterEach(() => delete process.env.IS_DOCKER)
-
         it('ignores --preview option with warning', async () => {
+          jest.spyOn(docker, 'isOfficialImage').mockImplementation(() => true)
           await marpCli([onePath, '--preview', '--no-output'])
+
           expect(Preview.prototype.open).not.toHaveBeenCalled()
           expect(warn).toHaveBeenCalledWith(
             expect.stringContaining('Preview option was ignored')

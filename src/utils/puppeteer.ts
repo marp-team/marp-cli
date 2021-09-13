@@ -3,6 +3,7 @@ import path from 'path'
 import puppeteer from 'puppeteer-core'
 import { warn } from '../cli'
 import { CLIErrorCode, error } from '../error'
+import { isDocker } from '../utils/docker'
 import { findChromeInstallation } from './chrome-finder'
 import { findEdgeInstallation } from './edge-finder'
 import { isWSL, resolveWindowsEnv } from './wsl'
@@ -30,11 +31,11 @@ export const generatePuppeteerLaunchArgs = () => {
   const args = new Set<string>(['--export-tagged-pdf'])
 
   // Docker environment and WSL environment need to disable sandbox. :(
-  if (process.env.IS_DOCKER || isWSL()) args.add('--no-sandbox')
+  if (isDocker() || isWSL()) args.add('--no-sandbox')
 
   // Workaround for Chrome 73 in docker and unit testing with CircleCI
   // https://github.com/GoogleChrome/puppeteer/issues/3774
-  if (process.env.IS_DOCKER || process.env.CI)
+  if (isDocker() || process.env.CI)
     args.add('--disable-features=VizDisplayCompositor')
 
   // Enable DocumentTransition API
@@ -44,15 +45,10 @@ export const generatePuppeteerLaunchArgs = () => {
   if (executablePath === false) {
     let findChromeError: Error | undefined
 
-    if (process.env.IS_DOCKER) {
-      // Use already known path within Marp CLI official Docker image
-      executablePath = '/usr/bin/chromium-browser'
-    } else {
-      try {
-        executablePath = findChromeInstallation()
-      } catch (e) {
-        if (e instanceof Error) findChromeError = e
-      }
+    try {
+      executablePath = findChromeInstallation()
+    } catch (e) {
+      if (e instanceof Error) findChromeError = e
     }
 
     if (!executablePath) {

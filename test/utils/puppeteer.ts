@@ -15,6 +15,9 @@ const puppeteer = (): typeof import('../../src/utils/puppeteer') =>
 const chromeFinder = (): typeof import('../../src/utils/chrome-finder') =>
   require('../../src/utils/chrome-finder')
 
+const docker = (): typeof import('../../src/utils/docker') =>
+  require('../../src/utils/docker')
+
 const edgeFinder = (): typeof import('../../src/utils/edge-finder') =>
   require('../../src/utils/edge-finder')
 
@@ -117,17 +120,15 @@ describe('#generatePuppeteerLaunchArgs', () => {
     }
   })
 
-  it('uses specific settings if running in the official Docker image', () => {
-    try {
-      process.env.IS_DOCKER = 'true'
+  it('uses specific settings if running within a Docker container', () => {
+    jest.spyOn(docker(), 'isDocker').mockImplementation(() => true)
+    jest
+      .spyOn(chromeFinder(), 'findChromeInstallation')
+      .mockImplementation(() => '/usr/bin/chromium')
 
-      const args = puppeteer().generatePuppeteerLaunchArgs()
-      expect(args.executablePath).toBe('/usr/bin/chromium-browser')
-      expect(args.args).toContain('--no-sandbox')
-      expect(args.args).toContain('--disable-features=VizDisplayCompositor')
-    } finally {
-      delete process.env.IS_DOCKER
-    }
+    const args = puppeteer().generatePuppeteerLaunchArgs()
+    expect(args.args).toContain('--no-sandbox')
+    expect(args.args).toContain('--disable-features=VizDisplayCompositor')
   })
 
   it("ignores puppeteer's --disable-extensions option if defined CHROME_ENABLE_EXTENSIONS environment value", () => {
