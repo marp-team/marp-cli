@@ -129,7 +129,7 @@ commands:
       - run:
           name: Install Docker buildx
           command: |
-            docker build --platform=local --quiet -o ~ git://github.com/docker/buildx
+            docker build --platform=local --quiet -o ~ git://github.com/docker/buildx.git#v0.6.3
             mkdir -p ~/.docker/cli-plugins
             mv ~/buildx ~/.docker/cli-plugins/docker-buildx
           environment:
