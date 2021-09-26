@@ -51,7 +51,7 @@ npx @marp-team/marp-cli@latest -s ./slides
 
 ### Docker
 
-Don't you like to install Node and Chrome locally? We have [an official Docker image `marpteam/marp-cli`][marp-cli-docker] ready to use CLI.
+Don't you like installing Node.js and Chrome to local? We have [an official Docker image `marpteam/marp-cli`][marp-cli-docker] ready to use CLI.
 
 [Please refer how to use at Docker Hub.][marp-cli-docker]
 
