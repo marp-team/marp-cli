@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v1.4.1 - 2021-09-26
+
 ### Fixed
 
 - Prevent outputting a warning about `CHROME_PATH` env if fallbacked to Edge ([#388](https://github.com/marp-team/marp-cli/pull/388))
