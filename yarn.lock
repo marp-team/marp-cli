@@ -1153,10 +1153,10 @@
   resolved "https://registry.yarnpkg.com/@marp-team/marpit-svg-polyfill/-/marpit-svg-polyfill-1.7.1.tgz#be98fcd3758c2be60980dc31f17116a90262cf03"
   integrity sha512-dSZLyPNzBY+lrcIPF1dC9dcYcU3MPFigtjQDxLZP48uWq5oaMSnPLGtDsiDjlqVHk6MAmMuw7qy1i4+tt9HhpA==
 
-"@marp-team/marpit@^2.1.1":
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/@marp-team/marpit/-/marpit-2.1.1.tgz#916b82a0074500202a5d9137b1447507525f9dbe"
-  integrity sha512-purTdrC6tj9NGQMFcRg8pycIAhihdqtOgE3mFteyKmyjK+DxU00vLMB4RVD3mewfuhNd5367Y5gmHek/0KlcBw==
+"@marp-team/marpit@^2.1.1", "@marp-team/marpit@^2.1.2":
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/@marp-team/marpit/-/marpit-2.1.2.tgz#e333b5099e8308ced1d8c52d22ebd2c902d51dd4"
+  integrity sha512-euGUlXoIOZg1I49HibmenGHoTuxqDgpFKIEy46khmBOYvmYk+Rzmygp4KThv2HVYtsn9JRD+xlM30TRaIADgHA==
   dependencies:
     color-string "^1.6.0"
     cssesc "^3.0.0"
@@ -1164,7 +1164,7 @@
     lodash.kebabcase "^4.1.1"
     markdown-it "^12.2.0"
     markdown-it-front-matter "^0.2.3"
-    postcss "^8.3.6"
+    postcss "^8.3.11"
 
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
@@ -5510,10 +5510,15 @@ multistream@^4.1.0:
     once "^1.4.0"
     readable-stream "^3.6.0"
 
-nanoid@^3.1.23, nanoid@^3.1.25:
+nanoid@^3.1.25:
   version "3.1.25"
   resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.1.25.tgz#09ca32747c0e543f0e1814b7d3793477f9c8e152"
   integrity sha512-rdwtIXaXCLFAQbnfqDRnI6jaRHp9fTcYBjtFKE8eezcZ7LuLjhUaQGNeMXf1HmRoCH32CLz6XwX0TtxEOS/A3Q==
+
+nanoid@^3.1.30:
+  version "3.1.30"
+  resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.1.30.tgz#63f93cc548d2a113dc5dfbc63bfa09e2b9b64362"
+  integrity sha512-zJpuPDwOv8D2zq2WRoMe1HsfZthVewpel9CAvTfc/2mBD1uUT/agc5f7GHGWXlYkFvi1mVxe4IjvP2HNrop7nQ==
 
 napi-build-utils@^1.0.1:
   version "1.0.2"
@@ -5947,6 +5952,11 @@ pend@~1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/pend/-/pend-1.2.0.tgz#7a57eb550a6783f9115331fcf4663d5c8e007a50"
   integrity sha1-elfrVQpng/kRUzH89GY9XI4AelA=
+
+picocolors@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/picocolors/-/picocolors-1.0.0.tgz#cb5bdc74ff3f51892236eaf79d68bc44564ab81c"
+  integrity sha512-1fygroTLlHu66zi26VoTDv8yRgm0Fccecssto+MhsZ0D/DGW2sm8E8AjW7NU5VVTRt5GxbeZ5qBuJr+HyLYkjQ==
 
 picomatch@^2.0.4, picomatch@^2.2.1, picomatch@^2.2.2, picomatch@^2.2.3:
   version "2.3.0"
@@ -6388,13 +6398,13 @@ postcss@^7.0.14, postcss@^7.0.2, postcss@^7.0.21, postcss@^7.0.26, postcss@^7.0.
     source-map "^0.6.1"
     supports-color "^6.1.0"
 
-postcss@^8.3.6:
-  version "8.3.6"
-  resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.3.6.tgz#2730dd76a97969f37f53b9a6096197be311cc4ea"
-  integrity sha512-wG1cc/JhRgdqB6WHEuyLTedf3KIRuD0hG6ldkFEZNCjRxiC+3i6kkWUUbiJQayP28iwG35cEmAbe98585BYV0A==
+postcss@^8.3.11, postcss@^8.3.6:
+  version "8.3.11"
+  resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.3.11.tgz#c3beca7ea811cd5e1c4a3ec6d2e7599ef1f8f858"
+  integrity sha512-hCmlUAIlUiav8Xdqw3Io4LcpA1DOt7h3LSTAC4G6JGHFFaWzI6qvFt9oilvl8BmkbBRX1IhM90ZAmpk68zccQA==
   dependencies:
-    colorette "^1.2.2"
-    nanoid "^3.1.23"
+    nanoid "^3.1.30"
+    picocolors "^1.0.0"
     source-map-js "^0.6.2"
 
 pptxgenjs@^3.7.1:
