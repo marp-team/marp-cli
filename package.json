@@ -140,7 +140,7 @@
     "zip-stream": "^4.1.0"
   },
   "dependencies": {
-    "@marp-team/marp-core": "^2.1.1",
+    "@marp-team/marp-core": "^2.2.0",
     "@marp-team/marpit": "^2.1.1",
     "chokidar": "^3.5.2",
     "cosmiconfig": "^7.0.0",
