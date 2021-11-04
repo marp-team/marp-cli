@@ -257,7 +257,7 @@ describe('WatchNotifier', () => {
       expect(wss()).toBeUndefined()
 
       await instance.start()
-      expect(wss()).not.toBeUndefined()
+      expect(wss()).toBeDefined()
     })
 
     describe('when client is connected to registered path', () => {

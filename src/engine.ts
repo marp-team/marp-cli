@@ -1,7 +1,7 @@
 import path from 'path'
 import { Marpit } from '@marp-team/marpit'
 import importFrom from 'import-from'
-import pkgUp from 'pkg-up'
+import { pkgUp } from 'pkg-up'
 import { error } from './error'
 
 export type Engine = typeof Marpit

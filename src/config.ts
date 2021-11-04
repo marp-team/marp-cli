@@ -8,7 +8,7 @@ import { info, warn } from './cli'
 import { ConverterOption, ConvertType } from './converter'
 import { ResolvableEngine, ResolvedEngine } from './engine'
 import { keywordsAsArray } from './engine/meta-plugin'
-import { error } from './error'
+import { error, isError } from './error'
 import { TemplateOption } from './templates'
 import { Theme, ThemeSet } from './theme'
 import { isOfficialImage } from './utils/docker'
@@ -273,8 +273,8 @@ export class MarpCLIConfig {
 
     try {
       stat = await fs.promises.lstat(dir)
-    } catch (e) {
-      if (e.code !== 'ENOENT') throw e
+    } catch (e: unknown) {
+      if (isError(e) && e.code !== 'ENOENT') throw e
       error(`Input directory "${dir}" is not found.`)
     }
 
@@ -295,11 +295,11 @@ export class MarpCLIConfig {
         this.confPath = ret.filepath
         this.conf = ret.config
       }
-    } catch (e) {
+    } catch (e: unknown) {
       error(
         [
           'Could not find or parse configuration file.',
-          e.name !== 'Error' && `(${e.name})`,
+          isError(e) && e.name !== 'Error' && `(${e.name})`,
           confPath !== undefined && `[${confPath}]`,
         ]
           .filter((m) => m)
@@ -328,17 +328,20 @@ export class MarpCLIConfig {
 
     try {
       return await Theme.initialize(theme.path, { overrideName: true })
-    } catch (e) {
-      if (e.code === 'EISDIR') {
-        info(
-          `Please use ${chalk.yellow(theme.advice.use)} option instead of ${
-            theme.advice.insteadOf
-          } to make theme CSS available from directory.`
-        )
-        error(`Directory cannot pass to theme option. (${theme.path})`)
+    } catch (e: unknown) {
+      if (isError(e)) {
+        if (e.code === 'EISDIR') {
+          info(
+            `Please use ${chalk.yellow(theme.advice.use)} option instead of ${
+              theme.advice.insteadOf
+            } to make theme CSS available from directory.`
+          )
+          error(`Directory cannot pass to theme option. (${theme.path})`)
+        }
+        if (e.code !== 'ENOENT') throw e
+      } else {
+        throw e
       }
-
-      if (e.code !== 'ENOENT') throw e
     }
 
     return theme.name

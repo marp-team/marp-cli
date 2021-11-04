@@ -128,7 +128,7 @@ describe("Bespoke template's browser context", () => {
 
       deck.next()
       expect(firstItem?.dataset.bespokeMarpFragment).toBe('active')
-      expect(firstItem?.dataset.bespokeMarpCurrentFragment).not.toBeUndefined()
+      expect(firstItem?.dataset.bespokeMarpCurrentFragment).toBeDefined()
 
       deck.prev()
       expect(firstItem?.dataset.bespokeMarpFragment).toBe('inactive')

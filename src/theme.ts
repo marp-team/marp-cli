@@ -4,6 +4,7 @@ import path from 'path'
 import { Marpit } from '@marp-team/marpit'
 import { isDynamicPattern } from 'globby'
 import { warn } from './cli'
+import { isError } from './error'
 import { File } from './file'
 
 export class Theme {
@@ -94,9 +95,11 @@ export class ThemeSet {
       try {
         const engineTheme = engine.themeSet.add(theme.css)
         theme.name = engineTheme.name
-      } catch (e) {
+      } catch (e: unknown) {
         const fn = path.relative(process.cwd(), theme.filename)
-        warn(`Cannot register theme CSS: ${fn} (${e.message})`)
+        const errorMsg = isError(e) ? ` (${e.message})` : ''
+
+        warn(`Cannot register theme CSS: ${fn}${errorMsg}`)
       }
     }
   }
@@ -128,7 +131,7 @@ export class ThemeSet {
 
           if (stat.isFile() || stat.isDirectory() || stat.isSymbolicLink())
             fnForWatch.add(path.resolve(f))
-        } catch (e) {
+        } catch (e: unknown) {
           // No ops
         }
       }

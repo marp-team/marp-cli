@@ -1,6 +1,6 @@
 @use './button';
 
-$progressHeight: 5px;
+$progress-height: 5px;
 
 .bespoke-marp-note,
 .bespoke-marp-osc,
@@ -28,7 +28,7 @@ $progressHeight: 5px;
 
     /* Fallback */
     pointer-events: none;
-    opacity: 0;
+    opacity: 0%;
 
     &.bespoke-marp-active {
       content-visibility: visible;
@@ -36,7 +36,7 @@ $progressHeight: 5px;
 
       /* Fallback */
       pointer-events: auto;
-      opacity: 1;
+      opacity: 100%;
 
       &.bespoke-marp-active-ready {
         * {
@@ -82,7 +82,7 @@ $progressHeight: 5px;
         font-size: 16px;
         left: 50%;
         line-height: 0;
-        opacity: 1;
+        opacity: 100%;
         padding: 12px;
         position: absolute;
         touch-action: manipulation;
@@ -104,7 +104,7 @@ $progressHeight: 5px;
         }
 
         > span {
-          opacity: 0.8;
+          opacity: 80%;
 
           &[data-bespoke-marp-osc='page'] {
             display: inline-block;
@@ -138,7 +138,7 @@ $progressHeight: 5px;
         cursor: none;
 
         > .bespoke-marp-osc {
-          opacity: 0;
+          opacity: 0%;
           pointer-events: none;
         }
       }
@@ -158,11 +158,11 @@ $progressHeight: 5px;
     .bespoke-progress-parent {
       background: #222;
       display: flex;
-      height: $progressHeight;
+      height: $progress-height;
       width: 100%;
 
       & + .bespoke-marp-parent {
-        top: $progressHeight;
+        top: $progress-height;
       }
 
       .bespoke-progress-bar {
@@ -194,12 +194,11 @@ $progressHeight: 5px;
 
       // Grid layout for presenter view
       display: grid;
-      grid-template-columns: 2fr 1fr;
-      grid-template-rows: minmax(140px, 1fr) 2fr 3em;
-      grid-template-areas:
-        'current next'
-        'current note'
-        'info    note';
+      grid-template:
+        'current next' minmax(140px, 1fr)
+        'current note' 2fr
+        'info    note' 3em /
+        2fr 1fr;
 
       .bespoke-marp-parent {
         grid-area: current;

@@ -65,7 +65,7 @@ export const setQuery = (
       '',
       generateURLfromParams(params, options.location)
     )
-  } catch (e) {
+  } catch (e: unknown) {
     // Safari may throw SecurityError by replacing state 100 times per 30 seconds.
     console.error(e)
   }
@@ -90,7 +90,7 @@ export const storage = (() => {
       localStorage.removeItem(key)
 
       return true
-    } catch (e) {
+    } catch (e: unknown) {
       return false
     }
   })()
@@ -100,7 +100,7 @@ export const storage = (() => {
     get: (key: string): string | null => {
       try {
         return localStorage.getItem(key)
-      } catch (e) {
+      } catch (e: unknown) {
         return null
       }
     },
@@ -108,7 +108,7 @@ export const storage = (() => {
       try {
         localStorage.setItem(key, value)
         return true
-      } catch (e) {
+      } catch (e: unknown) {
         return false
       }
     },
@@ -116,7 +116,7 @@ export const storage = (() => {
       try {
         localStorage.removeItem(key)
         return true
-      } catch (e) {
+      } catch (e: unknown) {
         return false
       }
     },

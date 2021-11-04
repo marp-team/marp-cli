@@ -5,6 +5,7 @@ import chokidar from 'chokidar'
 import { getPortPromise } from 'portfinder'
 import { Server as WSServer, ServerOptions } from 'ws'
 import { Converter, ConvertedCallback } from './converter'
+import { isError } from './error'
 import { File, FileType } from './file'
 
 export class Watcher {
@@ -58,8 +59,8 @@ export class Watcher {
         // Notification only
         mdFiles.forEach(notify)
       }
-    } catch (e) {
-      this.events.onError(e)
+    } catch (e: unknown) {
+      if (isError(e)) this.events.onError(e)
     }
 
     // Reload Theme CSS

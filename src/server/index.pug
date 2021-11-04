@@ -17,7 +17,7 @@ html
 
     ul#index
       each file in files
-        li(class={ convertible: file.convertible, directory: file.directory, nodeModules: file.nodeModules })
+        li(class={ convertible: file.convertible, directory: file.directory, 'node-modules': file.nodeModules })
           a.link.file(href=encodeURIComponent(file.name) + (file.directory ? "/" : ""))= file.name
 
           if file.convertible

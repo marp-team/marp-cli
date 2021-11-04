@@ -39,7 +39,7 @@ export const isWSL = (): number => {
         // https://github.com/microsoft/WSL/issues/423#issuecomment-611086412
         const release = readFileSync('/proc/sys/kernel/osrelease').toString()
         if (release.includes('WSL2')) isWsl = 2
-      } catch (e) {
+      } catch (e: unknown) {
         // no ops
       }
     } else {

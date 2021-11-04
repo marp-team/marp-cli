@@ -1,12 +1,11 @@
 extends:
-  - stylelint-config-standard
+  - stylelint-config-standard-scss
   - stylelint-config-prettier
-
-plugins:
-  - stylelint-scss
 
 rules:
   at-rule-no-unknown:
+    - null
+  color-function-notation:
     - null
   property-no-unknown:
     - true

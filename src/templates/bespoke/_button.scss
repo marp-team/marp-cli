@@ -1,4 +1,4 @@
-@mixin _button-icon($icon) {
+@mixin button-icon-internal($icon) {
   background: transparent url($icon) no-repeat center center;
   background-size: contain;
   overflow: hidden;
@@ -25,7 +25,7 @@
     color: inherit;
     cursor: pointer;
     font-size: inherit;
-    opacity: 0.8;
+    opacity: 80%;
     outline: none;
     padding: 0;
     transition: opacity 0.2s linear;
@@ -33,14 +33,14 @@
 
     &:disabled {
       cursor: not-allowed;
-      opacity: 0.15 !important;
+      opacity: 15% !important;
     }
 
     &:hover {
-      opacity: 1;
+      opacity: 100%;
 
       &:active {
-        opacity: 0.6;
+        opacity: 60%;
       }
 
       &:not(:disabled) {
@@ -51,15 +51,15 @@
 
   // Use placeholder selectors to prevent multi time definitions of image data URI
   %button-prev {
-    @include _button-icon('../../assets/osc-prev.svg');
+    @include button-icon-internal('../../assets/osc-prev.svg');
   }
 
   %button-next {
-    @include _button-icon('../../assets/osc-next.svg');
+    @include button-icon-internal('../../assets/osc-next.svg');
   }
 
   %button-fullscreen {
-    @include _button-icon('../../assets/osc-fullscreen.svg');
+    @include button-icon-internal('../../assets/osc-fullscreen.svg');
 
     &.exit {
       background-image: url('../../assets/osc-fullscreen-exit.svg');
@@ -67,6 +67,6 @@
   }
 
   %button-presenter {
-    @include _button-icon('../../assets/osc-presenter.svg');
+    @include button-icon-internal('../../assets/osc-presenter.svg');
   }
 }

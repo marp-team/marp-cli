@@ -15,7 +15,7 @@ export const requestWakeLock = async (): Promise<WakeLockObject> => {
   if (api) {
     try {
       return await api.request('screen')
-    } catch (e) {
+    } catch (e: unknown) {
       console.warn(e)
     }
   }

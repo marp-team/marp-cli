@@ -16,7 +16,7 @@ import {
   ConvertType,
   mimeTypes,
 } from './converter'
-import { CLIError, CLIErrorCode, error } from './error'
+import { CLIError, CLIErrorCode, error, isError } from './error'
 import { File, markdownExtensions } from './file'
 import serverIndex from './server/index.pug'
 import style from './server/index.scss'
@@ -76,9 +76,8 @@ export class Server extends (EventEmitter as new () => TypedEmitter<Server.Event
     if (this.httpServer) {
       try {
         await promisify(this.httpServer.close.bind(this.httpServer))()
-      } catch (e) {
-        if (e instanceof Error && e['code'] !== 'ERR_SERVER_NOT_RUNNING')
-          throw e
+      } catch (e: unknown) {
+        if (!(isError(e) && e.code === 'ERR_SERVER_NOT_RUNNING')) throw e
       }
 
       this.httpServer = undefined
@@ -140,9 +139,15 @@ export class Server extends (EventEmitter as new () => TypedEmitter<Server.Event
           res.attachment(`${path.basename(fn, path.extname(fn))}.pptx`)
 
         res.type(mimeTypes[type]).end(ret.newFile.buffer)
-      } catch (e) {
-        this.emit('error', e)
-        res.status(503).end(e.toString())
+      } catch (e: unknown) {
+        let errorString = 'Internal server error'
+
+        if (isError(e)) {
+          this.emit('error', e)
+          errorString = e.toString()
+        }
+
+        res.status(503).end(errorString)
       }
     }
 
@@ -227,7 +232,7 @@ export class Server extends (EventEmitter as new () => TypedEmitter<Server.Event
     try {
       stats = fetchedStats || (await fs.promises.stat(targetPath))
       valid = valid && !!stats?.isFile()
-    } catch (e) {
+    } catch (e: unknown) {
       valid = false
     }
 

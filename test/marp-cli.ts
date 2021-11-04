@@ -400,7 +400,7 @@ describe('Marp CLI', () => {
         const { themeSet } = converter.options
         const theme = themeSet.themes.get(cssFile)
 
-        expect(theme?.overrideName).not.toBeUndefined()
+        expect(theme?.overrideName).toBeDefined()
         expect(converter.options.globalDirectives.theme).toBe(
           theme?.overrideName
         )
