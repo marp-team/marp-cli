@@ -5,7 +5,7 @@ on:
   - push
 
 env:
-  YARN_VERSION: '^1.22.5'
+  YARN_VERSION: '^1.22.17'
 
 jobs:
   win-test:
@@ -15,9 +15,9 @@ jobs:
       fail-fast: false
       matrix:
         node-version:
-          - '^12.20.0'
-          - '14.17.3'
-          - '^16.0.0'
+          - '^12.22.7'
+          - '^14.18.1'
+          - '16.13.0'
 
     steps:
       - uses: actions/checkout@v2

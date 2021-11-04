@@ -34,7 +34,7 @@ commands:
         default: []
       yarn:
         type: string
-        default: '^1.22.5'
+        default: '^1.22.17'
     steps:
       - run:
           name: Upgrade yarn for current user
@@ -166,7 +166,7 @@ jobs:
     executor:
       name: node
       browser: true
-      version: '14.17.3' # Specify LTS version for development
+      version: '14.18'
     steps:
       - test
 
@@ -174,7 +174,7 @@ jobs:
     executor:
       name: node
       browser: true
-      version: '16.5'
+      version: '16.13.0' # Specify LTS version for development
     steps:
       - test
 
