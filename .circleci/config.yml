@@ -1,5 +1,8 @@
 version: 2.1
 
+orbs:
+  codecov: codecov/codecov@3.2.0
+
 executors:
   node:
     parameters:
@@ -90,7 +93,7 @@ commands:
           environment:
             JEST_JUNIT_OUTPUT_DIR: tmp/test-results
 
-      - run: yarn codecov
+      - codecov/upload
 
       - store_test_results:
           path: tmp/test-results

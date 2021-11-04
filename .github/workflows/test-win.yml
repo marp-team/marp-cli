@@ -60,7 +60,7 @@ jobs:
           name: coverage
           path: coverage
 
-      - name: Codecov
-        run: yarn codecov -F windows
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      - uses: codecov/codecov-action@v2
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          flags: windows
