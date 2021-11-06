@@ -1,15 +1,4 @@
-ARG NODE_VERSION=16.13.0
-
-########## Build Marp CLI
-
-FROM node:${NODE_VERSION} AS builder
-WORKDIR /usr/src/marp
-COPY . .
-RUN yarn install --frozen-lockfile && yarn build && rm -rf node_modules src rollup.config.js tsconfig.json
-
-########## Build the image
-
-FROM node:${NODE_VERSION}-alpine
+FROM node:16.13.0-alpine
 LABEL maintainer "Marp team"
 
 RUN apk update && apk upgrade && \
@@ -39,7 +28,7 @@ USER marp
 ENV CHROME_PATH /usr/bin/chromium-browser
 
 WORKDIR /home/marp/.cli
-COPY --from=builder --chown=marp:marp /usr/src/marp .
+COPY --chown=marp:marp . .
 RUN yarn install --production --frozen-lockfile && yarn cache clean && node marp-cli.js --version
 
 # Setup workspace for user

@@ -11,7 +11,7 @@ executors:
         default: false
       version:
         type: string
-        default: lts
+        default: '16.13.0' # Specify LTS version for development
     docker:
       - image: circleci/node:<< parameters.version >><<# parameters.browser >>-browsers<</ parameters.browser >>
         entrypoint:
@@ -102,6 +102,18 @@ commands:
           path: ./coverage
           destination: coverage
 
+  build:
+    steps:
+      - checkout
+      - install
+
+      - run: yarn build
+
+      - persist_to_workspace:
+          root: ~/marp-cli
+          paths:
+            - lib
+
   docker:
     parameters:
       tag:
@@ -118,6 +130,9 @@ commands:
         default: false
     steps:
       - checkout
+
+      - attach_workspace:
+          at: ~/marp-cli
 
       - unless:
           condition: << parameters.machine >>
@@ -150,7 +165,6 @@ commands:
             docker buildx build --no-cache --platform linux/amd64,linux/arm64 --progress plain --push -t marpteam/marp-cli:<< parameters.tag >> .
           environment:
             DOCKER_CLI_EXPERIMENTAL: enabled
-          no_output_timeout: 20m
 
 jobs:
   audit:
@@ -178,27 +192,35 @@ jobs:
     executor:
       name: node
       browser: true
-      version: '16.13.0' # Specify LTS version for development
     steps:
       - test
+
+  docker-build-latest:
+    executor: node
+    steps:
+      - build
 
   docker-image-latest:
     executor: docker
     steps:
       - docker:
-          machine: true
           tag: latest
+
+  docker-build-tag:
+    executor: node
+    steps:
+      - build
 
   docker-image-tag:
     executor: docker
     steps:
       - docker:
-          machine: true
           tag: $CIRCLE_TAG
 
 workflows:
   test:
     jobs:
+      # Test
       - audit
       - test-node12:
           requires:
@@ -209,7 +231,9 @@ workflows:
       - test-node16:
           requires:
             - audit
-      - docker-image-latest:
+
+      # Docker (latest)
+      - docker-build-latest:
           requires:
             - test-node12
             - test-node14
@@ -217,9 +241,19 @@ workflows:
           filters:
             branches:
               only: main
-      - docker-image-tag:
+
+      - docker-image-latest:
+          requires:
+            - docker-build-latest
+
+      # Docker (tag)
+      - docker-build-tag:
           filters:
             branches:
               ignore: /.*/
             tags:
               only: /^v.*/
+
+      - docker-image-tag:
+          requires:
+            - docker-build-tag
