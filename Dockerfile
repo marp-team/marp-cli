@@ -1,4 +1,15 @@
-FROM node:16.13.0-alpine
+ARG NODE_VERSION=16.13.0
+
+########## Build Marp CLI
+
+FROM node:${NODE_VERSION} AS builder
+WORKDIR /usr/src/marp
+COPY . .
+RUN yarn install --frozen-lockfile && yarn build && rm -rf node_modules src rollup.config.js tsconfig.json
+
+########## Build the image
+
+FROM node:${NODE_VERSION}-alpine
 LABEL maintainer "Marp team"
 
 RUN apk update && apk upgrade && \
@@ -23,18 +34,16 @@ RUN addgroup -S marp && adduser -S -g marp marp \
     && mkdir -p /home/marp/app /home/marp/.cli \
     && chown -R marp:marp /home/marp
 
+# Install node dependencies, and create v8 cache by running Marp CLI once
 USER marp
 ENV CHROME_PATH /usr/bin/chromium-browser
 
 WORKDIR /home/marp/.cli
-COPY --chown=marp:marp . /home/marp/.cli/
-RUN yarn add puppeteer-core@chrome-$(chromium-browser --version | sed -r 's/^Chromium ([0-9]+).+$/\1/') || true
-RUN yarn install --frozen-lockfile && yarn build && \
-    rm -rf ./src ./node_modules && yarn install --production --frozen-lockfile && yarn cache clean \
-    && node /home/marp/.cli/marp-cli.js --version
+COPY --from=builder --chown=marp:marp /usr/src/marp .
+RUN yarn install --production --frozen-lockfile && yarn cache clean && node marp-cli.js --version
 
+# Setup workspace for user
 USER root
-
 ENV MARP_USER marp:marp
 
 WORKDIR /home/marp/app
