@@ -259,3 +259,8 @@ workflows:
       - docker-image-tag:
           requires:
             - docker-build-tag
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/
