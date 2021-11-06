@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Improve reliability of connection to Chromium process for conversion ([#395](https://github.com/marp-team/marp-cli/issues/395), [#400](https://github.com/marp-team/marp-cli/pull/400))
+
 ### Changed
 
 - Upgrade Marpit to [v2.1.2](https://github.com/marp-team/marpit/releases/tag/v2.1.2) ([#399](https://github.com/marp-team/marp-cli/pull/399))
