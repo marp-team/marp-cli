@@ -205,6 +205,7 @@ jobs:
     steps:
       - docker:
           tag: latest
+          machine: true
 
   docker-build-tag:
     executor: node
@@ -216,6 +217,7 @@ jobs:
     steps:
       - docker:
           tag: $CIRCLE_TAG
+          machine: true
 
 workflows:
   test:
