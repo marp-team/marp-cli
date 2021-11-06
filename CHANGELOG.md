@@ -11,6 +11,7 @@
 - Upgrade Marpit to [v2.1.2](https://github.com/marp-team/marpit/releases/tag/v2.1.2) ([#399](https://github.com/marp-team/marp-cli/pull/399))
 - Upgrade Marp Core to [v2.2.0](https://github.com/marp-team/marp-core/releases/tag/v2.2.0) ([#399](https://github.com/marp-team/marp-cli/pull/399))
 - Upgrade development Node LTS and dependencies to the latest ([#399](https://github.com/marp-team/marp-cli/pull/399))
+- Update `Dockerfile` to make a image with multi-stage builds ([#401](https://github.com/marp-team/marp-cli/pull/401))
 
 ## v1.4.1 - 2021-09-26
 
