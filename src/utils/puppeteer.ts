@@ -2,7 +2,7 @@ import os from 'os'
 import path from 'path'
 import puppeteer from 'puppeteer-core'
 import { warn } from '../cli'
-import { CLIErrorCode, error } from '../error'
+import { CLIErrorCode, error, isError } from '../error'
 import { isDocker } from '../utils/docker'
 import { findChromeInstallation } from './chrome-finder'
 import { findEdgeInstallation } from './edge-finder'
@@ -47,8 +47,8 @@ export const generatePuppeteerLaunchArgs = () => {
 
     try {
       executablePath = findChromeInstallation()
-    } catch (e) {
-      if (e instanceof Error) findChromeError = e
+    } catch (e: unknown) {
+      if (isError(e)) findChromeError = e
     }
 
     if (!executablePath) {
@@ -86,8 +86,8 @@ export const launchPuppeteer = async (
 ) => {
   try {
     return await puppeteer.launch(options)
-  } catch (e) {
-    if (e instanceof Error) {
+  } catch (e: unknown) {
+    if (isError(e)) {
       if (
         options?.executablePath &&
         isSnapBrowser(options.executablePath) &&

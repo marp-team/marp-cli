@@ -27,3 +27,6 @@ export function error(
 ): never {
   throw new CLIError(msg, errorCode)
 }
+
+export const isError = (e: unknown): e is NodeJS.ErrnoException =>
+  Object.prototype.toString.call(e) === '[object Error]'

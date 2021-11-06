@@ -3,11 +3,18 @@ const { jsWithBabel } = require('ts-jest/presets')
 const esModules = [
   'ansi-regex',
   'array-union',
-  'is-docker',
+  'find-up',
   'globby',
+  'is-docker',
+  'locate-path',
   'os-locale',
+  'p-limit',
+  'p-locate',
+  'path-exists',
+  'pkg-up',
   'slash',
   'strip-ansi',
+  'yocto-queue',
 ]
 
 module.exports = {

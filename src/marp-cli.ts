@@ -4,7 +4,7 @@ import yargs from 'yargs/yargs'
 import * as cli from './cli'
 import fromArguments from './config'
 import { Converter, ConvertedCallback, ConvertType } from './converter'
-import { CLIError, error } from './error'
+import { CLIError, error, isError } from './error'
 import { File, FileType } from './file'
 import { Preview, fileToURI } from './preview'
 import { Server } from './server'
@@ -324,8 +324,13 @@ export const marpCli = async (
         cli.info(`Converting ${length} markdown${length > 1 ? 's' : ''}...`)
         await converter.convertFiles(foundFiles, { onConverted })
       }
-    } catch (e) {
-      error(`Failed converting Markdown. (${e.message})`, e.errorCode)
+    } catch (e: unknown) {
+      if (isError(e)) {
+        const errorCode = e instanceof CLIError ? e.errorCode : undefined
+        error(`Failed converting Markdown. (${e.message})`, errorCode)
+      } else {
+        throw e
+      }
     }
 
     // Watch mode / Server mode
@@ -397,7 +402,7 @@ export const marpCli = async (
     }
 
     return 0
-  } catch (e) {
+  } catch (e: unknown) {
     if (throwErrorAlways || !(e instanceof CLIError)) throw e
 
     cli.error(e.message)

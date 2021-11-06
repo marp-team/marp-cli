@@ -546,7 +546,7 @@ export class Converter {
             failedFileSet.add(url.href)
           }
         }
-      } catch (e) {
+      } catch (e: unknown) {
         // No ops
       }
     })

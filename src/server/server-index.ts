@@ -10,7 +10,7 @@ export default function serverIndex() {
 
     try {
       sessionStorage.setItem(showAllKey, state ? '1' : '')
-    } catch (e) {
+    } catch (e: unknown) {
       console.error(e)
     }
   }

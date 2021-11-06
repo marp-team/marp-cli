@@ -106,7 +106,7 @@ export class File {
       cleanup: async () => {
         try {
           await this.cleanup(tmp)
-        } catch (e) {
+        } catch (e: unknown) {
           // No ops
         }
       },
@@ -175,7 +175,7 @@ export class File {
           dirs.push(path.resolve(p))
           continue
         }
-      } catch (e) {
+      } catch (e: unknown) {
         // No ops
       }
 

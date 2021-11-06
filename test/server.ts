@@ -207,7 +207,7 @@ describe('Server', () => {
         expect($('h1').text()).toBe('/')
         expect($('ul#index li')).toHaveLength(9) // Actual file count
         expect($('ul#index li.directory')).toHaveLength(5) // Directories
-        expect($('ul#index li.directory.nodeModules')).toHaveLength(1)
+        expect($('ul#index li.directory.node-modules')).toHaveLength(1)
         expect($('ul#index li.convertible')).toHaveLength(3) // Markdown files
 
         // Link to query parameters

@@ -133,7 +133,7 @@ export class Preview extends (EventEmitter as new () => TypedEmitter<Preview.Eve
           })()
         })
       )
-    } catch (e) {
+    } catch (e: unknown) {
       if (!e) return false
       throw e
     }
