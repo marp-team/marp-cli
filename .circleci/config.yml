@@ -150,6 +150,7 @@ commands:
             docker buildx build --no-cache --platform linux/amd64,linux/arm64 --progress plain --push -t marpteam/marp-cli:<< parameters.tag >> .
           environment:
             DOCKER_CLI_EXPERIMENTAL: enabled
+          no_output_timeout: 20m
 
 jobs:
   audit:
