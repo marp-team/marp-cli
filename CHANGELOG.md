@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v1.4.2 - 2021-11-06
+
 ### Fixed
 
 - Improve reliability of connection to Chromium process for conversion ([#395](https://github.com/marp-team/marp-cli/issues/395), [#400](https://github.com/marp-team/marp-cli/pull/400))
