@@ -88,6 +88,15 @@ export const launchPuppeteer = async (
     return await puppeteer.launch(options)
   } catch (e: unknown) {
     if (isError(e)) {
+      // Retry to launch Chromium with WebSocket connection instead of pipe if failed to connect to Chromium
+      // https://github.com/puppeteer/puppeteer/issues/6258
+      if (options?.pipe && e.message.includes('Target.setDiscoverTargets')) {
+        return await puppeteer.launch({ ...options, pipe: false })
+      }
+
+      // Warning when tried to spawn the snap chromium within the snapd container
+      // (e.g. Terminal in VS Code installed by snap +  chromium installed through apt)
+      // It would be resolved by https://github.com/snapcore/snapd/pull/10029 but there is no progress :(
       if (
         options?.executablePath &&
         isSnapBrowser(options.executablePath) &&
@@ -99,7 +108,6 @@ export const launchPuppeteer = async (
         )
       }
     }
-
     throw e
   }
 }
