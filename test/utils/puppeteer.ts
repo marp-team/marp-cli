@@ -9,7 +9,10 @@ jest.mock('../../src/utils/wsl')
 const CLIError = (): typeof import('../../src/error').CLIError =>
   require('../../src/error').CLIError // eslint-disable-line @typescript-eslint/no-var-requires
 
-const puppeteer = (): typeof import('../../src/utils/puppeteer') =>
+const puppeteer = (): typeof import('puppeteer-core') =>
+  require('puppeteer-core')
+
+const puppeteerUtils = (): typeof import('../../src/utils/puppeteer') =>
   require('../../src/utils/puppeteer')
 
 const chromeFinder = (): typeof import('../../src/utils/chrome-finder') =>
@@ -29,17 +32,19 @@ afterEach(() => jest.restoreAllMocks())
 
 describe('#generatePuppeteerDataDirPath', () => {
   it('returns data dir path for OS specific temporary directory', async () => {
-    const dataDir = await puppeteer().generatePuppeteerDataDirPath('tmp-name')
+    const dataDir = await puppeteerUtils().generatePuppeteerDataDirPath(
+      'tmp-name'
+    )
     expect(dataDir).toBe(path.resolve(os.tmpdir(), 'tmp-name'))
   })
 
   describe('with wslPath option', () => {
     it('returns regular path if the current environment is not WSL', async () => {
       expect(
-        await puppeteer().generatePuppeteerDataDirPath('tmp-name', {
+        await puppeteerUtils().generatePuppeteerDataDirPath('tmp-name', {
           wslHost: true,
         })
-      ).toBe(await puppeteer().generatePuppeteerDataDirPath('tmp-name'))
+      ).toBe(await puppeteerUtils().generatePuppeteerDataDirPath('tmp-name'))
     })
 
     it('resolves tmpdir for Windows and returns data dir path for resolved directory', async () => {
@@ -49,7 +54,7 @@ describe('#generatePuppeteerDataDirPath', () => {
         .spyOn(wsl(), 'resolveWindowsEnv')
         .mockResolvedValue('C:\\Test\\Tmp')
 
-      const dataDir = await puppeteer().generatePuppeteerDataDirPath(
+      const dataDir = await puppeteerUtils().generatePuppeteerDataDirPath(
         'tmp-name',
         { wslHost: true }
       )
@@ -66,12 +71,12 @@ describe('#generatePuppeteerLaunchArgs', () => {
       .spyOn(chromeFinder(), 'findChromeInstallation')
       .mockImplementation(() => '/usr/bin/chromium')
 
-    const args = puppeteer().generatePuppeteerLaunchArgs()
+    const args = puppeteerUtils().generatePuppeteerLaunchArgs()
     expect(args.executablePath).toBe('/usr/bin/chromium')
     expect(getFirstInstallation).toHaveBeenCalledTimes(1)
 
     // Cache found result
-    puppeteer().generatePuppeteerLaunchArgs()
+    puppeteerUtils().generatePuppeteerLaunchArgs()
     expect(getFirstInstallation).toHaveBeenCalledTimes(1)
   })
 
@@ -81,7 +86,7 @@ describe('#generatePuppeteerLaunchArgs', () => {
       .spyOn(edgeFinder(), 'findEdgeInstallation')
       .mockImplementation(() => '/usr/bin/msedge')
 
-    const args = puppeteer().generatePuppeteerLaunchArgs()
+    const args = puppeteerUtils().generatePuppeteerLaunchArgs()
     expect(args.executablePath).toBe('/usr/bin/msedge')
     expect(edgeFinder().findEdgeInstallation).toHaveBeenCalledTimes(1)
   })
@@ -96,7 +101,7 @@ describe('#generatePuppeteerLaunchArgs', () => {
       })
     jest.spyOn(edgeFinder(), 'findEdgeInstallation').mockImplementation()
 
-    expect(puppeteer().generatePuppeteerLaunchArgs).toThrow(
+    expect(puppeteerUtils().generatePuppeteerLaunchArgs).toThrow(
       new (CLIError())(
         'You have to install Google Chrome, Chromium, or Microsoft Edge to convert slide deck with current options.',
         CLIErrorCode.NOT_FOUND_CHROMIUM
@@ -113,7 +118,7 @@ describe('#generatePuppeteerLaunchArgs', () => {
     try {
       process.env.CHROME_PATH = path.resolve(__dirname, '../../marp-cli.js')
 
-      const args = puppeteer().generatePuppeteerLaunchArgs()
+      const args = puppeteerUtils().generatePuppeteerLaunchArgs()
       expect(args.executablePath).toBe(process.env.CHROME_PATH)
     } finally {
       delete process.env.CHROME_PATH
@@ -126,7 +131,7 @@ describe('#generatePuppeteerLaunchArgs', () => {
       .spyOn(chromeFinder(), 'findChromeInstallation')
       .mockImplementation(() => '/usr/bin/chromium')
 
-    const args = puppeteer().generatePuppeteerLaunchArgs()
+    const args = puppeteerUtils().generatePuppeteerLaunchArgs()
     expect(args.args).toContain('--no-sandbox')
     expect(args.args).toContain('--disable-features=VizDisplayCompositor')
   })
@@ -135,10 +140,108 @@ describe('#generatePuppeteerLaunchArgs', () => {
     try {
       process.env.CHROME_ENABLE_EXTENSIONS = 'true'
 
-      const args = puppeteer().generatePuppeteerLaunchArgs()
+      const args = puppeteerUtils().generatePuppeteerLaunchArgs()
       expect(args.ignoreDefaultArgs).toContain('--disable-extensions')
     } finally {
       delete process.env.CHROME_ENABLE_EXTENSIONS
     }
+  })
+})
+
+describe('#launchPuppeteer', () => {
+  let launchSpy: jest.SpyInstance
+
+  beforeEach(() => {
+    launchSpy = jest.spyOn(puppeteer(), 'launch').mockImplementation()
+  })
+
+  it('delegates to puppeteer.launch', async () => {
+    const launchOpts = { headless: true } as const
+    await puppeteerUtils().launchPuppeteer(launchOpts)
+
+    expect(launchSpy).toHaveBeenCalledTimes(1)
+    expect(launchSpy).toHaveBeenCalledWith(launchOpts)
+  })
+
+  describe('when rejected', () => {
+    it('rejects with an error occured in delegated puppeteer.launch', async () => {
+      const err = new Error('test')
+      launchSpy.mockRejectedValue(err)
+
+      await expect(puppeteerUtils().launchPuppeteer()).rejects.toBe(err)
+    })
+
+    it('retries to launch with "pipe: false" if rejected with "Target.setDiscoverTargets" when pipe option is enabled', async () => {
+      const puppeteerKnownError = new Error(
+        'Protocol error (Target.setDiscoverTargets): Target closed.'
+      )
+      launchSpy.mockRejectedValueOnce(puppeteerKnownError)
+
+      await puppeteerUtils().launchPuppeteer({ pipe: true })
+      expect(launchSpy).toHaveBeenCalledTimes(2)
+      expect(launchSpy).toHaveBeenNthCalledWith(2, { pipe: false })
+    })
+
+    describe('by AppArmor for snapd containment', () => {
+      // Simulate spawning error by AppArmor
+      const originalError = new Error('need to run as root or suid')
+
+      let originalPlatform: NodeJS.Platform | undefined
+
+      beforeEach(() => {
+        originalPlatform = process.platform
+        Object.defineProperty(process, 'platform', { value: 'linux' })
+
+        launchSpy.mockRejectedValue(originalError)
+      })
+
+      afterEach(() => {
+        if (originalPlatform) {
+          Object.defineProperty(process, 'platform', {
+            value: originalPlatform,
+          })
+        }
+      })
+
+      it('rejects CLIError instead of original error if the executable path is snap binary', async () => {
+        await expect(
+          puppeteerUtils().launchPuppeteer({
+            executablePath: '/snap/bin/chromium-browser',
+          })
+        ).rejects.toMatchInlineSnapshot(
+          `[CLIError: Marp CLI has detected trying to spawn Chromium browser installed by snap, from the confined environment like another snap app. At least either of Chrome/Chromium or the shell environment must be non snap app.]`
+        )
+      })
+
+      it('rejects an original error if the executable path is not snap executable', async () => {
+        await expect(
+          puppeteerUtils().launchPuppeteer({
+            executablePath: path.resolve(__dirname, '_executable_mocks/empty'),
+          })
+        ).rejects.toBe(originalError)
+      })
+
+      it('rejects CLIError if the executable path is shebang script that has included path to snap binary', async () => {
+        await expect(
+          puppeteerUtils().launchPuppeteer({
+            executablePath: path.resolve(
+              __dirname,
+              '_executable_mocks/shebang-snapd-chromium'
+            ),
+          })
+        ).rejects.toStrictEqual(expect.any(CLIError()))
+      })
+
+      it('rejects an original error if the executable path is shebang script that has included path to snap binary', async () => {
+        await expect(
+          puppeteerUtils().launchPuppeteer({
+            executablePath: path.resolve(
+              __dirname,
+              '_executable_mocks/shebang-chromium'
+            ),
+          })
+        ).rejects.toBe(originalError)
+      })
+    })
   })
 })
