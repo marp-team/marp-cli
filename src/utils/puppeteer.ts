@@ -1,3 +1,4 @@
+import fs from 'fs'
 import os from 'os'
 import path from 'path'
 import puppeteer from 'puppeteer-core'
@@ -11,8 +12,37 @@ import { isWSL, resolveWindowsEnv } from './wsl'
 let executablePath: string | undefined | false = false
 let wslTmp: string | undefined
 
-const isSnapBrowser = (path: string | undefined) =>
-  !!(process.platform === 'linux' && path?.startsWith('/snap/'))
+const isShebang = (path: string) => {
+  let fd: number | null = null
+
+  try {
+    fd = fs.openSync(path, 'r')
+
+    const shebangBuffer = Buffer.alloc(2)
+    fs.readSync(fd, shebangBuffer, 0, 2, 0)
+
+    if (shebangBuffer[0] === 0x23 && shebangBuffer[1] === 0x21) return true
+  } catch (e: unknown) {
+    // no ops
+  } finally {
+    if (fd !== null) fs.closeSync(fd)
+  }
+  return false
+}
+
+const isSnapBrowser = (executablePath: string | undefined) => {
+  if (process.platform === 'linux' && executablePath) {
+    // Snapd binary
+    if (executablePath.startsWith('/snap/')) return true
+
+    // Check the content of shebang script (for alias script installed by apt)
+    if (isShebang(executablePath)) {
+      const scriptContent = fs.readFileSync(executablePath, 'utf8')
+      if (scriptContent.includes('/snap/')) return true
+    }
+  }
+  return false
+}
 
 export const generatePuppeteerDataDirPath = async (
   name: string,
@@ -88,6 +118,15 @@ export const launchPuppeteer = async (
     return await puppeteer.launch(options)
   } catch (e: unknown) {
     if (isError(e)) {
+      // Retry to launch Chromium with WebSocket connection instead of pipe if failed to connect to Chromium
+      // https://github.com/puppeteer/puppeteer/issues/6258
+      if (options?.pipe && e.message.includes('Target.setDiscoverTargets')) {
+        return await puppeteer.launch({ ...options, pipe: false })
+      }
+
+      // Warning when tried to spawn the snap chromium within the snapd container
+      // (e.g. Terminal in VS Code installed by snap + chromium installed by apt)
+      // It would be resolved by https://github.com/snapcore/snapd/pull/10029 but there is no progress :(
       if (
         options?.executablePath &&
         isSnapBrowser(options.executablePath) &&
@@ -99,7 +138,6 @@ export const launchPuppeteer = async (
         )
       }
     }
-
     throw e
   }
 }
