@@ -139,7 +139,7 @@
   },
   "dependencies": {
     "@marp-team/marp-core": "^2.2.0",
-    "@marp-team/marpit": "^2.1.2",
+    "@marp-team/marpit": "^2.2.0",
     "chokidar": "^3.5.2",
     "cosmiconfig": "^7.0.1",
     "import-from": "^4.0.0",
