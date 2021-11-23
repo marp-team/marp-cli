@@ -1130,20 +1130,20 @@
     "@types/yargs" "^16.0.0"
     chalk "^4.0.0"
 
-"@marp-team/marp-core@^2.2.0":
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/@marp-team/marp-core/-/marp-core-2.2.0.tgz#a5eccc9df203556c80d61be8c353e371f42f2042"
-  integrity sha512-E0EpWqZBVU7mmyKNMPX1uEh8PuylodEp1t24SHOkuVYQlndE8pw0qZuisEXJbeQTvEqCRiIWbo3K9o++TecSsw==
+"@marp-team/marp-core@^2.3.0":
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/@marp-team/marp-core/-/marp-core-2.3.0.tgz#f88f8ca4374ad25f59039939a6be2a11e49ad31d"
+  integrity sha512-cLrKTw0LpJXhxLXREaUW0XWOGEcP69MjARN3u385TRVe+juANvwyzK1x/k4jJd1Lg/+dGVD1m/WYxT3adfi4GA==
   dependencies:
-    "@marp-team/marpit" "^2.1.2"
+    "@marp-team/marpit" "^2.2.0"
     "@marp-team/marpit-svg-polyfill" "^1.7.1"
     emoji-regex "^9.2.2"
     highlight.js "^10.7.3"
-    katex "^0.13.20"
+    katex "^0.15.1"
     markdown-it-emoji "^2.0.0"
     mathjax-full "^3.2.0"
     postcss "^8.3.11"
-    postcss-minify-params "^5.0.1"
+    postcss-minify-params "^5.0.2"
     postcss-minify-selectors "^5.1.0"
     postcss-normalize-whitespace "^5.0.1"
     twemoji "^13.1.0"
@@ -1154,10 +1154,10 @@
   resolved "https://registry.yarnpkg.com/@marp-team/marpit-svg-polyfill/-/marpit-svg-polyfill-1.7.1.tgz#be98fcd3758c2be60980dc31f17116a90262cf03"
   integrity sha512-dSZLyPNzBY+lrcIPF1dC9dcYcU3MPFigtjQDxLZP48uWq5oaMSnPLGtDsiDjlqVHk6MAmMuw7qy1i4+tt9HhpA==
 
-"@marp-team/marpit@^2.1.2":
-  version "2.1.2"
-  resolved "https://registry.yarnpkg.com/@marp-team/marpit/-/marpit-2.1.2.tgz#e333b5099e8308ced1d8c52d22ebd2c902d51dd4"
-  integrity sha512-euGUlXoIOZg1I49HibmenGHoTuxqDgpFKIEy46khmBOYvmYk+Rzmygp4KThv2HVYtsn9JRD+xlM30TRaIADgHA==
+"@marp-team/marpit@^2.1.2", "@marp-team/marpit@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@marp-team/marpit/-/marpit-2.2.0.tgz#4b6a90ee81df12ea5d510c32b542fa956414edaf"
+  integrity sha512-t79NGq8+CDKsE8HAvcFkxbxiheNtxHdLmMx6btCck4Tk4GMBaoZQLYuBmV0m6HyNQz4YjyejwS4dRnfBIoRsTA==
   dependencies:
     color-string "^1.6.0"
     cssesc "^3.0.0"
@@ -4783,10 +4783,10 @@ jszip@^3.7.1:
     readable-stream "~2.3.6"
     set-immediate-shim "~1.0.1"
 
-katex@^0.13.20:
-  version "0.13.24"
-  resolved "https://registry.yarnpkg.com/katex/-/katex-0.13.24.tgz#fe55455eb455698cb24b911a353d16a3c855d905"
-  integrity sha512-jZxYuKCma3VS5UuxOx/rFV1QyGSl3Uy/i0kTJF3HgQ5xMinCQVF8Zd4bMY/9aI9b9A2pjIBOsjSSm68ykTAr8w==
+katex@^0.15.1:
+  version "0.15.1"
+  resolved "https://registry.yarnpkg.com/katex/-/katex-0.15.1.tgz#cf4ce2fa1257c3279cc7a7fe0c8d1fab40800893"
+  integrity sha512-KIk+gizli0gl1XaJlCYS8/donGMbzXYTka6BbH3AgvDJTOwyDY4hJ+YmzJ1F0y/3XzX5B9ED8AqB2Hmn2AZ0uA==
   dependencies:
     commander "^8.0.0"
 
@@ -5879,16 +5879,15 @@ postcss-minify-gradients@^5.0.3:
     cssnano-utils "^2.0.1"
     postcss-value-parser "^4.1.0"
 
-postcss-minify-params@^5.0.1:
-  version "5.0.1"
-  resolved "https://registry.yarnpkg.com/postcss-minify-params/-/postcss-minify-params-5.0.1.tgz#371153ba164b9d8562842fdcd929c98abd9e5b6c"
-  integrity sha512-4RUC4k2A/Q9mGco1Z8ODc7h+A0z7L7X2ypO1B6V8057eVK6mZ6xwz6QN64nHuHLbqbclkX1wyzRnIrdZehTEHw==
+postcss-minify-params@^5.0.1, postcss-minify-params@^5.0.2:
+  version "5.0.2"
+  resolved "https://registry.yarnpkg.com/postcss-minify-params/-/postcss-minify-params-5.0.2.tgz#1b644da903473fbbb18fbe07b8e239883684b85c"
+  integrity sha512-qJAPuBzxO1yhLad7h2Dzk/F7n1vPyfHfCCh5grjGfjhi1ttCnq4ZXGIW77GSrEbh9Hus9Lc/e/+tB4vh3/GpDg==
   dependencies:
     alphanum-sort "^1.0.2"
-    browserslist "^4.16.0"
+    browserslist "^4.16.6"
     cssnano-utils "^2.0.1"
     postcss-value-parser "^4.1.0"
-    uniqs "^2.0.0"
 
 postcss-minify-selectors@^5.1.0:
   version "5.1.0"
