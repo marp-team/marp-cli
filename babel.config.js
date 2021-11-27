@@ -2,6 +2,14 @@
 module.exports = {
   presets: [['@babel/env', { targets: { node: 'current' } }]],
   plugins: [
-    ['transform-rename-import', { original: '^#(.+)$', replacement: '$1' }],
+    [
+      'transform-rename-import',
+      {
+        replacements: [
+          { original: '^node:(.+)$', replacement: '$1' },
+          { original: '^#(.+)$', replacement: '$1' }, // "#"" prefix is used by chalk
+        ],
+      },
+    ],
   ],
 }
