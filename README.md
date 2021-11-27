@@ -417,10 +417,20 @@ By using `--version` (`-v`) option, you may confirm the version of engine that i
 
 ```console
 $ marp --version
-@marp-team/marp-cli v0.x.x (w/ bundled @marp-team/marp-core v0.x.x)
+@marp-team/marp-cli v1.x.x (w/ @marp-team/marp-core v2.x.x)
 ```
 
-Marp CLI prefers to use _an installed core by user_ than the bundled. If the current project has installed `@marp-team/marp-core` individually, it would show its version and the annotation: `w/ user-installed @marp-team/marp-core vX.X.X` or `w/ customized engine`.
+### Use specific version of Marp Core
+
+Marp CLI prefers to use _an installed core to local project by user_ than the bundled.
+
+If the current project has installed `@marp-team/marp-core` individually, it would show its version and the annotation: `w/ user-installed @marp-team/marp-core vX.X.X` or `w/ customized engine`.
+
+```console
+$ npm i @marp-team/marp-cli @marp-team/marp-core@^3.0.0 --save-dev
+$ npx marp --version
+@marp-team/marp-cli v1.x.x (w/ user-installed @marp-team/marp-core v3.0.0)
+```
 
 ## Configuration file
 

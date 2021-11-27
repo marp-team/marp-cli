@@ -31,6 +31,7 @@ const plugins = (opts = {}) => [
   }),
   nodeResolve({
     browser: !!opts.browser,
+    exportConditions: opts.browser ? [] : ['node'],
     mainFields: ['module', 'jsnext:main', 'main'],
   }),
   replace({

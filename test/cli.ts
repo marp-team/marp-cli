@@ -15,7 +15,7 @@ describe('CLI helpers', () => {
     it('passes message with colored header to console.error', () => {
       error('cli-helper')
       expect(spy).toHaveBeenCalledWith(
-        chalk`{bgRed.white [ ERROR ]} cli-helper`
+        `${chalk.bgRed.white`[ ERROR ]`} cli-helper`
       )
     })
 
@@ -33,7 +33,7 @@ describe('CLI helpers', () => {
     it('passes message with colored header to console.warn', () => {
       info('cli-helper')
       expect(spy).toHaveBeenCalledWith(
-        chalk`{bgCyan.black [  INFO ]} cli-helper`
+        `${chalk.bgCyan.black`[  INFO ]`} cli-helper`
       )
     })
 
@@ -50,7 +50,7 @@ describe('CLI helpers', () => {
     it('passes message with colored header to console.warn', () => {
       warn('cli-helper')
       expect(spy).toHaveBeenCalledWith(
-        chalk`{bgYellow.black [  WARN ]} cli-helper`
+        `${chalk.bgYellow.black`[  WARN ]`} cli-helper`
       )
     })
 
