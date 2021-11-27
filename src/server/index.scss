@@ -28,19 +28,19 @@ ul#index {
     display: flex;
     height: $list-height;
     margin: $list-icon-vertical-gap 0 0 0;
-    opacity: 50%;
+    opacity: 0.5;
     padding: 0 0 0 calc(#{$list-icon-size} + #{$list-icon-horizontal-gap});
 
     &.convertible {
       background-image: url('../assets/icon-marp.svg');
-      opacity: 100%;
+      opacity: 1;
     }
 
     &.directory {
       background-image: url('../assets/icon-directory.svg');
 
       &:not(.node-modules) {
-        opacity: 100%;
+        opacity: 1;
       }
     }
 
@@ -129,7 +129,7 @@ input.toggle[type='checkbox'] {
     content: '';
     display: block;
     left: -2px;
-    opacity: 75%;
+    opacity: 0.75;
     position: absolute;
     right: -2px;
     top: -2px;

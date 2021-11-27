@@ -28,7 +28,7 @@ $progress-height: 5px;
 
     /* Fallback */
     pointer-events: none;
-    opacity: 0%;
+    opacity: 0;
 
     &.bespoke-marp-active {
       content-visibility: visible;
@@ -36,7 +36,7 @@ $progress-height: 5px;
 
       /* Fallback */
       pointer-events: auto;
-      opacity: 100%;
+      opacity: 1;
 
       &.bespoke-marp-active-ready {
         * {
@@ -82,7 +82,7 @@ $progress-height: 5px;
         font-size: 16px;
         left: 50%;
         line-height: 0;
-        opacity: 100%;
+        opacity: 1;
         padding: 12px;
         position: absolute;
         touch-action: manipulation;
@@ -104,7 +104,7 @@ $progress-height: 5px;
         }
 
         > span {
-          opacity: 80%;
+          opacity: 0.8;
 
           &[data-bespoke-marp-osc='page'] {
             display: inline-block;
@@ -138,7 +138,7 @@ $progress-height: 5px;
         cursor: none;
 
         > .bespoke-marp-osc {
-          opacity: 0%;
+          opacity: 0;
           pointer-events: none;
         }
       }

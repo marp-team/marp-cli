@@ -3,6 +3,7 @@ const { jsWithBabel } = require('ts-jest/presets')
 const esModules = [
   'ansi-regex',
   'array-union',
+  'chalk',
   'find-up',
   'globby',
   'is-docker',
