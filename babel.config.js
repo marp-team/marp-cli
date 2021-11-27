@@ -2,6 +2,6 @@
 module.exports = {
   presets: [['@babel/env', { targets: { node: 'current' } }]],
   plugins: [
-    ['transform-rename-import', { original: '^node:(.+)$', replacement: '$1' }],
+    ['transform-rename-import', { original: '^#(.+)$', replacement: '$1' }],
   ],
 }
