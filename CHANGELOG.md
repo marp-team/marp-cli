@@ -4,6 +4,9 @@
 
 ### Changed
 
+- Upgrade Marpit to [v2.2.0](https://github.com/marp-team/marpit/releases/tag/v2.2.0) ([#406](https://github.com/marp-team/marp-cli/pull/406))
+  - [`::backdrop` pseudo-element](https://marpit.marp.app/inline-svg?id=backdrop-css-selector) matches to the container SVG ([#358](https://github.com/marp-team/marp-cli/issues/358))
+- Upgrade Marp Core to [v2.3.0](https://github.com/marp-team/marp-core/releases/tag/v2.3.0) ([#406](https://github.com/marp-team/marp-cli/pull/406))
 - Upgrade dependent packages to the latest version ([#406](https://github.com/marp-team/marp-cli/pull/406))
 
 ## v1.4.2 - 2021-11-06
