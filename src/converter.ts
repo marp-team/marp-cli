@@ -266,7 +266,7 @@ export class Converter {
 
     ret.buffer = await this.usePuppeteer(html, async (page, uri) => {
       await page.goto(uri, { waitUntil: ['domcontentloaded', 'networkidle0'] })
-      return await page.pdf({ printBackground: true, preferCSSPageSize: true, timeout: 120 })
+      return await page.pdf({ printBackground: true, preferCSSPageSize: true, timeout: 180000 })
     })
 
     // Apply PDF metadata and annotations
