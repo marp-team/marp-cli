@@ -17,7 +17,7 @@ import { bare as bareTpl } from '../src/templates'
 import { ThemeSet } from '../src/theme'
 import { WatchNotifier } from '../src/watcher'
 
-const puppeteerTimeoutMs = 15000
+const puppeteerTimeoutMs = 30000
 
 jest.mock('fs')
 
