@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## v1.5.0-3 - 2021-11-27
+
+### Changed
+
+- Increased puppeteer timeout parameter
+
 ## v1.5.0-2 - 2021-11-27
 
 ### Changed
