@@ -244,6 +244,16 @@ export const marpCli = async (
           group: OptionGroup.Marp,
           type: 'string',
         },
+        'duration': {
+          describe: 'Duration of each slide (aPNG only) in ms',
+          group: OptionGroup.Converter,
+          type: 'number',
+        },
+        'slide': {
+          describe: 'Slide number to be converted (aPNG only)',
+          group: OptionGroup.Converter,
+          type: 'number',
+        },
       })
 
     const argvRet = await program.argv

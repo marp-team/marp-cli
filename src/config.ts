@@ -48,6 +48,8 @@ interface IMarpCLIArguments {
   title?: string
   url?: string
   watch?: boolean
+  duration?: number
+  slide?: number
 }
 
 export type IMarpCLIConfig = Overwrite<
@@ -244,6 +246,8 @@ export class MarpCLIConfig {
       pages: !!(this.args.images || this.conf.images),
       pdfNotes: !!(this.args.pdfNotes || this.conf.pdfNotes),
       watch: (this.args.watch ?? this.conf.watch) || preview || server || false,
+      duration: this.args.duration ?? this.conf.duration,
+      slide: this.args.slide ?? this.conf.slide
     }
   }
 
