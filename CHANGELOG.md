@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## v1.5.0-1 - 2021-11-27
+
+### Changed
+
+- Merged animated slides with upstream from Marp team.
+
 ## v1.5.0 - 2021-11-27
 
 ### Changed
