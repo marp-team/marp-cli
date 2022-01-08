@@ -60,6 +60,7 @@ export interface ConverterOption {
   pages?: boolean | number[]
   pdfNotes?: boolean
   preview?: boolean
+  puppeteerTimeout?: number
   jpegQuality?: number
   server?: boolean
   template: string
@@ -103,6 +104,10 @@ export class Converter {
     if (!template) error(`Template "${this.options.template}" is not found.`)
 
     return template
+  }
+
+  get puppeteerTimeout(): number {
+    return this.options.puppeteerTimeout ?? 30000
   }
 
   async convert(
@@ -259,7 +264,11 @@ export class Converter {
 
     ret.buffer = await this.usePuppeteer(html, async (page, uri) => {
       await page.goto(uri, { waitUntil: ['domcontentloaded', 'networkidle0'] })
-      return await page.pdf({ printBackground: true, preferCSSPageSize: true })
+      return await page.pdf({
+        printBackground: true,
+        preferCSSPageSize: true,
+        timeout: this.puppeteerTimeout,
+      })
     })
 
     // Apply PDF metadata and annotations
@@ -496,6 +505,8 @@ export class Converter {
       })()
 
       const page = await browser.newPage()
+      page.setDefaultTimeout(this.puppeteerTimeout)
+
       const { missingFileSet, failedFileSet } =
         this.trackFailedLocalFileAccess(page)
 
