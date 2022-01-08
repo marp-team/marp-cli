@@ -31,11 +31,42 @@ beforeEach(() => jest.resetModules())
 afterEach(() => jest.restoreAllMocks())
 
 describe('#generatePuppeteerDataDirPath', () => {
-  it('returns data dir path for OS specific temporary directory', async () => {
+  let mkdirSpy: jest.SpyInstance
+
+  beforeEach(async () => {
+    const { promises } = await import('fs')
+
+    mkdirSpy = jest.spyOn(promises, 'mkdir')
+    mkdirSpy.mockImplementation(() => Promise.resolve(undefined))
+  })
+
+  it('returns the path of created data dir for OS specific temporary directory', async () => {
     const dataDir = await puppeteerUtils().generatePuppeteerDataDirPath(
       'tmp-name'
     )
-    expect(dataDir).toBe(path.resolve(os.tmpdir(), 'tmp-name'))
+    const expectedDir = path.resolve(os.tmpdir(), 'tmp-name')
+
+    expect(dataDir).toBe(expectedDir)
+    expect(mkdirSpy).toHaveBeenCalledWith(expectedDir, { recursive: true })
+  })
+
+  it('ignores EEXIST error thrown by mkdir', async () => {
+    // EEXIST error
+    mkdirSpy.mockRejectedValueOnce(
+      Object.assign(new Error('EEXIST'), { code: 'EEXIST' })
+    )
+
+    await expect(
+      puppeteerUtils().generatePuppeteerDataDirPath('tmp-name')
+    ).resolves.toStrictEqual(expect.any(String))
+
+    // Regular error
+    const err = new Error('Regular error')
+    mkdirSpy.mockRejectedValueOnce(err)
+
+    await expect(
+      puppeteerUtils().generatePuppeteerDataDirPath('tmp-name')
+    ).rejects.toBe(err)
   })
 
   describe('with wslPath option', () => {
