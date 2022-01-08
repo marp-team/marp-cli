@@ -50,6 +50,25 @@ describe('#generatePuppeteerDataDirPath', () => {
     expect(mkdirSpy).toHaveBeenCalledWith(expectedDir, { recursive: true })
   })
 
+  it('ignores EEXIST error thrown by mkdir', async () => {
+    // EEXIST error
+    mkdirSpy.mockRejectedValueOnce(
+      Object.assign(new Error('EEXIST'), { code: 'EEXIST' })
+    )
+
+    await expect(
+      puppeteerUtils().generatePuppeteerDataDirPath('tmp-name')
+    ).resolves.toStrictEqual(expect.any(String))
+
+    // Regular error
+    const err = new Error('Regular error')
+    mkdirSpy.mockRejectedValueOnce(err)
+
+    await expect(
+      puppeteerUtils().generatePuppeteerDataDirPath('tmp-name')
+    ).rejects.toBe(err)
+  })
+
   describe('with wslPath option', () => {
     it('returns regular path if the current environment is not WSL', async () => {
       expect(
