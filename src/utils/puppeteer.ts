@@ -48,13 +48,24 @@ export const generatePuppeteerDataDirPath = async (
   name: string,
   { wslHost }: { wslHost?: boolean } = {}
 ): Promise<string> => {
-  if (isWSL() && wslHost) {
-    // In WSL environment, Marp CLI will use Chrome on Windows. Thus, we have to
-    // specify Windows path when converting within WSL.
-    if (wslTmp === undefined) wslTmp = await resolveWindowsEnv('TMP')
-    if (wslTmp !== undefined) return path.win32.resolve(wslTmp, name)
+  const dataDir = await (async () => {
+    if (isWSL() && wslHost) {
+      // In WSL environment, Marp CLI will use Chrome on Windows. Thus, we have to
+      // specify Windows path when converting within WSL.
+      if (wslTmp === undefined) wslTmp = await resolveWindowsEnv('TMP')
+      if (wslTmp !== undefined) return path.win32.resolve(wslTmp, name)
+    }
+    return path.resolve(os.tmpdir(), name)
+  })()
+
+  // Ensure the data directory is created
+  try {
+    await fs.promises.mkdir(dataDir, { recursive: true })
+  } catch (e: unknown) {
+    if (isError(e) && e.code !== 'EEXIST') throw e
   }
-  return path.resolve(os.tmpdir(), name)
+
+  return dataDir
 }
 
 export const generatePuppeteerLaunchArgs = () => {
