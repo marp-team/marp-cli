@@ -491,7 +491,9 @@ export class Converter {
     })()
 
     try {
-      const browser = await Converter.runBrowser()
+      const browser = await Converter.runBrowser({
+        timeout: this.puppeteerTimeout,
+      })
 
       const uri = await (async () => {
         if (tmpFile) {
@@ -571,12 +573,13 @@ export class Converter {
 
   private static browser?: puppeteer.Browser
 
-  private static async runBrowser() {
+  private static async runBrowser({ timeout }: { timeout?: number }) {
     if (!Converter.browser) {
       const baseArgs = generatePuppeteerLaunchArgs()
 
       Converter.browser = await launchPuppeteer({
         ...baseArgs,
+        timeout,
         userDataDir: await generatePuppeteerDataDirPath('marp-cli-conversion', {
           wslHost: isChromeInWSLHost(baseArgs.executablePath),
         }),
