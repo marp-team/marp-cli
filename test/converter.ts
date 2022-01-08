@@ -84,6 +84,7 @@ describe('Converter', () => {
   describe('get #puppeteerTimeout', () => {
     it('returns specified timeout', () => {
       expect(instance({ puppeteerTimeout: 1000 }).puppeteerTimeout).toBe(1000)
+      expect(instance({ puppeteerTimeout: 0 }).puppeteerTimeout).toBe(0)
     })
 
     it('returns the default timeout 30000ms if not specified', () => {
