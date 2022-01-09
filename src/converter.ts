@@ -60,6 +60,7 @@ export interface ConverterOption {
   pages?: boolean | number[]
   pdfNotes?: boolean
   preview?: boolean
+  puppeteerTimeout?: number
   jpegQuality?: number
   server?: boolean
   template: string
@@ -103,6 +104,10 @@ export class Converter {
     if (!template) error(`Template "${this.options.template}" is not found.`)
 
     return template
+  }
+
+  get puppeteerTimeout(): number {
+    return this.options.puppeteerTimeout ?? 30000
   }
 
   async convert(
@@ -259,7 +264,11 @@ export class Converter {
 
     ret.buffer = await this.usePuppeteer(html, async (page, uri) => {
       await page.goto(uri, { waitUntil: ['domcontentloaded', 'networkidle0'] })
-      return await page.pdf({ printBackground: true, preferCSSPageSize: true })
+      return await page.pdf({
+        printBackground: true,
+        preferCSSPageSize: true,
+        timeout: this.puppeteerTimeout,
+      })
     })
 
     // Apply PDF metadata and annotations
@@ -482,7 +491,9 @@ export class Converter {
     })()
 
     try {
-      const browser = await Converter.runBrowser()
+      const browser = await Converter.runBrowser({
+        timeout: this.puppeteerTimeout,
+      })
 
       const uri = await (async () => {
         if (tmpFile) {
@@ -496,6 +507,8 @@ export class Converter {
       })()
 
       const page = await browser.newPage()
+      page.setDefaultTimeout(this.puppeteerTimeout)
+
       const { missingFileSet, failedFileSet } =
         this.trackFailedLocalFileAccess(page)
 
@@ -560,12 +573,13 @@ export class Converter {
 
   private static browser?: puppeteer.Browser
 
-  private static async runBrowser() {
+  private static async runBrowser({ timeout }: { timeout?: number }) {
     if (!Converter.browser) {
       const baseArgs = generatePuppeteerLaunchArgs()
 
       Converter.browser = await launchPuppeteer({
         ...baseArgs,
+        timeout,
         userDataDir: await generatePuppeteerDataDirPath('marp-cli-conversion', {
           wslHost: isChromeInWSLHost(baseArgs.executablePath),
         }),

@@ -920,6 +920,30 @@ describe('Marp CLI', () => {
         )
       })
     })
+
+    describe('with PUPPETEER_TIMEOUT env', () => {
+      beforeEach(() => {
+        process.env.PUPPETEER_TIMEOUT = '12345'
+      })
+
+      afterEach(() => {
+        delete process.env.PUPPETEER_TIMEOUT
+      })
+
+      it('follows specified timeout in conversion that is using Puppeteer', async () => {
+        expect(
+          (await conversion(onePath, '--pdf')).options.puppeteerTimeout
+        ).toBe(12345)
+      })
+
+      it('does not follows specified timeout if the env value is not valid number', async () => {
+        process.env.PUPPETEER_TIMEOUT = 'invalid'
+
+        expect(
+          (await conversion(onePath, '--pdf')).options.puppeteerTimeout
+        ).toBeUndefined()
+      })
+    })
   })
 
   describe('with passing directory', () => {

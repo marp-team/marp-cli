@@ -214,11 +214,20 @@ export class MarpCLIConfig {
       return scale
     })()
 
+    const puppeteerTimeout = (() => {
+      if (process.env['PUPPETEER_TIMEOUT']) {
+        const envTimeout = Number.parseInt(process.env['PUPPETEER_TIMEOUT'], 10)
+        if (!Number.isNaN(envTimeout)) return envTimeout
+      }
+      return undefined
+    })()
+
     return {
       imageScale,
       inputDir,
       output,
       preview,
+      puppeteerTimeout,
       server,
       template,
       templateOption,

@@ -8,6 +8,7 @@ import { Options } from '@marp-team/marpit'
 import cheerio from 'cheerio'
 import { imageSize } from 'image-size'
 import { PDFDocument, PDFDict, PDFName, PDFHexString } from 'pdf-lib'
+import { TimeoutError } from 'puppeteer-core'
 import { Page } from 'puppeteer-core/lib/cjs/puppeteer/common/Page'
 import yauzl from 'yauzl'
 import { Converter, ConvertType, ConverterOption } from '../src/converter'
@@ -77,6 +78,17 @@ describe('Converter', () => {
     it('throws CLIError when specified template is not defined', () => {
       const throwErr = () => instance({ template: 'not_defined' }).template
       expect(throwErr).toThrow(CLIError)
+    })
+  })
+
+  describe('get #puppeteerTimeout', () => {
+    it('returns specified timeout', () => {
+      expect(instance({ puppeteerTimeout: 1000 }).puppeteerTimeout).toBe(1000)
+      expect(instance({ puppeteerTimeout: 0 }).puppeteerTimeout).toBe(0)
+    })
+
+    it('returns the default timeout 30000ms if not specified', () => {
+      expect(instance().puppeteerTimeout).toBe(30000)
     })
   })
 
@@ -516,6 +528,19 @@ describe('Converter', () => {
           expect(annotation.get(PDFName.of('T'))).toStrictEqual(
             PDFHexString.fromText('author')
           )
+        })
+      })
+
+      describe('with custom puppeteer timeout', () => {
+        it('follows setting timeout', async () => {
+          ;(fs as any).__mockWriteFile()
+
+          await expect(
+            pdfInstance({
+              output: 'test.pdf',
+              puppeteerTimeout: 1,
+            }).convertFile(new File(onePath))
+          ).rejects.toThrow(TimeoutError)
         })
       })
     })
