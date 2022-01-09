@@ -35,12 +35,19 @@ export const isWSL = (): number => {
     if (require('is-wsl')) {
       isWsl = 1
 
-      try {
-        // https://github.com/microsoft/WSL/issues/423#issuecomment-611086412
-        const release = readFileSync('/proc/sys/kernel/osrelease').toString()
-        if (release.includes('WSL2')) isWsl = 2
-      } catch (e: unknown) {
-        // no ops
+      // Detect whether WSL version is 2
+      // https://github.com/microsoft/WSL/issues/4555#issuecomment-700213318
+      if (process.env.WSL_DISTRO_NAME && process.env.WSL_INTEROP) {
+        isWsl = 2
+      } else {
+        try {
+          const versionString = readFileSync('/proc/version', 'utf8')
+          const gccMatched = versionString.match(/gcc version (\d+)\.\d+\.\d+/i)
+
+          if (gccMatched && Number.parseInt(gccMatched[1], 10) >= 8) isWsl = 2
+        } catch (e: unknown) {
+          // no ops
+        }
       }
     } else {
       isWsl = 0
