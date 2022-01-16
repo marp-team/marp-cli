@@ -6,6 +6,10 @@
 
 - Allow to set timeout for Puppeteer actions by `PUPPETEER_TIMEOUT` env ([#409](https://github.com/marp-team/marp-cli/pull/409))
 
+### Fixed
+
+- Improved WSL 2 detection and browser resolution ([#410](https://github.com/marp-team/marp-cli/pull/410))
+
 ### Changed
 
 - Upgrade Marpit to [v2.2.1](https://github.com/marp-team/marpit/releases/tag/v2.2.1) ([#408](https://github.com/marp-team/marp-cli/pull/408))
