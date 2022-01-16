@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v1.5.1 - 2022-01-16
+
 ### Added
 
 - Allow to set timeout for Puppeteer actions by `PUPPETEER_TIMEOUT` env ([#409](https://github.com/marp-team/marp-cli/pull/409))
