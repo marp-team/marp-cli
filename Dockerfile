@@ -17,6 +17,7 @@ RUN apk update && apk upgrade && \
       font-noto-arabic@edge \
       font-noto-bengali@edge \
       nss@edge \
+      wayland-dev@edge \
       su-exec
 
 RUN addgroup -S marp && adduser -S -g marp marp \
