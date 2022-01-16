@@ -9,7 +9,7 @@ import { isWSL } from './wsl'
 // A lightweight version of Launcher.getFirstInstallation()
 // https://github.com/GoogleChrome/chrome-launcher/blob/30755cde8627b7aad6caff1594c9752f80a39a4d/src/chrome-launcher.ts#L189-L192
 export const findChromeInstallation = () => {
-  // 'wsm' platform will resolve Chrome from Windows. In WSL 2, Puppeteer cannot
+  // 'wsl' platform will resolve Chrome from Windows. In WSL 2, Puppeteer cannot
   // communicate with Chrome spawned in the host OS so should follow the
   // original platform ('linux') if CLI was executed in WSL 2.
   const platform = isWSL() === 1 ? 'wsl' : process.platform
