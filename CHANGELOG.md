@@ -16,6 +16,7 @@
 - Upgrade Marpit to [v2.2.1](https://github.com/marp-team/marpit/releases/tag/v2.2.1) ([#408](https://github.com/marp-team/marp-cli/pull/408))
 - Upgrade Marp Core to [v2.3.1](https://github.com/marp-team/marp-core/releases/tag/v2.3.1) ([#408](https://github.com/marp-team/marp-cli/pull/408))
 - Upgrade dependent packages to the latest version ([#408](https://github.com/marp-team/marp-cli/pull/408))
+- Set `png` as the default type for CLI image options ([#416](https://github.com/marp-team/marp-cli/pull/416))
 
 ## v1.5.0 - 2021-11-27
 
