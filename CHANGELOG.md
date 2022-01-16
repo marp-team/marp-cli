@@ -9,6 +9,7 @@
 ### Fixed
 
 - Improved WSL 2 detection and browser resolution ([#410](https://github.com/marp-team/marp-cli/pull/410))
+- Update Dockerfile to install required dependency `wayland-dev@edge` ([#411](https://github.com/marp-team/marp-cli/issues/411), [#415](https://github.com/marp-team/marp-cli/pull/415))
 
 ### Changed
 
