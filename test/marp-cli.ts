@@ -608,6 +608,11 @@ describe('Marp CLI', () => {
         expect((await conversion(...cmd)).options.type).toBe(ConvertType.png)
       })
 
+      it('converts file with PNG type if the type was not specified', async () => {
+        const cmd = [onePath, '--image']
+        expect((await conversion(...cmd)).options.type).toBe(ConvertType.png)
+      })
+
       it('converts file with JPEG type by specified jpeg', async () => {
         const cmd = [onePath, '--image=jpeg']
         expect((await conversion(...cmd)).options.type).toBe(ConvertType.jpeg)
@@ -629,6 +634,12 @@ describe('Marp CLI', () => {
     describe('with --images option', () => {
       it('converts file with PNG type and enabled pages option by specified png', async () => {
         const converter = await conversion(onePath, '--images', 'png')
+        expect(converter.options.type).toBe(ConvertType.png)
+        expect(converter.options.pages).toBe(true)
+      })
+
+      it('converts file with PNG type if the type was not specified', async () => {
+        const converter = await conversion(onePath, '--images')
         expect(converter.options.type).toBe(ConvertType.png)
         expect(converter.options.pages).toBe(true)
       })
