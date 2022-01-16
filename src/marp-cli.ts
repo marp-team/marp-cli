@@ -133,7 +133,11 @@ export const marpCli = async (
           describe: 'Convert the first slide page into an image file',
           group: OptionGroup.Converter,
           choices: ['png', 'jpeg'],
-          coerce: (type: string) => (type === 'jpg' ? 'jpeg' : type),
+          coerce: (type: string) => {
+            if (type === '') return 'png'
+            if (type === 'jpg') return 'jpeg'
+            return type
+          },
           type: 'string',
         },
         images: {
@@ -141,7 +145,11 @@ export const marpCli = async (
           describe: 'Convert slide deck into multiple image files',
           group: OptionGroup.Converter,
           choices: ['png', 'jpeg'],
-          coerce: (type: string) => (type === 'jpg' ? 'jpeg' : type),
+          coerce: (type: string) => {
+            if (type === '') return 'png'
+            if (type === 'jpg') return 'jpeg'
+            return type
+          },
           type: 'string',
         },
         'image-scale': {
@@ -266,7 +274,7 @@ export const marpCli = async (
     const cvtOpts = converter.options
 
     // Find target markdown files
-    const finder = async () => {
+    const finder = async (): Promise<File[]> => {
       if (cvtOpts.inputDir) {
         if (config.files.length > 0) {
           cli.error('Cannot pass files together with input directory.')
@@ -283,8 +291,8 @@ export const marpCli = async (
       const stdin = args.stdin ? await File.stdin() : undefined
 
       // Regular file finding powered by globby
-      return <File[]>(
-        [stdin, ...(await File.find(...config.files))].filter((f) => f)
+      return [stdin, ...(await File.find(...config.files))].filter(
+        (f): f is File => !!f
       )
     }
 
