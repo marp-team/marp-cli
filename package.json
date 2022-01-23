@@ -153,7 +153,11 @@
   },
   "resolutions": {
     "pug": "^3.0.2",
-    "pug-runtime": "^3.0.1"
+    "pug-runtime": "^3.0.1",
+    "puppeteer-core/node-fetch": "^2.6.7"
+  },
+  "overrides": {
+    "node-fetch@2": "2.6.7"
   },
   "publishConfig": {
     "access": "public"
