@@ -15,12 +15,12 @@ import {
 import { isChromeInWSLHost } from './utils/wsl'
 
 export namespace Preview {
-  export interface Events {
-    close(window: any): void
-    exit(): void
-    launch(): void
-    open(window: any, location: string): void
-    opening(location: string): void
+  export type Events = {
+    close: (window: any) => void
+    exit: () => void
+    launch: () => void
+    open: (window: any, location: string) => void
+    opening: (location: string) => void
   }
 
   export interface Options {

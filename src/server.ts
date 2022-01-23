@@ -241,7 +241,7 @@ export class Server extends (EventEmitter as new () => TypedEmitter<Server.Event
 }
 
 export namespace Server {
-  export interface Events {
+  export type Events = {
     converted: ConvertedCallback
     error: (err: Error) => void
   }
