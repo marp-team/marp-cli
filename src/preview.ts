@@ -151,6 +151,7 @@ export class Preview extends (EventEmitter as new () => TypedEmitter<Preview.Eve
       ],
       defaultViewport: null as any,
       headless: process.env.NODE_ENV === 'test',
+      ignoreDefaultArgs: ['--enable-automation'],
       userDataDir: await generatePuppeteerDataDirPath('marp-cli-preview', {
         wslHost: isChromeInWSLHost(baseArgs.executablePath),
       }),
