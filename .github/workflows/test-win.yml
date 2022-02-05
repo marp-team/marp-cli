@@ -8,7 +8,7 @@ env:
   YARN_VERSION: '^1.22.17'
 
 concurrency:
-  group: ${{ github.workflow }}-${{ (github.ref == 'refs/heads/main' && github.run_id) || github.event.pull_request.number || github.ref }}
+  group: win-test-${{ (github.ref == 'refs/heads/main' && github.run_id) || github.head_ref || github.ref }}
   cancel-in-progress: true
 
 jobs:
