@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Disable automation flag in preview window ([#421](https://github.com/marp-team/marp-cli/pull/421))
+
 ### Changed
 
 - Upgrade dependent packages to the latest version ([#422](https://github.com/marp-team/marp-cli/pull/422))
