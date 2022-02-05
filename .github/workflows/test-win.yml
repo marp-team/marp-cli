@@ -64,3 +64,4 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: windows
+          version: v0.1.15
