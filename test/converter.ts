@@ -341,19 +341,17 @@ describe('Converter', () => {
           template: 'bespoke',
           templateOption: { transition: true },
         }).convert(
-          '<!-- transition: reveal -->\n\n---\n\n<!-- transition: {"invalid-format":"will-be-ignored"} -->\n\n---\n\n<!-- transition: false -->'
+          '<!-- transition: reveal -->\n\n---\n\n<!-- transition: false -->'
         )
 
         const $ = cheerio.load(toggleResult)
         const sections = $('section')
 
-        expect(sections).toHaveLength(3)
+        expect(sections).toHaveLength(2)
         expect($(sections[0]).attr('data-transition')).toBe('reveal-left')
         expect($(sections[0]).attr('data-transition-back')).toBe('reveal-right')
-        expect($(sections[1]).attr('data-transition')).toBe('reveal-left')
-        expect($(sections[1]).attr('data-transition-back')).toBe('reveal-right')
-        expect($(sections[2]).attr('data-transition')).toBeUndefined()
-        expect($(sections[2]).attr('data-transition-back')).toBeUndefined()
+        expect($(sections[1]).attr('data-transition')).toBeUndefined()
+        expect($(sections[1]).attr('data-transition-back')).toBeUndefined()
       })
     })
   })
