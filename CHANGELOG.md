@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v1.6.0 - 2022-02-12
+
 ### Added
 
 - Experimental `transition` directive for bespoke template is now configurable by YAML object ([#382](https://github.com/marp-team/marp-cli/issues/382), [#425](https://github.com/marp-team/marp-cli/pull/425))
