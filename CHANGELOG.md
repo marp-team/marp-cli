@@ -12,7 +12,7 @@
 
 ### Changed
 
-- Upgrade dependent packages to the latest version ([#422](https://github.com/marp-team/marp-cli/pull/422))
+- Upgrade dependent packages to the latest version ([#422](https://github.com/marp-team/marp-cli/pull/422), [#426](https://github.com/marp-team/marp-cli/pull/426))
 
 ## v1.5.2 - 2022-01-23
 

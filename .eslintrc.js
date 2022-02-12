@@ -8,7 +8,7 @@ module.exports = {
   extends: ['eslint:recommended', 'plugin:import/recommended', 'prettier'],
   parserOptions: { ecmaFeatures: { jsx: true } },
   rules: {
-    'import/no-unresolved': ['error', { ignore: ['chalk'] }],
+    'import/no-unresolved': ['error', { ignore: ['chalk', 'ts-key-enum'] }],
     'import/order': ['error', { alphabetize: { order: 'asc' } }],
   },
   settings: {
