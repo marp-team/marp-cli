@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Experimental `transition` directive for bespoke template is now configurable by YAML object ([#382](https://github.com/marp-team/marp-cli/issues/382), [#425](https://github.com/marp-team/marp-cli/pull/425))
+
 ### Fixed
 
 - Disable automation flag in preview window ([#421](https://github.com/marp-team/marp-cli/pull/421))

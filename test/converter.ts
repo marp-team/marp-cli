@@ -336,24 +336,148 @@ describe('Converter', () => {
         expect(enabledResult).toContain('data-transition="cover-left"')
         expect(enabledResult).toContain('data-transition-back="cover-right"')
 
+        // Invalid value
+        const { result: invalidResult } = await instance({
+          template: 'bespoke',
+          templateOption: { transition: true },
+        }).convert('<!-- transition: inavlid -->')
+
+        expect(invalidResult).not.toContain('data-transition')
+
         // Turn on and off
         const { result: toggleResult } = await instance({
           template: 'bespoke',
           templateOption: { transition: true },
         }).convert(
-          '<!-- transition: reveal -->\n\n---\n\n<!-- transition: {"invalid-format":"will-be-ignored"} -->\n\n---\n\n<!-- transition: false -->'
+          '<!-- transition: reveal -->\n\n---\n\n<!-- transition: false -->'
         )
 
         const $ = cheerio.load(toggleResult)
         const sections = $('section')
 
-        expect(sections).toHaveLength(3)
+        expect(sections).toHaveLength(2)
         expect($(sections[0]).attr('data-transition')).toBe('reveal-left')
         expect($(sections[0]).attr('data-transition-back')).toBe('reveal-right')
-        expect($(sections[1]).attr('data-transition')).toBe('reveal-left')
-        expect($(sections[1]).attr('data-transition-back')).toBe('reveal-right')
-        expect($(sections[2]).attr('data-transition')).toBeUndefined()
-        expect($(sections[2]).attr('data-transition-back')).toBeUndefined()
+        expect($(sections[1]).attr('data-transition')).toBeUndefined()
+        expect($(sections[1]).attr('data-transition-back')).toBeUndefined()
+      })
+    })
+
+    describe('with option object', () => {
+      it('defines configured values', async () => {
+        const converter = instance({
+          template: 'bespoke',
+          templateOption: { transition: true },
+        })
+
+        const { result } = await converter.convert(
+          `
+<!--
+transition:
+  type: reveal
+  duration: 500
+  delay: 1234
+-->
+`.trim()
+        )
+
+        expect(result).toContain('data-transition="reveal-left"')
+        expect(result).toContain('data-transition-duration="500"')
+        expect(result).toContain('data-transition-delay="1234"')
+        expect(result).toContain('data-transition-back-duration="500"')
+        expect(result).toContain('data-transition-back-delay="1234"')
+
+        // "type" is required
+        const { result: noTypeResult } = await converter.convert(
+          `
+<!--
+transition:
+  duration: 123
+  delay: 456
+-->
+`.trim()
+        )
+
+        expect(noTypeResult).not.toContain('data-transition-duration="123"')
+        expect(noTypeResult).not.toContain('data-transition-delay="456"')
+
+        // Invalid numbers
+        const { result: invalidResult } = await converter.convert(
+          `
+<!--
+transition:
+  type: fade
+  duration: invalid
+  delay: true
+-->
+`.trim()
+        )
+
+        expect(invalidResult).toContain('data-transition="fade"')
+        expect(invalidResult).not.toContain('data-transition-duration')
+        expect(invalidResult).not.toContain('data-transition-delay')
+      })
+
+      it('allows ms and s unit for duration and delay', async () => {
+        const converter = instance({
+          template: 'bespoke',
+          templateOption: { transition: true },
+        })
+
+        const { result } = await converter.convert(
+          `
+<!--
+transition:
+  type: reveal
+  duration: 1.5s
+  delay: 500ms
+-->
+`.trim()
+        )
+
+        expect(result).toContain('data-transition-duration="1500"')
+        expect(result).toContain('data-transition-delay="500"')
+
+        // Omitted leading zero in seconds unit
+        const { result: noLeadingZeroResult } = await converter.convert(
+          `
+<!--
+transition:
+  type: reveal
+  duration: .123s
+  delay: .4567s
+-->
+`.trim()
+        )
+
+        expect(noLeadingZeroResult).toContain('data-transition-duration="123"')
+        expect(noLeadingZeroResult).toContain('data-transition-delay="456"')
+      })
+
+      it('outputs warning if duration and delay were out of range in API (0 to 5000)', async () => {
+        const warn = jest.spyOn(console, 'warn').mockImplementation()
+
+        const { result } = await instance({
+          template: 'bespoke',
+          templateOption: { transition: true },
+        }).convert(
+          `
+<!--
+transition:
+  type: fade
+  duration: -123
+  delay: 5.001s
+-->
+`.trim()
+        )
+
+        expect(warn).toHaveBeenCalledWith(
+          expect.stringContaining('must be between 0 to 5000ms')
+        )
+
+        // Set clamped values
+        expect(result).toContain('data-transition-duration="0"')
+        expect(result).toContain('data-transition-delay="5000"')
       })
     })
   })

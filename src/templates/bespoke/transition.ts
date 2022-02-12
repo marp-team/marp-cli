@@ -20,7 +20,9 @@ const bespokeTransition = (deck) => {
     (fn: (e: any) => void, { back, cond }: TransitionCallbackOption) =>
     (e: any) => {
       const current = deck.slides[deck.slide()]
-      const section = current.querySelector('section[data-transition]')
+      const section: HTMLElement = current.querySelector(
+        'section[data-transition]'
+      )
 
       if (!section) return true
 
@@ -44,12 +46,24 @@ const bespokeTransition = (deck) => {
       } else {
         if (!cond(e)) return true
 
+        const target = `transition${e.back || back ? 'Back' : ''}` as const
+        const duration = Number.parseInt(
+          section.dataset[`${target}Duration`] ?? '',
+          10
+        )
+        const delay = Number.parseInt(
+          section.dataset[`${target}Delay`] ?? '',
+          10
+        )
+
+        const rootConfig: Record<string, string> = {}
+        if (!Number.isNaN(duration)) rootConfig.duration = duration.toString()
+        if (!Number.isNaN(delay)) rootConfig.delay = delay.toString()
+
         deck[transitionPreparing] = documentTransition
           .prepare({
-            rootTransition:
-              e.back || back
-                ? section.dataset.transitionBack
-                : section.dataset.transition,
+            rootTransition: section.dataset[target],
+            rootConfig,
             sharedElements,
           })
           .then(() => fn(e))
