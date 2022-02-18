@@ -491,6 +491,7 @@ If you want to prevent looking up a configuration file, you can pass `--no-confi
 | `jpegQuality`     |           number            |    `--jpeg-quality`    | Setting JPEG image quality (`85` by default)                                                                |
 | `keywords`        |     string \| string[]      |      `--keywords`      | Define keywords for the slide deck (Accepts comma-separated string and array of string)                     |
 | `lang`            |           string            |                        | Define the language of converted HTML                                                                       |
+| `notes`           |           boolean           |       `--notes`        | Convert slide deck into just the text notes                                                                 |
 | `ogImage`         |           string            |      `--og-image`      | Define [Open Graph] image URL                                                                               |
 | `options`         |           object            |                        | The base options for the constructor of engine                                                              |
 | `output`          |           string            |    `--output` `-o`     | Output file path (or directory when input-dir is passed)                                                    |

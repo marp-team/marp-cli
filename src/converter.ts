@@ -1,10 +1,15 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { URL } from 'url'
 import type { MarpOptions } from '@marp-team/marp-core'
-import { Marpit, Options as MarpitOptions } from '@marp-team/marpit'
+import Marp from '@marp-team/marp-core'
+import {
+  Marpit,
+  Options as MarpitOptions,
+  Element as MarpitElement,
+} from '@marp-team/marpit'
 import chalk from 'chalk'
 import puppeteer from 'puppeteer-core'
-import { silence, warn } from './cli'
+import { silence, warn, info } from './cli'
 import { Engine, ResolvedEngine } from './engine'
 import infoPlugin, { engineInfo, EngineInfo } from './engine/info-plugin'
 import metaPlugin from './engine/meta-plugin'
@@ -35,6 +40,7 @@ export enum ConvertType {
   png = 'png',
   pptx = 'pptx',
   jpeg = 'jpg',
+  notes = 'notes',
 }
 
 export const mimeTypes = {
@@ -191,7 +197,6 @@ export class Converter {
 
     if (!opts.onlyScanning) {
       const files: File[] = []
-
       switch (this.options.type) {
         case ConvertType.pdf:
           template = await useTemplate(true)
@@ -216,6 +221,10 @@ export class Converter {
               scale: this.options.imageScale ?? 2,
             })
           )
+          break
+        case ConvertType.notes:
+          template = await useTemplate(false)
+          files.push(await this.convertFileToNotes(template, file))
           break
         default:
           template = await useTemplate()
@@ -250,6 +259,20 @@ export class Converter {
     const ret = file.convert(this.options.output, { extension: 'html' })
     ret.buffer = Buffer.from(tpl.result)
 
+    return ret
+  }
+
+  private convertFileToNotes(tpl: TemplateResult, file: File): File {
+    const ret = file.convert(this.options.output, { extension: 'txt' })
+    const comments = new Marp().render(file.buffer?.toString() || '').comments
+    if (comments.flat().length === 0) {
+      warn(`${file.relativePath()} contains no notes.`)
+      ret.buffer = Buffer.from('no notes found')
+    } else {
+      ret.buffer = Buffer.from(
+        comments.map((c) => c.join('\n\n')).join('\n\n---\n\n')
+      )
+    }
     return ret
   }
 
