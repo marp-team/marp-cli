@@ -58,6 +58,14 @@
     @include button-icon-internal('../../assets/osc-next.svg');
   }
 
+  %button-bigger {
+    @include button-icon-internal('../../assets/osc-bigger.svg');
+  }
+
+  %button-smaller {
+    @include button-icon-internal('../../assets/osc-smaller.svg');
+  }
+
   %button-fullscreen {
     @include button-icon-internal('../../assets/osc-fullscreen.svg');
 

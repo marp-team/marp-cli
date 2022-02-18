@@ -12,11 +12,14 @@ export const classes = {
   next: `${presenterPrefix}next`,
   nextContainer: `${presenterPrefix}next-container`,
   noteContainer: `${presenterPrefix}note-container`,
+  noteButtonsContainer: `${presenterPrefix}note-buttons-container`,
   infoContainer: `${presenterPrefix}info-container`,
   infoPage: `${presenterPrefix}info-page`,
   infoPageText: `${presenterPrefix}info-page-text`,
   infoPagePrev: `${presenterPrefix}info-page-prev`,
   infoPageNext: `${presenterPrefix}info-page-next`,
+  noteButtonsBigger: `${presenterPrefix}note-bigger`,
+  noteButtonsSmaller: `${presenterPrefix}note-smaller`,
   infoTime: `${presenterPrefix}info-time`,
   infoTimer: `${presenterPrefix}info-timer`,
 } as const
@@ -45,7 +48,24 @@ const presenterView = (deck) => {
         <div class={classes.nextContainer}>
           <iframe class={classes.next} src="?view=next" />
         </div>
-        <div class={classes.noteContainer}></div>
+        <div class={classes.noteContainer}>
+          <div class={classes.noteButtonsContainer}>
+            <button
+              class={classes.noteButtonsBigger}
+              tabindex="-1"
+              title="Bigger"
+            >
+              Bigger
+            </button>
+            <button
+              class={classes.noteButtonsSmaller}
+              tabindex="-1"
+              title="Smaller"
+            >
+              Smaller
+            </button>
+          </div>
+        </div>
         <div class={classes.infoContainer}>
           <div class={classes.infoPage}>
             <button class={classes.infoPagePrev} tabindex="-1" title="Previous">
@@ -73,9 +93,26 @@ const presenterView = (deck) => {
     return $cache[klass]
   }
 
+  const resizeNotes = (direction: string) => {
+    const current = parseFloat($(classes.noteContainer).style.fontSize) || 1
+    const intended = current + (direction === 'bigger' ? 0.1 : -0.1)
+    $(classes.noteContainer).style.fontSize = `${intended}em`
+  }
+
   const subscribe = (deck) => {
     // Next slide view
     $(classes.nextContainer).addEventListener('click', () => deck.next())
+    $(classes.noteButtonsBigger).addEventListener('click', () =>
+      resizeNotes('bigger')
+    )
+    $(classes.noteButtonsSmaller).addEventListener('click', () =>
+      resizeNotes('smaller')
+    )
+
+    document.addEventListener('keyup', (e: KeyboardEvent) => {
+      if (e.key === '+' || e.key === '=') resizeNotes('bigger')
+      if (e.key === '-' || e.key === '_') resizeNotes('smaller')
+    })
 
     const nextIframe = $(classes.next) as HTMLIFrameElement
     const nextNav = createNavigateFunc(nextIframe)
