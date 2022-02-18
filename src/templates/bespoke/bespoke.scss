@@ -254,6 +254,7 @@ $progress-height: 5px;
         color: $text-color;
         position: relative;
         grid-area: note;
+        resize: horizontal;
 
         button {
           @extend %button;
