@@ -255,6 +255,7 @@ $progress-height: 5px;
         position: relative;
         grid-area: note;
         resize: horizontal;
+        overlfow: hidden;
 
         button {
           @extend %button;
