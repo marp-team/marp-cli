@@ -195,10 +195,10 @@ $progress-height: 5px;
       // Grid layout for presenter view
       display: grid;
       grid-template:
-        'current next' minmax(140px, 1fr)
-        'current note' 2fr
-        'info    note' 3em /
-        2fr 1fr;
+        'current dragbar next' minmax(140px, 1fr)
+        'current dragbar note' 2fr
+        'info    dragbar note' 3em /
+        2fr 6px 1fr;
 
       .bespoke-marp-parent {
         grid-area: current;
@@ -218,6 +218,13 @@ $progress-height: 5px;
             filter: drop-shadow(0 3px 10px rgba(#000, 0.5));
           }
         }
+      }
+
+      // Dragbar
+      .bespoke-marp-presenter-dragbar-container {
+        grid-area: dragbar;
+        background: white;
+        cursor: ew-resize;
       }
 
       // Next slide view
@@ -254,8 +261,6 @@ $progress-height: 5px;
         color: $text-color;
         position: relative;
         grid-area: note;
-        resize: horizontal;
-        overflow: hidden;
 
         button {
           @extend %button;

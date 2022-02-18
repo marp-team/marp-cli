@@ -9,6 +9,7 @@ const Fragment: any = ({ children }) => h(null, null, ...children)
 export const presenterPrefix = `${classPrefix}presenter-` as const
 export const classes = {
   container: `${presenterPrefix}container`,
+  dragbar: `${presenterPrefix}dragbar-container`,
   next: `${presenterPrefix}next`,
   nextContainer: `${presenterPrefix}next-container`,
   noteContainer: `${presenterPrefix}note-container`,
@@ -53,6 +54,7 @@ const presenterView = (deck) => {
         <div class={classes.nextContainer}>
           <iframe class={classes.next} src="?view=next" />
         </div>
+        <div class={classes.dragbar}></div>
         <div class={classes.noteContainer}>
           <div class={classes.noteWrapper} />
           <div class={classes.noteButtons}>
@@ -103,6 +105,9 @@ const presenterView = (deck) => {
   const subscribe = (deck) => {
     // Next slide view
     $(classes.nextContainer).addEventListener('click', () => deck.next())
+    $(classes.dragbar).addEventListener('mousedown', startDragging)
+    $(classes.container).addEventListener('mouseup', endDragging)
+    $(classes.container).addEventListener('mousemove', onDragging)
     $(classes.infoTimer).addEventListener(
       'click',
       () => (startTime = new Date())
@@ -217,6 +222,33 @@ const presenterView = (deck) => {
 
     update()
     setInterval(update, 250)
+  }
+
+  let isDragging = false
+
+  const startDragging = () => (isDragging = true)
+  const endDragging = () => (isDragging = false)
+
+  const onDragging = (event: MouseEvent) => {
+    if (!isDragging) return
+
+    const leftColWidth = isDragging ? event.clientX : deck.parent.clientWidth
+
+    const dragbarWidth = parseInt(
+      getComputedStyle($(classes.dragbar)).width.replace('px', '')
+    )
+
+    const cols = [
+      leftColWidth,
+      dragbarWidth,
+      $(classes.container).clientWidth - 2 * dragbarWidth - leftColWidth,
+    ]
+
+    const newColDefn = cols.map((c) => c.toString() + 'px').join(' ')
+
+    $(classes.container).style.gridTemplateColumns = newColDefn
+
+    event.preventDefault()
   }
 
   document.body.appendChild(buildContainer(deck.parent))
