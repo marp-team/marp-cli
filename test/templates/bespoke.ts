@@ -909,7 +909,24 @@ describe("Bespoke template's browser context", () => {
           })
         })
       })
-
+      describe('Presenter timer', () => {
+        it('timer should start at 00:00:00', () =>
+          testPresenterView(() => {
+            expect($p(classes.infoTimer).textContent).toBe('00:00:00')
+          }))
+        it('timer should be at 00:00:01 after one second', () =>
+          testPresenterView(() => {
+            jest.advanceTimersByTime(12000)
+            expect($p(classes.infoTimer).textContent).toBe('00:00:12')
+          }))
+        it('timer should be at 00:00:00 after clicking', () =>
+          testPresenterView(() => {
+            jest.advanceTimersByTime(12000)
+            $p(classes.infoTimer).click()
+            jest.advanceTimersByTime(1200)
+            expect($p(classes.infoTimer).textContent).toBe('00:00:01')
+          }))
+      })
       describe('Presenter note', () => {
         it('marks element with bespoke-marp-note class and current slide index as active', () =>
           testPresenterView(({ deck }) => {
