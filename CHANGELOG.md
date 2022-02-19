@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Make notes font size changeable in bespoke template ([#428](https://github.com/marp-team/marp-cli/pull/428) by [@chrisns](https://github.com/chrisns), [#431](https://github.com/marp-team/marp-cli/pull/431))
+
 ## v1.6.0 - 2022-02-12
 
 ### Added
