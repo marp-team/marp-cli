@@ -143,6 +143,7 @@ const presenterView = (deck) => {
       const diff = new Date(time.getTime() - startTime.getTime())
       $(classes.infoTime).textContent = time.toLocaleTimeString()
       $(classes.infoTimer).textContent = diff.toLocaleTimeString('en-GB', {
+        hour12: false,
         timeZone: 'UTC',
       })
     }
