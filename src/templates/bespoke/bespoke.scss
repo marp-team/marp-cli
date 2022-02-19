@@ -252,30 +252,52 @@ $progress-height: 5px;
       .bespoke-marp-presenter-note-container {
         background: #222;
         color: $text-color;
+        position: relative;
         grid-area: note;
-
-        .bespoke-marp-presenter-note-buttons-container {
-          display: none;
-          position: absolute;
-          bottom: 0;
-          right: 0;
-        }
 
         button {
           @extend %button;
           @include button.button-size(1.5em);
 
           &.bespoke-marp-presenter-note-bigger {
-            @extend %button-bigger;
+            @extend %button-plus;
           }
 
           &.bespoke-marp-presenter-note-smaller {
-            @extend %button-smaller;
+            @extend %button-minus;
           }
         }
 
-        &:hover .bespoke-marp-presenter-note-buttons-container {
+        .bespoke-marp-presenter-note-wrapper {
+          bottom: 0;
           display: block;
+          left: 0;
+          position: absolute;
+          right: 0;
+          top: 0;
+        }
+
+        .bespoke-marp-presenter-note-buttons {
+          background: rgba(#000, 0.65);
+          border-radius: 4px;
+          bottom: 0;
+          display: flex;
+          gap: 4px;
+          margin: 12px;
+          opacity: 0;
+          padding: 6px;
+          pointer-events: none;
+          position: absolute;
+          right: 0;
+          transition: opacity 0.2s linear;
+        }
+
+        &:hover .bespoke-marp-presenter-note-buttons,
+        .bespoke-marp-presenter-note-buttons:focus-within,
+        .bespoke-marp-presenter-note-wrapper:focus-within
+          + .bespoke-marp-presenter-note-buttons {
+          opacity: 1;
+          pointer-events: auto;
         }
 
         .bespoke-marp-note {
@@ -283,7 +305,7 @@ $progress-height: 5px;
           width: calc(100% - 40px);
           height: calc(100% - 40px);
           box-sizing: border-box;
-          font-size: 1.1em;
+          font-size: calc(1.1em * var(--bespoke-marp-note-font-scale, 1));
           overflow: auto;
           padding-right: 3px;
           white-space: pre-wrap;
@@ -336,6 +358,7 @@ $progress-height: 5px;
         flex-wrap: nowrap;
         grid-area: info;
         justify-content: center;
+        overflow: hidden;
         padding: 0 10px;
 
         %info-element {

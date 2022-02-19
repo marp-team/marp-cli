@@ -58,14 +58,6 @@
     @include button-icon-internal('../../assets/osc-next.svg');
   }
 
-  %button-bigger {
-    @include button-icon-internal('../../assets/osc-bigger.svg');
-  }
-
-  %button-smaller {
-    @include button-icon-internal('../../assets/osc-smaller.svg');
-  }
-
   %button-fullscreen {
     @include button-icon-internal('../../assets/osc-fullscreen.svg');
 
@@ -76,5 +68,13 @@
 
   %button-presenter {
     @include button-icon-internal('../../assets/osc-presenter.svg');
+  }
+
+  %button-plus {
+    @include button-icon-internal('../../assets/plus.svg');
+  }
+
+  %button-minus {
+    @include button-icon-internal('../../assets/minus.svg');
   }
 }
