@@ -254,27 +254,28 @@ $progress-height: 5px;
         color: $text-color;
         grid-area: note;
 
-        &:hover .bespoke-marp-presenter-note-buttons-container {
-          display: block;
-        }
         .bespoke-marp-presenter-note-buttons-container {
           display: none;
           position: absolute;
           bottom: 0;
           right: 0;
+        }
 
-          button {
-            @extend %button;
-            @include button.button-size(1.5em);
+        button {
+          @extend %button;
+          @include button.button-size(1.5em);
 
-            &.bespoke-marp-presenter-note-bigger {
-              @extend %button-bigger;
-            }
-
-            &.bespoke-marp-presenter-note-smaller {
-              @extend %button-smaller;
-            }
+          &.bespoke-marp-presenter-note-bigger {
+            @extend %button-bigger;
           }
+
+          &.bespoke-marp-presenter-note-smaller {
+            @extend %button-smaller;
+          }
+        }
+
+        &:hover .bespoke-marp-presenter-note-buttons-container {
+          display: block;
         }
 
         .bespoke-marp-note {
