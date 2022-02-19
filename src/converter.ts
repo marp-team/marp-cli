@@ -9,7 +9,7 @@ import {
 } from '@marp-team/marpit'
 import chalk from 'chalk'
 import puppeteer from 'puppeteer-core'
-import { silence, warn, info } from './cli'
+import { silence, warn } from './cli'
 import { Engine, ResolvedEngine } from './engine'
 import infoPlugin, { engineInfo, EngineInfo } from './engine/info-plugin'
 import metaPlugin from './engine/meta-plugin'
