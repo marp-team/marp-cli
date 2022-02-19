@@ -140,12 +140,17 @@ const presenterView = (deck) => {
     let startTime = new Date()
     const update = () => {
       const time = new Date()
-      const diff = new Date(time.getTime() - startTime.getTime())
+
+      const formatTime = (time: number) => ('0' + Math.floor(time)).slice(-2)
+
+      const diff = time.getTime() - startTime.getTime()
+
+      const seconds = formatTime((diff / 1000) % 60)
+      const minutes = formatTime((diff / 1000 / 60) % 60)
+      const hours = formatTime((diff / (1000 * 60 * 60)) % 24)
+
       $(classes.infoTime).textContent = time.toLocaleTimeString()
-      $(classes.infoTimer).textContent = diff.toLocaleTimeString('en-GB', {
-        hour12: false,
-        timeZone: 'UTC',
-      })
+      $(classes.infoTimer).textContent = `${hours}:${minutes}:${seconds}`
     }
 
     update()
