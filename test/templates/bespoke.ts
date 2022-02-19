@@ -989,6 +989,27 @@ describe("Bespoke template's browser context", () => {
             }))
         })
       })
+
+      describe('Drag resize', () => {
+        it('resizes on drag', () =>
+          testPresenterView(({ deck }) => {
+            $p(classes.dragbar).dispatchEvent(new MouseEvent('mousedown'))
+            $p(classes.container).dispatchEvent(
+              new MouseEvent('mousemove', { clientX: 200 })
+            )
+            expect($p(classes.container).style.gridTemplateColumns).toBe(
+              '200px NaNpx NaNpx'
+            )
+            $p(classes.container).dispatchEvent(new MouseEvent('mouseup'))
+          }))
+        it('no resize without drag', () =>
+          testPresenterView(({ deck }) => {
+            $p(classes.container).dispatchEvent(
+              new MouseEvent('mousemove', { clientX: 200 })
+            )
+            expect($p(classes.container).style.gridTemplateColumns).toBe('')
+          }))
+      })
     })
 
     describe('In next view mode', () => {

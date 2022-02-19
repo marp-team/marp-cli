@@ -232,7 +232,7 @@ const presenterView = (deck) => {
   const onDragging = (event: MouseEvent) => {
     if (!isDragging) return
 
-    const leftColWidth = isDragging ? event.clientX : deck.parent.clientWidth
+    const leftColWidth = event.clientX
 
     const dragbarWidth = parseInt(
       getComputedStyle($(classes.dragbar)).width.replace('px', '')
