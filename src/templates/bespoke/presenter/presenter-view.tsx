@@ -96,7 +96,7 @@ const presenterView = (deck) => {
   const resizeNotes = (direction: string) => {
     const current = parseFloat($(classes.noteContainer).style.fontSize) || 1
     const intended = current + (direction === 'bigger' ? 0.1 : -0.1)
-    $(classes.noteContainer).style.fontSize = `${intended}em`
+    $(classes.noteContainer).style.fontSize = `${intended.toFixed(1)}em`
   }
 
   const subscribe = (deck) => {

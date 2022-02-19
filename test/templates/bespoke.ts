@@ -70,6 +70,9 @@ describe("Bespoke template's browser context", () => {
   const keydown = (opts, target: EventTarget = document) =>
     target.dispatchEvent(new KeyboardEvent('keydown', opts))
 
+  const keyup = (opts, target: EventTarget = document) =>
+    target.dispatchEvent(new KeyboardEvent('keyup', opts))
+
   describe('Classes', () => {
     it('adds bespoke classes to #p', () => {
       const parent = render()
@@ -930,6 +933,34 @@ describe("Bespoke template's browser context", () => {
             expect(noteA?.className).not.toContain('active')
             expect(noteB?.className).toContain('active')
           }, '<!-- A -->\n\n---\n\n<!-- B -->'))
+
+        it('increases the font-size when clicked once', () =>
+          testPresenterView(() => {
+            $p(classes.noteButtonsBigger).click()
+            expect($p(classes.noteContainer).style.fontSize).toBe('1.1em')
+          }))
+        it('increases the font-size when clicked twice', () =>
+          testPresenterView(() => {
+            $p(classes.noteButtonsBigger).click()
+            $p(classes.noteButtonsBigger).click()
+            expect($p(classes.noteContainer).style.fontSize).toBe('1.2em')
+          }))
+        it('reduces the font-size when clicked once', () =>
+          testPresenterView(() => {
+            $p(classes.noteButtonsSmaller).click()
+            expect($p(classes.noteContainer).style.fontSize).toBe('0.9em')
+          }))
+        it('reduces the font-size on minus key', () =>
+          testPresenterView(() => {
+            keyup({ key: '-' })
+            expect($p(classes.noteContainer).style.fontSize).toBe('0.4em')
+          }))
+
+        it('increases the font-size on plus key', () =>
+          testPresenterView(({ deck, parent }) => {
+            keyup({ key: '+' })
+            expect($p(classes.noteContainer).style.fontSize).toBe('1.1em')
+          }))
       })
     })
 
