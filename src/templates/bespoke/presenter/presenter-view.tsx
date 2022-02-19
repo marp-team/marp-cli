@@ -12,13 +12,21 @@ export const classes = {
   next: `${presenterPrefix}next`,
   nextContainer: `${presenterPrefix}next-container`,
   noteContainer: `${presenterPrefix}note-container`,
+  noteWrapper: `${presenterPrefix}note-wrapper`,
+  noteButtons: `${presenterPrefix}note-buttons`,
   infoContainer: `${presenterPrefix}info-container`,
   infoPage: `${presenterPrefix}info-page`,
   infoPageText: `${presenterPrefix}info-page-text`,
   infoPagePrev: `${presenterPrefix}info-page-prev`,
   infoPageNext: `${presenterPrefix}info-page-next`,
+  noteButtonsBigger: `${presenterPrefix}note-bigger`,
+  noteButtonsSmaller: `${presenterPrefix}note-smaller`,
   infoTime: `${presenterPrefix}info-time`,
   infoTimer: `${presenterPrefix}info-timer`,
+} as const
+
+export const properties = {
+  noteFontScale: '--bespoke-marp-note-font-scale',
 } as const
 
 /** Create function to send message to iframe for navigation */
@@ -45,7 +53,25 @@ const presenterView = (deck) => {
         <div class={classes.nextContainer}>
           <iframe class={classes.next} src="?view=next" />
         </div>
-        <div class={classes.noteContainer}></div>
+        <div class={classes.noteContainer}>
+          <div class={classes.noteWrapper} />
+          <div class={classes.noteButtons}>
+            <button
+              class={classes.noteButtonsSmaller}
+              tabindex="-1"
+              title="Smaller notes font size"
+            >
+              Smaller notes font size
+            </button>
+            <button
+              class={classes.noteButtonsBigger}
+              tabindex="-1"
+              title="Bigger notes font size"
+            >
+              Bigger notes font size
+            </button>
+          </div>
+        </div>
         <div class={classes.infoContainer}>
           <div class={classes.infoPage}>
             <button class={classes.infoPagePrev} tabindex="-1" title="Previous">
@@ -66,9 +92,10 @@ const presenterView = (deck) => {
   }
 
   const $cache: { -readonly [T in keyof typeof classes]?: HTMLElement } = {}
-  const $ = (klass: typeof classes[keyof typeof classes]): HTMLElement => {
-    $cache[klass] =
-      $cache[klass] || document.querySelector<HTMLElement>(`.${klass}`)
+  const $ = <T extends HTMLElement>(
+    klass: typeof classes[keyof typeof classes]
+  ): T => {
+    $cache[klass] = $cache[klass] || document.querySelector<T>(`.${klass}`)
 
     return $cache[klass]
   }
@@ -96,13 +123,47 @@ const presenterView = (deck) => {
 
     notes.forEach((note) => {
       note.addEventListener('keydown', (e) => e.stopPropagation())
-      $(classes.noteContainer).appendChild(note)
+      $(classes.noteWrapper).appendChild(note)
     })
 
     deck.on('activate', () =>
       notes.forEach((n) =>
         n.classList.toggle('active', n.dataset.index == deck.slide())
       )
+    )
+
+    // Presenter note buttons
+    let notesFontSizeBase = 0
+    const resizeNotesFont = (increment: number) => {
+      notesFontSizeBase = Math.max(-5, notesFontSizeBase + increment)
+
+      $(classes.noteContainer).style.setProperty(
+        properties.noteFontScale,
+        (1.2 ** notesFontSizeBase).toFixed(4)
+      )
+    }
+    const biggerNotesFont = () => resizeNotesFont(1)
+    const smallerNotesFont = () => resizeNotesFont(-1)
+
+    const noteButtonBigger = $<HTMLButtonElement>(classes.noteButtonsBigger)
+    const noteButtonSmaller = $<HTMLButtonElement>(classes.noteButtonsSmaller)
+
+    noteButtonBigger.addEventListener('click', () => {
+      noteButtonBigger.blur()
+      biggerNotesFont()
+    })
+    noteButtonSmaller.addEventListener('click', () => {
+      noteButtonSmaller.blur()
+      smallerNotesFont()
+    })
+
+    document.addEventListener(
+      'keydown',
+      (e) => {
+        if (e.key === '+') biggerNotesFont()
+        if (e.key === '-') smallerNotesFont()
+      },
+      true // Ignore stopped propagation in notes
     )
 
     // Page info
@@ -112,8 +173,8 @@ const presenterView = (deck) => {
       }`
     })
 
-    const prev = $(classes.infoPagePrev) as HTMLButtonElement
-    const next = $(classes.infoPageNext) as HTMLButtonElement
+    const prev = $<HTMLButtonElement>(classes.infoPagePrev)
+    const next = $<HTMLButtonElement>(classes.infoPageNext)
 
     prev.addEventListener('click', (e) => {
       prev.blur()

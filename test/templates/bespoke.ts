@@ -3,7 +3,10 @@ import Marp from '@marp-team/marp-core'
 import { Element as MarpitElement } from '@marp-team/marpit'
 import { Key } from 'ts-key-enum'
 import bespoke from '../../src/templates/bespoke/bespoke'
-import { classes } from '../../src/templates/bespoke/presenter/presenter-view'
+import {
+  classes,
+  properties,
+} from '../../src/templates/bespoke/presenter/presenter-view'
 import * as fullscreen from '../../src/templates/bespoke/utils/fullscreen'
 import { _clearCachedWakeLockApi } from '../../src/templates/bespoke/wake-lock'
 
@@ -930,6 +933,44 @@ describe("Bespoke template's browser context", () => {
             expect(noteA?.className).not.toContain('active')
             expect(noteB?.className).toContain('active')
           }, '<!-- A -->\n\n---\n\n<!-- B -->'))
+
+        describe('Font size', () => {
+          const fontSizeScale = () =>
+            $p(classes.noteContainer).style.getPropertyValue(
+              properties.noteFontScale
+            )
+
+          it('increases the font-size when clicked "+" button once', () =>
+            testPresenterView(() => {
+              $p(classes.noteButtonsBigger).click()
+              expect(fontSizeScale()).toBe('1.2000')
+            }))
+
+          it('increases the font-size when clicked "+" button twice', () =>
+            testPresenterView(() => {
+              $p(classes.noteButtonsBigger).click()
+              $p(classes.noteButtonsBigger).click()
+              expect(fontSizeScale()).toBe('1.4400') // 1.2 ** 2
+            }))
+
+          it('reduces the font-size when clicked "-" once', () =>
+            testPresenterView(() => {
+              $p(classes.noteButtonsSmaller).click()
+              expect(fontSizeScale()).toBe('0.8333') // 1.2 ** -1
+            }))
+
+          it('reduces the font-size on minus key', () =>
+            testPresenterView(() => {
+              keydown({ key: '-' })
+              expect(fontSizeScale()).toBe('0.8333') // 1.2 ** -1
+            }))
+
+          it('increases the font-size on plus key', () =>
+            testPresenterView(() => {
+              keydown({ key: '+' })
+              expect(fontSizeScale()).toBe('1.2000')
+            }))
+        })
       })
     })
 
