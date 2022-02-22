@@ -267,7 +267,7 @@ export class Converter {
     const comments = new Marp().render(file.buffer?.toString() || '').comments
     if (comments.flat().length === 0) {
       warn(`${file.relativePath()} contains no notes.`)
-      ret.buffer = Buffer.from('no notes found')
+      ret.buffer = Buffer.from('')
     } else {
       ret.buffer = Buffer.from(
         comments.map((c) => c.join('\n\n')).join('\n\n---\n\n')

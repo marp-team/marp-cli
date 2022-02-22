@@ -561,7 +561,7 @@ transition:
       )
       expect(write).toHaveBeenCalled()
       expect(write.mock.calls[0][0]).toBe('./specified.txt')
-      expect(notes.toString()).toBe('no notes found')
+      expect(notes.toString()).toBe('')
       expect(ret.newFile?.path).toBe('./specified.txt')
       expect(ret.newFile?.buffer).toBe(notes)
     })
