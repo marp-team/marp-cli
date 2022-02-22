@@ -1,12 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { URL } from 'url'
 import type { MarpOptions } from '@marp-team/marp-core'
-import Marp from '@marp-team/marp-core'
-import {
-  Marpit,
-  Options as MarpitOptions,
-  Element as MarpitElement,
-} from '@marp-team/marpit'
+import { Marpit, Options as MarpitOptions } from '@marp-team/marpit'
 import chalk from 'chalk'
 import puppeteer from 'puppeteer-core'
 import { silence, warn } from './cli'
@@ -264,7 +259,7 @@ export class Converter {
 
   private convertFileToNotes(tpl: TemplateResult, file: File): File {
     const ret = file.convert(this.options.output, { extension: 'txt' })
-    const comments = new Marp().render(file.buffer?.toString() || '').comments
+    const comments = tpl.rendered.comments
     if (comments.flat().length === 0) {
       warn(`${file.relativePath()} contains no notes.`)
       ret.buffer = Buffer.from('')
