@@ -993,13 +993,18 @@ describe("Bespoke template's browser context", () => {
       describe('Drag resize', () => {
         it('resizes on drag', () =>
           testPresenterView(({ deck }) => {
+            Object.defineProperty(document.documentElement, 'clientWidth', {
+              value: 1000,
+            })
             $p(classes.dragbar).dispatchEvent(new MouseEvent('mousedown'))
             $p(classes.container).dispatchEvent(
               new MouseEvent('mousemove', { clientX: 200 })
             )
-            expect($p(classes.container).style.gridTemplateColumns).toBe(
-              '200px NaNpx NaNpx'
-            )
+            expect(
+              $p(classes.container).style.getPropertyValue(
+                '--bespoke-marp-presenter-split-ratio'
+              )
+            ).toBe('20%')
             $p(classes.container).dispatchEvent(new MouseEvent('mouseup'))
           }))
         it('no resize without drag', () =>

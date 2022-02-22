@@ -232,21 +232,10 @@ const presenterView = (deck) => {
   const onDragging = (event: MouseEvent) => {
     if (!isDragging) return
 
-    const leftColWidth = event.clientX
-
-    const dragbarWidth = parseInt(
-      getComputedStyle($(classes.dragbar)).width.replace('px', '')
+    $(classes.container).style.setProperty(
+      '--bespoke-marp-presenter-split-ratio',
+      `${(event.clientX / document.documentElement.clientWidth) * 100}%`
     )
-
-    const cols = [
-      leftColWidth,
-      dragbarWidth,
-      $(classes.container).clientWidth - 2 * dragbarWidth - leftColWidth,
-    ]
-
-    const newColDefn = cols.map((c) => c.toString() + 'px').join(' ')
-
-    $(classes.container).style.gridTemplateColumns = newColDefn
 
     event.preventDefault()
   }

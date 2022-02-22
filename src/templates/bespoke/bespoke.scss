@@ -194,11 +194,14 @@ $progress-height: 5px;
 
       // Grid layout for presenter view
       display: grid;
+
+      --bespoke-marp-presenter-split-ratio: 66%;
+
       grid-template:
         'current dragbar next' minmax(140px, 1fr)
         'current dragbar note' 2fr
-        'info    dragbar note' 3em /
-        2fr 6px 1fr;
+        'info    dragbar note' 3em;
+      grid-template-columns: var(--bespoke-marp-presenter-split-ratio) 0 1fr;
 
       .bespoke-marp-parent {
         grid-area: current;
@@ -225,6 +228,10 @@ $progress-height: 5px;
         grid-area: dragbar;
         background: white;
         cursor: ew-resize;
+        width: 6px;
+        margin-left: -3px;
+        position: relative;
+        z-index: 1;
       }
 
       // Next slide view
