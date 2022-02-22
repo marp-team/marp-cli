@@ -141,7 +141,8 @@ const presenterView = (deck) => {
     const update = () => {
       const time = new Date()
 
-      const formatTime = (time: number) => `${Math.floor(time)}`.padStart(2, '0')
+      const formatTime = (time: number) =>
+        `${Math.floor(time)}`.padStart(2, '0')
 
       const diff = time.getTime() - startTime.getTime()
 
