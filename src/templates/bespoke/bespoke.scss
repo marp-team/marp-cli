@@ -226,12 +226,18 @@ $progress-height: 5px;
       // Dragbar
       .bespoke-marp-presenter-dragbar-container {
         grid-area: dragbar;
-        background: white;
+        background: #0288d1; // Marp brand color
         cursor: ew-resize;
         width: 6px;
         margin-left: -3px;
         position: relative;
         z-index: 1;
+        opacity: 0;
+        transition: opacity 0.4s linear 0.1s;
+
+        &:hover {
+          opacity: 1;
+        }
       }
 
       // Next slide view
