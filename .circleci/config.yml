@@ -13,13 +13,7 @@ executors:
         type: string
         default: '16.14.0' # Specify LTS version for development
     docker:
-      - image: circleci/node:<< parameters.version >><<# parameters.browser >>-browsers<</ parameters.browser >>
-        entrypoint:
-          - docker-init
-          - --
-          - <<# parameters.browser >>/<</ parameters.browser >>docker-entrypoint.sh
-        command:
-          - /bin/sh
+      - image: cimg/node:<< parameters.version >><<# parameters.browser >>-browsers<</ parameters.browser >>
     working_directory: ~/marp-cli
 
   docker:
