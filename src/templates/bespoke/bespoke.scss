@@ -409,6 +409,10 @@ $progress-height: 5px;
           color: #999;
           order: 3;
           text-align: right;
+
+          &:hover {
+            cursor: pointer;
+          }
         }
       }
     }

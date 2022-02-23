@@ -83,7 +83,7 @@ const presenterView = (deck) => {
             </button>
           </div>
           <time class={classes.infoTime} title="Current time"></time>
-          <div class={classes.infoTimer}>{/* TODO: Implement timer */}</div>
+          <time class={classes.infoTimer} title="Timer"></time>
         </div>
       </>
     )
@@ -103,6 +103,10 @@ const presenterView = (deck) => {
   const subscribe = (deck) => {
     // Next slide view
     $(classes.nextContainer).addEventListener('click', () => deck.next())
+    $(classes.infoTimer).addEventListener(
+      'click',
+      () => (startTime = new Date())
+    )
 
     const nextIframe = $(classes.next) as HTMLIFrameElement
     const nextNav = createNavigateFunc(nextIframe)
@@ -194,8 +198,22 @@ const presenterView = (deck) => {
     })
 
     // Current time
-    const update = () =>
-      ($(classes.infoTime).textContent = new Date().toLocaleTimeString())
+    let startTime = new Date()
+    const update = () => {
+      const time = new Date()
+
+      const formatTime = (time: number) =>
+        `${Math.floor(time)}`.padStart(2, '0')
+
+      const diff = time.getTime() - startTime.getTime()
+
+      const seconds = formatTime((diff / 1000) % 60)
+      const minutes = formatTime((diff / 1000 / 60) % 60)
+      const hours = formatTime((diff / (1000 * 60 * 60)) % 24)
+
+      $(classes.infoTime).textContent = time.toLocaleTimeString()
+      $(classes.infoTimer).textContent = `${hours}:${minutes}:${seconds}`
+    }
 
     update()
     setInterval(update, 250)
