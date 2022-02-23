@@ -1012,7 +1012,11 @@ describe("Bespoke template's browser context", () => {
             $p(classes.container).dispatchEvent(
               new MouseEvent('mousemove', { clientX: 200 })
             )
-            expect($p(classes.container).style.gridTemplateColumns).toBe('')
+            expect(
+              $p(classes.container).style.getPropertyValue(
+                '--bespoke-marp-presenter-split-ratio'
+              )
+            ).toBe('')
           }))
       })
     })
