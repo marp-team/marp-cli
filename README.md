@@ -194,6 +194,16 @@ marp slide-deck.md -o title-slide@2x.png --image-scale 2
 >
 > It is also available for PPTX conversion. By default, Marp CLI will use `2` as the default scale factor in PPTX to suppress deterioration of slide rendering in full-screen presentation.
 
+### Export presenter notes (`--notes`)
+
+You can export [presenter notes][marpit presenter notes] in Marp / Marpit Markdown as a text file by using `--notes` option or specifying the output path with TXT extension.
+
+```bash
+# Export presenter notes as a text
+marp --notes slide-deck.md
+marp slide-deck.md -o output.txt
+```
+
 ### Security about local files
 
 Because of [the security reason](https://github.com/marp-team/marp-cli/pull/10#user-content-security), **PDF, PPTX and image(s) conversion cannot use local files by default.**
@@ -491,7 +501,7 @@ If you want to prevent looking up a configuration file, you can pass `--no-confi
 | `jpegQuality`     |           number            |    `--jpeg-quality`    | Setting JPEG image quality (`85` by default)                                                                |
 | `keywords`        |     string \| string[]      |      `--keywords`      | Define keywords for the slide deck (Accepts comma-separated string and array of string)                     |
 | `lang`            |           string            |                        | Define the language of converted HTML                                                                       |
-| `notes`           |           boolean           |       `--notes`        | Convert slide deck into just the text notes                                                                 |
+| `notes`           |           boolean           |       `--notes`        | Convert slide deck notes into a text file                                                                   |
 | `ogImage`         |           string            |      `--og-image`      | Define [Open Graph] image URL                                                                               |
 | `options`         |           object            |                        | The base options for the constructor of engine                                                              |
 | `output`          |           string            |    `--output` `-o`     | Output file path (or directory when input-dir is passed)                                                    |

@@ -45,6 +45,7 @@ export const mimeTypes = {
   [ConvertType.pptx]:
     'application/vnd.openxmlformats-officedocument.presentationml.presentation',
   [ConvertType.jpeg]: 'image/jpeg',
+  [ConvertType.notes]: 'text/plain',
 }
 
 export interface ConverterOption {
