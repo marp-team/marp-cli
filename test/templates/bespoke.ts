@@ -991,11 +991,17 @@ describe("Bespoke template's browser context", () => {
       })
 
       describe('Drag resize', () => {
+        let spy
+        beforeAll(() => {
+          spy = jest
+            .spyOn(document.documentElement, 'clientWidth', 'get')
+            .mockReturnValue(1000)
+        })
+        afterAll(() => {
+          spy.mockRestore()
+        })
         it('resizes on drag', () =>
           testPresenterView(({ deck }) => {
-            Object.defineProperty(document.documentElement, 'clientWidth', {
-              value: 1000,
-            })
             $p(classes.dragbar).dispatchEvent(new MouseEvent('mousedown'))
             $p(classes.container).dispatchEvent(
               new MouseEvent('mousemove', { clientX: 200 })
