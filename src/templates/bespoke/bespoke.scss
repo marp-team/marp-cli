@@ -194,11 +194,14 @@ $progress-height: 5px;
 
       // Grid layout for presenter view
       display: grid;
+
+      --bespoke-marp-presenter-split-ratio: 66%;
+
       grid-template:
-        'current next' minmax(140px, 1fr)
-        'current note' 2fr
-        'info    note' 3em /
-        2fr 1fr;
+        'current dragbar next' minmax(140px, 1fr)
+        'current dragbar note' 2fr
+        'info    dragbar note' 3em;
+      grid-template-columns: var(--bespoke-marp-presenter-split-ratio) 0 1fr;
 
       .bespoke-marp-parent {
         grid-area: current;
@@ -217,6 +220,23 @@ $progress-height: 5px;
           &.bespoke-marp-active {
             filter: drop-shadow(0 3px 10px rgba(#000, 0.5));
           }
+        }
+      }
+
+      // Dragbar
+      .bespoke-marp-presenter-dragbar-container {
+        grid-area: dragbar;
+        background: #0288d1; // Marp brand color
+        cursor: ew-resize;
+        width: 6px;
+        margin-left: -3px;
+        position: relative;
+        z-index: 1;
+        opacity: 0;
+        transition: opacity 0.4s linear 0.1s;
+
+        &:hover {
+          opacity: 1;
         }
       }
 
