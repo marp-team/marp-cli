@@ -122,15 +122,15 @@ export const marpCli = async (
           group: OptionGroup.Converter,
           type: 'boolean',
         },
-        notes: {
-          conflicts: ['image', 'images', 'pptx', 'pdf'],
-          describe: 'Convert slide deck notes into TXT',
-          group: OptionGroup.Converter,
-          type: 'boolean',
-        },
         pptx: {
           conflicts: ['pdf', 'image', 'images', 'notes'],
           describe: 'Convert slide deck into PowerPoint document',
+          group: OptionGroup.Converter,
+          type: 'boolean',
+        },
+        notes: {
+          conflicts: ['image', 'images', 'pptx', 'pdf'],
+          describe: 'Convert slide deck notes into a text file',
           group: OptionGroup.Converter,
           type: 'boolean',
         },
