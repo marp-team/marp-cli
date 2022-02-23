@@ -35,6 +35,7 @@ interface IMarpCLIArguments {
   inputDir?: string
   jpegQuality?: number
   keywords?: string
+  notes?: boolean
   ogImage?: string
   output?: string | false
   pdf?: boolean
@@ -169,6 +170,7 @@ export class MarpCLIConfig {
       // CLI options
       if (this.args.pdf || this.conf.pdf) return ConvertType.pdf
       if (this.args.pptx || this.conf.pptx) return ConvertType.pptx
+      if (this.args.notes || this.conf.notes) return ConvertType.notes
 
       const image =
         this.args.images ||
@@ -188,6 +190,7 @@ export class MarpCLIConfig {
       if (lowerOutput.endsWith('.pptx')) return ConvertType.pptx
       if (lowerOutput.endsWith('.jpg') || lowerOutput.endsWith('.jpeg'))
         return ConvertType.jpeg
+      if (lowerOutput.endsWith('.txt')) return ConvertType.notes
 
       // Prefer PDF than HTML if enabled presenter notes for PDF
       if (this.args.pdfNotes || this.conf.pdfNotes) return ConvertType.pdf

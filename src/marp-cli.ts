@@ -117,19 +117,25 @@ export const marpCli = async (
           type: 'boolean',
         },
         pdf: {
-          conflicts: ['image', 'images', 'pptx'],
+          conflicts: ['image', 'images', 'pptx', 'notes'],
           describe: 'Convert slide deck into PDF',
           group: OptionGroup.Converter,
           type: 'boolean',
         },
+        notes: {
+          conflicts: ['image', 'images', 'pptx', 'pdf'],
+          describe: 'Convert slide deck notes into TXT',
+          group: OptionGroup.Converter,
+          type: 'boolean',
+        },
         pptx: {
-          conflicts: ['pdf', 'image', 'images'],
+          conflicts: ['pdf', 'image', 'images', 'notes'],
           describe: 'Convert slide deck into PowerPoint document',
           group: OptionGroup.Converter,
           type: 'boolean',
         },
         image: {
-          conflicts: ['pdf', 'images', 'pptx'],
+          conflicts: ['pdf', 'images', 'pptx', 'notes'],
           describe: 'Convert the first slide page into an image file',
           group: OptionGroup.Converter,
           choices: ['png', 'jpeg'],
@@ -141,7 +147,7 @@ export const marpCli = async (
           type: 'string',
         },
         images: {
-          conflicts: ['pdf', 'image', 'pptx'],
+          conflicts: ['pdf', 'image', 'pptx', 'notes'],
           describe: 'Convert slide deck into multiple image files',
           group: OptionGroup.Converter,
           choices: ['png', 'jpeg'],

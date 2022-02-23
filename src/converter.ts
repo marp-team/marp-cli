@@ -35,6 +35,7 @@ export enum ConvertType {
   png = 'png',
   pptx = 'pptx',
   jpeg = 'jpg',
+  notes = 'notes',
 }
 
 export const mimeTypes = {
@@ -191,7 +192,6 @@ export class Converter {
 
     if (!opts.onlyScanning) {
       const files: File[] = []
-
       switch (this.options.type) {
         case ConvertType.pdf:
           template = await useTemplate(true)
@@ -216,6 +216,10 @@ export class Converter {
               scale: this.options.imageScale ?? 2,
             })
           )
+          break
+        case ConvertType.notes:
+          template = await useTemplate(false)
+          files.push(await this.convertFileToNotes(template, file))
           break
         default:
           template = await useTemplate()
@@ -250,6 +254,20 @@ export class Converter {
     const ret = file.convert(this.options.output, { extension: 'html' })
     ret.buffer = Buffer.from(tpl.result)
 
+    return ret
+  }
+
+  private convertFileToNotes(tpl: TemplateResult, file: File): File {
+    const ret = file.convert(this.options.output, { extension: 'txt' })
+    const comments = tpl.rendered.comments
+    if (comments.flat().length === 0) {
+      warn(`${file.relativePath()} contains no notes.`)
+      ret.buffer = Buffer.from('')
+    } else {
+      ret.buffer = Buffer.from(
+        comments.map((c) => c.join('\n\n')).join('\n\n---\n\n')
+      )
+    }
     return ret
   }
 

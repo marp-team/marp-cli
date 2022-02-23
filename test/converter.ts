@@ -526,6 +526,46 @@ transition:
       expect(ret.newFile.type).toBe(FileType.StandardIO)
     })
 
+    it('converts markdown file to text and save to specified path when output is defined', async () => {
+      const notesInstance = (opts: Partial<ConverterOption> = {}) =>
+        instance({ ...opts, type: ConvertType.notes })
+      const write = (<any>fs).__mockWriteFile()
+      const output = './specified.txt'
+      const ret = await (<any>notesInstance({ output })).convertFile(
+        new File(threePath),
+        { type: 'notes' }
+      )
+      const notes: Buffer = write.mock.calls[0][1]
+
+      expect(write).toHaveBeenCalled()
+      expect(write.mock.calls[0][0]).toBe('./specified.txt')
+      expect(notes.toString()).toBe('presenter note')
+      expect(ret.newFile?.path).toBe('./specified.txt')
+      expect(ret.newFile?.buffer).toBe(notes)
+    })
+
+    it('converts markdown file to text and save to specified path when output is defined but no notes exist', async () => {
+      const warn = jest.spyOn(console, 'warn').mockImplementation()
+      const notesInstance = (opts: Partial<ConverterOption> = {}) =>
+        instance({ ...opts, type: ConvertType.notes })
+      const write = (<any>fs).__mockWriteFile()
+      const output = './specified.txt'
+      const ret = await (<any>notesInstance({ output })).convertFile(
+        new File(onePath),
+        { type: 'notes' }
+      )
+      const notes: Buffer = write.mock.calls[0][1]
+
+      expect(warn).toHaveBeenCalledWith(
+        expect.stringContaining('contains no notes')
+      )
+      expect(write).toHaveBeenCalled()
+      expect(write.mock.calls[0][0]).toBe('./specified.txt')
+      expect(notes.toString()).toBe('')
+      expect(ret.newFile?.path).toBe('./specified.txt')
+      expect(ret.newFile?.buffer).toBe(notes)
+    })
+
     describe('when convert type is PDF', () => {
       const pdfInstance = (opts: Partial<ConverterOption> = {}) =>
         instance({ ...opts, type: ConvertType.pdf })
