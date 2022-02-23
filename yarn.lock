@@ -1502,12 +1502,12 @@
   resolved "https://registry.yarnpkg.com/@types/minimist/-/minimist-1.2.2.tgz#ee771e2ba4b3dc5b372935d549fd9617bf345b8c"
   integrity sha512-jhuKLIRrhvCPLqwPcx6INqmKeiA5EWrsCOPhrlFSrbrmU4ZMPjj5Ul/oLCMDO98XRUIwVm78xICz4EPCektzeQ==
 
-"@types/node@*", "@types/node@~17.0.20":
+"@types/node@*":
   version "17.0.20"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-17.0.20.tgz#29626bd9c9119df5b8194353d34044c895fe56e3"
   integrity sha512-Q15Clj3lZSLnhVA6yKw1G7SQz46DeL9gO1TEgfK1OQGvMdQ6TUWmCeWf1QBUNkw2BDfV52i2YuYd9OF3ZwGhjw==
 
-"@types/node@^16.10.1":
+"@types/node@^16.10.1", "@types/node@~16.11.25":
   version "16.11.25"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-16.11.25.tgz#bb812b58bacbd060ce85921250d8b4ca553cd4a2"
   integrity sha512-NrTwfD7L1RTc2qrHQD4RTTy4p0CO2LatKBEKEds3CaVuhoM/+DJzmWZl5f+ikR8cm8F5mfJxK+9rQq07gRiSjQ==
