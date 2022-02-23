@@ -992,32 +992,35 @@ describe("Bespoke template's browser context", () => {
 
       describe('Drag resize', () => {
         let spy
+
         beforeAll(() => {
           spy = jest
             .spyOn(document.documentElement, 'clientWidth', 'get')
             .mockReturnValue(1000)
         })
+
         afterAll(() => {
           spy.mockRestore()
         })
+
         it('resizes on drag', () =>
-          testPresenterView(({ deck }) => {
+          testPresenterView(() => {
             $p(classes.dragbar).dispatchEvent(new MouseEvent('mousedown'))
-            $p(classes.container).dispatchEvent(
-              new MouseEvent('mousemove', { clientX: 200 })
-            )
+            window.dispatchEvent(new MouseEvent('mousemove', { clientX: 200 }))
+
             expect(
               $p(classes.container).style.getPropertyValue(
                 '--bespoke-marp-presenter-split-ratio'
               )
             ).toBe('20%')
-            $p(classes.container).dispatchEvent(new MouseEvent('mouseup'))
+
+            window.dispatchEvent(new MouseEvent('mouseup'))
           }))
+
         it('no resize without drag', () =>
-          testPresenterView(({ deck }) => {
-            $p(classes.container).dispatchEvent(
-              new MouseEvent('mousemove', { clientX: 200 })
-            )
+          testPresenterView(() => {
+            window.dispatchEvent(new MouseEvent('mousemove', { clientX: 200 }))
+
             expect(
               $p(classes.container).style.getPropertyValue(
                 '--bespoke-marp-presenter-split-ratio'
