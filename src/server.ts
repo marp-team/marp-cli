@@ -98,6 +98,8 @@ export class Server extends (EventEmitter as new () => TypedEmitter<Server.Event
       if (queryKeys.includes('png')) return ConvertType.png
       if (queryKeys.includes('jpg') || queryKeys.includes('jpeg'))
         return ConvertType.jpeg
+      if (queryKeys.includes('txt') || queryKeys.includes('notes'))
+        return ConvertType.notes
 
       return ConvertType.html
     })()

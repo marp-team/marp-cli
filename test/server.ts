@@ -178,6 +178,14 @@ describe('Server', () => {
           const jpegRes = await request(server.server).get('/1.md?jpeg')
           expect(server.converter.options.type).toBe(ConvertType.jpeg)
           expect(jpegRes.type).toBe('image/jpeg')
+
+          const txtRes = await request(server.server).get('/1.md?txt')
+          expect(server.converter.options.type).toBe(ConvertType.notes)
+          expect(txtRes.type).toBe('text/plain')
+
+          const notesRes = await request(server.server).get('/1.md?notes')
+          expect(server.converter.options.type).toBe(ConvertType.notes)
+          expect(notesRes.type).toBe('text/plain')
         })
       })
 
