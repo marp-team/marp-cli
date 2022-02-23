@@ -103,15 +103,37 @@ const presenterView = (deck) => {
   }
 
   const subscribe = (deck) => {
+    // Splitter
+    let isDragging = false
+
+    const startDragging = () => {
+      isDragging = true
+      $(classes.dragbar).classList.add('active')
+    }
+
+    const endDragging = () => {
+      isDragging = false
+      $(classes.dragbar).classList.remove('active')
+    }
+
+    const onDragging = (event: MouseEvent) => {
+      if (!isDragging) return
+
+      const splitRatio =
+        (event.clientX / document.documentElement.clientWidth) * 100
+
+      $(classes.container).style.setProperty(
+        '--bespoke-marp-presenter-split-ratio',
+        `${Math.max(0, Math.min(100, splitRatio))}%`
+      )
+    }
+
+    $(classes.dragbar).addEventListener('mousedown', startDragging)
+    window.addEventListener('mouseup', endDragging)
+    window.addEventListener('mousemove', onDragging)
+
     // Next slide view
     $(classes.nextContainer).addEventListener('click', () => deck.next())
-    $(classes.dragbar).addEventListener('mousedown', startDragging)
-    $(classes.container).addEventListener('mouseup', endDragging)
-    $(classes.container).addEventListener('mousemove', onDragging)
-    $(classes.infoTimer).addEventListener(
-      'click',
-      () => (startTime = new Date())
-    )
 
     const nextIframe = $(classes.next) as HTMLIFrameElement
     const nextNav = createNavigateFunc(nextIframe)
@@ -202,8 +224,9 @@ const presenterView = (deck) => {
         fragmentIndex === fragments.length - 1
     })
 
-    // Current time
+    // Current time and presenter timer
     let startTime = new Date()
+
     const update = () => {
       const time = new Date()
 
@@ -222,22 +245,10 @@ const presenterView = (deck) => {
 
     update()
     setInterval(update, 250)
-  }
 
-  let isDragging = false
-
-  const startDragging = () => (isDragging = true)
-  const endDragging = () => (isDragging = false)
-
-  const onDragging = (event: MouseEvent) => {
-    if (!isDragging) return
-
-    $(classes.container).style.setProperty(
-      '--bespoke-marp-presenter-split-ratio',
-      `${(event.clientX / document.documentElement.clientWidth) * 100}%`
-    )
-
-    event.preventDefault()
+    $(classes.infoTimer).addEventListener('click', () => {
+      startTime = new Date()
+    })
   }
 
   document.body.appendChild(buildContainer(deck.parent))
