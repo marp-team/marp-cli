@@ -6,6 +6,7 @@
 
 - `--notes` option to export presenter notes as text file ([#278](https://github.com/marp-team/marp-cli/issues/278), [#429](https://github.com/marp-team/marp-cli/pull/429) by [@chrisns](https://github.com/chrisns))
 - Make notes font size changeable in bespoke template ([#428](https://github.com/marp-team/marp-cli/pull/428) by [@chrisns](https://github.com/chrisns), [#431](https://github.com/marp-team/marp-cli/pull/431))
+- Timer for the presenter view of bespoke template ([#314](https://github.com/marp-team/marp-cli/issues/314), [#430](https://github.com/marp-team/marp-cli/pull/430) by [@chrisns](https://github.com/chrisns))
 
 ## v1.6.0 - 2022-02-12
 
