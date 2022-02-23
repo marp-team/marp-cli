@@ -9,6 +9,10 @@
 - The draggable splitter in the presenter view of bespoke template ([#427](https://github.com/marp-team/marp-cli/pull/427) by [@chrisns](https://github.com/chrisns), [#433](https://github.com/marp-team/marp-cli/pull/433))
 - Make notes font size changeable in bespoke template ([#428](https://github.com/marp-team/marp-cli/pull/428) by [@chrisns](https://github.com/chrisns), [#431](https://github.com/marp-team/marp-cli/pull/431))
 
+### Changed
+
+- Upgrade Node and dependent packages to the latest version ([#434](https://github.com/marp-team/marp-cli/pull/434))
+
 ## v1.6.0 - 2022-02-12
 
 ### Added
