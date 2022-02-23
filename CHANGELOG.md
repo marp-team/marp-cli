@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v1.7.0 - 2022-02-23
+
 ### Added
 
 - `--notes` option to export presenter notes as text file ([#278](https://github.com/marp-team/marp-cli/issues/278), [#429](https://github.com/marp-team/marp-cli/pull/429) by [@chrisns](https://github.com/chrisns), [#432](https://github.com/marp-team/marp-cli/pull/432))
