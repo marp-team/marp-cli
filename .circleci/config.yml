@@ -17,14 +17,11 @@ executors:
         entrypoint:
           - docker-init
           - --
-          - <<^ parameters.browser >>/usr/local/bin<</ parameters.browser >>/docker-entrypoint.sh
-        command:
-          - /bin/sh
     working_directory: ~/marp-cli
 
   docker:
     machine:
-      image: ubuntu-2004:202101-01
+      image: ubuntu-2004:202111-02
       docker_layer_caching: true
     working_directory: ~/marp-cli
     environment:
