@@ -11,13 +11,13 @@ executors:
         default: false
       version:
         type: string
-        default: '16.13.1' # Specify LTS version for development
+        default: '16.14' # Specify LTS major and minor for development
     docker:
       - image: circleci/node:<< parameters.version >><<# parameters.browser >>-browsers<</ parameters.browser >>
         entrypoint:
           - docker-init
           - --
-          - <<# parameters.browser >>/<</ parameters.browser >>docker-entrypoint.sh
+          - <<^ parameters.browser >>/usr/local/bin<</ parameters.browser >>/docker-entrypoint.sh
         command:
           - /bin/sh
     working_directory: ~/marp-cli

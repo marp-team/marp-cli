@@ -17,7 +17,7 @@ jobs:
         node-version:
           - '^12.22.7'
           - '^14.18.1'
-          - '16.14.0'
+          - '16.14.2'
 
     steps:
       - uses: actions/checkout@v2
