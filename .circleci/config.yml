@@ -1,6 +1,7 @@
 version: 2.1
 
 orbs:
+  browser-tools: circleci/browser-tools@1.2.4
   codecov: codecov/codecov@3.2.2
 
 executors:
@@ -51,6 +52,11 @@ commands:
           key: v2.3-dependencies-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}-{{ .Branch }}
           paths:
             - ~/.cache/yarn
+
+      - when:
+          condition: << parameters.browser >>
+          steps:
+            - browser-tools/install-chrome
 
   audit:
     steps:
