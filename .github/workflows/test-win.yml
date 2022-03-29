@@ -4,6 +4,10 @@ on:
   - pull_request
   - push
 
+concurrency:
+  group: ${{ github.workflow }}-${{ (github.ref_name == 'main' && github.run_id) || format('{0}-{1}', github.actor, github.head_ref || github.ref_name) }}
+  cancel-in-progress: true
+
 env:
   YARN_VERSION: '^1.22.17'
 
