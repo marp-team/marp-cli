@@ -53,11 +53,6 @@ commands:
           paths:
             - ~/.cache/yarn
 
-      - when:
-          condition: << parameters.browser >>
-          steps:
-            - browser-tools/install-chrome
-
   audit:
     steps:
       - checkout
@@ -66,11 +61,20 @@ commands:
             - run: yarn -s check:audit
 
   test:
+    parameters:
+      browser:
+        type: boolean
+        default: false
     steps:
       - run: node --version
 
       - checkout
       - install
+
+      - when:
+          condition: << parameters.browser >>
+          steps:
+            - browser-tools/install-chrome
 
       - run:
           name: Prettier formatting
@@ -180,7 +184,8 @@ jobs:
       browser: true
       version: '12.22'
     steps:
-      - test
+      - test:
+          browser: true
 
   test-node14:
     executor:
@@ -188,14 +193,16 @@ jobs:
       browser: true
       version: '14.18'
     steps:
-      - test
+      - test:
+          browser: true
 
   test-node16:
     executor:
       name: node
       browser: true
     steps:
-      - test
+      - test:
+          browser: true
 
   docker-build-latest:
     executor: node
