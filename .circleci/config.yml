@@ -14,9 +14,6 @@ executors:
         default: '16.14' # Specify LTS major and minor for development
     docker:
       - image: cimg/node:<< parameters.version >><<# parameters.browser >>-browsers<</ parameters.browser >>
-        entrypoint:
-          - docker-init
-          - --
     working_directory: ~/marp-cli
 
   docker:
