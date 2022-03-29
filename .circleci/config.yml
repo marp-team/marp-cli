@@ -13,7 +13,7 @@ executors:
         type: string
         default: '16.14' # Specify LTS major and minor for development
     docker:
-      - image: circleci/node:<< parameters.version >><<# parameters.browser >>-browsers<</ parameters.browser >>
+      - image: cimg/node:<< parameters.version >><<# parameters.browser >>-browsers<</ parameters.browser >>
         entrypoint:
           - docker-init
           - --
