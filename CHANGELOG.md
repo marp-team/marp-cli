@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Bump Node LTS, and improve CI settings ([#437](https://github.com/marp-team/marp-cli/pull/437))
+
 ## v1.7.0 - 2022-02-23
 
 ### Added
