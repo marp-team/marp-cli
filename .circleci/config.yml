@@ -1,6 +1,7 @@
 version: 2.1
 
 orbs:
+  browser-tools: circleci/browser-tools@1.2.4
   codecov: codecov/codecov@3.2.2
 
 executors:
@@ -11,20 +12,14 @@ executors:
         default: false
       version:
         type: string
-        default: '16.13.1' # Specify LTS version for development
+        default: '16.14' # Specify LTS major and minor for development
     docker:
-      - image: circleci/node:<< parameters.version >><<# parameters.browser >>-browsers<</ parameters.browser >>
-        entrypoint:
-          - docker-init
-          - --
-          - <<# parameters.browser >>/<</ parameters.browser >>docker-entrypoint.sh
-        command:
-          - /bin/sh
+      - image: cimg/node:<< parameters.version >><<# parameters.browser >>-browsers<</ parameters.browser >>
     working_directory: ~/marp-cli
 
   docker:
     machine:
-      image: ubuntu-2004:202101-01
+      image: ubuntu-2004:202111-02
       docker_layer_caching: true
     working_directory: ~/marp-cli
     environment:
@@ -66,11 +61,20 @@ commands:
             - run: yarn -s check:audit
 
   test:
+    parameters:
+      browser:
+        type: boolean
+        default: false
     steps:
       - run: node --version
 
       - checkout
       - install
+
+      - when:
+          condition: << parameters.browser >>
+          steps:
+            - browser-tools/install-chrome
 
       - run:
           name: Prettier formatting
@@ -180,7 +184,8 @@ jobs:
       browser: true
       version: '12.22'
     steps:
-      - test
+      - test:
+          browser: true
 
   test-node14:
     executor:
@@ -188,14 +193,16 @@ jobs:
       browser: true
       version: '14.18'
     steps:
-      - test
+      - test:
+          browser: true
 
   test-node16:
     executor:
       name: node
       browser: true
     steps:
-      - test
+      - test:
+          browser: true
 
   docker-build-latest:
     executor: node
