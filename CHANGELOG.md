@@ -4,6 +4,9 @@
 
 ### Changed
 
+- Upgrade Marpit to [v2.2.3](https://github.com/marp-team/marpit/releases/tag/v2.2.3) ([#435](https://github.com/marp-team/marp-cli/pull/435))
+- Upgrade Marp Core to [v2.4.0](https://github.com/marp-team/marp-core/releases/tag/v2.4.0) ([#438](https://github.com/marp-team/marp-cli/pull/438))
+  - Added Unicode 14.0 emoji support
 - Bump Node LTS, and improve CI settings ([#437](https://github.com/marp-team/marp-cli/pull/437))
 
 ## v1.7.0 - 2022-02-23
