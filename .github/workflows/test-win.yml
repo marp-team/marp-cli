@@ -24,8 +24,8 @@ jobs:
           - '16.14.2'
 
     steps:
-      - name: Output concurrency group
-        run: echo "${{ github.workflow }}-${{ (github.ref_name == 'main' && github.run_id) || format('{0}-{1}', github.actor, github.head_ref || github.ref_name) }}"
+      # - name: Output concurrency group
+      #   run: echo "${{ github.workflow }}-${{ (github.ref_name == 'main' && github.run_id) || format('{0}-{1}', github.actor, github.head_ref || github.ref_name) }}"
 
       - uses: actions/checkout@v2
 
@@ -56,9 +56,9 @@ jobs:
       # https://stackoverflow.com/a/59365905
       - name: Jest
         run: >-
-          yarn test:coverage --ci -i --reporters=default --reporters=jest-junit ||
-          yarn test:coverage --ci -i --reporters=default --reporters=jest-junit --no-cache ||
-          yarn test:coverage --ci -i --reporters=default --reporters=jest-junit --no-cache
+          yarn test:coverage --ci -i --reporters=default --reporters=jest-junit --forceExit ||
+          yarn test:coverage --ci -i --reporters=default --reporters=jest-junit --forceExit --no-cache ||
+          yarn test:coverage --ci -i --reporters=default --reporters=jest-junit --forceExit --no-cache
         env:
           CI: true
 
