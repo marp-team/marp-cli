@@ -1191,10 +1191,10 @@
   resolved "https://registry.yarnpkg.com/@marp-team/marpit-svg-polyfill/-/marpit-svg-polyfill-1.7.1.tgz#be98fcd3758c2be60980dc31f17116a90262cf03"
   integrity sha512-dSZLyPNzBY+lrcIPF1dC9dcYcU3MPFigtjQDxLZP48uWq5oaMSnPLGtDsiDjlqVHk6MAmMuw7qy1i4+tt9HhpA==
 
-"@marp-team/marpit@^2.2.2":
-  version "2.2.2"
-  resolved "https://registry.yarnpkg.com/@marp-team/marpit/-/marpit-2.2.2.tgz#b5152e51c2e1ee4e14346e41192f182bd68739c3"
-  integrity sha512-jrEl8YtK2Fz06BSqtwtAsX/fEqDMQ2UwepFzMwRrmbyVd3lP4O+3BoI7VmX7mIOXaXcYcv33yw66MdaCN+M4cg==
+"@marp-team/marpit@^2.2.2", "@marp-team/marpit@^2.2.3":
+  version "2.2.3"
+  resolved "https://registry.yarnpkg.com/@marp-team/marpit/-/marpit-2.2.3.tgz#03a166deb118276e164faf706243d37597e92103"
+  integrity sha512-r2k7Z9oyiRNMdpYDS74X/6SUJ6IZTjTkRfOlH0KeKeUqlmL4Y3O8F1XXiQOmmjpLpL6JUbEDkRuM5thMsg6HVw==
   dependencies:
     color-string "^1.9.0"
     cssesc "^3.0.0"
@@ -1202,7 +1202,7 @@
     lodash.kebabcase "^4.1.1"
     markdown-it "^12.3.2"
     markdown-it-front-matter "^0.2.3"
-    postcss "^8.4.5"
+    postcss "^8.4.12"
 
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
@@ -5274,7 +5274,7 @@ multistream@^4.1.0:
     once "^1.4.0"
     readable-stream "^3.6.0"
 
-nanoid@^3.2.0, nanoid@^3.3.1:
+nanoid@^3.3.1:
   version "3.3.1"
   resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.3.1.tgz#6347a18cac88af88f58af0b3594b723d5e99bb35"
   integrity sha512-n6Vs/3KGyxPQd6uO0eH4Bv0ojGSUvuLlIHtC3Y0kEO23YRge8H9x1GCzLn28YX0H66pMkxuaeESFq4tKISKwdw==
@@ -6071,12 +6071,12 @@ postcss-value-parser@^4.1.0, postcss-value-parser@^4.2.0:
   resolved "https://registry.yarnpkg.com/postcss-value-parser/-/postcss-value-parser-4.2.0.tgz#723c09920836ba6d3e5af019f92bc0971c02e514"
   integrity sha512-1NNCs6uurfkVbeXG4S8JFT9t19m45ICnif8zWLd5oPSZ50QnwMfK+H3jv408d4jw/7Bttv5axS5IiHoLaVNHeQ==
 
-postcss@^8.4.5, postcss@^8.4.6:
-  version "8.4.6"
-  resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.4.6.tgz#c5ff3c3c457a23864f32cb45ac9b741498a09ae1"
-  integrity sha512-OovjwIzs9Te46vlEx7+uXB0PLijpwjXGKXjVGGPIGubGpq7uh5Xgf6D6FiJ/SzJMBosHDp6a2hiXOS97iBXcaA==
+postcss@^8.4.12, postcss@^8.4.5, postcss@^8.4.6:
+  version "8.4.12"
+  resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.4.12.tgz#1e7de78733b28970fa4743f7da6f3763648b1905"
+  integrity sha512-lg6eITwYe9v6Hr5CncVbK70SoioNQIq81nsaG86ev5hAidQvmOeETBqs7jm43K2F5/Ley3ytDtriImV6TpNiSg==
   dependencies:
-    nanoid "^3.2.0"
+    nanoid "^3.3.1"
     picocolors "^1.0.0"
     source-map-js "^1.0.2"
 
