@@ -138,7 +138,7 @@
     "zip-stream": "^4.1.0"
   },
   "dependencies": {
-    "@marp-team/marp-core": "^2.3.2",
+    "@marp-team/marp-core": "^2.4.0",
     "@marp-team/marpit": "^2.2.3",
     "chokidar": "^3.5.3",
     "cosmiconfig": "^7.0.1",
