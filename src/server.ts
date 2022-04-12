@@ -1,4 +1,4 @@
-/* eslint-disable import/export, @typescript-eslint/no-namespace */
+/* eslint-disable @typescript-eslint/no-namespace */
 import EventEmitter from 'events'
 import fs from 'fs'
 import { Server as HttpServer } from 'http'

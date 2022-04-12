@@ -4,10 +4,12 @@
 
 ### Changed
 
-- Upgrade Marpit to [v2.2.3](https://github.com/marp-team/marpit/releases/tag/v2.2.3) ([#435](https://github.com/marp-team/marp-cli/pull/435))
-- Upgrade Marp Core to [v2.4.0](https://github.com/marp-team/marp-core/releases/tag/v2.4.0) ([#438](https://github.com/marp-team/marp-cli/pull/438))
-  - Added Unicode 14.0 emoji support
+- Upgrade Marpit to [v2.2.4](https://github.com/marp-team/marpit/releases/tag/v2.2.4) ([#441](https://github.com/marp-team/marp-cli/pull/441))
+  - Fixed: Scoped style does not style pseudo elements `section::before` and `section::after` in advanced background
+- Upgrade Marp Core to [v2.4.1](https://github.com/marp-team/marp-core/releases/tag/v2.4.1) ([#441](https://github.com/marp-team/marp-cli/pull/441))
+  - Added Unicode 14.0 emoji support ([Marp Core v2.4.0](https://github.com/marp-team/marp-core/releases/tag/v2.4.0) / [#438](https://github.com/marp-team/marp-cli/pull/438))
 - Bump Node LTS, and improve CI settings ([#437](https://github.com/marp-team/marp-cli/pull/437))
+- Upgrade dependent packages to the latest version ([#441](https://github.com/marp-team/marp-cli/pull/441))
 
 ## v1.7.0 - 2022-02-23
 

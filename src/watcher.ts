@@ -1,4 +1,4 @@
-/* eslint-disable import/export, @typescript-eslint/no-namespace */
+/* eslint-disable @typescript-eslint/no-namespace */
 import crypto from 'crypto'
 import path from 'path'
 import chokidar from 'chokidar'
