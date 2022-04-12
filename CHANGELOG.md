@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Cannot output the conversion result into the drive root ([#442](https://github.com/marp-team/marp-cli/issues/442), [#443](https://github.com/marp-team/marp-cli/pull/443))
+
 ### Changed
 
 - Upgrade Marpit to [v2.2.4](https://github.com/marp-team/marpit/releases/tag/v2.2.4) ([#441](https://github.com/marp-team/marp-cli/pull/441))
