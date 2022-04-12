@@ -68,8 +68,8 @@ const bespokeNavigation =
         if (elm?.parentElement) detectScrollable(elm.parentElement, dir)
       }
 
-      if (e.deltaX !== 0) detectScrollable(<HTMLElement>e.target, 'X')
-      if (e.deltaY !== 0) detectScrollable(<HTMLElement>e.target, 'Y')
+      if (e.deltaX !== 0) detectScrollable(e.target as HTMLElement, 'X')
+      if (e.deltaY !== 0) detectScrollable(e.target as HTMLElement, 'Y')
       if (scrollable) return
 
       e.preventDefault()

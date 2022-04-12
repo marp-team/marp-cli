@@ -13,8 +13,8 @@ describe('JavaScript for server index', () => {
       <ul id="index"></ul>
     `.trim()
 
-    index = <HTMLUListElement>document.getElementById('index')
-    showAll = <HTMLInputElement>document.getElementById('show-all')
+    index = document.getElementById('index') as HTMLUListElement
+    showAll = document.getElementById('show-all') as HTMLInputElement
   })
 
   const checkShowAll = (state: boolean) => {

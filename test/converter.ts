@@ -20,7 +20,13 @@ import { WatchNotifier } from '../src/watcher'
 
 const puppeteerTimeoutMs = 60000
 
+let mkdirSpy: jest.SpiedFunction<typeof fs.promises.mkdir>
+
 jest.mock('fs')
+
+beforeEach(() => {
+  mkdirSpy = jest.spyOn(fs.promises, 'mkdir').mockImplementation()
+})
 
 afterAll(() => Converter.closeBrowser())
 afterEach(() => jest.restoreAllMocks())
@@ -58,7 +64,7 @@ describe('Converter', () => {
         globalDirectives: { theme: 'default' },
         imageScale: 2,
         lang: 'fr',
-        options: <Options>{ html: true },
+        options: { html: true } as Options,
         server: false,
         template: 'test-template',
         templateOption: {},
@@ -485,12 +491,12 @@ transition:
   describe('#convertFile', () => {
     it('rejects Promise when specified file is not found', () =>
       expect(
-        (instance() as any).convertFile(new File('_NOT_FOUND_MARKDOWN_'))
+        instance().convertFile(new File('_NOT_FOUND_MARKDOWN_'))
       ).rejects.toBeTruthy())
 
     it('converts markdown file and save as html file by default', async () => {
-      const write = (<any>fs).__mockWriteFile()
-      await (<any>instance()).convertFile(new File(onePath))
+      const write = (fs as any).__mockWriteFile()
+      await instance().convertFile(new File(onePath))
 
       expect(write).toHaveBeenCalledWith(
         `${onePath.slice(0, -3)}.html`,
@@ -500,9 +506,9 @@ transition:
     })
 
     it('converts markdown file and save to specified path when output is defined', async () => {
-      const write = (<any>fs).__mockWriteFile()
+      const write = (fs as any).__mockWriteFile()
       const output = './specified.html'
-      await (<any>instance({ output })).convertFile(new File(twoPath))
+      await instance({ output }).convertFile(new File(twoPath))
 
       expect(write).toHaveBeenCalledWith(
         output,
@@ -511,19 +517,40 @@ transition:
       )
     })
 
+    it('tries to create the directory of output file when saving', async () => {
+      const write = (fs as any).__mockWriteFile()
+      const output = path.resolve(__dirname, '__test_dir__/out.html')
+
+      await instance({ output }).convertFile(new File(twoPath))
+
+      expect(write).toHaveBeenCalled()
+      expect(mkdirSpy).toHaveBeenCalledWith(
+        path.resolve(__dirname, '__test_dir__'),
+        { recursive: true }
+      )
+    })
+
+    it('does not try to create the directory of output file when saving to the root', async () => {
+      const write = (fs as any).__mockWriteFile()
+      const output = '/out.html'
+
+      await instance({ output }).convertFile(new File(twoPath))
+
+      expect(write).toHaveBeenCalled()
+      expect(mkdirSpy).not.toHaveBeenCalled()
+    })
+
     it('converts markdown file but not save when output is stdout', async () => {
-      const write = (<any>fs).__mockWriteFile()
+      const write = (fs as any).__mockWriteFile()
       const stdout = jest.spyOn(process.stdout, 'write').mockImplementation()
 
       const output = '-'
-      const ret = await (<any>instance({ output })).convertFile(
-        new File(threePath)
-      )
+      const ret = await instance({ output }).convertFile(new File(threePath))
 
       expect(write).not.toHaveBeenCalled()
       expect(stdout).toHaveBeenCalledTimes(1)
       expect(ret.file.path).toBe(threePath)
-      expect(ret.newFile.type).toBe(FileType.StandardIO)
+      expect(ret.newFile?.type).toBe(FileType.StandardIO)
     })
 
     describe('when convert type is PDF', () => {
@@ -533,7 +560,7 @@ transition:
       it(
         'converts markdown file into PDF',
         async () => {
-          const write = (<any>fs).__mockWriteFile()
+          const write = (fs as any).__mockWriteFile()
           const opts = { output: 'test.pdf' }
           const ret = await pdfInstance(opts).convertFile(new File(onePath))
           const pdf: Buffer = write.mock.calls[0][1]
@@ -551,7 +578,7 @@ transition:
         it(
           'assigns meta info thorugh pdf-lib',
           async () => {
-            const write = (<any>fs).__mockWriteFile()
+            const write = (fs as any).__mockWriteFile()
 
             await pdfInstance({
               output: 'test.pdf',
@@ -580,7 +607,7 @@ transition:
           async () => {
             const file = new File(onePath)
 
-            const fileCleanup = jest.spyOn(<any>File.prototype, 'cleanup')
+            const fileCleanup = jest.spyOn(File.prototype as any, 'cleanup')
             const fileSave = jest
               .spyOn(File.prototype, 'save')
               .mockImplementation()
@@ -614,7 +641,7 @@ transition:
         it(
           'assigns presenter notes as annotation of PDF',
           async () => {
-            const write = (<any>fs).__mockWriteFile()
+            const write = (fs as any).__mockWriteFile()
 
             await pdfInstance({
               output: 'test.pdf',
@@ -637,7 +664,7 @@ transition:
         )
 
         it('sets a comment author to notes if set author global directive', async () => {
-          const write = (<any>fs).__mockWriteFile()
+          const write = (fs as any).__mockWriteFile()
 
           await pdfInstance({
             output: 'test.pdf',
@@ -673,7 +700,7 @@ transition:
       let write: jest.Mock
 
       beforeEach(() => {
-        write = (<any>fs).__mockWriteFile()
+        write = (fs as any).__mockWriteFile()
       })
 
       const converter = (opts: Partial<ConverterOption> = {}) =>
@@ -781,7 +808,7 @@ transition:
       let write: jest.Mock
 
       beforeEach(() => {
-        write = (<any>fs).__mockWriteFile()
+        write = (fs as any).__mockWriteFile()
       })
 
       it(
@@ -851,7 +878,7 @@ transition:
       let write: jest.Mock
 
       beforeEach(() => {
-        write = (<any>fs).__mockWriteFile()
+        write = (fs as any).__mockWriteFile()
       })
 
       it(
@@ -929,7 +956,7 @@ transition:
           pages: true,
           type: ConvertType.png,
         })
-        write = (<any>fs).__mockWriteFile()
+        write = (fs as any).__mockWriteFile()
       })
 
       it(
@@ -950,9 +977,9 @@ transition:
         const notesInstance = (opts: Partial<ConverterOption> = {}) =>
           instance({ ...opts, type: ConvertType.notes })
 
-        const write = (<any>fs).__mockWriteFile()
+        const write = (fs as any).__mockWriteFile()
         const output = './specified.txt'
-        const ret = await (<any>notesInstance({ output })).convertFile(
+        const ret = await notesInstance({ output }).convertFile(
           new File(threePath)
         )
         const notes: Buffer = write.mock.calls[0][1]
@@ -969,9 +996,9 @@ transition:
         const notesInstance = (opts: Partial<ConverterOption> = {}) =>
           instance({ ...opts, type: ConvertType.notes })
 
-        const write = (<any>fs).__mockWriteFile()
+        const write = (fs as any).__mockWriteFile()
         const output = './specified.txt'
-        const ret = await (<any>notesInstance({ output })).convertFile(
+        const ret = await notesInstance({ output }).convertFile(
           new File(onePath)
         )
         const notes: Buffer = write.mock.calls[0][1]
@@ -991,7 +1018,7 @@ transition:
   describe('#convertFiles', () => {
     describe('with multiple files', () => {
       it('converts passed files', async () => {
-        const write = (<any>fs).__mockWriteFile()
+        const write = (fs as any).__mockWriteFile()
 
         await instance().convertFiles([new File(onePath), new File(twoPath)])
         expect(write).toHaveBeenCalledTimes(2)
@@ -1008,7 +1035,7 @@ transition:
         ).rejects.toBeInstanceOf(CLIError))
 
       it('converts passed files when output is stdout', async () => {
-        const write = (<any>fs).__mockWriteFile()
+        const write = (fs as any).__mockWriteFile()
         const stdout = jest.spyOn(process.stdout, 'write').mockImplementation()
         const files = [new File(onePath), new File(twoPath)]
 
