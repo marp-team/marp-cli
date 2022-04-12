@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v1.7.1 - 2022-04-12
+
 ### Fixed
 
 - Cannot output the conversion result into the drive root ([#442](https://github.com/marp-team/marp-cli/issues/442), [#443](https://github.com/marp-team/marp-cli/pull/443))
