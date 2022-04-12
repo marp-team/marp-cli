@@ -224,7 +224,7 @@ describe('Marp CLI', () => {
     const files = assetFn('_files')
 
     let writeFile: jest.Mock
-    beforeEach(() => (writeFile = (<any>fs).__mockWriteFile()))
+    beforeEach(() => (writeFile = (fs as any).__mockWriteFile()))
 
     it('converts files in specified dir', async () => {
       jest.spyOn(cli, 'info').mockImplementation()
@@ -372,7 +372,7 @@ describe('Marp CLI', () => {
       info = jest.spyOn(cli, 'info')
 
       info.mockImplementation()
-      ;(<any>fs).__mockWriteFile()
+      ;(fs as any).__mockWriteFile()
     })
 
     describe('when passed value is theme name', () => {
@@ -395,7 +395,7 @@ describe('Marp CLI', () => {
         const { css } = (await convert.mock.results[0].value).rendered
         expect(css).toContain('/* @theme a */')
 
-        const converter = <Converter>convert.mock.instances[0]
+        const converter: Converter = convert.mock.instances[0]
         const { themeSet } = converter.options
         const theme = themeSet.themes.get(cssFile)
 
@@ -441,7 +441,7 @@ describe('Marp CLI', () => {
       observeSpy = jest.spyOn(ThemeSet.prototype, 'observe')
 
       jest.spyOn(cli, 'info').mockImplementation()
-      ;(<any>fs).__mockWriteFile()
+      ;(fs as any).__mockWriteFile()
     })
 
     describe('with specified single file', () => {
@@ -555,7 +555,7 @@ describe('Marp CLI', () => {
         await marpCli(cmd)
         expect(cvtFiles).toHaveBeenCalled()
 
-        return <any>cvtFiles.mock.instances[0]
+        return cvtFiles.mock.instances[0] as any
       } finally {
         cvtFiles.mockRestore()
         cliInfo.mockRestore()
@@ -564,7 +564,7 @@ describe('Marp CLI', () => {
 
     it('converts file', async () => {
       const cliInfo = jest.spyOn(cli, 'info').mockImplementation()
-      ;(<any>fs).__mockWriteFile()
+      ;(fs as any).__mockWriteFile()
 
       expect(await marpCli([onePath])).toBe(0)
 
@@ -764,7 +764,7 @@ describe('Marp CLI', () => {
     describe('with -w option', () => {
       it('starts watching by Watcher.watch()', async () => {
         jest.spyOn(cli, 'info').mockImplementation()
-        ;(<any>fs).__mockWriteFile()
+        ;(fs as any).__mockWriteFile()
 
         await runForObservation([onePath, '-w'])
         expect(Watcher.watch).toHaveBeenCalledWith([onePath], expect.anything())
@@ -1070,7 +1070,7 @@ describe('Marp CLI', () => {
         .mockResolvedValue(Buffer.from('# markdown'))
 
       // reset cached stdin buffer
-      ;(<any>File).stdinBuffer = undefined
+      ;(File as any).stdinBuffer = undefined
     })
 
     it('converts markdown came from stdin and outputs to stdout', async () => {

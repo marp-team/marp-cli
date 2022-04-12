@@ -75,7 +75,7 @@ describe('ThemeSet', () => {
           expect(themeSet.onThemeUpdated).toHaveBeenCalledWith('testA2.md')
 
           // It does no longer trigger after #unobserve
-          ;(<jest.Mock>themeSet.onThemeUpdated).mockClear()
+          ;(themeSet.onThemeUpdated as jest.Mock).mockClear()
           themeSet.unobserve('testA.md')
 
           await themeSet.load(themeA)

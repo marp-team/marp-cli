@@ -33,7 +33,7 @@ describe('Watcher', () => {
   const file = new File('test.md')
 
   const createThemeSet = () => {
-    const instance = new (<any>ThemeSet)()
+    const instance = new (ThemeSet as any)()
 
     instance.findPath.mockResolvedValue(['test.css'])
     instance.themes = { delete: jest.fn() }
@@ -42,12 +42,12 @@ describe('Watcher', () => {
   }
 
   const createWatcher = (opts: Partial<Watcher.Options> = {}) =>
-    Watcher.watch(['test.md'], <any>{
+    Watcher.watch(['test.md'], {
       finder: async () => [file],
       converter: {
         convertFiles: jest.fn(),
         options: { themeSet: createThemeSet() },
-      },
+      } as any,
       events: {
         onConverted: jest.fn(),
         onError: jest.fn(),
@@ -68,7 +68,7 @@ describe('Watcher', () => {
       expect(notifier.start).toHaveBeenCalled()
 
       // Chokidar events
-      const on = <jest.Mock>watcher.chokidar.on
+      const on = watcher.chokidar.on as jest.Mock
 
       expect(on).toHaveBeenCalledWith('change', expect.any(Function))
       expect(on).toHaveBeenCalledWith('add', expect.any(Function))
@@ -79,8 +79,8 @@ describe('Watcher', () => {
       const onUnlink = on.mock.calls.find(([e]) => e === 'unlink')[1]
 
       // Callbacks
-      const conv = jest.spyOn(<any>watcher, 'convert').mockImplementation()
-      const del = jest.spyOn(<any>watcher, 'delete').mockImplementation()
+      const conv = jest.spyOn(watcher as any, 'convert').mockImplementation()
+      const del = jest.spyOn(watcher as any, 'delete').mockImplementation()
 
       onChange('change')
       expect(conv).toHaveBeenCalledWith('change')
@@ -251,7 +251,7 @@ describe('WatchNotifier', () => {
 
     afterEach(() => instance.stop())
 
-    const wss = () => (<any>instance).wss
+    const wss = () => (instance as any).wss
 
     it('starts WebSocket server for notify to HTML', async () => {
       expect(wss()).toBeUndefined()
