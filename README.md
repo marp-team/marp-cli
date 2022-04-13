@@ -451,7 +451,7 @@ Marp CLI can be configured options with file, such as `marp.config.js`, `marp.co
 {
   "marp": {
     "inputDir": "./slides",
-    "output":" ./public",
+    "output": "./public",
     "themeSet": "./themes"
   }
 }
