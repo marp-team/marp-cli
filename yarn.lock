@@ -1158,17 +1158,17 @@
     "@jridgewell/resolve-uri" "^3.0.3"
     "@jridgewell/sourcemap-codec" "^1.4.10"
 
-"@marp-team/marp-core@^2.4.1":
-  version "2.4.1"
-  resolved "https://registry.yarnpkg.com/@marp-team/marp-core/-/marp-core-2.4.1.tgz#a79dcff9904dd1e62990dfa9e863aa4bbe74e422"
-  integrity sha512-03QStxisTug2YuWKQ2jza1FrSToB7WyEwndQOj3KjYSNUcSKdZKZpDmPmgXh0+uTWYJpOw+K/xb8vVds3KjfMg==
+"@marp-team/marp-core@^2.4.2":
+  version "2.4.2"
+  resolved "https://registry.yarnpkg.com/@marp-team/marp-core/-/marp-core-2.4.2.tgz#fc56de3111acbb2b08f4cd35b8202d42e7c4b3c9"
+  integrity sha512-Nnhp0NYATlpxjT9mALbmtGzoi2GZ0/HCJbsxZybxb5AtXiPXdYFyoZ5kYjeVR1+bSMrakJHXAkpAUUF8PF4bJQ==
   dependencies:
     "@marp-team/marpit" "^2.2.4"
     "@marp-team/marpit-svg-polyfill" "^2.0.0"
     emoji-regex "^10.1.0"
     highlight.js "^10.7.3"
     katex "^0.15.3"
-    markdown-it-emoji "^2.0.0"
+    markdown-it-emoji "^2.0.2"
     mathjax-full "^3.2.0"
     postcss "^8.4.12"
     postcss-minify-params "^5.1.2"
@@ -2788,10 +2788,10 @@ detect-newline@^3.0.0:
   resolved "https://registry.yarnpkg.com/detect-newline/-/detect-newline-3.1.0.tgz#576f5dfc63ae1a192ff192d8ad3af6308991b651"
   integrity sha512-TLz+x/vEXm/Y7P7wn1EJFNLxYpUD4TgMosxY6fAVJUnJMbupHBOncxyWUG9OpTaH9EBD7uFI5LfEgmMOc54DsA==
 
-devtools-protocol@0.0.969999:
-  version "0.0.969999"
-  resolved "https://registry.yarnpkg.com/devtools-protocol/-/devtools-protocol-0.0.969999.tgz#3d6be0a126b3607bb399ae2719b471dda71f3478"
-  integrity sha512-6GfzuDWU0OFAuOvBokXpXPLxjOJ5DZ157Ue3sGQQM3LgAamb8m0R0ruSfN0DDu+XG5XJgT50i6zZ/0o8RglreQ==
+devtools-protocol@0.0.981744:
+  version "0.0.981744"
+  resolved "https://registry.yarnpkg.com/devtools-protocol/-/devtools-protocol-0.0.981744.tgz#9960da0370284577d46c28979a0b32651022bacf"
+  integrity sha512-0cuGS8+jhR67Fy7qG3i3Pc7Aw494sb9yG9QgpG97SFVWwolgYjlhJg7n+UaHxOQT30d1TYu/EYe9k01ivLErIg==
 
 dezalgo@1.0.3:
   version "1.0.3"
@@ -5044,10 +5044,10 @@ map-obj@^4.0.0:
   resolved "https://registry.yarnpkg.com/map-obj/-/map-obj-4.3.0.tgz#9304f906e93faae70880da102a9f1df0ea8bb05a"
   integrity sha512-hdN1wVrZbb29eBGiGjJbeP8JbKjq1urkHJ/LIP/NY48MZ1QVXUsQBV1G1zvYFHn1XE06cwjBsOI2K3Ulnj1YXQ==
 
-markdown-it-emoji@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/markdown-it-emoji/-/markdown-it-emoji-2.0.0.tgz#3164ad4c009efd946e98274f7562ad611089a231"
-  integrity sha512-39j7/9vP/CPCKbEI44oV8yoPJTpvfeReTn/COgRhSpNrjWF3PfP/JUxxB0hxV6ynOY8KH8Y8aX9NMDdo6z+6YQ==
+markdown-it-emoji@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/markdown-it-emoji/-/markdown-it-emoji-2.0.2.tgz#cd42421c2fda1537d9cc12b9923f5c8aeb9029c8"
+  integrity sha512-zLftSaNrKuYl0kR5zm4gxXjHaOI3FAOEaloKmRA5hijmJZvSjmxcokOLlzycb/HXlUFWzXqpIEoyEMCE4i9MvQ==
 
 markdown-it-front-matter@^0.2.3:
   version "0.2.3"
@@ -6299,14 +6299,14 @@ punycode@^2.1.0, punycode@^2.1.1:
   resolved "https://registry.yarnpkg.com/punycode/-/punycode-2.1.1.tgz#b58b010ac40c22c5657616c8d2c2c02c7bf479ec"
   integrity sha512-XRsRjdf+j5ml+y/6GKHPZbrF/8p2Yga0JPtdqTIY2Xe5ohJPD9saDJJLPvp9+NSBprVvevdXZybnj2cv8OEd0A==
 
-puppeteer-core@13.5.2:
-  version "13.5.2"
-  resolved "https://registry.yarnpkg.com/puppeteer-core/-/puppeteer-core-13.5.2.tgz#ae5788f98dbb322fa3514b60f2ebdd2fb3b7cfb7"
-  integrity sha512-uxHOWCHt9mGUCLu8qtbEy3UqHlBRMzGCyPmAeoq2KrtmPOC0ZJPRZrDLWJMG3E/gwuHinDtZnBbnFfRfk/PABg==
+puppeteer-core@13.6.0:
+  version "13.6.0"
+  resolved "https://registry.yarnpkg.com/puppeteer-core/-/puppeteer-core-13.6.0.tgz#1626efbe789c19000a4c15309dbe55db5e936724"
+  integrity sha512-n692xT9uOTxbFKcCRkfOT2Go5LL0YBCHrSpBdbNsjLhcxO5yuhj2/4jgAIK9bT1blY17Pb4I35eBSuDzJ54ERw==
   dependencies:
     cross-fetch "3.1.5"
     debug "4.3.4"
-    devtools-protocol "0.0.969999"
+    devtools-protocol "0.0.981744"
     extract-zip "2.0.1"
     https-proxy-agent "5.0.0"
     pkg-dir "4.2.0"
