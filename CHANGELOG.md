@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Upgrade Marp Core to [v2.4.2](https://github.com/marp-team/marp-core/releases/tag/v2.4.2) ([#446](https://github.com/marp-team/marp-cli/pull/446))
+  - Make compatible with a patched markdown-it-emoji ([#445](https://github.com/marp-team/marp-cli/pull/445))
+- Upgrade dependent packages to the latest version ([#446](https://github.com/marp-team/marp-cli/pull/446))
+
 ## v1.7.1 - 2022-04-12
 
 ### Fixed

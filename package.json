@@ -138,13 +138,13 @@
     "zip-stream": "^4.1.0"
   },
   "dependencies": {
-    "@marp-team/marp-core": "^2.4.1",
+    "@marp-team/marp-core": "^2.4.2",
     "@marp-team/marpit": "^2.2.4",
     "chokidar": "^3.5.3",
     "cosmiconfig": "^7.0.1",
     "import-from": "^4.0.0",
     "is-wsl": "^2.2.0",
-    "puppeteer-core": "13.5.2",
+    "puppeteer-core": "13.6.0",
     "serve-index": "^1.9.1",
     "tmp": "^0.2.1",
     "v8-compile-cache": "^2.3.0",
