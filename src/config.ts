@@ -130,7 +130,7 @@ export class MarpCLIConfig {
               (preview
                 ? ''
                 : `Recommend to use with ${chalk.yellow`--preview`} option for trying transitions. `) +
-              `Track the latest information at ${chalk.blueBright`https://github.com/marp-team/marp-cli/issues/382`}.`
+              `Track the latest information at ${chalk.blueBright`https://github.com/marp-team/marp-cli/issues/447`}.`
           )
         }
 

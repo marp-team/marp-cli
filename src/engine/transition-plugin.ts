@@ -1,124 +1,77 @@
 import { Marpit } from '@marp-team/marpit'
 import type MarkdownIt from 'markdown-it'
-import { warn } from '../cli'
+import {
+  isTransitionData,
+  type MarpTransitionData,
+} from '../templates/bespoke/utils/transition'
 
-const hasOwnProperty = Object.prototype.hasOwnProperty
+import cover from './transition/keyframes/cover.scss'
+import cube from './transition/keyframes/cube.scss'
+import drop from './transition/keyframes/drop.scss'
+import explode from './transition/keyframes/explode.scss'
+import fadeOut from './transition/keyframes/fade-out.scss'
+import fade from './transition/keyframes/fade.scss'
+import flip from './transition/keyframes/flip.scss'
+import grow from './transition/keyframes/grow.scss'
+import implode from './transition/keyframes/implode.scss'
+import inOut from './transition/keyframes/in-out.scss'
+import irisIn from './transition/keyframes/iris-in.scss'
+import irisOut from './transition/keyframes/iris-out.scss'
+import pivot from './transition/keyframes/pivot.scss'
+import pull from './transition/keyframes/pull.scss'
+import push from './transition/keyframes/push.scss'
+import reveal from './transition/keyframes/reveal.scss'
+import slide from './transition/keyframes/slide.scss'
+import star from './transition/keyframes/star.scss'
+import swap from './transition/keyframes/swap.scss'
+import wipe from './transition/keyframes/wipe.scss'
 
-interface TransitionMetaConfig {
-  type: keyof typeof transitions
-  duration?: number
-  delay?: number
+export const engineTransition = Symbol()
+
+export interface EngineTransition {
+  builtinTransitionStyle: string
 }
 
 interface TransitionMeta {
-  transition?: TransitionMetaConfig
-  transitionBack?: TransitionMetaConfig
+  transition?: MarpTransitionData
 }
 
-const inverted = {
-  'reveal-left': 'reveal-right',
-  'reveal-right': 'reveal-left',
-  'reveal-up': 'reveal-down',
-  'reveal-down': 'reveal-up',
-  'cover-left': 'cover-right',
-  'cover-right': 'cover-left',
-  'cover-up': 'cover-down',
-  'cover-down': 'cover-up',
-  fade: 'fade',
-  explode: 'implode',
-  implode: 'explode',
+const builtinTransitions = {
+  cover,
+  cube,
+  drop,
+  explode,
+  fade,
+  'fade-out': fadeOut,
+  flip,
+  grow,
+  implode,
+  'in-out': inOut,
+  'iris-in': irisIn,
+  'iris-out': irisOut,
+  pivot,
+  pull,
+  push,
+  reveal,
+  slide,
+  star,
+  swap,
+  wipe,
+
+  // Reserved transition to disable
+  none: false,
 } as const
-
-const transitions = {
-  reveal: 'reveal-left',
-  'reveal-left': 'reveal-left',
-  'reveal-right': 'reveal-right',
-  'reveal-up': 'reveal-up',
-  'reveal-down': 'reveal-down',
-  cover: 'cover-left',
-  'cover-left': 'cover-left',
-  'cover-right': 'cover-right',
-  'cover-up': 'cover-up',
-  'cover-down': 'cover-down',
-  fade: 'fade',
-  explode: 'implode',
-  implode: 'explode',
-} as const
-
-const asTransitionLength = (target: string, value: number) => {
-  const integer = Math.floor(value)
-  const clamped = Math.max(0, Math.min(5000, integer))
-
-  if (integer !== clamped) {
-    warn(
-      `The length of ${target} must be between 0 to 5000ms. ${integer}ms is clamped to ${clamped}ms.`
-    )
-  }
-
-  return clamped
-}
-
-const parseMs = (value: unknown): number => {
-  if (typeof value === 'number') return value
-  if (typeof value !== 'string') return Number.NaN
-
-  const normalized = value.trim()
-
-  const msUnitMatcher = normalized.match(/^(-?\d+)ms$/)
-  if (msUnitMatcher) return Number.parseInt(msUnitMatcher[1], 10)
-
-  const secondUnitMatcher = normalized.match(/^(-?(?:\d*\.)?\d+)s$/)
-  if (secondUnitMatcher) return Number.parseFloat(secondUnitMatcher[1]) * 1000
-
-  return Number.parseFloat(normalized)
-}
-
-const parseTransitionMetaConfig = (
-  value: unknown
-): TransitionMetaConfig | undefined => {
-  if (typeof value === 'string') {
-    const transition = transitions[value]
-    if (transition) return { type: transition }
-  } else if (value && typeof value === 'object') {
-    const obj = value as TransitionMetaConfig
-    const transition = transitions[obj.type]
-
-    if (transition) {
-      const ret: TransitionMetaConfig = { type: transition }
-
-      const duration = parseMs(obj.duration)
-      if (!Number.isNaN(duration)) {
-        ret.duration = asTransitionLength('duration', duration)
-      }
-
-      const delay = parseMs(obj.delay)
-      if (!Number.isNaN(delay)) ret.delay = asTransitionLength('delay', delay)
-
-      return ret
-    }
-  }
-  return undefined
-}
 
 export default function transitionPlugin(md: MarkdownIt & { marpit: Marpit }) {
-  md.marpit.customDirectives.local.transition = (value): TransitionMeta => {
-    if (typeof value === 'string' || (value && typeof value === 'object')) {
-      const transition = parseTransitionMetaConfig(value)
+  const { marpit } = md
 
-      if (transition) {
-        const transitionBackType = inverted[transition.type]
+  marpit.customDirectives.local.transition = (value): TransitionMeta => {
+    if (typeof value === 'string') {
+      const [name, duration] = value.trim().split(/\s+/)
+      const transition = { name, duration }
 
-        return {
-          transition,
-          ...(transitionBackType
-            ? { transitionBack: { ...transition, type: transitionBackType } }
-            : {}),
-        }
-      } else {
-        return { transition: undefined, transitionBack: undefined }
-      }
+      if (isTransitionData(transition)) return { transition }
     }
-
     return {}
   }
 
@@ -128,35 +81,36 @@ export default function transitionPlugin(md: MarkdownIt & { marpit: Marpit }) {
     (state) => {
       if (state.inlineMode) return false
 
+      const builtinTransitionStyles = new Map<string, string>()
+
       for (const token of state.tokens) {
         const { marpitDirectives } = token.meta || {}
 
-        if (marpitDirectives?.transition) {
-          const { transition } = marpitDirectives
-          token.attrSet(`data-transition`, transition.type)
+        if (typeof marpitDirectives?.transition === 'object') {
+          const transition = { ...marpitDirectives.transition }
 
-          if (hasOwnProperty.call(transition, 'duration')) {
-            token.attrSet(`data-transition-duration`, transition.duration)
-          }
-          if (hasOwnProperty.call(transition, 'delay')) {
-            token.attrSet(`data-transition-delay`, transition.delay)
-          }
-        }
-        if (marpitDirectives?.transitionBack) {
-          const { transitionBack } = marpitDirectives
-          token.attrSet(`data-transition-back`, transitionBack.type)
+          if (isTransitionData(transition)) {
+            if (builtinTransitions[transition.name] !== undefined) {
+              builtinTransitionStyles.set(
+                transition.name,
+                builtinTransitions[transition.name]
+              )
+              transition.bultinFallback = true
+            }
 
-          if (hasOwnProperty.call(transitionBack, 'duration')) {
-            token.attrSet(
-              `data-transition-back-duration`,
-              transitionBack.duration
-            )
-          }
-          if (hasOwnProperty.call(transitionBack, 'delay')) {
-            token.attrSet(`data-transition-back-delay`, transitionBack.delay)
+            const json = JSON.stringify(transition)
+
+            token.attrSet('data-transition', json)
+            token.attrSet('data-transition-back', json)
           }
         }
       }
+
+      const transitionEngineInfo: EngineTransition = {
+        builtinTransitionStyle: [...builtinTransitionStyles.values()].join(''),
+      }
+
+      marpit[engineTransition] = transitionEngineInfo
 
       return true
     }

@@ -1,0 +1,29 @@
+@keyframes marp-incoming-transition-__builtin__drop {
+  0% {
+    transform: translateY(-100%);
+  }
+  35% {
+    transform: none;
+    animation-timing-function: ease-out;
+  }
+  60% {
+    transform: translateY(-10%);
+    animation-timing-function: ease-in;
+  }
+  85% {
+    transform: none;
+    animation-timing-function: ease-out;
+  }
+  92.5% {
+    transform: translateY(-1%);
+    animation-timing-function: ease-in;
+  }
+}
+@keyframes marp-outgoing-transition-__builtin__drop {
+  35% {
+    filter: none;
+  }
+  100% {
+    filter: brightness(0.75);
+  }
+}

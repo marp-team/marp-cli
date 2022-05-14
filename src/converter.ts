@@ -8,6 +8,7 @@ import { silence, warn } from './cli'
 import { Engine, ResolvedEngine } from './engine'
 import infoPlugin, { engineInfo, EngineInfo } from './engine/info-plugin'
 import metaPlugin from './engine/meta-plugin'
+import { engineTransition, EngineTransition } from './engine/transition-plugin'
 import { error } from './error'
 import { File, FileType } from './file'
 import templates, {
@@ -163,11 +164,13 @@ export class Converter {
 
         const ret = engine.render(stripBOM(`${markdown}${additionals}`))
         const info = engine[engineInfo]
+        const transition: EngineTransition | undefined =
+          engine[engineTransition]
 
         if (isFile(file))
           this.options.themeSet.observe(file.absolutePath, info?.theme)
 
-        return { ...ret, ...info! }
+        return { ...ret, ...info!, transition }
       },
     })
   }

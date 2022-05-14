@@ -1,4 +1,5 @@
 @use './button';
+@use './transition';
 
 $progress-height: 5px;
 
@@ -10,6 +11,8 @@ $progress-height: 5px;
 }
 
 @media screen {
+  @include transition.transition;
+
   html,
   body {
     height: 100%;

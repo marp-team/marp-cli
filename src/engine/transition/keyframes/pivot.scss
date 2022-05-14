@@ -1,0 +1,26 @@
+@use './utils';
+
+@keyframes marp-incoming-transition-__builtin__pivot {
+  from {
+    transform-origin: left top;
+    transform: rotate(-90deg);
+    animation-timing-function: ease-out;
+  }
+  to {
+    transform-origin: left top;
+  }
+}
+
+@keyframes marp-incoming-transition-backward-__builtin__pivot {
+  @include utils.send-backward;
+}
+@keyframes marp-outgoing-transition-backward-__builtin__pivot {
+  from {
+    transform-origin: left top;
+    animation-timing-function: ease-in;
+  }
+  to {
+    transform-origin: left top;
+    transform: rotate(-90deg);
+  }
+}

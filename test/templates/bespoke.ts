@@ -1474,7 +1474,7 @@ describe("Bespoke template's browser context", () => {
     })
   })
 
-  describe('[Experimental] Transition', () => {
+  describe.skip('[Experimental] Transition', () => {
     let documentTransition: Record<string, jest.Mock>
 
     beforeEach(() => {

@@ -1,0 +1,26 @@
+@keyframes marp-outgoing-transition-__builtin__flip {
+  0% {
+    animation-timing-function: ease-in;
+  }
+  50% {
+    transform: perspective(800px) translateZ(-400px)
+      rotateY(calc(var(--marp-transition-direction, 1) * -90deg));
+    opacity: 0.5;
+    animation-timing-function: step-start;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes marp-incoming-transition-__builtin__flip {
+  0% {
+    opacity: 0;
+    animation-timing-function: step-end;
+  }
+  50% {
+    transform: perspective(800px) translateZ(-400px)
+      rotateY(calc(var(--marp-transition-direction, 1) * 90deg));
+    opacity: 0.5;
+    animation-timing-function: ease-out;
+  }
+}
