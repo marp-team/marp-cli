@@ -1,6 +1,6 @@
 @use './utils';
 
-@keyframes marp-outgoing-transition-__builtin__grow {
+@keyframes marp-outgoing-transition-__builtin__glow {
   50% {
     filter: blur(10px) contrast(0) brightness(2);
     opacity: 1;
@@ -10,7 +10,7 @@
     opacity: 0;
   }
 }
-@keyframes marp-incoming-transition-__builtin__grow {
+@keyframes marp-incoming-transition-__builtin__glow {
   @include utils.send-backward;
 
   0% {

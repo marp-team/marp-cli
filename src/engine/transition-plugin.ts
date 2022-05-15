@@ -12,7 +12,7 @@ import explode from './transition/keyframes/explode.scss'
 import fadeOut from './transition/keyframes/fade-out.scss'
 import fade from './transition/keyframes/fade.scss'
 import flip from './transition/keyframes/flip.scss'
-import grow from './transition/keyframes/grow.scss'
+import glow from './transition/keyframes/glow.scss'
 import implode from './transition/keyframes/implode.scss'
 import inOut from './transition/keyframes/in-out.scss'
 import irisIn from './transition/keyframes/iris-in.scss'
@@ -44,7 +44,7 @@ const builtinTransitions = {
   fade,
   'fade-out': fadeOut,
   flip,
-  grow,
+  glow,
   implode,
   'in-out': inOut,
   'iris-in': irisIn,
