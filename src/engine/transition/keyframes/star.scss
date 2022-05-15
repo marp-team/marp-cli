@@ -1,7 +1,11 @@
 @use './utils';
 
+:root {
+  --bespoke-marp-transition-star-mask: url('data:image/svg+xml;charset=utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%201000%20951.1%22%3E%3Cpath%20d%3D%22m500%200%20118%20363.3h382L691%20587.8l118%20363.3-309-224.6-309%20224.6%20118-363.3L0%20363.3h382L500%200z%22%2F%3E%3C%2Fsvg%3E');
+}
+
 @mixin star-mask {
-  -webkit-mask-image: url('data:image/svg+xml;charset=utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%201000%20951.1%22%3E%3Cpath%20d%3D%22m500%200%20118%20363.3h382L691%20587.8l118%20363.3-309-224.6-309%20224.6%20118-363.3L0%20363.3h382L500%200z%22%2F%3E%3C%2Fsvg%3E');
+  -webkit-mask-image: var(--bespoke-marp-transition-star-mask);
   -webkit-mask-position: center center;
   -webkit-mask-repeat: no-repeat;
 
