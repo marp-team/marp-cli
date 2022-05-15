@@ -1,11 +1,11 @@
 @mixin wipe-mask($mask-on: right) {
-  -webkit-mask-image: linear-gradient(
+  mask-image: linear-gradient(
     to #{$mask-on},
     transparent 100vw,
     #000 110vw,
     #000
   );
-  -webkit-mask-size: 210vw 100vh;
+  mask-size: 210vw 100vh;
 
   @content;
 }
@@ -13,12 +13,13 @@
 @keyframes marp-incoming-transition-__builtin__wipe {
   0% {
     @include wipe-mask {
-      -webkit-mask-position: left top;
+      mask-position: left top;
     }
   }
+
   100% {
     @include wipe-mask {
-      -webkit-mask-position: right top;
+      mask-position: right top;
     }
   }
 }
@@ -26,12 +27,13 @@
 @keyframes marp-incoming-transition-backward-__builtin__wipe {
   0% {
     @include wipe-mask(left) {
-      -webkit-mask-position: right top;
+      mask-position: right top;
     }
   }
+
   100% {
     @include wipe-mask(left) {
-      -webkit-mask-position: left top;
+      mask-position: left top;
     }
   }
 }

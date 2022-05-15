@@ -6,6 +6,7 @@
     opacity: 1;
     animation-timing-function: step-start;
   }
+
   100% {
     opacity: 0;
   }
@@ -16,6 +17,7 @@
   0% {
     filter: blur(10px) contrast(0) brightness(2);
   }
+
   50% {
     filter: blur(10px) contrast(0) brightness(2);
   }

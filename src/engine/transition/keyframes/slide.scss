@@ -3,6 +3,7 @@
     transform: translateX(calc(var(--marp-transition-direction, 1) * 100vw));
     animation-timing-function: ease-in-out;
   }
+
   to {
     animation-timing-function: ease-in-out;
   }
@@ -11,6 +12,7 @@
   from {
     animation-timing-function: ease-in-out;
   }
+
   to {
     transform: translateX(calc(var(--marp-transition-direction, 1) * -100vw));
     animation-timing-function: ease-in-out;

@@ -5,6 +5,7 @@
       translateZ(50vw);
     animation-timing-function: ease-in-out;
   }
+
   to {
     z-index: 0;
     filter: brightness(0.5);
@@ -22,6 +23,7 @@
       translateZ(50vw);
     animation-timing-function: ease-in-out;
   }
+
   to {
     z-index: 1;
     transform: perspective(100vw) translateZ(-50vw) rotateY(0deg)

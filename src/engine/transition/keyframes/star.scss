@@ -5,9 +5,9 @@
 }
 
 @mixin star-mask {
-  -webkit-mask-image: var(--bespoke-marp-transition-star-mask);
-  -webkit-mask-position: center center;
-  -webkit-mask-repeat: no-repeat;
+  mask-image: var(--bespoke-marp-transition-star-mask);
+  mask-position: center center;
+  mask-repeat: no-repeat;
 
   @content;
 }
@@ -15,12 +15,13 @@
 @keyframes marp-incoming-transition-__builtin__star {
   from {
     @include star-mask {
-      -webkit-mask-size: 0 0;
+      mask-size: 0 0;
     }
   }
+
   to {
     @include star-mask {
-      -webkit-mask-size: 270vmax 270vmax;
+      mask-size: 270vmax 270vmax;
     }
   }
 }
@@ -28,12 +29,13 @@
 @keyframes marp-outgoing-transition-backward-__builtin__star {
   from {
     @include star-mask {
-      -webkit-mask-size: 270vmax 270vmax;
+      mask-size: 270vmax 270vmax;
     }
   }
+
   to {
     @include star-mask {
-      -webkit-mask-size: 0 0;
+      mask-size: 0 0;
     }
   }
 }

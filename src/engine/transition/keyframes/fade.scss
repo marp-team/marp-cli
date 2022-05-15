@@ -2,6 +2,7 @@
   from {
     opacity: 1;
   }
+
   to {
     opacity: 0;
   }
@@ -11,6 +12,7 @@
     mix-blend-mode: plus-lighter;
     opacity: 0;
   }
+
   to {
     mix-blend-mode: plus-lighter;
     opacity: 1;

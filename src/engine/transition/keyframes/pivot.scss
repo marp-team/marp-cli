@@ -6,6 +6,7 @@
     transform: rotate(-90deg);
     animation-timing-function: ease-out;
   }
+
   to {
     transform-origin: left top;
   }
@@ -19,6 +20,7 @@
     transform-origin: left top;
     animation-timing-function: ease-in;
   }
+
   to {
     transform-origin: left top;
     transform: rotate(-90deg);
