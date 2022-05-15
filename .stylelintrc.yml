@@ -11,5 +11,21 @@ rules:
     - true
     - ignoreProperties:
         - content-visibility
+  selector-pseudo-element-no-unknown:
+    - true
+    - ignorePseudoElements:
+        - /^page-transition-/
+  selector-type-no-unknown:
+    - true
+    - ignoreTypes:
+        - __bespoke_marp_transition_osc__
   scss/at-rule-no-unknown:
     - true
+
+overrides:
+  - files:
+      - src/engine/transition/keyframes/**/*.scss
+      - src/engine/transition/keyframes/**/*.css
+    rules:
+      keyframes-name-pattern:
+        - null
