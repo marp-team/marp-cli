@@ -78,7 +78,9 @@ const bespokeTransition = (deck) => {
       )
       if (!transitionData) return true
 
-      getMarpTransitionKeyframes(transitionData.name).then((keyframes) => {
+      getMarpTransitionKeyframes(transitionData.name, {
+        bultinFallback: transitionData.bultinFallback,
+      }).then((keyframes) => {
         if (!keyframes) {
           doTransition(() => fn(e))
           return

@@ -18,7 +18,16 @@ export type MarpTransitionKeyframes = Record<
 const resolvedMarpTransitionKeyframes = new Map<
   string,
   MarpTransitionKeyframes
->()
+>([
+  // none is a reserved transition name to disable any transition effects
+  [
+    'none',
+    {
+      backward: { both: undefined, incoming: undefined, outgoing: undefined },
+      forward: { both: undefined, incoming: undefined, outgoing: undefined },
+    },
+  ],
+])
 
 const types = {
   both: '',
