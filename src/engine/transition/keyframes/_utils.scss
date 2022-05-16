@@ -7,9 +7,3 @@
     z-index: -1;
   }
 }
-
-@mixin no-animation {
-  to {
-    opacity: 1; /* dummy definition */
-  }
-}

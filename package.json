@@ -41,6 +41,10 @@
   "pkg": {
     "scripts": "lib/**/*.js"
   },
+  "browserslist": [
+    "> 1% and last 3 versions",
+    "Firefox ESR"
+  ],
   "scripts": {
     "build": "yarn -s clean && rollup -c",
     "build:standalone": "run-s build standalone",

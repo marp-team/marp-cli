@@ -27,5 +27,7 @@ overrides:
       - src/engine/transition/keyframes/**/*.scss
       - src/engine/transition/keyframes/**/*.css
     rules:
+      block-no-empty:
+        - null
       keyframes-name-pattern:
         - null
