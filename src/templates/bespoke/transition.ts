@@ -11,6 +11,12 @@ interface TransitionCallbackOption {
   cond: (e: any) => boolean
 }
 
+interface DocumentTransition {
+  start(callback: () => void): Promise<void>
+  setElement(element: Element, tag: string, options?: any): void
+  abandon(): void
+}
+
 const transitionApply = '_tA' as const
 const transitionDuring = '_tD' as const
 const transitionKeyOSC = '__bespoke_marp_transition_osc__' as const
@@ -20,16 +26,29 @@ const bespokeTransition = (deck) => {
   const createDocumentTransition: any = document['createDocumentTransition']
   if (!createDocumentTransition) return
 
+  const transitionDuringState = (
+    value?: boolean | DocumentTransition
+  ): boolean | DocumentTransition | undefined => {
+    if (value !== undefined) deck[transitionDuring] = value
+    return deck[transitionDuring]
+  }
+
   let currentFragment: any
 
-  deck[transitionDuring] = false
+  transitionDuringState(false)
 
-  const doTransition = async (callback: () => void | Promise<void>) => {
-    deck[transitionDuring] = true
+  const doTransition = async (
+    transition: DocumentTransition | true, // true means no transition
+    callback: () => void | Promise<void>
+  ) => {
+    transitionDuringState(transition)
+
     try {
       await callback()
+    } catch (e) {
+      console.warn(e)
     } finally {
-      deck[transitionDuring] = false
+      transitionDuringState(false)
     }
   }
 
@@ -58,12 +77,21 @@ const bespokeTransition = (deck) => {
   const transitionCallback =
     (fn: (e: any) => void, { back, cond }: TransitionCallbackOption) =>
     (e: any) => {
-      if (deck[transitionDuring]) return !!e[transitionApply]
+      const currentTransition = transitionDuringState()
+
+      if (currentTransition) {
+        if (e[transitionApply]) return true
+        if (typeof currentTransition === 'object') {
+          currentTransition.abandon()
+          if (e.forSync) return true
+        }
+        return false
+      }
 
       // Check transition
       const current = deck.slides[deck.slide()]
-      const isBack = e.back || back
-      const transitionDataTarget = `data-transition${isBack ? '-back' : ''}`
+      const isBack = () => e.back ?? back
+      const transitionDataTarget = `data-transition${isBack() ? '-back' : ''}`
       const section: HTMLElement = current.querySelector(
         `section[${transitionDataTarget}]`
       )
@@ -81,46 +109,45 @@ const bespokeTransition = (deck) => {
       getMarpTransitionKeyframes(transitionData.name, {
         bultinFallback: transitionData.bultinFallback,
       }).then((keyframes) => {
-        if (!keyframes) {
-          doTransition(() => fn(e))
-          return
-        }
+        if (!keyframes) return doTransition(true, () => fn(e))
 
         // Set style for transition effect
         const style = document.createElement('style')
         document.head.appendChild(style)
 
         resolveAnimationStyles(keyframes, {
-          backward: isBack,
+          backward: isBack(),
           duration: transitionData.duration,
         }).forEach((styleText) => style.sheet?.insertRule(styleText))
 
         try {
           // Start transition
-          const setSharedElements = (transition: any) => {
+          const setSharedElements = (transition: DocumentTransition) => {
             const osc = document.querySelector(`.${classPrefix}osc`)
             if (osc) transition.setElement(osc, transitionKeyOSC)
           }
 
-          const transition = document['createDocumentTransition']()
+          const transition: DocumentTransition =
+            document['createDocumentTransition']()
           setSharedElements(transition)
 
-          document.documentElement.classList.add(transitionWarmUpClass)
+          const rootClassList = document.documentElement.classList
+          rootClassList.add(transitionWarmUpClass)
 
-          doTransition(async () => {
+          doTransition(transition, async () => {
             await transition
               .start(async () => {
                 fn(e)
                 setSharedElements(transition)
-                document.documentElement.classList.remove(transitionWarmUpClass)
+                rootClassList.remove(transitionWarmUpClass)
               })
               .finally(() => {
                 style.remove()
-                document.documentElement.classList.remove(transitionWarmUpClass)
+                rootClassList.remove(transitionWarmUpClass)
               })
           })
         } catch (e) {
-          deck[transitionDuring] = false
+          transitionDuringState(false)
         }
       })
 

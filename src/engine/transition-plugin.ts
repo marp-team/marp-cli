@@ -90,7 +90,7 @@ export default function transitionPlugin(md: MarkdownIt & { marpit: Marpit }) {
           const transition = { ...marpitDirectives.transition }
 
           if (isTransitionData(transition)) {
-            if (builtinTransitions[transition.name] !== undefined) {
+            if (builtinTransitions[transition.name]) {
               builtinTransitionStyles.set(
                 transition.name,
                 builtinTransitions[transition.name]
