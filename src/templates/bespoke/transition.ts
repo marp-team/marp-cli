@@ -19,6 +19,7 @@ interface DocumentTransition {
 
 const transitionApply = '_tA' as const
 const transitionDuring = '_tD' as const
+const transitionStyleId = '_tSId' as const
 const transitionKeyOSC = '__bespoke_marp_transition_osc__' as const
 const transitionWarmUpClass = 'bespoke-marp-transition-warming-up' as const
 
@@ -37,19 +38,21 @@ const bespokeTransition = (deck) => {
 
   transitionDuringState(false)
 
-  const doTransition = async (
+  const doTransition = (
     transition: DocumentTransition | true, // true means no transition
     callback: () => void | Promise<void>
   ) => {
-    transitionDuringState(transition)
+    requestAnimationFrame(async () => {
+      transitionDuringState(transition)
 
-    try {
-      await callback()
-    } catch (e) {
-      console.warn(e)
-    } finally {
-      transitionDuringState(false)
-    }
+      try {
+        await callback()
+      } catch (e) {
+        console.warn(e)
+      } finally {
+        transitionDuringState(false)
+      }
+    })
   }
 
   // Prefetch using keyframes
@@ -111,8 +114,14 @@ const bespokeTransition = (deck) => {
       }).then((keyframes) => {
         if (!keyframes) return doTransition(true, () => fn(e))
 
+        // Clean up (A previous style may be remaining if navigated by anchor link)
+        const existStyle = document.getElementById(transitionStyleId)
+        if (existStyle) existStyle.remove()
+
         // Set style for transition effect
         const style = document.createElement('style')
+        style.id = transitionStyleId
+
         document.head.appendChild(style)
 
         resolveAnimationStyles(keyframes, {
