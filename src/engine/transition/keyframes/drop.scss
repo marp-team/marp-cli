@@ -1,6 +1,12 @@
+:root {
+  --bespoke-marp-transition-drop-shadow: 0px 0.3vh 0.6vh rgba(0, 0, 0, 0.39),
+    rgba(0, 0, 0, 0.3) 0px 3vh 5vh, rgba(0, 0, 0, 0.22) 0px 2vh 1.5vh;
+}
+
 @keyframes marp-incoming-transition-__builtin__drop {
   0% {
     transform: translateY(-100%);
+    box-shadow: var(--bespoke-marp-transition-drop-shadow);
   }
 
   35% {
@@ -21,6 +27,7 @@
   92.5% {
     transform: translateY(-1%);
     animation-timing-function: ease-in;
+    box-shadow: var(--bespoke-marp-transition-drop-shadow);
   }
 }
 @keyframes marp-outgoing-transition-__builtin__drop {
@@ -29,6 +36,29 @@
   }
 
   100% {
-    filter: brightness(0.75);
+    filter: brightness(0.5);
+  }
+}
+
+@keyframes marp-incoming-transition-backward-__builtin__drop {
+  0% {
+    filter: brightness(0.5);
+    animation-timing-function: ease-in;
+  }
+
+  65% {
+    filter: none;
+  }
+}
+@keyframes marp-outgoing-transition-backward-__builtin__drop {
+  0% {
+    z-index: 1;
+    animation-timing-function: ease-in;
+    box-shadow: var(--bespoke-marp-transition-drop-shadow);
+  }
+  100% {
+    z-index: 1;
+    transform: translateY(-100%);
+    box-shadow: var(--bespoke-marp-transition-drop-shadow);
   }
 }
