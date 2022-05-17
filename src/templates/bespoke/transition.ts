@@ -4,6 +4,7 @@ import {
   resolveAnimationStyles,
   prepareMarpTransitions,
   parseTransitionData,
+  MarpTransitionKeyframes,
 } from './utils/transition'
 
 interface TransitionCallbackOption {
@@ -22,6 +23,28 @@ const transitionDuring = '_tD' as const
 const transitionStyleId = '_tSId' as const
 const transitionKeyOSC = '__bespoke_marp_transition_osc__' as const
 const transitionWarmUpClass = 'bespoke-marp-transition-warming-up' as const
+
+const prefersReducedMotion = window.matchMedia(
+  '(prefers-reduced-motion: reduce)'
+)
+const reducedMotionOutgoingKeyframes =
+  '__bespoke_marp_transition_reduced_outgoing__' as const
+
+const reducedMotionIncomingKeyframes =
+  '__bespoke_marp_transition_reduced_incoming__' as const
+
+const reducedKeyframes: MarpTransitionKeyframes = {
+  forward: {
+    both: undefined,
+    incoming: reducedMotionIncomingKeyframes,
+    outgoing: reducedMotionOutgoingKeyframes,
+  },
+  backward: {
+    both: undefined,
+    incoming: reducedMotionIncomingKeyframes,
+    outgoing: reducedMotionOutgoingKeyframes,
+  },
+}
 
 const bespokeTransition = (deck) => {
   const createDocumentTransition: any = document['createDocumentTransition']
@@ -114,6 +137,16 @@ const bespokeTransition = (deck) => {
       }).then((keyframes) => {
         if (!keyframes) return doTransition(true, () => fn(e))
 
+        // Normalize keyframes for preferred reduced motion
+        let normalizedKeyframes = keyframes
+
+        if (prefersReducedMotion.matches) {
+          console.warn(
+            'Use a constant animation to transition because preferring reduced motion by viewer has detected. '
+          )
+          normalizedKeyframes = reducedKeyframes
+        }
+
         // Clean up (A previous style may be remaining if navigated by anchor link)
         const existStyle = document.getElementById(transitionStyleId)
         if (existStyle) existStyle.remove()
@@ -124,7 +157,7 @@ const bespokeTransition = (deck) => {
 
         document.head.appendChild(style)
 
-        resolveAnimationStyles(keyframes, {
+        resolveAnimationStyles(normalizedKeyframes, {
           backward: isBack(),
           duration: transitionData.duration,
         }).forEach((styleText) => style.sheet?.insertRule(styleText))

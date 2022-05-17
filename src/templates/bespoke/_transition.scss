@@ -1,3 +1,22 @@
+@keyframes __bespoke_marp_transition_reduced_outgoing__ {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes __bespoke_marp_transition_reduced_incoming__ {
+  0% {
+    opacity: 0;
+    mix-blend-mode: plus-lighter;
+  }
+  100% {
+    opacity: 1;
+    mix-blend-mode: plus-lighter;
+  }
+}
+
 @mixin transition {
   @at-root {
     ::page-transition-outgoing-image(*),

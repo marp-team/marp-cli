@@ -40,7 +40,7 @@ const directions = { forward: '', backward: '-backward' } as const
 const animCSSVar = <T extends string>(key: T) =>
   `--marp-bespoke-transition-animation-${key}` as const
 
-export const publicCSSVar = <T extends string>(key: T) =>
+const publicCSSVar = <T extends string>(key: T) =>
   `--marp-transition-${key}` as const
 
 const isAvailableKeyframe = (keyframe: string) =>
