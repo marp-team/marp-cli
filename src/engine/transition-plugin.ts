@@ -1,5 +1,6 @@
 import { Marpit } from '@marp-team/marpit'
 import type MarkdownIt from 'markdown-it'
+import { showCompletionScript } from 'yargs'
 import {
   isTransitionData,
   type MarpTransitionData,
@@ -83,8 +84,16 @@ export default function transitionPlugin(md: MarkdownIt & { marpit: Marpit }) {
 
       const builtinTransitionStyles = new Map<string, string>()
 
+      let previousTransitionBack: string | undefined
+
       for (const token of state.tokens) {
         const { marpitDirectives } = token.meta || {}
+
+        // Apply stored transition for backward direction in the next slide of defined slide
+        if (token.type === 'marpit_slide_open' && previousTransitionBack) {
+          token.attrSet('data-transition-back', previousTransitionBack)
+          previousTransitionBack = undefined
+        }
 
         if (typeof marpitDirectives?.transition === 'object') {
           const transition = { ...marpitDirectives.transition }
@@ -99,9 +108,9 @@ export default function transitionPlugin(md: MarkdownIt & { marpit: Marpit }) {
             }
 
             const json = JSON.stringify(transition)
-
             token.attrSet('data-transition', json)
-            token.attrSet('data-transition-back', json)
+
+            previousTransitionBack = json
           }
         }
       }
