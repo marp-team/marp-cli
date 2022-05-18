@@ -1,0 +1,32 @@
+@keyframes marp-outgoing-transition-coverflow {
+  from {
+    animation-timing-function: ease-in-out;
+    transform: perspective(50vw) translateX(0) rotateY(0) translateZ(0);
+    z-index: 1;
+  }
+
+  to {
+    filter: brightness(0.5);
+    transform: perspective(50vw)
+      translateX(calc(var(--marp-transition-direction, 1) * -60vw))
+      rotateY(calc(var(--marp-transition-direction, 1) * 70deg))
+      translateZ(-50vw);
+    z-index: 0;
+  }
+}
+@keyframes marp-incoming-transition-coverflow {
+  from {
+    animation-timing-function: ease-in-out;
+    filter: brightness(0.5);
+    transform: perspective(50vw)
+      translateX(calc(var(--marp-transition-direction, 1) * 60vw))
+      rotateY(calc(var(--marp-transition-direction, 1) * -70deg))
+      translateZ(-50vw);
+    z-index: 0;
+  }
+
+  to {
+    transform: perspective(50vw) translateX(0) rotateY(0) translateZ(0);
+    z-index: 1;
+  }
+}

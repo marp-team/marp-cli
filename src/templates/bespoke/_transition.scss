@@ -1,7 +1,9 @@
+/* stylelint-disable keyframes-name-pattern */
 @keyframes __bespoke_marp_transition_reduced_outgoing__ {
   0% {
     opacity: 1;
   }
+
   100% {
     opacity: 0;
   }
@@ -11,11 +13,13 @@
     opacity: 0;
     mix-blend-mode: plus-lighter;
   }
+
   100% {
     opacity: 1;
     mix-blend-mode: plus-lighter;
   }
 }
+/* stylelint-enable keyframes-name-pattern */
 
 @mixin transition {
   @at-root {

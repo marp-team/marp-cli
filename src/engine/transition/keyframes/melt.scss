@@ -1,0 +1,112 @@
+@use 'sass:list';
+@use 'sass:math';
+@use './utils';
+
+$melt-lines: 48;
+$melt-resolution: 8;
+$melt-radius: math.div(100%, $melt-lines * 2);
+$melt-base-aspect-ratio: math.div(16, 9);
+
+@function melt-patterns($seed, $height, $dy) {
+  $melt-patterns-list: ();
+
+  /* Use LCG algorithm to generate random list from seed */
+  @for $i from 1 through $melt-lines {
+    $seed: ($seed * 9301 + 49297) % 233280;
+    $rand: math.div($seed, 233280);
+    $melt-patterns-list: list.append(
+      $melt-patterns-list,
+      (math.div(math.pow($rand * 2, 2), 4) * $height) + $dy - ($height * 0.5)
+    );
+  }
+
+  @return $melt-patterns-list;
+}
+
+@function round-with-precision($number, $precision) {
+  $base: math.pow(10, $precision);
+
+  @return math.div(math.round($number * $base), $base);
+}
+
+@mixin melt-path($patterns, $y-flip: false) {
+  $melt-path: ();
+
+  @for $i from 1 through $melt-lines {
+    $melt-base-x: ($i * 2 - 1) * $melt-radius;
+    $melt-base-y: list.nth($patterns, $i);
+
+    @for $j from 0 through $melt-resolution {
+      $melt-angle-base: -180deg;
+
+      @if $y-flip {
+        $melt-angle-base: 180deg;
+      }
+
+      $melt-angle: math.div($j * $melt-angle-base, $melt-resolution) + 180deg;
+      $melt-dx: math.cos($melt-angle) * $melt-radius;
+      $melt-dy: math.sin($melt-angle) * $melt-radius * $melt-base-aspect-ratio;
+      $melt-x: round-with-precision($melt-base-x + $melt-dx, 2);
+      $melt-y: round-with-precision($melt-base-y + $melt-dy, 2);
+      $melt-path: list.append(
+        $melt-path,
+        #{$melt-x} #{$melt-y},
+        $separator: comma
+      );
+    }
+  }
+
+  clip-path: polygon(100% 0%, 0% 0%, $melt-path);
+}
+
+@keyframes marp-incoming-transition-melt {
+  from {
+    @include melt-path(melt-patterns(915, 30%, -15%));
+
+    animation-timing-function: ease-in;
+    opacity: 0.8;
+    filter: blur(8px);
+  }
+
+  30% {
+    @include melt-path(melt-patterns(130, 60%, 50%));
+
+    animation-timing-function: ease-out;
+    opacity: 1;
+    filter: blur(2px);
+  }
+
+  to {
+    @include melt-path(melt-patterns(376, 140%, 170%));
+  }
+}
+
+@keyframes marp-incoming-transition-backward-melt {
+  @include utils.send-backward;
+
+  from {
+    filter: blur(8px);
+  }
+
+  30% {
+    filter: blur(2px);
+  }
+}
+@keyframes marp-outgoing-transition-backward-melt {
+  from {
+    @include melt-path(melt-patterns(917, 30%, 115%), true);
+
+    animation-timing-function: ease-in;
+  }
+
+  30% {
+    @include melt-path(melt-patterns(131, 60%, 50%), true);
+
+    animation-timing-function: ease-out;
+    opacity: 1;
+  }
+
+  to {
+    @include melt-path(melt-patterns(377, 140%, -70%), true);
+  }
+}

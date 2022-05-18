@@ -1,23 +1,26 @@
 import { Marpit } from '@marp-team/marpit'
 import type MarkdownIt from 'markdown-it'
-import { showCompletionScript } from 'yargs'
 import {
   isTransitionData,
   type MarpTransitionData,
 } from '../templates/bespoke/utils/transition'
 
 import cover from './transition/keyframes/cover.scss'
+import coverflow from './transition/keyframes/coverflow.scss'
 import cube from './transition/keyframes/cube.scss'
+import diamond from './transition/keyframes/diamond.scss'
 import drop from './transition/keyframes/drop.scss'
 import explode from './transition/keyframes/explode.scss'
 import fadeOut from './transition/keyframes/fade-out.scss'
 import fade from './transition/keyframes/fade.scss'
+import fall from './transition/keyframes/fall.scss'
 import flip from './transition/keyframes/flip.scss'
 import glow from './transition/keyframes/glow.scss'
 import implode from './transition/keyframes/implode.scss'
 import inOut from './transition/keyframes/in-out.scss'
 import irisIn from './transition/keyframes/iris-in.scss'
 import irisOut from './transition/keyframes/iris-out.scss'
+import melt from './transition/keyframes/melt.scss'
 import pivot from './transition/keyframes/pivot.scss'
 import pull from './transition/keyframes/pull.scss'
 import push from './transition/keyframes/push.scss'
@@ -25,6 +28,7 @@ import reveal from './transition/keyframes/reveal.scss'
 import slide from './transition/keyframes/slide.scss'
 import star from './transition/keyframes/star.scss'
 import swap from './transition/keyframes/swap.scss'
+import swipe from './transition/keyframes/swipe.scss'
 import wipe from './transition/keyframes/wipe.scss'
 
 export const engineTransition = Symbol()
@@ -39,17 +43,21 @@ interface TransitionMeta {
 
 const builtinTransitions = {
   cover,
+  coverflow,
   cube,
+  diamond,
   drop,
   explode,
   fade,
   'fade-out': fadeOut,
+  fall,
   flip,
   glow,
   implode,
   'in-out': inOut,
   'iris-in': irisIn,
   'iris-out': irisOut,
+  melt,
   pivot,
   pull,
   push,
@@ -57,6 +65,7 @@ const builtinTransitions = {
   slide,
   star,
   swap,
+  swipe,
   wipe,
 
   // Reserved transition to disable

@@ -1,0 +1,52 @@
+@keyframes marp-outgoing-transition-swipe {
+  0% {
+    animation-timing-function: ease-in;
+    box-shadow: 6px 6px 10px 6px rgba(0, 0, 0, 25%);
+    transform-origin: 100% 100%;
+    z-index: 1;
+  }
+
+  100% {
+    box-shadow: 6px 6px 10px 6px rgba(0, 0, 0, 25%);
+    transform: translate(calc(-100vw - 30px), -30vh) rotate(-30deg);
+    transform-origin: 100% 100%;
+    z-index: 1;
+  }
+}
+@keyframes marp-incoming-transition-swipe {
+  0% {
+    animation-timing-function: ease-in-out;
+    filter: brightness(0.5);
+    transform: scale(0.95);
+  }
+
+  100% {
+    filter: none;
+    transform: scale(1);
+  }
+}
+@keyframes marp-outgoing-transition-backward-swipe {
+  0% {
+    animation-timing-function: ease-in-out;
+  }
+
+  100% {
+    filter: brightness(0.5);
+    transform: scale(0.95);
+  }
+}
+@keyframes marp-incoming-transition-backward-swipe {
+  0% {
+    animation-timing-function: ease-out;
+    box-shadow: 6px 6px 10px 6px rgba(0, 0, 0, 25%);
+    transform: translate(calc(-100vw - 30px), 30vh) rotate(30deg);
+    transform-origin: 100% 0%;
+    z-index: 1;
+  }
+
+  100% {
+    box-shadow: 6px 6px 10px 6px rgba(0, 0, 0, 25%);
+    transform-origin: 100% 0%;
+    z-index: 1;
+  }
+}

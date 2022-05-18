@@ -1,6 +1,6 @@
 :root {
-  --bespoke-marp-transition-drop-shadow: 0px 0.3vh 0.6vh rgba(0, 0, 0, 0.39),
-    rgba(0, 0, 0, 0.3) 0px 3vh 5vh, rgba(0, 0, 0, 0.22) 0px 2vh 1.5vh;
+  --bespoke-marp-transition-drop-shadow: 0 0.3vh 0.6vh rgba(0, 0, 0, 39%),
+    rgba(0, 0, 0, 30%) 0 3vh 5vh, rgba(0, 0, 0, 22%) 0 2vh 1.5vh;
 }
 
 @keyframes marp-incoming-transition-__builtin__drop {
@@ -56,6 +56,7 @@
     animation-timing-function: ease-in;
     box-shadow: var(--bespoke-marp-transition-drop-shadow);
   }
+
   100% {
     z-index: 1;
     transform: translateY(-100%);
