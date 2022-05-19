@@ -5,9 +5,12 @@ import {
   type MarpTransitionData,
 } from '../templates/bespoke/utils/transition'
 
+import clockwise from './transition/keyframes/clockwise.scss'
+import counterclockwise from './transition/keyframes/counterclockwise.scss'
 import cover from './transition/keyframes/cover.scss'
 import coverflow from './transition/keyframes/coverflow.scss'
 import cube from './transition/keyframes/cube.scss'
+import cylinder from './transition/keyframes/cylinder.scss'
 import diamond from './transition/keyframes/diamond.scss'
 import drop from './transition/keyframes/drop.scss'
 import explode from './transition/keyframes/explode.scss'
@@ -21,15 +24,20 @@ import inOut from './transition/keyframes/in-out.scss'
 import irisIn from './transition/keyframes/iris-in.scss'
 import irisOut from './transition/keyframes/iris-out.scss'
 import melt from './transition/keyframes/melt.scss'
+import overlap from './transition/keyframes/overlap.scss'
 import pivot from './transition/keyframes/pivot.scss'
 import pull from './transition/keyframes/pull.scss'
 import push from './transition/keyframes/push.scss'
 import reveal from './transition/keyframes/reveal.scss'
+import rotate from './transition/keyframes/rotate.scss'
 import slide from './transition/keyframes/slide.scss'
 import star from './transition/keyframes/star.scss'
 import swap from './transition/keyframes/swap.scss'
 import swipe from './transition/keyframes/swipe.scss'
+import swoosh from './transition/keyframes/swoosh.scss'
 import wipe from './transition/keyframes/wipe.scss'
+import wiper from './transition/keyframes/wiper.scss'
+import zoom from './transition/keyframes/zoom.scss'
 
 export const engineTransition = Symbol()
 
@@ -42,9 +50,12 @@ interface TransitionMeta {
 }
 
 const builtinTransitions = {
+  clockwise,
+  counterclockwise,
   cover,
   coverflow,
   cube,
+  cylinder,
   diamond,
   drop,
   explode,
@@ -58,15 +69,20 @@ const builtinTransitions = {
   'iris-in': irisIn,
   'iris-out': irisOut,
   melt,
+  overlap,
   pivot,
   pull,
   push,
   reveal,
+  rotate,
   slide,
   star,
   swap,
   swipe,
+  swoosh,
   wipe,
+  wiper,
+  zoom,
 
   // Reserved transition to disable
   none: false,

@@ -30,4 +30,4 @@ overrides:
       block-no-empty:
         - null
       keyframes-name-pattern:
-        - null
+        - marp-(incoming-|outgoing-)?transition-(backward-)?__builtin__[a-z0-9-]+

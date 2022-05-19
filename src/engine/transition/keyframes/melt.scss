@@ -1,4 +1,4 @@
-@keyframes marp-incoming-transition-melt {
+@keyframes marp-incoming-transition-__builtin__melt {
   from {
     clip-path: polygon(
       100% -50%,
@@ -79,11 +79,13 @@
     opacity: 0.8;
     filter: blur(8px);
   }
+
   30% {
     opacity: 1;
     filter: blur(2px);
     animation-timing-function: ease-out;
   }
+
   to {
     clip-path: polygon(
       100% -50%,
@@ -164,7 +166,7 @@
   }
 }
 
-@keyframes marp-incoming-transition-backward-melt {
+@keyframes marp-incoming-transition-backward-__builtin__melt {
   from {
     clip-path: polygon(
       100% 150%,
@@ -245,11 +247,13 @@
     opacity: 0.8;
     filter: blur(8px);
   }
+
   30% {
     opacity: 1;
     filter: blur(2px);
     animation-timing-function: ease-out;
   }
+
   to {
     clip-path: polygon(
       100% 150%,

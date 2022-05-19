@@ -1,4 +1,4 @@
-@keyframes marp-outgoing-transition-swipe {
+@keyframes marp-outgoing-transition-__builtin__swipe {
   0% {
     animation-timing-function: ease-in;
     box-shadow: 6px 6px 10px 6px rgba(0, 0, 0, 25%);
@@ -13,7 +13,7 @@
     z-index: 1;
   }
 }
-@keyframes marp-incoming-transition-swipe {
+@keyframes marp-incoming-transition-__builtin__swipe {
   0% {
     animation-timing-function: ease-in-out;
     filter: brightness(0.5);
@@ -25,7 +25,7 @@
     transform: scale(1);
   }
 }
-@keyframes marp-outgoing-transition-backward-swipe {
+@keyframes marp-outgoing-transition-backward-__builtin__swipe {
   0% {
     animation-timing-function: ease-in-out;
   }
@@ -35,7 +35,7 @@
     transform: scale(0.95);
   }
 }
-@keyframes marp-incoming-transition-backward-swipe {
+@keyframes marp-incoming-transition-backward-__builtin__swipe {
   0% {
     animation-timing-function: ease-out;
     box-shadow: 6px 6px 10px 6px rgba(0, 0, 0, 25%);
