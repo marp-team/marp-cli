@@ -2,6 +2,7 @@
   50% {
     filter: contrast(1);
   }
+
   100% {
     filter: contrast(0);
   }
@@ -11,9 +12,11 @@
     mix-blend-mode: overlay;
     opacity: 0;
   }
+
   50% {
     opacity: 1;
   }
+
   100% {
     mix-blend-mode: overlay;
   }
