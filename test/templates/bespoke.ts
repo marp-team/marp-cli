@@ -1,4 +1,5 @@
 /** @jest-environment jsdom */
+import '../__mocks__/browser/matchMedia' // eslint-disable-line jest/no-mocks-import
 import Marp from '@marp-team/marp-core'
 import { Element as MarpitElement } from '@marp-team/marpit'
 import { Key } from 'ts-key-enum'
