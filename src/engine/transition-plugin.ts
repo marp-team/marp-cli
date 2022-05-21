@@ -129,7 +129,7 @@ export default function transitionPlugin(md: MarkdownIt & { marpit: Marpit }) {
                 transition.name,
                 builtinTransitions[transition.name]
               )
-              transition.bultinFallback = true
+              transition.builtinFallback = true
             }
 
             const json = JSON.stringify(transition)

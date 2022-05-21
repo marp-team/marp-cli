@@ -7,7 +7,7 @@ export type ResolveAnimationOptions = {
 export type MarpTransitionData = {
   name: string
   duration?: string
-  bultinFallback?: boolean
+  builtinFallback?: boolean
 }
 
 export type MarpTransitionKeyframes = Record<
@@ -97,13 +97,13 @@ const fetchMarpTransitionKeyframes = async (
 
 export const getMarpTransitionKeyframes = async (
   transitionName: string,
-  { bultinFallback = true }: { bultinFallback?: boolean } = {}
+  { builtinFallback = true }: { builtinFallback?: boolean } = {}
 ): Promise<Readonly<MarpTransitionKeyframes> | undefined> => {
   let keyframes = await fetchMarpTransitionKeyframes(transitionName)
 
   // Fallback to builtin keyframes
   if (isMarpTransitionKeyframesEmpty(keyframes)) {
-    if (!bultinFallback) return undefined
+    if (!builtinFallback) return undefined
 
     keyframes = await fetchMarpTransitionKeyframes(
       `__builtin__${transitionName}`

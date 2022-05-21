@@ -91,7 +91,7 @@ const bespokeTransition = (deck) => {
 
           return [
             transitionData?.name,
-            transitionData?.bultinFallback
+            transitionData?.builtinFallback
               ? `__builtin__${transitionData.name}`
               : undefined,
           ]
@@ -133,7 +133,7 @@ const bespokeTransition = (deck) => {
       if (!transitionData) return true
 
       getMarpTransitionKeyframes(transitionData.name, {
-        bultinFallback: transitionData.bultinFallback,
+        builtinFallback: transitionData.builtinFallback,
       }).then((keyframes) => {
         if (!keyframes) return doTransition(true, () => fn(e))
 
