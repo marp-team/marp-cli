@@ -80,7 +80,7 @@
     "@types/express": "^4.17.13",
     "@types/jest": "^27.5.1",
     "@types/markdown-it": "^12.2.3",
-    "@types/node": "~16.11.25",
+    "@types/node": "~16.11.36",
     "@types/pug": "^2.0.6",
     "@types/supertest": "^2.0.12",
     "@types/ws": "^8.5.3",
