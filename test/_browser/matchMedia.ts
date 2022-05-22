@@ -1,14 +1,25 @@
-// https://jestjs.io/docs/26.x/manual-mocks#mocking-methods-which-are-not-implemented-in-jsdom
+const _MediaQueryList = jest.fn()
+
+_MediaQueryList.prototype = {
+  get matches() {
+    return false
+  },
+  onchange: null,
+  addListener: jest.fn(),
+  removeListener: jest.fn(),
+  addEventListener: jest.fn(),
+  removeEventListener: jest.fn(),
+  dispatchEvent: jest.fn(),
+}
+
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
-  value: jest.fn((query) => ({
-    matches: false,
-    media: query,
-    onchange: null,
-    addListener: jest.fn(), // deprecated
-    removeListener: jest.fn(), // deprecated
-    addEventListener: jest.fn(),
-    removeEventListener: jest.fn(),
-    dispatchEvent: jest.fn(),
-  })),
+  value: jest.fn((query) =>
+    Object.assign(new MediaQueryList(), { media: query })
+  ),
+})
+
+Object.defineProperty(window, 'MediaQueryList', {
+  writable: true,
+  value: _MediaQueryList,
 })

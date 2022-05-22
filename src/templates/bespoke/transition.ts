@@ -18,9 +18,10 @@ interface DocumentTransition {
   abandon(): void
 }
 
+export const transitionStyleId = '_tSId' as const
+
 const transitionApply = '_tA' as const
 const transitionDuring = '_tD' as const
-const transitionStyleId = '_tSId' as const
 const transitionKeyOSC = '__bespoke_marp_transition_osc__' as const
 const transitionWarmUpClass = 'bespoke-marp-transition-warming-up' as const
 

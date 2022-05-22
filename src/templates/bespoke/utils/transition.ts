@@ -15,19 +15,27 @@ export type MarpTransitionKeyframes = Record<
   Record<keyof typeof types, string | undefined>
 >
 
+export const _resetResolvedKeyframes = () => {
+  resolvedMarpTransitionKeyframes.clear()
+  resolvedMarpTransitionKeyframes.set('none', {
+    backward: { both: undefined, incoming: undefined, outgoing: undefined },
+    forward: { both: undefined, incoming: undefined, outgoing: undefined },
+  })
+}
+
+export const _testElementAnimation = (
+  _element: HTMLElement,
+  callback: (ret: boolean) => void
+) => {
+  /* istanbul ignore next */
+  requestAnimationFrame(() => requestAnimationFrame(() => callback(false)))
+}
+
 const resolvedMarpTransitionKeyframes = new Map<
   string,
   MarpTransitionKeyframes
->([
-  // none is a reserved transition name to disable any transition effects
-  [
-    'none',
-    {
-      backward: { both: undefined, incoming: undefined, outgoing: undefined },
-      forward: { both: undefined, incoming: undefined, outgoing: undefined },
-    },
-  ],
-])
+>()
+_resetResolvedKeyframes()
 
 const types = {
   both: '',
@@ -42,13 +50,6 @@ const animCSSVar = <T extends string>(key: T) =>
 
 const publicCSSVar = <T extends string>(key: T) =>
   `--marp-transition-${key}` as const
-
-export const _testElementAnimation = (
-  _element: HTMLElement,
-  callback: (ret: boolean) => void
-) => {
-  requestAnimationFrame(() => requestAnimationFrame(() => callback(false)))
-}
 
 const isAvailableKeyframe = (keyframe: string) =>
   new Promise<boolean>((res) => {

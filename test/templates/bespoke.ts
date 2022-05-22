@@ -8,6 +8,7 @@ import {
   classes,
   properties,
 } from '../../src/templates/bespoke/presenter/presenter-view'
+import { transitionStyleId } from '../../src/templates/bespoke/transition'
 import * as fullscreen from '../../src/templates/bespoke/utils/fullscreen'
 import * as transitionUtils from '../../src/templates/bespoke/utils/transition'
 import { _clearCachedWakeLockApi } from '../../src/templates/bespoke/wake-lock'
@@ -42,8 +43,11 @@ describe("Bespoke template's browser context", () => {
 
   const render = (
     md = defaultMarkdown,
-    targetDocument = document
+    targetDocument = document,
+    { resetHead = true }: { resetHead?: boolean } = {}
   ): HTMLElement => {
+    if (resetHead) targetDocument.head.innerHTML = ''
+
     let { html, comments } = marp.render(md) // eslint-disable-line prefer-const
 
     comments.forEach((c, i) => {
@@ -831,7 +835,7 @@ describe("Bespoke template's browser context", () => {
         md?: string
       ) =>
         replaceLocation('/?view=presenter', () => {
-          const parent = render(md)
+          const parent = render(md, document, { resetHead: false })
           const deck = bespoke()
 
           func({ deck, parent })
@@ -1479,6 +1483,7 @@ describe("Bespoke template's browser context", () => {
 
   describe('[Experimental] Transition', () => {
     beforeEach(() => {
+      transitionUtils._resetResolvedKeyframes()
       jest
         .spyOn(globalThis, 'requestAnimationFrame')
         .mockImplementation((callback) => {
@@ -1486,6 +1491,17 @@ describe("Bespoke template's browser context", () => {
           return 0
         })
     })
+
+    const initializeBespoke = async () => {
+      const deck = bespoke()
+
+      jest.runOnlyPendingTimers()
+      deck.slide(0)
+      await waitAsync()
+      documentTransition.start.mockClear()
+
+      return deck
+    }
 
     const defineKeyframesMock = (...keyframes: string[]) => {
       jest
@@ -1498,11 +1514,26 @@ describe("Bespoke template's browser context", () => {
     const waitAsync = () =>
       new Promise((res) => jest.requireActual('timers').setImmediate(res))
 
-    it('does not trigger transitions if not defined transition effects in Markdown', () => {
+    const getCSSText = (rules: CSSRuleList) => {
+      let style = ''
+      for (let i = 0; i < rules.length; i += 1) style += rules[i].cssText
+
+      return style
+    }
+
+    const getTransitionStyle = () => {
+      const style = document.getElementById(
+        transitionStyleId
+      ) as HTMLStyleElement
+
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      return getCSSText(style.sheet!.cssRules)
+    }
+
+    it('does not trigger transitions if not defined transition effects in Markdown', async () => {
       render()
 
-      const deck = bespoke()
-      expect(deck.slide()).toBe(0)
+      const deck = await initializeBespoke()
 
       deck.next()
       expect(deck.slide()).toBe(1)
@@ -1522,8 +1553,7 @@ describe("Bespoke template's browser context", () => {
       })
       defineKeyframesMock()
 
-      const deck = bespoke()
-      expect(deck.slide()).toBe(0)
+      const deck = await initializeBespoke()
 
       deck.next()
       expect(deck.slide()).toBe(0)
@@ -1552,8 +1582,7 @@ describe("Bespoke template's browser context", () => {
       )
 
       // Initialize
-      const deck = bespoke()
-      expect(deck.slide()).toBe(0)
+      const deck = await initializeBespoke()
 
       // Forward
       deck.next()
@@ -1583,11 +1612,47 @@ describe("Bespoke template's browser context", () => {
       expect(deck.slide()).toBe(0)
       await waitAsync()
 
-      deck.next() // Re-trigger navigation while prepare phase
+      const css = getTransitionStyle()
+      expect(css).toContain('marp-transition-__builtin__built-in')
+      expect(css).not.toContain('marp-incoming-transition-custom')
+
+      // Re-trigger navigation while prepare phase
+      deck.slide(0)
       await waitAsync()
 
       expect(documentTransition.abandon).toHaveBeenCalled()
       expect(deck.slide()).toBe(1)
+    })
+
+    it('uses internal keyframe instead of specified transition if matched prefers-reduced-motion media query', async () => {
+      jest.spyOn(console, 'warn').mockImplementation()
+      jest
+        .spyOn(MediaQueryList.prototype, 'matches', 'get')
+        .mockReturnValue(true)
+
+      const parent = render()
+
+      parent.querySelectorAll('section').forEach((section) => {
+        section.dataset.transition = JSON.stringify({ name: 'test' })
+      })
+      defineKeyframesMock('marp-transition-test')
+
+      // Initialize
+      const deck = await initializeBespoke()
+
+      documentTransition.start.mockImplementationOnce(async (callback) => {
+        callback()
+        await new Promise(() => {
+          /* never resolved to simulate transition */
+        })
+      })
+
+      deck.next()
+      await waitAsync()
+
+      const css = getTransitionStyle()
+      expect(css).not.toContain('marp-transition-test')
+      expect(css).toContain('transition_reduced')
     })
   })
 })
