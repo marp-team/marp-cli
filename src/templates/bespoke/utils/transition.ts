@@ -43,11 +43,16 @@ const animCSSVar = <T extends string>(key: T) =>
 const publicCSSVar = <T extends string>(key: T) =>
   `--marp-transition-${key}` as const
 
-export const _createAnimationTestElement = () => document.createElement('div')
+export const _testElementAnimation = (
+  _element: HTMLElement,
+  callback: (ret: boolean) => void
+) => {
+  requestAnimationFrame(() => requestAnimationFrame(() => callback(false)))
+}
 
 const isAvailableKeyframe = (keyframe: string) =>
   new Promise<boolean>((res) => {
-    const elm = _createAnimationTestElement()
+    const elm = document.createElement('div')
     const resolve = (ret: boolean) => {
       elm.remove()
       res(ret)
@@ -63,7 +68,7 @@ const isAvailableKeyframe = (keyframe: string) =>
     })
 
     document.body.appendChild(elm)
-    requestAnimationFrame(() => requestAnimationFrame(() => resolve(false)))
+    _testElementAnimation(elm, resolve)
   })
 
 const resolveMarpTransitionKeyframes = (transitionName: string) => {

@@ -1,7 +1,5 @@
 /** @jest-environment jsdom */
 import '../_browser/matchMedia'
-import '../_browser/requestAnimationFrame'
-import { setImmediate } from 'timers'
 import Marp from '@marp-team/marp-core'
 import { Element as MarpitElement } from '@marp-team/marpit'
 import { Key } from 'ts-key-enum'
@@ -1480,30 +1478,25 @@ describe("Bespoke template's browser context", () => {
   })
 
   describe('[Experimental] Transition', () => {
-    afterEach(() => {
-      jest.useFakeTimers()
+    beforeEach(() => {
+      jest
+        .spyOn(globalThis, 'requestAnimationFrame')
+        .mockImplementation((callback) => {
+          callback(0)
+          return 0
+        })
     })
 
     const defineKeyframesMock = (...keyframes: string[]) => {
-      // JSDOM environment does never trigger animationstart event for the
-      // element to check keyframes definition, so dispatch event manually.
       jest
-        .spyOn(transitionUtils, '_createAnimationTestElement')
-        .mockImplementation(() => {
-          const div = document.createElement('div')
-
-          setTimeout(() => {
-            if (keyframes.includes(div.style.animationName)) {
-              div.dispatchEvent(new Event('animationstart'))
-            }
-          }, 0)
-
-          return div
+        .spyOn(transitionUtils, '_testElementAnimation')
+        .mockImplementation((elm, resolve) => {
+          resolve(keyframes.includes(elm.style.animationName))
         })
     }
 
-    const sleep = (ms: number) =>
-      new Promise((resolve) => setTimeout(resolve, ms))
+    const waitAsync = () =>
+      new Promise((res) => jest.requireActual('timers').setImmediate(res))
 
     it('does not trigger transitions if not defined transition effects in Markdown', () => {
       render()
@@ -1527,15 +1520,15 @@ describe("Bespoke template's browser context", () => {
       parent.querySelectorAll('section').forEach((section) => {
         section.dataset.transition = JSON.stringify({ name: 'test' })
       })
+      defineKeyframesMock()
 
       const deck = bespoke()
       expect(deck.slide()).toBe(0)
 
-      jest.useRealTimers()
-
       deck.next()
       expect(deck.slide()).toBe(0)
-      await sleep(50) // Wait for finding keyframes
+      await waitAsync()
+
       expect(deck.slide()).toBe(1)
       expect(documentTransition.start).not.toHaveBeenCalled()
     })
@@ -1562,12 +1555,10 @@ describe("Bespoke template's browser context", () => {
       const deck = bespoke()
       expect(deck.slide()).toBe(0)
 
-      jest.useRealTimers()
-
       // Forward
       deck.next()
       expect(deck.slide()).toBe(0) // Prevent navigation while prepare phase
-      await sleep(300) // Wait transition phase
+      await waitAsync()
 
       expect(deck.slide()).toBe(1)
       expect(documentTransition.start).toHaveBeenCalled()
@@ -1575,17 +1566,26 @@ describe("Bespoke template's browser context", () => {
       // Back
       deck.prev()
       expect(deck.slide()).toBe(1) // Prevent navigation while prepare phase
-      await sleep(300) // Wait transition phase
+      await waitAsync()
 
       expect(deck.slide()).toBe(0)
       expect(documentTransition.start).toHaveBeenCalledTimes(2)
 
       // Cancel transition by double navigation
+      documentTransition.start.mockImplementationOnce(async (callback) => {
+        callback()
+        await new Promise(() => {
+          /* never resolved to simulate transition */
+        })
+      })
+
       deck.next()
-      expect(deck.slide()).toBe(0) // Prepare phase
-      await sleep(50) // Some asynchronous operations
+      expect(deck.slide()).toBe(0)
+      await waitAsync()
+
       deck.next() // Re-trigger navigation while prepare phase
-      await sleep(50) // Some asynchronous operations
+      await waitAsync()
+
       expect(documentTransition.abandon).toHaveBeenCalled()
       expect(deck.slide()).toBe(1)
     })

@@ -7,11 +7,7 @@ beforeEach(() => {
 })
 
 export const setElement = jest.fn()
-export const start = jest.fn(async (callback) => {
-  await new Promise((resolve) => setTimeout(resolve, 0))
-  callback()
-  await new Promise((resolve) => setTimeout(resolve, 250)) // 250ms transition duration
-})
+export const start = jest.fn(async (callback) => callback())
 export const abandon = jest.fn()
 
 const DocumentTransition = Object.seal({ setElement, start, abandon })
