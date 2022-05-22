@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Changed
+
+- ⚡️ Updates of experimental transition for bespoke template `--bespoke.transition` ([#447](https://github.com/marp-team/marp-cli/issues/447), [#448](https://github.com/marp-team/marp-cli/pull/448))
+  - More built-in transitions (5 transitions -> 33 transitions)
+  - Define custom transitions by `@keyframes` declaration in CSS
+  - Update spec of `transition` local directive
+  - Opt-out transition animation by preferring `prefers-reduced-motion` media query
+
 ## v1.7.2 - 2022-04-24
 
 ### Changed
