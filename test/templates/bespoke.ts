@@ -1,5 +1,7 @@
 /** @jest-environment jsdom */
-import '../__mocks__/browser/matchMedia' // eslint-disable-line jest/no-mocks-import
+import '../_browser/matchMedia'
+import '../_browser/requestAnimationFrame'
+import { setImmediate } from 'timers'
 import Marp from '@marp-team/marp-core'
 import { Element as MarpitElement } from '@marp-team/marpit'
 import { Key } from 'ts-key-enum'
@@ -9,7 +11,9 @@ import {
   properties,
 } from '../../src/templates/bespoke/presenter/presenter-view'
 import * as fullscreen from '../../src/templates/bespoke/utils/fullscreen'
+import * as transitionUtils from '../../src/templates/bespoke/utils/transition'
 import { _clearCachedWakeLockApi } from '../../src/templates/bespoke/wake-lock'
+import * as documentTransition from '../_browser/documentTransition'
 
 jest.useFakeTimers()
 
@@ -1475,25 +1479,33 @@ describe("Bespoke template's browser context", () => {
     })
   })
 
-  describe.skip('[Experimental] Transition', () => {
-    let documentTransition: Record<string, jest.Mock>
-
-    beforeEach(() => {
-      documentTransition = {
-        prepare: jest.fn(async () => {
-          /* mock */
-        }),
-        start: jest.fn(async () => {
-          /* mock */
-        }),
-      }
-
-      Object.assign(document, { documentTransition })
+  describe('[Experimental] Transition', () => {
+    afterEach(() => {
+      jest.useFakeTimers()
     })
 
-    afterEach(() => delete document['documentTransition'])
+    const defineKeyframesMock = (...keyframes: string[]) => {
+      // JSDOM environment does never trigger animationstart event for the
+      // element to check keyframes definition, so dispatch event manually.
+      jest
+        .spyOn(transitionUtils, '_createAnimationTestElement')
+        .mockImplementation(() => {
+          const div = document.createElement('div')
 
-    it('does not handle transitions if not defined transition effects in Markdown', () => {
+          setTimeout(() => {
+            if (keyframes.includes(div.style.animationName)) {
+              div.dispatchEvent(new Event('animationstart'))
+            }
+          }, 0)
+
+          return div
+        })
+    }
+
+    const sleep = (ms: number) =>
+      new Promise((resolve) => setTimeout(resolve, ms))
+
+    it('does not trigger transitions if not defined transition effects in Markdown', () => {
       render()
 
       const deck = bespoke()
@@ -1501,136 +1513,80 @@ describe("Bespoke template's browser context", () => {
 
       deck.next()
       expect(deck.slide()).toBe(1)
-      expect(documentTransition.prepare).not.toHaveBeenCalled()
       expect(documentTransition.start).not.toHaveBeenCalled()
 
       deck.prev()
       expect(deck.slide()).toBe(0)
-      expect(documentTransition.prepare).not.toHaveBeenCalled()
       expect(documentTransition.start).not.toHaveBeenCalled()
     })
 
-    it('handle transitions if defined transition effects in Markdown', async () => {
+    it('does not trigger transitions if not defined transition keyframes', async () => {
+      const parent = render()
+
+      // Set transition data (but not set any mocked keyframes)
+      parent.querySelectorAll('section').forEach((section) => {
+        section.dataset.transition = JSON.stringify({ name: 'test' })
+      })
+
+      const deck = bespoke()
+      expect(deck.slide()).toBe(0)
+
+      jest.useRealTimers()
+
+      deck.next()
+      expect(deck.slide()).toBe(0)
+      await sleep(50) // Wait for finding keyframes
+      expect(deck.slide()).toBe(1)
+      expect(documentTransition.start).not.toHaveBeenCalled()
+    })
+
+    it('triggers transitions if defined transition effects in Markdown', async () => {
       const parent = render()
 
       // Set transition data
       parent.querySelectorAll('section').forEach((section) => {
-        section.dataset.transition = 'cover-left'
-        section.dataset.transitionBack = 'cover-right'
+        section.dataset.transition = JSON.stringify({ name: 'built-in' })
+        section.dataset.transitionBack = JSON.stringify({
+          name: 'custom',
+          duration: '1s',
+        })
       })
 
-      // OSC is a shared element
-      const osc = document.createElement('div')
-      osc.className = 'bespoke-marp-osc'
-      document.body.appendChild(osc)
+      // Set mocked keyframes
+      defineKeyframesMock(
+        'marp-transition-__builtin__built-in',
+        'marp-incoming-transition-custom'
+      )
 
+      // Initialize
       const deck = bespoke()
       expect(deck.slide()).toBe(0)
+
+      jest.useRealTimers()
 
       // Forward
       deck.next()
       expect(deck.slide()).toBe(0) // Prevent navigation while prepare phase
-      expect(documentTransition.prepare).toHaveBeenCalledWith(
-        expect.objectContaining({
-          rootTransition: 'cover-left',
-          sharedElements: [osc],
-        })
-      )
-
-      await documentTransition.prepare.mock.results[0].value
+      await sleep(300) // Wait transition phase
 
       expect(deck.slide()).toBe(1)
-      expect(documentTransition.start).toHaveBeenCalledWith(
-        expect.objectContaining({ sharedElements: [osc] })
-      )
+      expect(documentTransition.start).toHaveBeenCalled()
 
       // Back
-      documentTransition.prepare.mockClear()
-      documentTransition.start.mockClear()
-
       deck.prev()
       expect(deck.slide()).toBe(1) // Prevent navigation while prepare phase
-      expect(documentTransition.prepare).toHaveBeenCalledWith(
-        expect.objectContaining({ rootTransition: 'cover-right' })
-      )
-
-      await documentTransition.prepare.mock.results[0].value
+      await sleep(300) // Wait transition phase
 
       expect(deck.slide()).toBe(0)
-      expect(documentTransition.start).toHaveBeenCalled()
-    })
+      expect(documentTransition.start).toHaveBeenCalledTimes(2)
 
-    it('applys a correct transition if moved to specific page', async () => {
-      history.replaceState(null, document.title, '#3')
-
-      const parent = render()
-
-      parent.querySelectorAll('section').forEach((section) => {
-        section.dataset.transition = 'cover-left'
-        section.dataset.transitionBack = 'cover-right'
-      })
-
-      const deck = bespoke()
-      jest.runAllTimers()
-
-      // Transition will not apply to an initial navigation by hash
-      expect(deck.slide()).toBe(2)
-      expect(documentTransition.prepare).not.toHaveBeenCalled()
-
-      // Same page navigation will not trigger transition
-      deck.slide(2)
-      expect(documentTransition.prepare).not.toHaveBeenCalled()
-
-      // Backward transition
-      deck.slide(0)
-      expect(deck.slide()).toBe(2) // Prevent navigation while prepare phase
-      expect(documentTransition.prepare).toHaveBeenCalledWith(
-        expect.objectContaining({ rootTransition: 'cover-right' })
-      )
-
-      await documentTransition.prepare.mock.results[0].value
-
-      expect(deck.slide()).toBe(0)
-      expect(documentTransition.start).toHaveBeenCalled()
-
-      // Forward transition
-      documentTransition.prepare.mockClear()
-      documentTransition.start.mockClear()
-
-      deck.slide(2)
-      expect(deck.slide()).toBe(0) // Prevent navigation while prepare phase
-      expect(documentTransition.prepare).toHaveBeenCalledWith(
-        expect.objectContaining({ rootTransition: 'cover-left' })
-      )
-
-      deck.slide(1) // This navigation will be ignored because #prepare Promise is not yet resolved
-      expect(documentTransition.prepare).toHaveBeenCalledTimes(1)
-
-      await documentTransition.prepare.mock.results[0].value
-
-      expect(deck.slide()).toBe(2)
-      expect(documentTransition.start).toHaveBeenCalled()
-    })
-
-    it('is ignored and applied only navigation if rejected documentTransition API', async () => {
-      const parent = render()
-
-      parent.querySelectorAll('section').forEach((section) => {
-        section.dataset.transition = 'cover-left'
-        section.dataset.transitionBack = 'cover-right'
-      })
-
-      const err = new Error('test')
-      documentTransition.prepare.mockRejectedValue(err)
-      documentTransition.start.mockRejectedValue(err)
-
-      const deck = bespoke()
+      // Cancel transition by double navigation
       deck.next()
-
-      await expect(
-        documentTransition.prepare.mock.results[0].value
-      ).rejects.toThrow('test')
-
+      expect(deck.slide()).toBe(0) // Prepare phase
+      await sleep(50) // Some asynchronous operations
+      deck.next() // Re-trigger navigation while prepare phase
+      await sleep(50) // Some asynchronous operations
+      expect(documentTransition.abandon).toHaveBeenCalled()
       expect(deck.slide()).toBe(1)
     })
   })
