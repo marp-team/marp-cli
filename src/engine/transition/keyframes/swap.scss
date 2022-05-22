@@ -1,0 +1,40 @@
+@keyframes marp-outgoing-transition-__builtin__swap {
+  0% {
+    z-index: 1;
+    transform-origin: calc(var(--marp-transition-direction, 1) * 50% + 50%)
+      calc(var(--marp-transition-direction, 1) * 50% + 50%);
+    animation-timing-function: ease-in-out;
+  }
+
+  50% {
+    transform: translateY(calc(var(--marp-transition-direction, 1) * -50%))
+      rotate(5deg);
+    animation-timing-function: ease-in-out;
+  }
+
+  100% {
+    transform-origin: calc(var(--marp-transition-direction, 1) * 50% + 50%)
+      calc(var(--marp-transition-direction, 1) * 50% + 50%);
+    filter: brightness(0.5);
+    z-index: 0;
+  }
+}
+@keyframes marp-incoming-transition-__builtin__swap {
+  0% {
+    filter: brightness(0.75);
+    transform-origin: calc(var(--marp-transition-direction, 1) * -50% + 50%)
+      calc(var(--marp-transition-direction, 1) * -50% + 50%);
+    animation-timing-function: ease-in-out;
+  }
+
+  50% {
+    transform: translateY(calc(var(--marp-transition-direction, 1) * 50%))
+      rotate(5deg);
+    animation-timing-function: ease-in-out;
+  }
+
+  100% {
+    transform-origin: calc(var(--marp-transition-direction, 1) * -50% + 50%)
+      calc(var(--marp-transition-direction, 1) * -50% + 50%);
+  }
+}

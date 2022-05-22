@@ -1,0 +1,39 @@
+@mixin wipe-mask($mask-on: right) {
+  mask-image: linear-gradient(
+    to #{$mask-on},
+    transparent 100vw,
+    #000 110vw,
+    #000
+  );
+  mask-size: 210vw 100vh;
+
+  @content;
+}
+
+@keyframes marp-incoming-transition-__builtin__wipe {
+  0% {
+    @include wipe-mask {
+      mask-position: left top;
+    }
+  }
+
+  100% {
+    @include wipe-mask {
+      mask-position: right top;
+    }
+  }
+}
+
+@keyframes marp-incoming-transition-backward-__builtin__wipe {
+  0% {
+    @include wipe-mask(left) {
+      mask-position: right top;
+    }
+  }
+
+  100% {
+    @include wipe-mask(left) {
+      mask-position: left top;
+    }
+  }
+}

@@ -3,6 +3,9 @@ extends ../layout.pug
 prepend head
   style!= bespoke.css
 
+  if bespoke.transitionStyle
+    style!= bespoke.transitionStyle
+
 prepend deck
   if bespoke.progress
     .bespoke-progress-parent

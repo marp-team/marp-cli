@@ -1,0 +1,25 @@
+@use './utils';
+
+@keyframes marp-outgoing-transition-__builtin__reveal {
+  from {
+    animation-timing-function: ease-out;
+  }
+
+  to {
+    opacity: 0;
+    transform: translateX(-10%);
+  }
+}
+@keyframes marp-incoming-transition-__builtin__reveal {
+  @include utils.send-backward;
+}
+
+@keyframes marp-outgoing-transition-backward-__builtin__reveal {
+}
+@keyframes marp-incoming-transition-backward-__builtin__reveal {
+  from {
+    opacity: 0;
+    transform: translateX(-10%);
+    animation-timing-function: ease-out;
+  }
+}

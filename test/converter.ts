@@ -5,7 +5,7 @@ import { URL } from 'url'
 import { promisify } from 'util'
 import { Marp } from '@marp-team/marp-core'
 import { Options } from '@marp-team/marpit'
-import cheerio from 'cheerio'
+import cheerio, { load } from 'cheerio'
 import { imageSize } from 'image-size'
 import { PDFDocument, PDFDict, PDFName, PDFHexString } from 'pdf-lib'
 import { TimeoutError } from 'puppeteer-core'
@@ -319,8 +319,9 @@ describe('Converter', () => {
 
     describe('Template specifics', () => {
       it('uses bespoke template specific Marpit plugins if enabled transition option', async () => {
-        // Footer directive is for testing the condition about inline mode
-        const transitionMd = '<!-- transition: cover -->\n<!-- footer: test -->'
+        // Footer directive is required for testing the condition about inline mode
+        const transitionMd =
+          '<!-- transition: cover -->\n<!-- footer: test -->\n\n---\n\n'
 
         // Disabled
         const { result: disabledResult } = await instance({
@@ -328,10 +329,10 @@ describe('Converter', () => {
           templateOption: { transition: false },
         }).convert(transitionMd)
 
-        expect(disabledResult).not.toContain('data-transition="cover-left"')
-        expect(disabledResult).not.toContain(
-          'data-transition-back="cover-right"'
-        )
+        const $disabled = load(disabledResult)
+
+        expect($disabled('[data-transition]')).toHaveLength(0)
+        expect($disabled('[data-transition-back]')).toHaveLength(0)
 
         // Enabled
         const { result: enabledResult } = await instance({
@@ -339,37 +340,61 @@ describe('Converter', () => {
           templateOption: { transition: true },
         }).convert(transitionMd)
 
-        expect(enabledResult).toContain('data-transition="cover-left"')
-        expect(enabledResult).toContain('data-transition-back="cover-right"')
+        const $enabled = load(enabledResult)
 
-        // Invalid value
-        const { result: invalidResult } = await instance({
+        expect($enabled('[data-transition]').length).toBeGreaterThanOrEqual(1)
+        expect(
+          $enabled('[data-transition-back]').length
+        ).toBeGreaterThanOrEqual(1)
+
+        const enabledData = $enabled('[data-transition]').data('transition')
+        const enabledDataBack = $enabled('[data-transition-back]').data(
+          'transitionBack'
+        )
+
+        expect(enabledData.name).toBe('cover')
+        expect(enabledData.builtinFallback).toBe(true)
+        expect(enabledDataBack.name).toBe('cover')
+        expect(enabledDataBack.builtinFallback).toBe(true)
+
+        // Non built-in transition will remain for custom transition
+        const { result: unknownResult } = await instance({
           template: 'bespoke',
           templateOption: { transition: true },
-        }).convert('<!-- transition: inavlid -->')
+        }).convert('<!-- transition: unknown -->')
 
-        expect(invalidResult).not.toContain('data-transition')
+        const $unknown = load(unknownResult)
+        expect($unknown('[data-transition]')).toHaveLength(1)
+
+        const unknownData = $unknown('[data-transition]').data('transition')
+        expect(unknownData.name).toBe('unknown')
+        expect(unknownData.builtinFallback).toBeFalsy()
 
         // Turn on and off
         const { result: toggleResult } = await instance({
           template: 'bespoke',
           templateOption: { transition: true },
         }).convert(
-          '<!-- transition: reveal -->\n\n---\n\n<!-- transition: false -->'
+          '<!-- transition: reveal -->\n\n---\n\n<!-- transition: none -->\n\n---\n\n'
         )
 
-        const $ = cheerio.load(toggleResult)
-        const sections = $('section')
+        const $toggle = load(toggleResult)
+        const sections = $toggle('section')
 
-        expect(sections).toHaveLength(2)
-        expect($(sections[0]).attr('data-transition')).toBe('reveal-left')
-        expect($(sections[0]).attr('data-transition-back')).toBe('reveal-right')
-        expect($(sections[1]).attr('data-transition')).toBeUndefined()
-        expect($(sections[1]).attr('data-transition-back')).toBeUndefined()
+        expect(sections).toHaveLength(3)
+
+        expect($toggle(sections[0]).data('transition').name).toBe('reveal')
+        expect($toggle(sections[1]).data('transition').name).toBe('none')
+        expect($toggle(sections[2]).data('transition').name).toBe('none')
+
+        // Assigning slides are shifted in backward transition
+        expect($toggle(sections[0]).data('transitionBack')).toBeUndefined()
+        expect($toggle(sections[1]).data('transitionBack').name).toBe('reveal')
+        expect($toggle(sections[2]).data('transitionBack').name).toBe('none')
       })
     })
 
-    describe('with option object', () => {
+    describe('with space-separated duration', () => {
       it('defines configured values', async () => {
         const converter = instance({
           template: 'bespoke',
@@ -377,113 +402,14 @@ describe('Converter', () => {
         })
 
         const { result } = await converter.convert(
-          `
-<!--
-transition:
-  type: reveal
-  duration: 500
-  delay: 1234
--->
-`.trim()
+          '<!-- transition: reveal 1s -->'
         )
 
-        expect(result).toContain('data-transition="reveal-left"')
-        expect(result).toContain('data-transition-duration="500"')
-        expect(result).toContain('data-transition-delay="1234"')
-        expect(result).toContain('data-transition-back-duration="500"')
-        expect(result).toContain('data-transition-back-delay="1234"')
+        const $result = load(result)
+        const data = $result('section').first().data('transition')
 
-        // "type" is required
-        const { result: noTypeResult } = await converter.convert(
-          `
-<!--
-transition:
-  duration: 123
-  delay: 456
--->
-`.trim()
-        )
-
-        expect(noTypeResult).not.toContain('data-transition-duration="123"')
-        expect(noTypeResult).not.toContain('data-transition-delay="456"')
-
-        // Invalid numbers
-        const { result: invalidResult } = await converter.convert(
-          `
-<!--
-transition:
-  type: fade
-  duration: invalid
-  delay: true
--->
-`.trim()
-        )
-
-        expect(invalidResult).toContain('data-transition="fade"')
-        expect(invalidResult).not.toContain('data-transition-duration')
-        expect(invalidResult).not.toContain('data-transition-delay')
-      })
-
-      it('allows ms and s unit for duration and delay', async () => {
-        const converter = instance({
-          template: 'bespoke',
-          templateOption: { transition: true },
-        })
-
-        const { result } = await converter.convert(
-          `
-<!--
-transition:
-  type: reveal
-  duration: 1.5s
-  delay: 500ms
--->
-`.trim()
-        )
-
-        expect(result).toContain('data-transition-duration="1500"')
-        expect(result).toContain('data-transition-delay="500"')
-
-        // Omitted leading zero in seconds unit
-        const { result: noLeadingZeroResult } = await converter.convert(
-          `
-<!--
-transition:
-  type: reveal
-  duration: .123s
-  delay: .4567s
--->
-`.trim()
-        )
-
-        expect(noLeadingZeroResult).toContain('data-transition-duration="123"')
-        expect(noLeadingZeroResult).toContain('data-transition-delay="456"')
-      })
-
-      it('outputs warning if duration and delay were out of range in API (0 to 5000)', async () => {
-        const warn = jest.spyOn(console, 'warn').mockImplementation()
-
-        const { result } = await instance({
-          template: 'bespoke',
-          templateOption: { transition: true },
-        }).convert(
-          `
-<!--
-transition:
-  type: fade
-  duration: -123
-  delay: 5.001s
--->
-`.trim()
-        )
-
-        expect(warn).toHaveBeenCalledWith(
-          expect.stringContaining('must be between 0 to 5000ms')
-        )
-
-        // Set clamped values
-        expect(result).toContain('data-transition-duration="0"')
-        expect(result).toContain('data-transition-delay="5000"')
+        expect(data.name).toBe('reveal')
+        expect(data.duration).toBe('1s')
       })
     })
   })

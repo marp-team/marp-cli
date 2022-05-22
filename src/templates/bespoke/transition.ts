@@ -1,74 +1,198 @@
 import { classPrefix } from './utils'
+import {
+  getMarpTransitionKeyframes,
+  resolveAnimationStyles,
+  prepareMarpTransitions,
+  parseTransitionData,
+  MarpTransitionKeyframes,
+} from './utils/transition'
 
 interface TransitionCallbackOption {
   back?: boolean
   cond: (e: any) => boolean
 }
 
+interface DocumentTransition {
+  start(callback: () => void): Promise<void>
+  setElement(element: Element, tag: string, options?: any): void
+  abandon(): void
+}
+
+export const transitionStyleId = '_tSId' as const
+
 const transitionApply = '_tA' as const
-const transitionPreparing = '_tP' as const
+const transitionDuring = '_tD' as const
+const transitionKeyOSC = '__bespoke_marp_transition_osc__' as const
+const transitionWarmUpClass = 'bespoke-marp-transition-warming-up' as const
+
+const prefersReducedMotion = window.matchMedia(
+  '(prefers-reduced-motion: reduce)'
+)
+const reducedMotionOutgoingKeyframes =
+  '__bespoke_marp_transition_reduced_outgoing__' as const
+
+const reducedMotionIncomingKeyframes =
+  '__bespoke_marp_transition_reduced_incoming__' as const
+
+const reducedKeyframes: MarpTransitionKeyframes = {
+  forward: {
+    both: undefined,
+    incoming: reducedMotionIncomingKeyframes,
+    outgoing: reducedMotionOutgoingKeyframes,
+  },
+  backward: {
+    both: undefined,
+    incoming: reducedMotionIncomingKeyframes,
+    outgoing: reducedMotionOutgoingKeyframes,
+  },
+}
 
 const bespokeTransition = (deck) => {
-  const documentTransition: any = document['documentTransition']
-  if (!documentTransition) return
+  const createDocumentTransition: any = document['createDocumentTransition']
+  if (!createDocumentTransition) return
+
+  const transitionDuringState = (
+    value?: boolean | DocumentTransition
+  ): boolean | DocumentTransition | undefined => {
+    if (value !== undefined) deck[transitionDuring] = value
+    return deck[transitionDuring]
+  }
 
   let currentFragment: any
 
-  deck[transitionPreparing] = false
+  transitionDuringState(false)
+
+  const doTransition = (
+    transition: DocumentTransition | true, // true means no transition
+    callback: () => void | Promise<void>
+  ) => {
+    requestAnimationFrame(async () => {
+      transitionDuringState(transition)
+
+      try {
+        await callback()
+      } catch (e) {
+        console.warn(e)
+      } finally {
+        transitionDuringState(false)
+      }
+    })
+  }
+
+  // Prefetch using keyframes
+  prepareMarpTransitions(
+    ...Array.from(
+      document.querySelectorAll<HTMLElement>(
+        'section[data-transition], section[data-transition-back]'
+      )
+    ).flatMap((elm) =>
+      [elm.dataset.transition, elm.dataset.transitionBack]
+        .flatMap((raw) => {
+          const transitionData = parseTransitionData(raw)
+
+          return [
+            transitionData?.name,
+            transitionData?.builtinFallback
+              ? `__builtin__${transitionData.name}`
+              : undefined,
+          ]
+        })
+        .filter((v): v is string => !!v)
+    )
+  )
 
   const transitionCallback =
     (fn: (e: any) => void, { back, cond }: TransitionCallbackOption) =>
     (e: any) => {
-      const current = deck.slides[deck.slide()]
-      const section: HTMLElement = current.querySelector(
-        'section[data-transition]'
-      )
+      const currentTransition = transitionDuringState()
 
+      if (currentTransition) {
+        if (e[transitionApply]) return true
+        if (typeof currentTransition === 'object') {
+          currentTransition.abandon()
+          if (e.forSync) return true
+        }
+        return false
+      }
+
+      // Check transition
+      const current = deck.slides[deck.slide()]
+      const isBack = () => e.back ?? back
+      const transitionDataTarget = `data-transition${isBack() ? '-back' : ''}`
+      const section: HTMLElement = current.querySelector(
+        `section[${transitionDataTarget}]`
+      )
       if (!section) return true
 
-      const osc = document.querySelector(`.${classPrefix}osc`)
-      const sharedElements = osc ? [osc] : undefined
+      // Check condition
+      if (!cond(e)) return true
 
-      if (deck[transitionPreparing]) {
-        if (e[transitionApply]) {
-          deck[transitionPreparing] = false
+      // Parse settings
+      const transitionData = parseTransitionData(
+        section.getAttribute(transitionDataTarget) ?? undefined
+      )
+      if (!transitionData) return true
 
-          try {
-            documentTransition.start({ sharedElements }).catch(() => {
-              /* no ops */
-            })
-          } catch (_) {
-            /* no ops */
+      getMarpTransitionKeyframes(transitionData.name, {
+        builtinFallback: transitionData.builtinFallback,
+      }).then((keyframes) => {
+        if (!keyframes) return doTransition(true, () => fn(e))
+
+        // Normalize keyframes for preferred reduced motion
+        let normalizedKeyframes = keyframes
+
+        if (prefersReducedMotion.matches) {
+          console.warn(
+            'Use a constant animation to transition because preferring reduced motion by viewer has detected. '
+          )
+          normalizedKeyframes = reducedKeyframes
+        }
+
+        // Clean up (A previous style may be remaining if navigated by anchor link)
+        const existStyle = document.getElementById(transitionStyleId)
+        if (existStyle) existStyle.remove()
+
+        // Set style for transition effect
+        const style = document.createElement('style')
+        style.id = transitionStyleId
+
+        document.head.appendChild(style)
+
+        resolveAnimationStyles(normalizedKeyframes, {
+          backward: isBack(),
+          duration: transitionData.duration,
+        }).forEach((styleText) => style.sheet?.insertRule(styleText))
+
+        try {
+          // Start transition
+          const setSharedElements = (transition: DocumentTransition) => {
+            const osc = document.querySelector(`.${classPrefix}osc`)
+            if (osc) transition.setElement(osc, transitionKeyOSC)
           }
 
-          return true
-        }
-      } else {
-        if (!cond(e)) return true
+          const transition: DocumentTransition =
+            document['createDocumentTransition']()
+          setSharedElements(transition)
 
-        const target = `transition${e.back || back ? 'Back' : ''}` as const
-        const duration = Number.parseInt(
-          section.dataset[`${target}Duration`] ?? '',
-          10
-        )
-        const delay = Number.parseInt(
-          section.dataset[`${target}Delay`] ?? '',
-          10
-        )
+          const rootClassList = document.documentElement.classList
+          rootClassList.add(transitionWarmUpClass)
 
-        const rootConfig: Record<string, string> = {}
-        if (!Number.isNaN(duration)) rootConfig.duration = duration.toString()
-        if (!Number.isNaN(delay)) rootConfig.delay = delay.toString()
-
-        deck[transitionPreparing] = documentTransition
-          .prepare({
-            rootTransition: section.dataset[target],
-            rootConfig,
-            sharedElements,
+          doTransition(transition, async () => {
+            await transition
+              .start(async () => {
+                fn(e)
+                setSharedElements(transition)
+                rootClassList.remove(transitionWarmUpClass)
+              })
+              .finally(() => {
+                style.remove()
+                rootClassList.remove(transitionWarmUpClass)
+              })
           })
-          .then(() => fn(e))
-          .catch(() => fn(e))
-      }
+        } catch (e) {
+          transitionDuringState(false)
+        }
+      })
 
       return false
     }

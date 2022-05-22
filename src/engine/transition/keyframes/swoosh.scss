@@ -1,0 +1,26 @@
+@use './utils';
+
+@keyframes marp-incoming-transition-__builtin__swoosh {
+  from {
+    transform: translate(-10vw, 0) scale(0) perspective(100vw)
+      translate3d(100vw, -100vh, -100vw) rotateX(90deg) rotateZ(90deg);
+  }
+
+  to {
+    transform: translate(0, 0) scale(1) perspective(100vw);
+  }
+}
+
+@keyframes marp-incoming-transition-backward-__builtin__swoosh {
+  @include utils.send-backward;
+}
+@keyframes marp-outgoing-transition-backward-__builtin__swoosh {
+  from {
+    transform: translate(0, 0) scale(1) perspective(100vw);
+  }
+
+  to {
+    transform: translate(-10vw, 0) scale(0) perspective(100vw)
+      translate3d(100vw, -100vh, -100vw) rotateX(90deg) rotateZ(90deg);
+  }
+}

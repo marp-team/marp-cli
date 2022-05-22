@@ -1,0 +1,23 @@
+@use './utils';
+
+@keyframes marp-outgoing-transition-__builtin__pull {
+  from {
+    animation-timing-function: ease-out;
+  }
+
+  to {
+    transform: translateX(-100%);
+  }
+}
+@keyframes marp-incoming-transition-__builtin__pull {
+  @include utils.send-backward;
+}
+
+@keyframes marp-incoming-transition-backward-__builtin__pull {
+  from {
+    animation-timing-function: ease-out;
+    transform: translateX(-100%);
+  }
+}
+@keyframes marp-outgoing-transition-backward-__builtin__pull {
+}
