@@ -12,7 +12,7 @@ executors:
         default: false
       version:
         type: string
-        default: '16.14' # Specify LTS major and minor for development
+        default: '16.15' # Specify LTS major and minor for development
     docker:
       - image: cimg/node:<< parameters.version >><<# parameters.browser >>-browsers<</ parameters.browser >>
     working_directory: ~/marp-cli
@@ -178,20 +178,11 @@ jobs:
     steps:
       - audit
 
-  test-node12:
-    executor:
-      name: node
-      browser: true
-      version: '12.22'
-    steps:
-      - test:
-          browser: true
-
   test-node14:
     executor:
       name: node
       browser: true
-      version: '14.18'
+      version: '14.19'
     steps:
       - test:
           browser: true
@@ -233,9 +224,6 @@ workflows:
     jobs:
       # Test
       - audit
-      - test-node12:
-          requires:
-            - audit
       - test-node14:
           requires:
             - audit
@@ -246,7 +234,6 @@ workflows:
       # Docker (latest)
       - docker-build-latest:
           requires:
-            - test-node12
             - test-node14
             - test-node16
           filters:

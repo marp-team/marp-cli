@@ -9,7 +9,7 @@ on:
 #   cancel-in-progress: true
 
 env:
-  YARN_VERSION: '^1.22.17'
+  YARN_VERSION: '^1.22.19'
 
 jobs:
   win-test:
@@ -19,9 +19,8 @@ jobs:
       fail-fast: false
       matrix:
         node-version:
-          - '^12.22.7'
           - '^14.18.1'
-          - '16.14.2'
+          - '16.15.0'
 
     steps:
       # - name: Output concurrency group
