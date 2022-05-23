@@ -439,9 +439,9 @@ Marp CLI prefers to use _an installed core to local project by user_ than the bu
 If the current project has installed `@marp-team/marp-core` individually, it would show its version and the annotation: `w/ user-installed @marp-team/marp-core vX.X.X` or `w/ customized engine`.
 
 ```console
-$ npm i @marp-team/marp-cli @marp-team/marp-core@^3.0.0 --save-dev
+$ npm i @marp-team/marp-cli @marp-team/marp-core@^3.2.0 --save-dev
 $ npx marp --version
-@marp-team/marp-cli v1.x.x (w/ user-installed @marp-team/marp-core v3.0.0)
+@marp-team/marp-cli v2.x.x (w/ user-installed @marp-team/marp-core v3.2.0)
 ```
 
 ## Configuration file
