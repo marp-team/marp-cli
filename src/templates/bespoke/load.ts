@@ -5,9 +5,16 @@ const bespokeLoad = (deck) => {
     for (const slide of deck.slides) {
       // Slides contained Marp Core's fitting elements must not hide via `display: none;`.
       // https://github.com/marp-team/marp-cli/issues/153
-      const type = slide.querySelector('[data-marp-fitting]') ? '' : 'hideable'
+      //
+      // NOTE: [data-marp-fitting] is used by Marp Core v2
+      const hasFittingElement = slide.querySelector(
+        'marp-auto-scaling, [data-auto-scaling], [data-marp-fitting]'
+      )
 
-      slide.setAttribute(`${dataAttrPrefix}load`, type)
+      slide.setAttribute(
+        `${dataAttrPrefix}load`,
+        hasFittingElement ? '' : 'hideable'
+      )
     }
   })
 }

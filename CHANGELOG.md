@@ -2,13 +2,24 @@
 
 ## [Unreleased]
 
+### ⚡️ Breaking
+
+- End-of-Lifed Node.js 12 is no longer supported, and required the latest Node.js 14 and later ([#450](https://github.com/marp-team/marp-cli/pull/450))
+- Upgrade Marp Core to [v3.2.0](https://github.com/marp-team/marp-core/releases/tag/v3.2.0) ([#450](https://github.com/marp-team/marp-cli/pull/450))
+  - This is the first version of using v3 core as a bundled engine. [Refer to major changes in Marp Core v3.0.0.](https://github.com/marp-team/marp-core/releases/tag/v3.0.0)
+
 ### Changed
 
-- ⚡️ Updates of experimental transition for bespoke template `--bespoke.transition` ([#447](https://github.com/marp-team/marp-cli/issues/447), [#448](https://github.com/marp-team/marp-cli/pull/448))
+- Upgrade Marpit to [v2.3.1](https://github.com/marp-team/marpit/releases/tag/v2.3.1) ([#450](https://github.com/marp-team/marp-cli/pull/450))
+- Updates of experimental transition for bespoke template `--bespoke.transition` ([#447](https://github.com/marp-team/marp-cli/issues/447), [#448](https://github.com/marp-team/marp-cli/pull/448))
   - More built-in transitions (5 transitions -> 33 transitions)
   - Define custom transitions by `@keyframes` declaration in CSS
   - Update spec of `transition` local directive
   - Opt-out transition animation by preferring `prefers-reduced-motion` media query
+
+### Deprecated
+
+- [Marpit v2.3.0](https://github.com/marp-team/marpit/releases/tag/v2.3.0): Shorthand syntax for setting colors `![](red)` has been deprecated ([#450](https://github.com/marp-team/marp-cli/pull/450))
 
 ## v1.7.2 - 2022-04-24
 

@@ -5,11 +5,11 @@ import { URL } from 'url'
 import { promisify } from 'util'
 import { Marp } from '@marp-team/marp-core'
 import { Options } from '@marp-team/marpit'
-import cheerio, { load } from 'cheerio'
+import { load } from 'cheerio'
 import { imageSize } from 'image-size'
 import { PDFDocument, PDFDict, PDFName, PDFHexString } from 'pdf-lib'
 import { TimeoutError } from 'puppeteer-core'
-import { Page } from 'puppeteer-core/lib/cjs/puppeteer/common/Page'
+import { Page } from 'puppeteer-core/lib/cjs/puppeteer/common/Page.js'
 import yauzl from 'yauzl'
 import { Converter, ConvertType, ConverterOption } from '../src/converter'
 import { CLIError } from '../src/error'
@@ -653,7 +653,7 @@ describe('Converter', () => {
 
                 readStream.on('data', (chunk) => readBuffer.push(chunk))
                 readStream.on('end', () => {
-                  const $ = cheerio.load(Buffer.concat(readBuffer).toString())
+                  const $ = load(Buffer.concat(readBuffer).toString())
                   const coreProps = $('cp\\:coreProperties')
 
                   coreProps.children().each((_, elm) => {

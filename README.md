@@ -21,7 +21,7 @@ It can convert Marp / Marpit Markdown files into static HTML / CSS, PDF, PowerPo
 
 [npx (`npm exec`)](https://docs.npmjs.com/cli/v7/commands/npx) is the best way to use the latest Marp CLI if you wanted
 one-shot Markdown conversion _without install_. Just run below if you have
-installed [Node.js](https://nodejs.org/) 12 and later.
+installed [Node.js](https://nodejs.org/) 14 and later.
 
 ```bash
 # Convert slide deck into HTML
@@ -59,6 +59,8 @@ Don't you like installing Node.js and Chrome to local? We have [an official Dock
 
 ## Install
 
+Marp CLI is working only in [actively supported Node.js versions](https://endoflife.date/nodejs) so Node.js 14 and later is required to install.
+
 ### Use package manager
 
 You can use the package manager to install/update Marp CLI easily.
@@ -79,7 +81,7 @@ We recommend to install Marp CLI into your Node project. You may control the CLI
 npm install --save-dev @marp-team/marp-cli
 ```
 
-Node.js 12 and later is required to install Marp CLI. The installed `marp` command is available in [npm-scripts](https://docs.npmjs.com/misc/scripts) or `npx marp`.
+The installed `marp` command is available in [npm-scripts](https://docs.npmjs.com/misc/scripts) or `npx marp`.
 
 #### Global installation
 
@@ -91,7 +93,7 @@ npm install -g @marp-team/marp-cli
 
 ### [Standalone binary][releases]
 
-We also provide standalone binaries for Linux, macOS, and Windows.
+We also provide standalone binaries for Linux, macOS, and Windows. These have bundled Marp CLI with Node.js binary, so no need to install Node.js separately.
 
 **[:fast_forward: Download the latest standalone binary from release page.][releases]**
 
@@ -437,9 +439,9 @@ Marp CLI prefers to use _an installed core to local project by user_ than the bu
 If the current project has installed `@marp-team/marp-core` individually, it would show its version and the annotation: `w/ user-installed @marp-team/marp-core vX.X.X` or `w/ customized engine`.
 
 ```console
-$ npm i @marp-team/marp-cli @marp-team/marp-core@^3.0.0 --save-dev
+$ npm i @marp-team/marp-cli @marp-team/marp-core@^3.2.0 --save-dev
 $ npx marp --version
-@marp-team/marp-cli v1.x.x (w/ user-installed @marp-team/marp-core v3.0.0)
+@marp-team/marp-cli v2.x.x (w/ user-installed @marp-team/marp-core v3.2.0)
 ```
 
 ## Configuration file
