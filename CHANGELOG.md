@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v2.0.0 - 2022-05-24
+
 ### ⚡️ Breaking
 
 - End-of-Lifed Node.js 12 is no longer supported, and required the latest Node.js 14 and later ([#450](https://github.com/marp-team/marp-cli/pull/450))
