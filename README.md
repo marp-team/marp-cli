@@ -212,7 +212,7 @@ Because of [the security reason](https://github.com/marp-team/marp-cli/pull/10#u
 
 Marp CLI would output incompleted result with warning if the blocked local file accessing is detected. We recommend uploading your assets to online.
 
-If you really need to use local files in these conversion, `--alow-local-files` option helps to find your local files. _Please use only to the trusted Markdown because there is a potential security risk._
+If you really need to use local files in these conversion, `--allow-local-files` option helps to find your local files. _Please use only to the trusted Markdown because there is a potential security risk._
 
 ```bash
 marp --pdf --allow-local-files slide-deck.md
