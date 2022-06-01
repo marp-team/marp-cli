@@ -4,6 +4,7 @@
 
 ### Fixed
 
+- [Experimental transition] Fix inconsistent transition by backward navigation via presenter view ([#452](https://github.com/marp-team/marp-cli/issues/452), [#455](https://github.com/marp-team/marp-cli/pull/455))
 - Preview mode has unexpected message in the information bar "You are using an unsupported command-line flag" ([#453](https://github.com/marp-team/marp-cli/issues/453), [#454](https://github.com/marp-team/marp-cli/pull/454))
 
 ## v2.0.0 - 2022-05-24
