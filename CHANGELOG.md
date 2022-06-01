@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Preview mode has unexpected message in the information bar "You are using an unsupported command-line flag" ([#453](https://github.com/marp-team/marp-cli/issues/453), [#454](https://github.com/marp-team/marp-cli/pull/454))
+
 ## v2.0.0 - 2022-05-24
 
 ### ⚡️ Breaking
