@@ -115,6 +115,10 @@ const bespokeTransition = (deck) => {
         return false
       }
 
+      // Check condition
+      // (The conditional function may modify event object so should be called at first of checks)
+      if (!cond(e)) return true
+
       // Check transition
       const current = deck.slides[deck.slide()]
       const isBack = () => e.back ?? back
@@ -123,9 +127,6 @@ const bespokeTransition = (deck) => {
         `section[${transitionDataTarget}]`
       )
       if (!section) return true
-
-      // Check condition
-      if (!cond(e)) return true
 
       // Parse settings
       const transitionData = parseTransitionData(
