@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v2.0.1 - 2022-06-01
+
 ### Fixed
 
 - [Experimental transition] Fix inconsistent transition by backward navigation via presenter view ([#452](https://github.com/marp-team/marp-cli/issues/452), [#455](https://github.com/marp-team/marp-cli/pull/455))
