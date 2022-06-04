@@ -35,7 +35,7 @@ $progress-height: 5px;
 
     &:not(.bespoke-marp-active) {
       * {
-        /* Unset page-transition-tag in inactive pages because it must be unique for a document. */
+        /* Unset page-transition-tag in inactive pages because it must be unique for a document */
         page-transition-tag: none !important;
       }
     }
@@ -63,6 +63,13 @@ $progress-height: 5px;
         &.bespoke-marp-active {
           display: block;
         }
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        /* Disable shared element transition declared by users */
+        page-transition-tag: none !important;
       }
     }
   }
