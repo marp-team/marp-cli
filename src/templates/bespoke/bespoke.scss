@@ -98,6 +98,9 @@ $progress-height: 5px;
         /* Hack for Chrome to show OSC overlay onto video correctly */
         will-change: transform;
 
+        /* Page transition API */
+        page-transition-tag: __bespoke_marp_transition_osc__;
+
         > * {
           margin-left: 6px;
 

@@ -143,16 +143,12 @@ const resolveAnimationVariables = (
 ): Record<ReturnType<typeof animCSSVar>, string> | undefined => {
   const target = keyframes[backward ? 'backward' : 'forward']
   const resolved = (() => {
-    const _default = duration
-      ? ({ [animCSSVar('duration')]: duration } as const)
-      : ({} as Record<string, never>)
-
     const detailedKeyframe = target[type]
 
     if (typeof detailedKeyframe === 'string') {
-      return { ..._default, [animCSSVar('name')]: detailedKeyframe } as const
+      return { [animCSSVar('name')]: detailedKeyframe } as const
     } else if (target.both) {
-      const style = { ..._default, [animCSSVar('name')]: target.both } as const
+      const style = { [animCSSVar('name')]: target.both } as const
 
       return type === 'incoming'
         ? ({ ...style, [animCSSVar('direction')]: 'reverse' } as const)
@@ -179,6 +175,14 @@ export const resolveAnimationStyles = (
   const rules: string[] = [
     `:root{${publicCSSVar('direction')}:${opts.backward ? -1 : 1};}`,
   ]
+
+  if (opts.duration !== undefined) {
+    rules.push(
+      `::page-transition-container(*){${animCSSVar('duration')}:${
+        opts.duration
+      };}`
+    )
+  }
 
   const incomingVars = resolveAnimationVariables(keyframes, {
     ...opts,
