@@ -412,6 +412,33 @@ describe('Converter', () => {
         expect(data.duration).toBe('1s')
       })
     })
+
+    describe('with scoped style', () => {
+      it('assigns transition data with the scoped name of keyframes', async () => {
+        const converter = instance({
+          template: 'bespoke',
+          templateOption: { transition: true },
+        })
+
+        const { result } = await converter.convert(
+          [
+            '<!-- transition: hello -->',
+            '<style scoped>',
+            '  @keyframes marp-transition-hello { to { opacity: 0; } }',
+            '</style>',
+            '\n---\n',
+          ].join('\n')
+        )
+        const $result = load(result)
+
+        const data = $result('section').first().data('transition')
+        expect(data.name).toMatch(/^hello-\w+$/)
+
+        const bData = $result($result('section').get(1)).data('transitionBack')
+        expect(bData.name).toMatch(/^hello-\w+$/)
+        expect(bData.name).toBe(data.name)
+      })
+    })
   })
 
   describe('#convertFile', () => {
