@@ -49,6 +49,13 @@ $progress-height: 5px;
       }
     }
 
+    &:not(.bespoke-marp-active) {
+      * {
+        /* Unset page-transition-tag in inactive pages because it must be unique for a document. */
+        page-transition-tag: none !important;
+      }
+    }
+
     @supports not (content-visibility: hidden) {
       &[data-bespoke-marp-load='hideable'] {
         display: none;
