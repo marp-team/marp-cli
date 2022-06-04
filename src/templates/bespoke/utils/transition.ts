@@ -51,6 +51,9 @@ const animCSSVar = <T extends string>(key: T) =>
 const publicCSSVar = <T extends string>(key: T) =>
   `--marp-transition-${key}` as const
 
+const nameCSSVar = animCSSVar('name')
+const durationCSSVar = animCSSVar('duration')
+
 const isAvailableKeyframe = (keyframe: string) =>
   new Promise<boolean>((res) => {
     const elm = document.createElement('div')
@@ -140,15 +143,15 @@ export const prepareMarpTransitions = (...transitionNames: string[]) => {
 const resolveAnimationVariables = (
   keyframes: MarpTransitionKeyframes,
   { type, backward, duration }: ResolveAnimationOptions
-): Record<ReturnType<typeof animCSSVar>, string> | undefined => {
+): Record<ReturnType<typeof animCSSVar>, string> => {
   const target = keyframes[backward ? 'backward' : 'forward']
   const resolved = (() => {
     const detailedKeyframe = target[type]
 
     if (typeof detailedKeyframe === 'string') {
-      return { [animCSSVar('name')]: detailedKeyframe } as const
+      return { [nameCSSVar]: detailedKeyframe } as const
     } else if (target.both) {
-      const style = { [animCSSVar('name')]: target.both } as const
+      const style = { [nameCSSVar]: target.both } as const
 
       return type === 'incoming'
         ? ({ ...style, [animCSSVar('direction')]: 'reverse' } as const)
@@ -165,7 +168,9 @@ const resolveAnimationVariables = (
       backward: false,
     })
 
-  return resolved
+  return (
+    resolved || { [nameCSSVar]: '__bespoke_marp_transition_no_animation__' }
+  )
 }
 
 export const resolveAnimationStyles = (
@@ -178,39 +183,23 @@ export const resolveAnimationStyles = (
 
   if (opts.duration !== undefined) {
     rules.push(
-      `::page-transition-container(*){${animCSSVar('duration')}:${
-        opts.duration
-      };}`
+      `::page-transition-container(*){${durationCSSVar}:${opts.duration};}`
     )
   }
 
-  const incomingVars = resolveAnimationVariables(keyframes, {
-    ...opts,
-    type: 'incoming',
-  })
-  const outgoingVars = resolveAnimationVariables(keyframes, {
-    ...opts,
-    type: 'outgoing',
-  })
-
-  const getStyleMap = (
-    // eslint-disable-next-line @typescript-eslint/ban-types
-    vars: ReturnType<typeof resolveAnimationVariables> & {}
-  ) =>
+  const getStyleMap = (vars: ReturnType<typeof resolveAnimationVariables>) =>
     Object.entries(vars)
       .map(([k, v]) => `${k}:${v};`)
       .join('')
 
-  if (outgoingVars) {
-    rules.push(
-      `::page-transition-outgoing-image(root){${getStyleMap(outgoingVars)}}`
-    )
-  }
-  if (incomingVars) {
-    rules.push(
-      `::page-transition-incoming-image(root){${getStyleMap(incomingVars)}}`
-    )
-  }
+  rules.push(
+    `::page-transition-outgoing-image(root){${getStyleMap(
+      resolveAnimationVariables(keyframes, { ...opts, type: 'outgoing' })
+    )}}`,
+    `::page-transition-incoming-image(root){${getStyleMap(
+      resolveAnimationVariables(keyframes, { ...opts, type: 'incoming' })
+    )}}`
+  )
 
   return rules
 }
