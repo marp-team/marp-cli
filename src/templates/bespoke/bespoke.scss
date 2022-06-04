@@ -33,6 +33,13 @@ $progress-height: 5px;
     pointer-events: none;
     opacity: 0;
 
+    &:not(.bespoke-marp-active) {
+      * {
+        /* Unset page-transition-tag in inactive pages because it must be unique for a document. */
+        page-transition-tag: none !important;
+      }
+    }
+
     &.bespoke-marp-active {
       content-visibility: visible;
       z-index: 0;
@@ -46,13 +53,6 @@ $progress-height: 5px;
           /* Reset animation: "none" keyword does not reset animation in Firefox */
           animation-name: __bespoke_marp__ !important;
         }
-      }
-    }
-
-    &:not(.bespoke-marp-active) {
-      * {
-        /* Unset page-transition-tag in inactive pages because it must be unique for a document. */
-        page-transition-tag: none !important;
       }
     }
 
