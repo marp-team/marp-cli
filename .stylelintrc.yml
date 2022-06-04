@@ -10,7 +10,7 @@ rules:
   property-no-unknown:
     - true
     - ignoreProperties:
-        - content-visibility
+        - page-transition-tag
   selector-pseudo-element-no-unknown:
     - true
     - ignorePseudoElements:
