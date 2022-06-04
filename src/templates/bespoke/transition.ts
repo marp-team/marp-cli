@@ -170,15 +170,23 @@ const bespokeTransition = (deck) => {
           const rootClassList = document.documentElement.classList
           rootClassList.add(transitionWarmUpClass)
 
+          let navigated = false
+
+          const navigate = () => {
+            if (navigated) return
+
+            fn(e)
+            navigated = true
+
+            rootClassList.remove(transitionWarmUpClass)
+          }
+
           doTransition(transition, async () => {
             try {
-              await transition.start(() => {
-                fn(e)
-                rootClassList.remove(transitionWarmUpClass)
-              })
+              await transition.start(navigate)
             } catch (err) {
               console.error(err)
-              fn(e)
+              navigate()
             } finally {
               style.remove()
               rootClassList.remove(transitionWarmUpClass)

@@ -49,6 +49,9 @@ interface TransitionMeta {
   transition?: MarpTransitionData
 }
 
+const keyframeMatcher =
+  /^marp-(?:(?:outgoing|incoming)-)?transition-(?:backward-)?(.+)$/
+
 const builtinTransitions = {
   clockwise,
   counterclockwise,
@@ -112,7 +115,7 @@ export default function transitionPlugin(md: MarkdownIt & { marpit: Marpit }) {
       let previousTransitionBack: string | undefined
 
       for (const token of state.tokens) {
-        const { marpitDirectives } = token.meta || {}
+        const { marpitDirectives, marpitStyleScoped } = token.meta || {}
 
         // Apply stored transition for backward direction in the next slide of defined slide
         if (token.type === 'marpit_slide_open' && previousTransitionBack) {
@@ -124,6 +127,7 @@ export default function transitionPlugin(md: MarkdownIt & { marpit: Marpit }) {
           const transition = { ...marpitDirectives.transition }
 
           if (isTransitionData(transition)) {
+            // Inject built-in transition style
             if (builtinTransitions[transition.name]) {
               builtinTransitionStyles.set(
                 transition.name,
@@ -132,6 +136,26 @@ export default function transitionPlugin(md: MarkdownIt & { marpit: Marpit }) {
               transition.builtinFallback = true
             }
 
+            // Detect keyframes in the scoped style
+            const scopedKey: string | undefined = marpitStyleScoped?.key
+
+            if (scopedKey) {
+              const scopedKeyframeSet: Set<string> | undefined =
+                marpitStyleScoped?.keyframeSet
+
+              for (const keyframe of scopedKeyframeSet?.values() ?? []) {
+                const matched = keyframe.match(keyframeMatcher)
+
+                if (matched && transition.name === matched[1]) {
+                  transition.name = `${transition.name}-${scopedKey}`
+                  transition.builtinFallback = false
+
+                  break
+                }
+              }
+            }
+
+            // Assign data JSON
             const json = JSON.stringify(transition)
             token.attrSet('data-transition', json)
 
