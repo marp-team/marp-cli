@@ -33,6 +33,13 @@ $progress-height: 5px;
     pointer-events: none;
     opacity: 0;
 
+    &:not(.bespoke-marp-active) {
+      * {
+        /* Unset page-transition-tag in inactive pages because it must be unique for a document */
+        page-transition-tag: none !important;
+      }
+    }
+
     &.bespoke-marp-active {
       content-visibility: visible;
       z-index: 0;
@@ -56,6 +63,13 @@ $progress-height: 5px;
         &.bespoke-marp-active {
           display: block;
         }
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        /* Disable shared element transition declared by users */
+        page-transition-tag: none !important;
       }
     }
   }
@@ -97,6 +111,9 @@ $progress-height: 5px;
 
         /* Hack for Chrome to show OSC overlay onto video correctly */
         will-change: transform;
+
+        /* Page transition API */
+        page-transition-tag: __bespoke_marp_transition_osc__;
 
         > * {
           margin-left: 6px;

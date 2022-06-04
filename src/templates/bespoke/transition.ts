@@ -1,4 +1,3 @@
-import { classPrefix } from './utils'
 import {
   getMarpTransitionKeyframes,
   resolveAnimationStyles,
@@ -22,7 +21,6 @@ export const transitionStyleId = '_tSId' as const
 
 const transitionApply = '_tA' as const
 const transitionDuring = '_tD' as const
-const transitionKeyOSC = '__bespoke_marp_transition_osc__' as const
 const transitionWarmUpClass = 'bespoke-marp-transition-warming-up' as const
 
 const prefersReducedMotion = window.matchMedia(
@@ -166,29 +164,25 @@ const bespokeTransition = (deck) => {
 
         try {
           // Start transition
-          const setSharedElements = (transition: DocumentTransition) => {
-            const osc = document.querySelector(`.${classPrefix}osc`)
-            if (osc) transition.setElement(osc, transitionKeyOSC)
-          }
-
           const transition: DocumentTransition =
             document['createDocumentTransition']()
-          setSharedElements(transition)
 
           const rootClassList = document.documentElement.classList
           rootClassList.add(transitionWarmUpClass)
 
           doTransition(transition, async () => {
-            await transition
-              .start(async () => {
+            try {
+              await transition.start(() => {
                 fn(e)
-                setSharedElements(transition)
                 rootClassList.remove(transitionWarmUpClass)
               })
-              .finally(() => {
-                style.remove()
-                rootClassList.remove(transitionWarmUpClass)
-              })
+            } catch (err) {
+              console.error(err)
+              fn(e)
+            } finally {
+              style.remove()
+              rootClassList.remove(transitionWarmUpClass)
+            }
           })
         } catch (e) {
           transitionDuringState(false)

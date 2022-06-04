@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- [Experimental transition] A basic support of transition with shared elements (just like PowerPoint Morph and Keynote Magic Move) ([#457](https://github.com/marp-team/marp-cli/pull/457))
+
 ## v2.0.1 - 2022-06-01
 
 ### Fixed
