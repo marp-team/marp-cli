@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v2.0.2 - 2022-06-04
+
 ### Added
 
 - [Experimental transition] Parse custom transitions declared in `<style scoped>` ([#456](https://github.com/marp-team/marp-cli/pull/456))
