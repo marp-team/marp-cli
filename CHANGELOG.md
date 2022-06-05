@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v2.0.3 - 2022-06-05
+
 ### Changed
 
 - Upgrade Marp Core to [v3.2.1](https://github.com/marp-team/marp-core/releases/tag/v3.2.1) ([#458](https://github.com/marp-team/marp-cli/pull/458))
