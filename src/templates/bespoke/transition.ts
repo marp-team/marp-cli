@@ -35,13 +35,13 @@ const reducedMotionIncomingKeyframes =
 const reducedKeyframes: MarpTransitionKeyframes = {
   forward: {
     both: undefined,
-    incoming: reducedMotionIncomingKeyframes,
-    outgoing: reducedMotionOutgoingKeyframes,
+    incoming: { name: reducedMotionIncomingKeyframes },
+    outgoing: { name: reducedMotionOutgoingKeyframes },
   },
   backward: {
     both: undefined,
-    incoming: reducedMotionIncomingKeyframes,
-    outgoing: reducedMotionOutgoingKeyframes,
+    incoming: { name: reducedMotionIncomingKeyframes },
+    outgoing: { name: reducedMotionOutgoingKeyframes },
   },
 }
 

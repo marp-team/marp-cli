@@ -10,9 +10,19 @@ export type MarpTransitionData = {
   builtinFallback?: boolean
 }
 
+export type MarpTransitionKeyframeSettings = {
+  name: string
+  defaultDuration?: string
+}
+
+type MarpTransitionResolvableKeyframeSettings = Omit<
+  MarpTransitionKeyframeSettings,
+  'name'
+>
+
 export type MarpTransitionKeyframes = Record<
   keyof typeof directions,
-  Record<keyof typeof types, string | undefined>
+  Record<keyof typeof types, MarpTransitionKeyframeSettings | undefined>
 >
 
 export const _resetResolvedKeyframes = () => {
@@ -24,11 +34,14 @@ export const _resetResolvedKeyframes = () => {
 }
 
 export const _testElementAnimation = (
-  _element: HTMLElement,
-  callback: (ret: boolean) => void
+  elm: HTMLElement,
+  callback: (ret: MarpTransitionResolvableKeyframeSettings | undefined) => void
 ) => {
   /* istanbul ignore next */
-  requestAnimationFrame(() => requestAnimationFrame(() => callback(false)))
+  requestAnimationFrame(() => {
+    elm.style.animationPlayState = 'running'
+    requestAnimationFrame(() => callback(undefined))
+  })
 }
 
 const resolvedMarpTransitionKeyframes = new Map<
@@ -54,24 +67,51 @@ const publicCSSVar = <T extends string>(key: T) =>
 const nameCSSVar = animCSSVar('name')
 const durationCSSVar = animCSSVar('duration')
 
-const isAvailableKeyframe = (keyframe: string) =>
-  new Promise<boolean>((res) => {
+const resolveKeyframeSetting = (keyframe: string) =>
+  new Promise<MarpTransitionResolvableKeyframeSettings | undefined>((res) => {
+    const setting: MarpTransitionResolvableKeyframeSettings = {}
+
     const elm = document.createElement('div')
-    const resolve = (ret: boolean) => {
+    const resolve = (
+      ret: MarpTransitionResolvableKeyframeSettings | undefined
+    ) => {
       elm.remove()
       res(ret)
     }
-    elm.addEventListener('animationstart', () => resolve(true))
+    elm.addEventListener('animationstart', () => resolve(setting))
 
     Object.assign(elm.style, {
       animationName: keyframe,
       animationDuration: '1s',
       animationFillMode: 'both',
+      animationPlayState: 'paused',
       position: 'absolute',
       pointerEvents: 'none',
     })
 
     document.body.appendChild(elm)
+
+    // Detect default duration for the current animation keyframe.
+    const currentStyle = getComputedStyle(elm)
+    const durationVar = currentStyle.getPropertyValue(publicCSSVar('duration'))
+
+    if (durationVar) {
+      setting.defaultDuration = durationVar
+    }
+    // TODO: Abuse animatable property with custom-ident if Shared Element
+    // Transition API had supported in cross-browser.
+    //
+    // else if (
+    //   // CSS variable that is setting within the keyframe cannot read in some
+    //   // browsers (Firefox, Safari). So Marp abuses grid-row-start property
+    //   // in "from" keyframe as a custom value.
+    //   currentStyle.gridRowStart.startsWith('marp-transition-duration-')
+    // ) {
+    //   setting.defaultDuration = currentStyle.gridRowStart
+    //     .slice(25)
+    //     .replace(/\\./g, '.')
+    // }
+
     _testElementAnimation(elm, resolve)
   })
 
@@ -83,9 +123,11 @@ const resolveMarpTransitionKeyframes = (transitionName: string) => {
     for (const [direction, directionSuffix] of Object.entries(directions)) {
       const keyframe = `marp-${typePrefix}transition${directionSuffix}-${transitionName}`
       promises.push(
-        isAvailableKeyframe(keyframe).then((available) => {
+        resolveKeyframeSetting(keyframe).then((setting) => {
           ret[direction] = ret[direction] || {}
-          ret[direction][type] = available ? keyframe : undefined
+          ret[direction][type] = setting
+            ? { ...setting, name: keyframe }
+            : undefined
         })
       )
     }
@@ -140,33 +182,34 @@ export const prepareMarpTransitions = (...transitionNames: string[]) => {
   ).then<void>()
 }
 
+type AnimationVariables = Record<ReturnType<typeof animCSSVar>, string>
+
 const resolveAnimationVariables = (
   keyframes: MarpTransitionKeyframes,
-  { type, backward, duration }: ResolveAnimationOptions
-): Record<ReturnType<typeof animCSSVar>, string> => {
+  { type, backward }: ResolveAnimationOptions
+): AnimationVariables => {
   const target = keyframes[backward ? 'backward' : 'forward']
   const resolved = (() => {
     const detailedKeyframe = target[type]
 
-    if (typeof detailedKeyframe === 'string') {
-      return { [nameCSSVar]: detailedKeyframe } as const
-    } else if (target.both) {
-      const style = { [nameCSSVar]: target.both } as const
+    const resolveStyle = (
+      kf: MarpTransitionKeyframeSettings
+    ): AnimationVariables => ({ [nameCSSVar]: kf.name })
 
-      return type === 'incoming'
-        ? ({ ...style, [animCSSVar('direction')]: 'reverse' } as const)
-        : style
+    if (detailedKeyframe) {
+      return resolveStyle(detailedKeyframe)
+    } else if (target.both) {
+      const style = resolveStyle(target.both)
+      if (type === 'incoming') style[animCSSVar('direction')] = 'reverse'
+
+      return style
     }
 
     return undefined
   })()
 
   if (!resolved && backward)
-    return resolveAnimationVariables(keyframes, {
-      type,
-      duration,
-      backward: false,
-    })
+    return resolveAnimationVariables(keyframes, { type, backward: false })
 
   return (
     resolved || { [nameCSSVar]: '__bespoke_marp_transition_no_animation__' }
@@ -181,10 +224,26 @@ export const resolveAnimationStyles = (
     `:root{${publicCSSVar('direction')}:${opts.backward ? -1 : 1};}`,
   ]
 
-  if (opts.duration !== undefined) {
-    rules.push(
-      `::page-transition-container(*){${durationCSSVar}:${opts.duration};}`
-    )
+  const resolveDefaultDuration = (
+    direction: keyof typeof directions
+  ): string | undefined => {
+    const ret =
+      keyframes[direction].both?.defaultDuration ||
+      keyframes[direction].outgoing?.defaultDuration ||
+      keyframes[direction].incoming?.defaultDuration
+
+    if (direction === 'forward') return ret
+
+    // Fallback to forward duration
+    return ret || resolveDefaultDuration('forward')
+  }
+
+  const duration =
+    opts.duration ||
+    resolveDefaultDuration(opts.backward ? 'backward' : 'forward')
+
+  if (duration !== undefined) {
+    rules.push(`::page-transition-container(*){${durationCSSVar}:${duration};}`)
   }
 
   const getStyleMap = (vars: ReturnType<typeof resolveAnimationVariables>) =>
