@@ -1503,11 +1503,18 @@ describe("Bespoke template's browser context", () => {
       return deck
     }
 
-    const defineKeyframesMock = (...keyframes: string[]) => {
+    const defineKeyframesMock = (
+      keyframes: string[] = [],
+      opts: transitionUtils.MarpTransitionResolvableKeyframeSettings = {}
+    ) => {
       jest
         .spyOn(transitionUtils, '_testElementAnimation')
         .mockImplementation((elm, resolve) => {
-          resolve(keyframes.includes(elm.style.animationName))
+          resolve(
+            keyframes.includes(elm.style.animationName)
+              ? { ...opts }
+              : undefined
+          )
         })
     }
 
@@ -1576,10 +1583,10 @@ describe("Bespoke template's browser context", () => {
       })
 
       // Set mocked keyframes
-      defineKeyframesMock(
+      defineKeyframesMock([
         'marp-transition-__builtin__built-in',
-        'marp-incoming-transition-custom'
-      )
+        'marp-incoming-transition-custom',
+      ])
 
       // Initialize
       const deck = await initializeBespoke()
@@ -1635,7 +1642,7 @@ describe("Bespoke template's browser context", () => {
       parent.querySelectorAll('section').forEach((section) => {
         section.dataset.transition = JSON.stringify({ name: 'test' })
       })
-      defineKeyframesMock('marp-transition-test')
+      defineKeyframesMock(['marp-transition-test'])
 
       // Initialize
       const deck = await initializeBespoke()

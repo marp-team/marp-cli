@@ -15,7 +15,7 @@ export type MarpTransitionKeyframeSettings = {
   defaultDuration?: string
 }
 
-type MarpTransitionResolvableKeyframeSettings = Omit<
+export type MarpTransitionResolvableKeyframeSettings = Omit<
   MarpTransitionKeyframeSettings,
   'name'
 >
