@@ -35,13 +35,13 @@ const reducedMotionIncomingKeyframes =
 const reducedKeyframes: MarpTransitionKeyframes = {
   forward: {
     both: undefined,
-    incoming: reducedMotionIncomingKeyframes,
-    outgoing: reducedMotionOutgoingKeyframes,
+    incoming: { name: reducedMotionIncomingKeyframes },
+    outgoing: { name: reducedMotionOutgoingKeyframes },
   },
   backward: {
     both: undefined,
-    incoming: reducedMotionIncomingKeyframes,
-    outgoing: reducedMotionOutgoingKeyframes,
+    incoming: { name: reducedMotionIncomingKeyframes },
+    outgoing: { name: reducedMotionOutgoingKeyframes },
   },
 }
 
@@ -97,7 +97,15 @@ const bespokeTransition = (deck) => {
         })
         .filter((v): v is string => !!v)
     )
-  )
+  ).then(() => {
+    // Workaround for Chrome's animation jank: Disable duration variables in keyframes after prefetch
+    document.querySelectorAll<HTMLStyleElement>('style').forEach((style) => {
+      style.innerHTML = style.innerHTML.replace(
+        /--marp-transition-duration:[^;}]*[;}]/g,
+        (matched) => matched.slice(0, -1) + '!important' + matched.slice(-1)
+      )
+    })
+  })
 
   const transitionCallback =
     (fn: (e: any) => void, { back, cond }: TransitionCallbackOption) =>

@@ -1503,11 +1503,18 @@ describe("Bespoke template's browser context", () => {
       return deck
     }
 
-    const defineKeyframesMock = (...keyframes: string[]) => {
+    const defineKeyframesMock = (
+      keyframes: string[] = [],
+      opts: transitionUtils.MarpTransitionResolvableKeyframeSettings = {}
+    ) => {
       jest
         .spyOn(transitionUtils, '_testElementAnimation')
         .mockImplementation((elm, resolve) => {
-          resolve(keyframes.includes(elm.style.animationName))
+          resolve(
+            keyframes.includes(elm.style.animationName)
+              ? { ...opts }
+              : undefined
+          )
         })
     }
 
@@ -1521,13 +1528,12 @@ describe("Bespoke template's browser context", () => {
       return style
     }
 
-    const getTransitionStyle = () => {
-      const style = document.getElementById(
+    const getTransitionStyle = (): string | null => {
+      const style: HTMLStyleElement | null = document.getElementById(
         transitionStyleId
-      ) as HTMLStyleElement
+      ) as HTMLStyleElement | null
 
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      return getCSSText(style.sheet!.cssRules)
+      return style?.sheet ? getCSSText(style.sheet.cssRules) : null
     }
 
     it('does not trigger transitions if not defined transition effects in Markdown', async () => {
@@ -1576,10 +1582,10 @@ describe("Bespoke template's browser context", () => {
       })
 
       // Set mocked keyframes
-      defineKeyframesMock(
+      defineKeyframesMock([
         'marp-transition-__builtin__built-in',
-        'marp-incoming-transition-custom'
-      )
+        'marp-incoming-transition-custom',
+      ])
 
       // Initialize
       const deck = await initializeBespoke()
@@ -1635,7 +1641,7 @@ describe("Bespoke template's browser context", () => {
       parent.querySelectorAll('section').forEach((section) => {
         section.dataset.transition = JSON.stringify({ name: 'test' })
       })
-      defineKeyframesMock('marp-transition-test')
+      defineKeyframesMock(['marp-transition-test'])
 
       // Initialize
       const deck = await initializeBespoke()
@@ -1653,6 +1659,109 @@ describe("Bespoke template's browser context", () => {
       const css = getTransitionStyle()
       expect(css).not.toContain('marp-transition-test')
       expect(css).toContain('transition_reduced')
+    })
+
+    it('uses the default custom duration defined in a transition keyframe', async () => {
+      const parent = render()
+
+      // Set transition data
+      parent.querySelectorAll('section').forEach((section) => {
+        section.dataset.transition = JSON.stringify({ name: 'custom' })
+        section.dataset.transitionBack = JSON.stringify({ name: 'custom' })
+      })
+
+      // Set mocked keyframes
+      jest
+        .spyOn(transitionUtils, '_testElementAnimation')
+        .mockImplementation((elm, resolve) => {
+          if (elm.style.animationName === 'marp-incoming-transition-custom') {
+            return resolve({ defaultDuration: '3s' })
+          } else if (
+            elm.style.animationName ===
+            'marp-incoming-transition-backward-custom'
+          ) {
+            return resolve({})
+          }
+          resolve(undefined)
+        })
+
+      // Initialize
+      const deck = await initializeBespoke()
+
+      let resolveTransition: (() => void) | undefined
+
+      documentTransition.start.mockImplementation(async (callback) => {
+        callback()
+        await new Promise<void>((resolve) => {
+          resolveTransition = resolve
+        })
+      })
+
+      try {
+        deck.next()
+        await waitAsync()
+
+        expect(deck.slide()).toBe(1)
+        expect(documentTransition.start).toHaveBeenCalled()
+        expect(getTransitionStyle()).toContain(
+          '--marp-bespoke-transition-animation-duration: 3s;'
+        )
+      } finally {
+        resolveTransition?.()
+      }
+
+      await waitAsync()
+      expect(getTransitionStyle()).toBeNull()
+
+      try {
+        deck.prev()
+        await waitAsync()
+
+        expect(deck.slide()).toBe(0)
+        expect(documentTransition.start).toHaveBeenCalled()
+        expect(getTransitionStyle()).toContain(
+          '--marp-bespoke-transition-animation-duration: 3s;'
+        )
+      } finally {
+        resolveTransition?.()
+      }
+    })
+
+    it('makes page navigate surely even if thrown an error when calling documentTransition.start', async () => {
+      const parent = render()
+
+      // Set transition data
+      parent.querySelectorAll('section').forEach((section) => {
+        section.dataset.transition = JSON.stringify({ name: 'custom' })
+      })
+      defineKeyframesMock(['marp-incoming-transition-custom'])
+
+      // Initialize
+      const deck = await initializeBespoke()
+
+      // Error when calling documentTransition.start
+      documentTransition.start.mockRejectedValueOnce(new Error('test'))
+
+      deck.next()
+      expect(deck.slide()).toBe(0)
+      await waitAsync()
+
+      expect(documentTransition.start).toHaveBeenCalled()
+      expect(deck.slide()).toBe(1)
+
+      deck.slide(0)
+      await waitAsync()
+
+      // Error in callback: Prevent double navigation
+      documentTransition.start.mockImplementationOnce(async (callback) => {
+        callback()
+        throw new Error('ex')
+      })
+
+      deck.next()
+      expect(deck.slide()).toBe(0)
+      await waitAsync()
+      expect(deck.slide()).toBe(1)
     })
   })
 })

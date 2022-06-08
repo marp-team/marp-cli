@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- [Experimental transition] Allow setting default duration in custom transition through `--marp-transition-duration` ([#459](https://github.com/marp-team/marp-cli/pull/459))
+
 ## v2.0.3 - 2022-06-05
 
 ### Changed
