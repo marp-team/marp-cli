@@ -1528,13 +1528,12 @@ describe("Bespoke template's browser context", () => {
       return style
     }
 
-    const getTransitionStyle = () => {
-      const style = document.getElementById(
+    const getTransitionStyle = (): string | null => {
+      const style: HTMLStyleElement | null = document.getElementById(
         transitionStyleId
-      ) as HTMLStyleElement
+      ) as HTMLStyleElement | null
 
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      return getCSSText(style.sheet!.cssRules)
+      return style?.sheet ? getCSSText(style.sheet.cssRules) : null
     }
 
     it('does not trigger transitions if not defined transition effects in Markdown', async () => {
@@ -1660,6 +1659,48 @@ describe("Bespoke template's browser context", () => {
       const css = getTransitionStyle()
       expect(css).not.toContain('marp-transition-test')
       expect(css).toContain('transition_reduced')
+    })
+
+    it('uses the default custom duration defined in a transition keyframe', async () => {
+      const parent = render()
+
+      // Set transition data
+      parent.querySelectorAll('section').forEach((section) => {
+        section.dataset.transition = JSON.stringify({ name: 'custom' })
+      })
+
+      // Set mocked keyframes
+      defineKeyframesMock(['marp-incoming-transition-custom'], {
+        defaultDuration: '3s',
+      })
+
+      // Initialize
+      const deck = await initializeBespoke()
+
+      let resolveTransition: (() => void) | undefined
+
+      documentTransition.start.mockImplementationOnce(async (callback) => {
+        callback()
+        await new Promise<void>((resolve) => {
+          resolveTransition = resolve
+        })
+      })
+
+      try {
+        deck.next()
+        await waitAsync()
+
+        expect(deck.slide()).toBe(1)
+        expect(documentTransition.start).toHaveBeenCalled()
+        expect(getTransitionStyle()).toContain(
+          '--marp-bespoke-transition-animation-duration: 3s;'
+        )
+      } finally {
+        resolveTransition?.()
+      }
+
+      await waitAsync()
+      expect(getTransitionStyle()).toBeNull()
     })
   })
 })
