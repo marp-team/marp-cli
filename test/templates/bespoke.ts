@@ -1702,5 +1702,42 @@ describe("Bespoke template's browser context", () => {
       await waitAsync()
       expect(getTransitionStyle()).toBeNull()
     })
+
+    it('makes page navigate surely even if thrown an error when calling documentTransition.start', async () => {
+      const parent = render()
+
+      // Set transition data
+      parent.querySelectorAll('section').forEach((section) => {
+        section.dataset.transition = JSON.stringify({ name: 'custom' })
+      })
+      defineKeyframesMock(['marp-incoming-transition-custom'])
+
+      // Initialize
+      const deck = await initializeBespoke()
+
+      // Error when calling documentTransition.start
+      documentTransition.start.mockRejectedValueOnce(new Error('test'))
+
+      deck.next()
+      expect(deck.slide()).toBe(0)
+      await waitAsync()
+
+      expect(documentTransition.start).toHaveBeenCalled()
+      expect(deck.slide()).toBe(1)
+
+      deck.slide(0)
+      await waitAsync()
+
+      // Error in callback: Prevent double navigation
+      documentTransition.start.mockImplementationOnce(async (callback) => {
+        callback()
+        throw new Error('ex')
+      })
+
+      deck.next()
+      expect(deck.slide()).toBe(0)
+      await waitAsync()
+      expect(deck.slide()).toBe(1)
+    })
   })
 })
