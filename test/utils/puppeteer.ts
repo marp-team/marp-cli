@@ -97,32 +97,32 @@ describe('#generatePuppeteerDataDirPath', () => {
 })
 
 describe('#generatePuppeteerLaunchArgs', () => {
-  it('finds out installed Chrome through chrome finder', () => {
+  it('finds out installed Chrome through chrome finder', async () => {
     const getFirstInstallation = jest
       .spyOn(chromeFinder(), 'findChromeInstallation')
-      .mockImplementation(() => '/usr/bin/chromium')
+      .mockResolvedValue('/usr/bin/chromium')
 
-    const args = puppeteerUtils().generatePuppeteerLaunchArgs()
+    const args = await puppeteerUtils().generatePuppeteerLaunchArgs()
     expect(args.executablePath).toBe('/usr/bin/chromium')
     expect(getFirstInstallation).toHaveBeenCalledTimes(1)
 
     // Cache found result
-    puppeteerUtils().generatePuppeteerLaunchArgs()
+    await puppeteerUtils().generatePuppeteerLaunchArgs()
     expect(getFirstInstallation).toHaveBeenCalledTimes(1)
   })
 
-  it('finds out installed Edge as the fallback if not found Chrome', () => {
+  it('finds out installed Edge as the fallback if not found Chrome', async () => {
     jest.spyOn(chromeFinder(), 'findChromeInstallation').mockImplementation()
     jest
       .spyOn(edgeFinder(), 'findEdgeInstallation')
       .mockImplementation(() => '/usr/bin/msedge')
 
-    const args = puppeteerUtils().generatePuppeteerLaunchArgs()
+    const args = await puppeteerUtils().generatePuppeteerLaunchArgs()
     expect(args.executablePath).toBe('/usr/bin/msedge')
     expect(edgeFinder().findEdgeInstallation).toHaveBeenCalledTimes(1)
   })
 
-  it('throws CLIError with specific error code if not found executable path', () => {
+  it('throws CLIError with specific error code if not found executable path', async () => {
     const warn = jest.spyOn(console, 'warn').mockImplementation()
 
     jest
@@ -132,7 +132,7 @@ describe('#generatePuppeteerLaunchArgs', () => {
       })
     jest.spyOn(edgeFinder(), 'findEdgeInstallation').mockImplementation()
 
-    expect(puppeteerUtils().generatePuppeteerLaunchArgs).toThrow(
+    await expect(puppeteerUtils().generatePuppeteerLaunchArgs).rejects.toThrow(
       new (CLIError())(
         'You have to install Google Chrome, Chromium, or Microsoft Edge to convert slide deck with current options.',
         CLIErrorCode.NOT_FOUND_CHROMIUM
@@ -143,35 +143,35 @@ describe('#generatePuppeteerLaunchArgs', () => {
     )
   })
 
-  it('uses custom executable path if CHROME_PATH environment value was defined as executable path', () => {
+  it('uses custom executable path if CHROME_PATH environment value was defined as executable path', async () => {
     jest.dontMock('../../src/utils/chrome-finder')
 
     try {
       process.env.CHROME_PATH = path.resolve(__dirname, '../../marp-cli.js')
 
-      const args = puppeteerUtils().generatePuppeteerLaunchArgs()
+      const args = await puppeteerUtils().generatePuppeteerLaunchArgs()
       expect(args.executablePath).toBe(process.env.CHROME_PATH)
     } finally {
       delete process.env.CHROME_PATH
     }
   })
 
-  it('uses specific settings if running within a Docker container', () => {
+  it('uses specific settings if running within a Docker container', async () => {
     jest.spyOn(docker(), 'isDocker').mockImplementation(() => true)
     jest
       .spyOn(chromeFinder(), 'findChromeInstallation')
-      .mockImplementation(() => '/usr/bin/chromium')
+      .mockResolvedValue('/usr/bin/chromium')
 
-    const args = puppeteerUtils().generatePuppeteerLaunchArgs()
+    const args = await puppeteerUtils().generatePuppeteerLaunchArgs()
     expect(args.args).toContain('--no-sandbox')
     expect(args.args).toContain('--disable-features=VizDisplayCompositor')
   })
 
-  it("ignores puppeteer's --disable-extensions option if defined CHROME_ENABLE_EXTENSIONS environment value", () => {
+  it("ignores puppeteer's --disable-extensions option if defined CHROME_ENABLE_EXTENSIONS environment value", async () => {
     try {
       process.env.CHROME_ENABLE_EXTENSIONS = 'true'
 
-      const args = puppeteerUtils().generatePuppeteerLaunchArgs()
+      const args = await puppeteerUtils().generatePuppeteerLaunchArgs()
       expect(args.ignoreDefaultArgs).toContain('--disable-extensions')
     } finally {
       delete process.env.CHROME_ENABLE_EXTENSIONS

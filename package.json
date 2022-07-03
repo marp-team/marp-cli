@@ -100,6 +100,7 @@
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-jest": "^26.5.1",
     "express": "^4.18.1",
+    "fast-plist": "^0.1.2",
     "get-stdin": "^9.0.0",
     "globby": "^13.1.1",
     "image-size": "^1.0.1",

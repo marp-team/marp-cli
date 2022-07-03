@@ -129,7 +129,9 @@ export class Converter {
       if (this.options.baseUrl) return this.options.baseUrl
 
       if (isFile(f) && type !== ConvertType.html) {
-        return isChromeInWSLHost(generatePuppeteerLaunchArgs().executablePath)
+        return isChromeInWSLHost(
+          (await generatePuppeteerLaunchArgs()).executablePath
+        )
           ? `file:${await resolveWSLPathToHost(f.absolutePath)}`
           : f.absoluteFileScheme
       }
@@ -597,7 +599,7 @@ export class Converter {
 
   private static async runBrowser({ timeout }: { timeout?: number }) {
     if (!Converter.browser) {
-      const baseArgs = generatePuppeteerLaunchArgs()
+      const baseArgs = await generatePuppeteerLaunchArgs()
 
       Converter.browser = await launchPuppeteer({
         ...baseArgs,
