@@ -35,7 +35,8 @@ RUN yarn install --production --frozen-lockfile && yarn cache clean && node marp
 # Setup workspace for user
 USER root
 ENV MARP_USER marp:marp
+ENV PATH $PATH:/home/marp/.cli
 
 WORKDIR /home/marp/app
-ENTRYPOINT ["/home/marp/.cli/docker-entrypoint"]
+ENTRYPOINT ["docker-entrypoint"]
 CMD ["--help"]
