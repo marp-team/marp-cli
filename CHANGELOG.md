@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Docker image: Set `PATH` env to the project directory ([#462](https://github.com/marp-team/marp-cli/pull/462) by [@rhtenhove](https://github.com/rhtenhove))
+
 ## v2.0.4 - 2022-06-08
 
 ### Added
