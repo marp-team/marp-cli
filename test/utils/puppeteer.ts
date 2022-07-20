@@ -178,7 +178,7 @@ describe('#generatePuppeteerLaunchArgs', () => {
     }
   })
 
-  describe('with .app directory as CHROME_PATH env in macOS', () => {
+  describe('with CHROME_PATH env in macOS', () => {
     let originalPlatform: string | undefined
 
     beforeEach(() => {
@@ -209,7 +209,7 @@ describe('#generatePuppeteerLaunchArgs', () => {
       expect(args.executablePath).toBeTruthy()
     })
 
-    it('tries to resolve the executable binary from Mac bundle', async () => {
+    it('tries to resolve the executable binary if CHROME_PATH was pointed to valid app bundle', async () => {
       const validAppPath = path.resolve(__dirname, './_mac_bundles/Valid.app')
       const validAppExecutable = path.resolve(
         __dirname,
