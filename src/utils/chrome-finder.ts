@@ -21,7 +21,6 @@ export const findChromeInstallation = async () => {
 
   const installations = await (async () => {
     switch (platform) {
-      /* istanbul ignore next: CI is not testing against darwin */
       case 'darwin':
         return await withNormalizedChromePathForDarwin(() => [darwinFast()])
       case 'linux':

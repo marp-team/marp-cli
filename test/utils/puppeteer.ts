@@ -177,6 +177,57 @@ describe('#generatePuppeteerLaunchArgs', () => {
       delete process.env.CHROME_ENABLE_EXTENSIONS
     }
   })
+
+  describe('with .app directory as CHROME_PATH env in macOS', () => {
+    let originalPlatform: string | undefined
+
+    beforeEach(() => {
+      originalPlatform = process.platform
+      Object.defineProperty(process, 'platform', { value: 'darwin' })
+
+      jest.dontMock('../../src/utils/chrome-finder')
+    })
+
+    afterEach(() => {
+      if (originalPlatform !== undefined) {
+        Object.defineProperty(process, 'platform', { value: originalPlatform })
+      }
+      originalPlatform = undefined
+
+      delete process.env.CHROME_PATH
+    })
+
+    it('tries to resolve the executable binary from Mac bundle', async () => {
+      const validAppPath = path.resolve(__dirname, './_mac_bundles/Valid.app')
+      const validAppExecutable = path.resolve(
+        __dirname,
+        './_mac_bundles/Valid.app/Contents/MacOS/Valid app'
+      )
+
+      process.env.CHROME_PATH = validAppPath
+
+      const args = await puppeteerUtils().generatePuppeteerLaunchArgs()
+      expect(args.executablePath).toBe(validAppExecutable)
+      expect(process.env.CHROME_PATH).toBe(validAppPath)
+    })
+
+    it('fallbacks to an original path if CHROME_PATH was pointed to invalid app bundle', async () => {
+      const invalidAppPath = path.resolve(
+        __dirname,
+        './_mac_bundles/Invalid.app'
+      )
+      const invalidAppExecutable = path.resolve(
+        __dirname,
+        './_mac_bundles/Valid.app/Contents/MacOS/Invalid app'
+      )
+
+      process.env.CHROME_PATH = invalidAppPath
+
+      const args = await puppeteerUtils().generatePuppeteerLaunchArgs()
+      expect(args.executablePath).not.toBe(invalidAppExecutable)
+      expect(process.env.CHROME_PATH).toBe(invalidAppPath)
+    })
+  })
 })
 
 describe('#launchPuppeteer', () => {
