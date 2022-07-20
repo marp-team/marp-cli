@@ -186,6 +186,11 @@ describe('#generatePuppeteerLaunchArgs', () => {
       Object.defineProperty(process, 'platform', { value: 'darwin' })
 
       jest.dontMock('../../src/utils/chrome-finder')
+
+      // Set Edge fallback as a sentinel
+      jest
+        .spyOn(edgeFinder(), 'findEdgeInstallation')
+        .mockImplementation(() => '/usr/bin/msedge')
     })
 
     afterEach(() => {
@@ -195,6 +200,13 @@ describe('#generatePuppeteerLaunchArgs', () => {
       originalPlatform = undefined
 
       delete process.env.CHROME_PATH
+    })
+
+    it('does not apply custom path if CHROME_PATH was undefined', async () => {
+      process.env.CHROME_PATH = undefined
+
+      const args = await puppeteerUtils().generatePuppeteerLaunchArgs()
+      expect(args.executablePath).toBeTruthy()
     })
 
     it('tries to resolve the executable binary from Mac bundle', async () => {
@@ -211,20 +223,16 @@ describe('#generatePuppeteerLaunchArgs', () => {
       expect(process.env.CHROME_PATH).toBe(validAppPath)
     })
 
-    it('fallbacks to an original path if CHROME_PATH was pointed to invalid app bundle', async () => {
+    it('fallbacks to an original custom path if CHROME_PATH was pointed to invalid app bundle', async () => {
       const invalidAppPath = path.resolve(
         __dirname,
         './_mac_bundles/Invalid.app'
-      )
-      const invalidAppExecutable = path.resolve(
-        __dirname,
-        './_mac_bundles/Valid.app/Contents/MacOS/Invalid app'
       )
 
       process.env.CHROME_PATH = invalidAppPath
 
       const args = await puppeteerUtils().generatePuppeteerLaunchArgs()
-      expect(args.executablePath).not.toBe(invalidAppExecutable)
+      expect(args.executablePath).toBe(invalidAppPath)
       expect(process.env.CHROME_PATH).toBe(invalidAppPath)
     })
   })
