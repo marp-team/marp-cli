@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- macOS: Auto detection of executable path when `CHROME_PATH` env has pointed `.app` directory ([#460](https://github.com/marp-team/marp-cli/issues/460), [#463](https://github.com/marp-team/marp-cli/pull/463))
+
 ### Changed
 
 - Docker image: Set `PATH` env to the project directory ([#462](https://github.com/marp-team/marp-cli/pull/462) by [@rhtenhove](https://github.com/rhtenhove))

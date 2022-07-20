@@ -140,7 +140,7 @@ export class Preview extends (EventEmitter as new () => TypedEmitter<Preview.Eve
   }
 
   private async launch(): Promise<Preview.Window> {
-    const baseArgs = generatePuppeteerLaunchArgs()
+    const baseArgs = await generatePuppeteerLaunchArgs()
 
     this.puppeteerInternal = await launchPuppeteer({
       ...baseArgs,

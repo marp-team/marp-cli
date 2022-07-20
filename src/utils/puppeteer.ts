@@ -68,7 +68,7 @@ export const generatePuppeteerDataDirPath = async (
   return dataDir
 }
 
-export const generatePuppeteerLaunchArgs = () => {
+export const generatePuppeteerLaunchArgs = async () => {
   const args = new Set<string>(['--export-tagged-pdf', '--test-type'])
 
   // Docker environment and WSL environment need to disable sandbox. :(
@@ -87,7 +87,7 @@ export const generatePuppeteerLaunchArgs = () => {
     let findChromeError: Error | undefined
 
     try {
-      executablePath = findChromeInstallation()
+      executablePath = await findChromeInstallation()
     } catch (e: unknown) {
       if (isError(e)) findChromeError = e
     }
