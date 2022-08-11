@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 import { EventEmitter } from 'events'
 import { nanoid } from 'nanoid'
-import puppeteer from 'puppeteer-core'
+import type puppeteer from 'puppeteer-core'
 import TypedEmitter from 'typed-emitter'
 import macDockIcon from './assets/mac-dock-icon.png'
 import { ConvertType, mimeTypes } from './converter'
