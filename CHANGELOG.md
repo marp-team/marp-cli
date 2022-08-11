@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Allow enabling [LayoutNG](https://www.chromium.org/blink/layoutng/) while PDF conversion via `CHROME_LAYOUTNG_PRINTING` env ([#469](https://github.com/marp-team/marp-cli/pull/469))
+
 ### Changed
 
 - Upgrade Marp Core to [v3.3.1](https://github.com/marp-team/marp-core/releases/v3.3.1) ([#468](https://github.com/marp-team/marp-cli/pull/468))

@@ -178,6 +178,19 @@ describe('#generatePuppeteerLaunchArgs', () => {
     }
   })
 
+  it('enables LayoutNGPrinting and LayoutNGTableFragmentation if defined CHROME_LAYOUTNG_PRINTING environment value', async () => {
+    try {
+      process.env.CHROME_LAYOUTNG_PRINTING = '1'
+
+      const args = await puppeteerUtils().generatePuppeteerLaunchArgs()
+      expect(args.args).toContain(
+        '--enable-blink-features=LayoutNGPrinting,LayoutNGTableFragmentation'
+      )
+    } finally {
+      delete process.env.CHROME_LAYOUTNG_PRINTING
+    }
+  })
+
   describe('with CHROME_PATH env in macOS', () => {
     let originalPlatform: string | undefined
 

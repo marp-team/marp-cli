@@ -82,6 +82,12 @@ export const generatePuppeteerLaunchArgs = async () => {
   // Enable DocumentTransition API
   if (!process.env.CI) args.add('--enable-blink-features=DocumentTransition')
 
+  // LayoutNG Printing
+  if (process.env.CHROME_LAYOUTNG_PRINTING)
+    args.add(
+      '--enable-blink-features=LayoutNGPrinting,LayoutNGTableFragmentation'
+    )
+
   // Resolve Chrome path to execute
   if (executablePath === false) {
     let findChromeError: Error | undefined
