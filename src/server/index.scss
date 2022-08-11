@@ -89,7 +89,7 @@ ul#index {
   }
 
   &:not(.show-all) li {
-    &:not(.convertible):not(.directory),
+    &:not(.convertible, .directory),
     &.node-modules {
       display: none;
     }
