@@ -113,8 +113,6 @@ export const generatePuppeteerLaunchArgs = async () => {
     }
   }
 
-  console.log(args)
-
   return {
     executablePath,
     args: [...args],
