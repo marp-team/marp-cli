@@ -1,7 +1,7 @@
 import fs from 'fs'
 import os from 'os'
 import path from 'path'
-import puppeteer from 'puppeteer-core'
+import { launch } from 'puppeteer-core'
 import { warn } from '../cli'
 import { CLIErrorCode, error, isError } from '../error'
 import { isDocker } from '../utils/docker'
@@ -123,16 +123,16 @@ export const generatePuppeteerLaunchArgs = async () => {
 }
 
 export const launchPuppeteer = async (
-  ...[options]: Parameters<typeof puppeteer['launch']>
+  ...[options]: Parameters<typeof launch>
 ) => {
   try {
-    return await puppeteer.launch(options)
+    return await launch(options)
   } catch (e: unknown) {
     if (isError(e)) {
       // Retry to launch Chromium with WebSocket connection instead of pipe if failed to connect to Chromium
       // https://github.com/puppeteer/puppeteer/issues/6258
       if (options?.pipe && e.message.includes('Target.setDiscoverTargets')) {
-        return await puppeteer.launch({ ...options, pipe: false })
+        return await launch({ ...options, pipe: false })
       }
 
       // Warning when tried to spawn the snap chromium within the snapd container

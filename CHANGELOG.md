@@ -9,6 +9,9 @@
 ### Changed
 
 - Docker image: Set `PATH` env to the project directory ([#462](https://github.com/marp-team/marp-cli/pull/462) by [@rhtenhove](https://github.com/rhtenhove))
+- Upgrade Marpit to [v2.4.0](https://github.com/marp-team/marpit/releases/v2.4.0) ([#467](https://github.com/marp-team/marp-cli/pull/467))
+- Upgrade Marp Core to [v3.3.0](https://github.com/marp-team/marp-core/releases/v3.3.0) ([#467](https://github.com/marp-team/marp-cli/pull/467))
+- Upgrade dependent packages to the latest version ([#467](https://github.com/marp-team/marp-cli/pull/467))
 
 ## v2.0.4 - 2022-06-08
 
