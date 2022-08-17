@@ -5,6 +5,9 @@ on:
     tags:
       - v*
 
+  # For debugging standalone packages
+  workflow_dispatch:
+
 env:
   YARN_VERSION: '^1.22.17'
 
@@ -13,10 +16,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        if: github.event_name == 'push'
+
       - uses: marp-team/actions@v1
         with:
           task: release
           token: ${{ secrets.GITHUB_TOKEN }}
+        if: github.event_name == 'push'
 
   upload-standalone-binary:
     needs: github-release
@@ -51,6 +57,7 @@ jobs:
           path: dist
       - name: Upload created asset to GitHub Release
         uses: marp-team/actions@v1
+        if: github.event_name == 'push'
         with:
           task: upload
           token: ${{ secrets.GITHUB_TOKEN }}
