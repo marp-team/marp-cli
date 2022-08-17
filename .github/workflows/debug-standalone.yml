@@ -1,0 +1,39 @@
+name: Debug standalone
+
+on:
+  workflow_dispatch:
+
+env:
+  YARN_VERSION: '^1.22.17'
+
+jobs:
+  upload-standalone-binary:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macOS-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: '.nvmrc'
+      - name: Install yarn
+        run: cd $HOME && yarn policies set-version $YARN_VERSION
+      - run: yarn install --frozen-lockfile
+      - name: Build and create standalone binaries
+        run: yarn build:standalone
+      - name: Create package
+        run: yarn standalone:pack
+        env:
+          MATRIX_OS: ${{ matrix.os }}
+      - uses: actions/upload-artifact@v3
+        with:
+          name: assets
+          path: dist
