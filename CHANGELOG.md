@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v2.1.3 - 2022-08-17
+
 ### Fixed
 
 - Re-packaged standalone binaries with no code changes, to avoid false positive by Windows Defender ([#471](https://github.com/marp-team/marp-cli/issues/471))
