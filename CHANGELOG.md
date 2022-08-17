@@ -2,11 +2,15 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Upgrade Node.js and dependencies ([#473](https://github.com/marp-team/marp-cli/pull/473))
+
 ## v2.1.3 - 2022-08-17
 
-### Fixed
+### ~~Fixed~~
 
-- Re-packaged standalone binaries with no code changes, to avoid false positive by Windows Defender ([#471](https://github.com/marp-team/marp-cli/issues/471))
+- Re-packaged standalone binaries with no code changes, ~~to avoid false positive by Windows Defender ([#471](https://github.com/marp-team/marp-cli/issues/471))~~
 
 ## v2.1.2 - 2022-08-12
 
