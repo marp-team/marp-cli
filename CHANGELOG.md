@@ -5,6 +5,7 @@
 ### Changed
 
 - Upgrade Node.js and dependencies ([#473](https://github.com/marp-team/marp-cli/pull/473))
+- Upgrade Marp Core to [v3.3.3](https://github.com/marp-team/marp-core/releases/v3.3.3) ([#474](https://github.com/marp-team/marp-cli/pull/474))
 
 ## v2.1.3 - 2022-08-17
 
