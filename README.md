@@ -128,11 +128,11 @@ marp --pdf slide-deck.md
 marp slide-deck.md -o converted.pdf
 ```
 
-All kind of conversions except HTML _require to install [Google Chrome]<!--, [Chromium]-->, [Microsoft Edge], or any [Chromium] flavored browser._ When an unexpected problem has occurred while converting, please update your browser to the latest version or try installing [Google Chrome Canary].
+All kind of conversions except HTML _require to install [Google Chrome]<!--, [Chromium]-->, [Microsoft Edge], or [Chromium] (flavored) browser._ When an unexpected problem has occurred while converting, please update your browser to the latest version or try installing [Google Chrome Canary].
 
 [google chrome canary]: https://www.google.com/chrome/canary/
 
-> :information_source: If you want to use Chromium or flavored browsers to convert, you have to specify the path to the binary through the `CHROME_PATH` environment variable. For example: `CHROME_PATH=$(which brave) marp --pdf slide-deck.md`
+> :information_source: If you want to use Chromium or flavored browsers to convert, you have to specify the path to the browser binary through `CHROME_PATH` environment variable. For example: `CHROME_PATH=$(which brave) marp --pdf slide-deck.md`
 
 If your slide deck had included [Marpit presenter notes] as HTML comment, you can add note annotations to the lower left by using `--pdf-notes` option together with `--pdf`.
 
