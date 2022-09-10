@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v2.1.4 - 2022-09-10
+
 ### Fixed
 
 - Don't suggest to install Chromium in error message if the current platform cannot resolve Chromium by `chrome-launcher` module ([#475](https://github.com/marp-team/marp-cli/issues/475), [#476](https://github.com/marp-team/marp-cli/pull/476))
