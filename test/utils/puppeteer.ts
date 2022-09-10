@@ -133,10 +133,7 @@ describe('#generatePuppeteerLaunchArgs', () => {
     jest.spyOn(edgeFinder(), 'findEdgeInstallation').mockImplementation()
 
     await expect(puppeteerUtils().generatePuppeteerLaunchArgs).rejects.toThrow(
-      new (CLIError())(
-        'You have to install Google Chrome, Chromium, or Microsoft Edge to convert slide deck with current options.',
-        CLIErrorCode.NOT_FOUND_CHROMIUM
-      )
+      'You have to install Google Chrome'
     )
     expect(warn).toHaveBeenCalledWith(
       expect.stringContaining('Error in chrome finder')
