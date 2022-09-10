@@ -105,8 +105,14 @@ export const generatePuppeteerLaunchArgs = async () => {
       if (!executablePath) {
         if (findChromeError) warn(findChromeError.message)
 
+        // https://github.com/marp-team/marp-cli/issues/475
+        // https://github.com/GoogleChrome/chrome-launcher/issues/278
+        const chromiumResolvable = process.platform === 'linux'
+
         error(
-          'You have to install Google Chrome, Chromium, or Microsoft Edge to convert slide deck with current options.',
+          `You have to install Google Chrome${
+            chromiumResolvable ? ', Chromium,' : ''
+          } or Microsoft Edge to convert slide deck with current options.`,
           CLIErrorCode.NOT_FOUND_CHROMIUM
         )
       }
