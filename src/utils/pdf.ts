@@ -60,7 +60,7 @@ export const setOutline = async (
   doc: PDFDocument,
   outlines: readonly PDFOutline[]
 ) => {
-  const { PDFString } = await pdfLib()
+  const { PDFHexString } = await pdfLib()
 
   // Refs
   const rootRef = doc.context.nextRef()
@@ -93,7 +93,7 @@ export const setOutline = async (
       const destOrAction = (() => {
         if (typeof outline.to === 'string') {
           // URL
-          return { A: { S: 'URI', URI: PDFString.of(outline.to) } }
+          return { A: { S: 'URI', URI: PDFHexString.fromText(outline.to) } }
         } else if (typeof outline.to === 'number') {
           return { Dest: [pageRefs[outline.to], 'Fit'] }
         } else if (Array.isArray(outline.to)) {
@@ -130,7 +130,7 @@ export const setOutline = async (
       doc.context.assign(
         outlineRef,
         doc.context.obj({
-          Title: PDFString.of(outline.title),
+          Title: PDFHexString.fromText(outline.title),
           Parent: parent,
           ...(i > 0 ? { Prev: refMap.get(outlines[i - 1])! } : {}),
           ...(i < length - 1 ? { Next: refMap.get(outlines[i + 1])! } : {}),

@@ -72,6 +72,58 @@ export const pptrOutlinePositionResolver = (
     return undefined
   }
 
+  const getInnerText = (node: Node) => {
+    let text = ''
+
+    if (node.nodeType === Node.ELEMENT_NODE) {
+      const elm = node as Element
+      const rect = elm.getBoundingClientRect()
+      const style = window.getComputedStyle(elm)
+      const visible =
+        (rect.width > 0 || rect.height > 0) && style.visibility === 'visible'
+
+      if (visible) {
+        // Alternative text
+        if (
+          elm.tagName === 'AREA' ||
+          elm.tagName === 'IMG' ||
+          (elm.tagName === 'INPUT' && elm.getAttribute('type') === 'image')
+        ) {
+          text += elm.getAttribute('alt') ?? ''
+        }
+
+        // Line breaks
+        if (elm.tagName === 'BR') {
+          text += '\n'
+        } else {
+          // Children
+          elm.childNodes.forEach((cNode) => {
+            text += getInnerText(cNode)
+          })
+
+          // Block elements
+          if (elm.tagName === 'P') text += '\n'
+          if (!style.display.startsWith('inline')) text += '\n'
+        }
+      }
+    } else if (node.nodeType === Node.TEXT_NODE) {
+      text += node.textContent ?? ''
+    }
+
+    return text
+  }
+
+  /** @see https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model/Whitespace#whitespace_helper_functions */
+  const normalizeDOMText = (text: string) => {
+    let normalized = text.replace(/[\t\n\r ]+/g, ' ')
+
+    if (normalized.charAt(0) === ' ') normalized = normalized.slice(1)
+    if (normalized.charAt(normalized.length - 1) === ' ')
+      normalized = normalized.slice(0, -1)
+
+    return normalized
+  }
+
   const positions: OutlineData = {}
 
   for (const heading of headings) {
@@ -97,7 +149,7 @@ export const pptrOutlinePositionResolver = (
       }
 
       positions[heading.key] = position
-        ? [...position, elm.textContent ?? '']
+        ? [...position, normalizeDOMText(getInnerText(elm))]
         : undefined
     }
   }
