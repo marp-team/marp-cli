@@ -40,6 +40,12 @@ interface IMarpCLIArguments {
   output?: string | false
   pdf?: boolean
   pdfNotes?: boolean
+  pdfOutlines?:
+    | boolean
+    | {
+        pages?: boolean
+        headings?: boolean
+      }
   pptx?: boolean
   preview?: boolean
   server?: boolean
@@ -166,6 +172,21 @@ export class MarpCLIConfig {
     )
       warn('Not found additional theme CSS files.')
 
+    const pdfNotes = !!(this.args.pdfNotes || this.conf.pdfNotes)
+    const pdfOutlines =
+      this.args.pdfOutlines ?? this.conf.pdfOutlines
+        ? {
+            pages: true,
+            headings: true,
+            ...(typeof this.conf.pdfOutlines === 'object'
+              ? this.conf.pdfOutlines
+              : {}),
+            ...(typeof this.args.pdfOutlines === 'object'
+              ? this.args.pdfOutlines
+              : {}),
+          }
+        : false
+
     const type = ((): ConvertType => {
       // CLI options
       if (this.args.pdf || this.conf.pdf) return ConvertType.pdf
@@ -192,8 +213,8 @@ export class MarpCLIConfig {
         return ConvertType.jpeg
       if (lowerOutput.endsWith('.txt')) return ConvertType.notes
 
-      // Prefer PDF than HTML if enabled presenter notes for PDF
-      if (this.args.pdfNotes || this.conf.pdfNotes) return ConvertType.pdf
+      // Prefer PDF than HTML if enabled any PDF options
+      if (pdfNotes || pdfOutlines) return ConvertType.pdf
 
       return ConvertType.html
     })()
@@ -229,6 +250,8 @@ export class MarpCLIConfig {
       imageScale,
       inputDir,
       output,
+      pdfNotes,
+      pdfOutlines,
       preview,
       puppeteerTimeout,
       server,
@@ -254,7 +277,6 @@ export class MarpCLIConfig {
       lang: this.conf.lang || (await osLocale()).replace(/@/g, '-'),
       options: this.conf.options || {},
       pages: !!(this.args.images || this.conf.images),
-      pdfNotes: !!(this.args.pdfNotes || this.conf.pdfNotes),
       watch: (this.args.watch ?? this.conf.watch) || preview || server || false,
     }
   }

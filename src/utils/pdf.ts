@@ -13,14 +13,14 @@ type PDFOutlineTo =
   | number
   | [pageIndex: number, xPercentage: number, yPercentage: number]
 
-interface PDFOutlineItem {
+export interface PDFOutlineItem {
   title: string
   to: PDFOutlineTo
   italic?: boolean
   bold?: boolean
 }
 
-interface PDFOutlineItemWithChildren extends Omit<PDFOutlineItem, 'to'> {
+export interface PDFOutlineItemWithChildren extends Omit<PDFOutlineItem, 'to'> {
   to?: PDFOutlineTo
   children: PDFOutline[]
   open: boolean

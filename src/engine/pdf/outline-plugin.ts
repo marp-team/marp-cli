@@ -1,6 +1,6 @@
 import type { Marpit } from '@marp-team/marpit'
 import type MarkdownIt from 'markdown-it'
-import type { PDFOutline } from '../../utils/pdf'
+import type { PDFOutline, PDFOutlineItemWithChildren } from '../../utils/pdf'
 
 export interface OutlinePage {
   pageNumber: number
@@ -105,51 +105,68 @@ export const pptrOutlinePositionResolver = (
   return positions
 }
 
+type GeneratePDFOutlinesOptions = {
+  pages: boolean
+  data?: OutlineData
+} & (
+  | { headings: false }
+  | { headings: true; size: { width: number; height: number } }
+)
+
 export const generatePDFOutlines = (
   pages: OutlinePage[],
-  data: OutlineData,
-  { width, height }: { width: number; height: number }
+  opts: GeneratePDFOutlinesOptions
 ) => {
   const { length } = pages
   const outlines: PDFOutline[] = []
+
+  const targets: [children: PDFOutline[], level: number][] = [
+    [outlines, Number.NEGATIVE_INFINITY],
+  ]
+
+  const push = (outline: PDFOutlineItemWithChildren, level: number) => {
+    while (targets[0][1] >= level) targets.shift()
+
+    targets[0][0].push(outline)
+    targets.unshift([outline.children, level])
+  }
 
   for (let i = 0; i < length; i += 1) {
     const outlinePage = pages[i]
 
     if (outlinePage) {
-      const pdfOutlinePage: PDFOutline = {
-        title: `Page ${outlinePage.pageNumber}`,
-        to: i,
-        bold: true,
-        children: [],
-        open: true,
-      }
+      let pdfOutlinePage: PDFOutlineItemWithChildren | undefined
 
-      const targets: [children: PDFOutline[], level: number][] = [
-        [pdfOutlinePage.children, Number.NEGATIVE_INFINITY],
-      ]
-
-      // Make outline tree from heading list
-      for (const heading of outlinePage.headings) {
-        const d = data?.[heading.key]
-        const outline: PDFOutline = {
-          title: d?.[2] ?? '',
-          to: d ? [i, d[0] / width, 1 - d[1] / height] : i,
-          open: true,
+      if (opts.pages) {
+        pdfOutlinePage = {
+          title: `Page ${outlinePage.pageNumber}`,
+          to: i,
+          bold: true,
           children: [],
+          open: true,
         }
-
-        while (targets[0][1] >= heading.level) targets.shift()
-
-        targets[0][0].push(outline)
-        targets.unshift([outline.children, heading.level])
+        push(pdfOutlinePage, -1)
       }
 
-      outlines.push(pdfOutlinePage)
+      if (opts.headings && opts.data) {
+        for (const heading of outlinePage.headings) {
+          const d = opts.data[heading.key]
+
+          push(
+            {
+              title: d?.[2] ?? '',
+              to: d
+                ? [i, d[0] / opts.size.width, 1 - d[1] / opts.size.height]
+                : i,
+              open: true,
+              children: [],
+            },
+            heading.level
+          )
+        }
+      }
     }
   }
 
   return outlines
 }
-
-export default pdfOutlinePlugin

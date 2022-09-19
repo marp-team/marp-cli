@@ -71,6 +71,12 @@ export interface ConverterOption {
   output?: string | false
   pages?: boolean | number[]
   pdfNotes?: boolean
+  pdfOutlines?:
+    | false
+    | {
+        pages: boolean
+        headings: boolean
+      }
   preview?: boolean
   puppeteerTimeout?: number
   jpegQuality?: number
@@ -333,14 +339,14 @@ export class Converter {
     if (tpl.rendered.keywords)
       pdfDoc.setKeywords([tpl.rendered.keywords.join('; ')])
 
-    if (tpl.rendered.outline && outlineData) {
+    if (this.options.pdfOutlines && tpl.rendered.outline) {
       await setOutline(
         pdfDoc,
-        generatePDFOutlines(
-          tpl.rendered.outline,
-          outlineData,
-          tpl.rendered.size
-        )
+        generatePDFOutlines(tpl.rendered.outline, {
+          ...this.options.pdfOutlines,
+          data: outlineData,
+          size: tpl.rendered.size,
+        })
       )
     }
 
@@ -515,7 +521,9 @@ export class Converter {
 
     // Marpit plugins
     engine.use(metaPlugin).use(infoPlugin)
-    if (this.options.type === ConvertType.pdf) engine.use(pdfOutlinePlugin)
+
+    if (this.options.type === ConvertType.pdf && this.options.pdfOutlines)
+      engine.use(pdfOutlinePlugin)
 
     // Themes
     this.options.themeSet.registerTo(engine)

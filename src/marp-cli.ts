@@ -18,6 +18,7 @@ enum OptionGroup {
   Basic = 'Basic Options:',
   Converter = 'Converter Options:',
   Template = 'Template Options:',
+  PDF = 'PDF Options:',
   Meta = 'Metadata Options:',
   Marp = 'Marp / Marpit Options:',
 }
@@ -202,6 +203,28 @@ export const marpCli = async (
           group: OptionGroup.Template,
           type: 'boolean',
         },
+        'pdf-notes': {
+          describe: 'Add presenter notes to PDF as annotations',
+          group: OptionGroup.PDF,
+          type: 'boolean',
+        },
+        'pdf-outlines': {
+          describe: 'Add outlines (bookmarks) to PDF',
+          group: OptionGroup.PDF,
+          type: undefined,
+        },
+        'pdf-outlines.pages': {
+          describe: 'Make outlines from slide pages',
+          defaultDescription: 'true',
+          group: OptionGroup.PDF,
+          type: 'boolean',
+        },
+        'pdf-outlines.headings': {
+          describe: 'Make outlines from Markdown headings',
+          defaultDescription: 'true',
+          group: OptionGroup.PDF,
+          type: 'boolean',
+        },
         title: {
           describe: 'Define title of the slide deck',
           group: OptionGroup.Meta,
@@ -232,11 +255,6 @@ export const marpCli = async (
           group: OptionGroup.Meta,
           type: 'string',
         },
-        'pdf-notes': {
-          describe: 'Add presenter notes to PDF as annotations',
-          group: OptionGroup.Meta,
-          type: 'boolean',
-        },
         engine: {
           describe: 'Select Marpit based engine by module name or path',
           group: OptionGroup.Marp,
@@ -259,6 +277,35 @@ export const marpCli = async (
           type: 'string',
         },
       })
+      .middleware((argv): any => {
+        const normalized: Record<any, any> = {}
+        const normalizeToObject = (key: string): any => {
+          if (argv[key] != null) {
+            const normalize = (args: any) => {
+              if (!Array.isArray(args)) return args
+
+              let normalized: Record<any, any> = {}
+              let enabled = false
+
+              for (const arg of args) {
+                if (typeof arg === 'boolean') {
+                  enabled = arg
+                } else if (typeof arg === 'object') {
+                  normalized = { ...normalized, ...arg }
+                }
+              }
+
+              return enabled && normalized
+            }
+            normalized[key] = normalize(argv[key])
+          }
+        }
+
+        normalizeToObject('pdf-outlines')
+        normalizeToObject('pdfOutlines')
+
+        return normalized
+      })
 
     const argvRet = await program.argv
     const args = {
@@ -272,7 +319,7 @@ export const marpCli = async (
       return 0
     }
 
-    const config = await fromArguments(args)
+    const config = await fromArguments(args as any)
     if (args.version) return await version(config)
 
     // Initialize converter
