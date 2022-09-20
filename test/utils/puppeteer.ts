@@ -1,6 +1,5 @@
 import os from 'os'
 import path from 'path'
-import { CLIErrorCode } from '../../src/error'
 
 jest.mock('../../src/utils/chrome-finder')
 jest.mock('../../src/utils/edge-finder')
