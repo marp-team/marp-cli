@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- [`--pdf-outlines` option(s)](https://github.com/marp-team/marp-cli#pdf-output-options) to assign PDF outlines based on pages and Markdown headings ([#478](https://github.com/marp-team/marp-cli/issues/478), [#479](https://github.com/marp-team/marp-cli/pull/479))
+
 ## v2.1.4 - 2022-09-10
 
 ### Fixed

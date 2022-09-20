@@ -8,6 +8,14 @@ import { silence, warn } from './cli'
 import { Engine, ResolvedEngine } from './engine'
 import infoPlugin, { engineInfo, EngineInfo } from './engine/info-plugin'
 import metaPlugin from './engine/meta-plugin'
+import {
+  generatePDFOutlines,
+  pdfOutlineAttr,
+  pdfOutlineInfo,
+  pdfOutlinePlugin,
+  pptrOutlinePositionResolver,
+  OutlineData,
+} from './engine/pdf/outline-plugin'
 import { engineTransition, EngineTransition } from './engine/transition-plugin'
 import { error } from './error'
 import { File, FileType } from './file'
@@ -20,6 +28,7 @@ import templates, {
 } from './templates/'
 import { ThemeSet } from './theme'
 import { isOfficialImage } from './utils/docker'
+import { pdfLib, setOutline } from './utils/pdf'
 import {
   generatePuppeteerDataDirPath,
   generatePuppeteerLaunchArgs,
@@ -62,6 +71,12 @@ export interface ConverterOption {
   output?: string | false
   pages?: boolean | number[]
   pdfNotes?: boolean
+  pdfOutlines?:
+    | false
+    | {
+        pages: boolean
+        headings: boolean
+      }
   preview?: boolean
   puppeteerTimeout?: number
   jpegQuality?: number
@@ -165,14 +180,16 @@ export class Converter {
         tplOpts.modifier?.(engine)
 
         const ret = engine.render(stripBOM(`${markdown}${additionals}`))
+
         const info = engine[engineInfo]
+        const outline = engine[pdfOutlineInfo]
         const transition: EngineTransition | undefined =
           engine[engineTransition]
 
         if (isFile(file))
           this.options.themeSet.observe(file.absolutePath, info?.theme)
 
-        return { ...ret, ...info!, transition }
+        return { ...ret, ...info!, outline, transition }
       },
     })
   }
@@ -286,8 +303,19 @@ export class Converter {
 
     const ret = file.convert(this.options.output, { extension: 'pdf' })
 
+    let outlineData: OutlineData | undefined
+
     ret.buffer = await this.usePuppeteer(html, async (page, uri) => {
       await page.goto(uri, { waitUntil: ['domcontentloaded', 'networkidle0'] })
+
+      if (tpl.rendered.outline) {
+        outlineData = await page.evaluate(
+          pptrOutlinePositionResolver,
+          tpl.rendered.outline.flatMap((o) => o.headings),
+          pdfOutlineAttr
+        )
+      }
+
       return await page.pdf({
         printBackground: true,
         preferCSSPageSize: true,
@@ -297,12 +325,7 @@ export class Converter {
 
     // Apply PDF metadata and annotations
     const creationDate = new Date()
-    const { PDFDocument, PDFHexString, PDFString } = await import(
-      // Use pre-bundled pdf-lib to avoid circular dependency warning. pdf-lib
-      // as an external dependency will make failure in the standalone binary.
-      // @see https://github.com/marp-team/marp-cli/issues/373
-      'pdf-lib/dist/pdf-lib.min.js'
-    )
+    const { PDFDocument, PDFHexString, PDFString } = await pdfLib()
     const pdfDoc = await PDFDocument.load(ret.buffer)
 
     pdfDoc.setCreator(CREATED_BY_MARP)
@@ -315,6 +338,17 @@ export class Converter {
     if (tpl.rendered.author) pdfDoc.setAuthor(tpl.rendered.author)
     if (tpl.rendered.keywords)
       pdfDoc.setKeywords([tpl.rendered.keywords.join('; ')])
+
+    if (this.options.pdfOutlines && tpl.rendered.outline) {
+      await setOutline(
+        pdfDoc,
+        generatePDFOutlines(tpl.rendered.outline, {
+          ...this.options.pdfOutlines,
+          data: outlineData,
+          size: tpl.rendered.size,
+        })
+      )
+    }
 
     if (this.options.pdfNotes) {
       const pages = pdfDoc.getPages()
@@ -487,6 +521,9 @@ export class Converter {
 
     // Marpit plugins
     engine.use(metaPlugin).use(infoPlugin)
+
+    if (this.options.type === ConvertType.pdf && this.options.pdfOutlines)
+      engine.use(pdfOutlinePlugin)
 
     // Themes
     this.options.themeSet.registerTo(engine)
