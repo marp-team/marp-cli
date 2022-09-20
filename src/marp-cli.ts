@@ -51,6 +51,7 @@ export const marpCli = async (
   try {
     const base: Argv = yargs(argv)
     const program = base
+      .parserConfiguration({ 'dot-notation': false })
       .usage(usage)
       .help(false)
       .version(false)
@@ -211,7 +212,7 @@ export const marpCli = async (
         'pdf-outlines': {
           describe: 'Add outlines (bookmarks) to PDF',
           group: OptionGroup.PDF,
-          type: undefined,
+          type: 'boolean',
         },
         'pdf-outlines.pages': {
           describe: 'Make outlines from slide pages',
@@ -276,35 +277,6 @@ export const marpCli = async (
           group: OptionGroup.Marp,
           type: 'string',
         },
-      })
-      .middleware((argv): any => {
-        const normalized: Record<any, any> = {}
-        const normalizeToObject = (key: string): any => {
-          if (argv[key] != null) {
-            const normalize = (args: any) => {
-              if (!Array.isArray(args)) return args
-
-              let normalized: Record<any, any> = {}
-              let enabled = false
-
-              for (const arg of args) {
-                if (typeof arg === 'boolean') {
-                  enabled = arg
-                } else if (typeof arg === 'object') {
-                  normalized = { ...normalized, ...arg }
-                }
-              }
-
-              return enabled && normalized
-            }
-            normalized[key] = normalize(argv[key])
-          }
-        }
-
-        normalizeToObject('pdf-outlines')
-        normalizeToObject('pdfOutlines')
-
-        return normalized
       })
 
     const argvRet = await program.argv

@@ -917,7 +917,7 @@ describe('Marp CLI', () => {
       })
     })
 
-    describe('with --pdf-notes option', () => {
+    describe('with --pdf-notes options', () => {
       it('prefers PDF than HTML if not specified conversion type', async () => {
         const cmd = [onePath, '--pdf-notes']
         expect((await conversion(...cmd)).options.type).toBe(ConvertType.pdf)
@@ -928,6 +928,94 @@ describe('Marp CLI', () => {
         expect((await conversion(...cmdPptx)).options.type).toBe(
           ConvertType.pptx
         )
+      })
+    })
+
+    describe('with --pdf-outlines options', () => {
+      it('converts PDF with outlines for pages and headings', async () => {
+        const converter = await conversion(onePath, '--pdf-outlines')
+        expect(converter.options.type).toBe(ConvertType.pdf)
+        expect(converter.options.pdfOutlines).toStrictEqual({
+          pages: true,
+          headings: true,
+        })
+      })
+
+      it('prefers PDF than HTML if not specified conversion type', async () => {
+        const converter = await conversion(onePath, '--pdf-outlines', '--pptx')
+        expect(converter.options.type).toBe(ConvertType.pptx)
+      })
+
+      describe('as false', () => {
+        it('converts PDF without outlines when pdf option is enabled', async () => {
+          const cmd = [onePath, '--pdf', '--pdf-outlines=false']
+          const converter = await conversion(...cmd)
+          expect(converter.options.type).toBe(ConvertType.pdf)
+          expect(converter.options.pdfOutlines).toBe(false)
+
+          // Negative option
+          const negativeCmd = [onePath, '--pdf', '--no-pdf-outlines']
+          const converterNegativeCmd = await conversion(...negativeCmd)
+          expect(converterNegativeCmd.options.type).toBe(ConvertType.pdf)
+          expect(converterNegativeCmd.options.pdfOutlines).toBe(false)
+
+          // With detailed options
+          const converterDetailed = await conversion(
+            onePath,
+            '--pdf',
+            '--pdf-outlines',
+            'false',
+            '--pdf-outline.pages',
+            '--pdf-outline.headings'
+          )
+          expect(converterDetailed.options.type).toBe(ConvertType.pdf)
+          expect(converterDetailed.options.pdfOutlines).toBe(false)
+        })
+      })
+
+      describe('with --pdf-outlines.pages as false', () => {
+        it('converts PDF with outlines only for headings', async () => {
+          const converter = await conversion(
+            onePath,
+            '--pdf-outlines',
+            '--pdf-outlines.pages=false'
+          )
+          expect(converter.options.type).toBe(ConvertType.pdf)
+          expect(converter.options.pdfOutlines).toStrictEqual({
+            pages: false,
+            headings: true,
+          })
+        })
+      })
+
+      describe('with --pdf-outlines.headings as false', () => {
+        it('converts PDF with outlines only for pages', async () => {
+          const converter = await conversion(
+            onePath,
+            '--pdf-outlines.headings',
+            'false',
+            '--pdf-outlines'
+          )
+          expect(converter.options.type).toBe(ConvertType.pdf)
+          expect(converter.options.pdfOutlines).toStrictEqual({
+            pages: true,
+            headings: false,
+          })
+        })
+      })
+
+      describe('with all detailed options as false', () => {
+        it('converts PDF without outlines when pdf option is enabled', async () => {
+          const converter = await conversion(
+            onePath,
+            '--pdf',
+            '--pdf-outlines.pages=false',
+            '--pdf-outlines.headings=false',
+            '--pdf-outlines'
+          )
+          expect(converter.options.type).toBe(ConvertType.pdf)
+          expect(converter.options.pdfOutlines).toBe(false)
+        })
       })
     })
 
