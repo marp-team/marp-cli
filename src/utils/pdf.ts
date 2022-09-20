@@ -9,9 +9,8 @@ export const pdfLib = async () => await import('pdf-lib/dist/pdf-lib.min.js')
 // --- Outline ---
 
 type PDFOutlineTo =
-  | string
-  | number
-  | [pageIndex: number, xPercentage: number, yPercentage: number]
+  // | string
+  number | [pageIndex: number, xPercentage: number, yPercentage: number]
 
 export interface PDFOutlineItem {
   title: string
@@ -91,10 +90,11 @@ export const setOutline = async (
       const outlineRef = refMap.get(outline)!
 
       const destOrAction = (() => {
-        if (typeof outline.to === 'string') {
-          // URL
-          return { A: { S: 'URI', URI: PDFHexString.fromText(outline.to) } }
-        } else if (typeof outline.to === 'number') {
+        // if (typeof outline.to === 'string') {
+        //   // URL
+        //   return { A: { S: 'URI', URI: PDFHexString.fromText(outline.to) } }
+        // } else
+        if (typeof outline.to === 'number') {
           return { Dest: [pageRefs[outline.to], 'Fit'] }
         } else if (Array.isArray(outline.to)) {
           const page = doc.getPage(outline.to[0])

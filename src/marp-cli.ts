@@ -291,7 +291,7 @@ export const marpCli = async (
       return 0
     }
 
-    const config = await fromArguments(args as any)
+    const config = await fromArguments(args)
     if (args.version) return await version(config)
 
     // Initialize converter
