@@ -237,7 +237,9 @@ export class MarpCLIConfig {
       if (lowerOutput.endsWith('.txt')) return ConvertType.notes
 
       // Prefer PDF than HTML if enabled any PDF options
-      if (pdfNotes || pdfOutlines) return ConvertType.pdf
+      if ((this.args.pdf ?? this.conf.pdf) !== false) {
+        if (pdfNotes || pdfOutlines) return ConvertType.pdf
+      }
 
       return ConvertType.html
     })()
