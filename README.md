@@ -21,7 +21,7 @@ It can convert Marp / Marpit Markdown files into static HTML / CSS, PDF, PowerPo
 
 [npx (`npm exec`)](https://docs.npmjs.com/cli/v7/commands/npx) is the best way to use the latest Marp CLI if you wanted
 one-shot Markdown conversion _without install_. Just run below if you have
-installed [Node.js](https://nodejs.org/) 12 and later.
+installed [Node.js](https://nodejs.org/) 14 and later.
 
 ```bash
 # Convert slide deck into HTML
@@ -43,7 +43,7 @@ npx @marp-team/marp-cli@latest -w slide-deck.md
 npx @marp-team/marp-cli@latest -s ./slides
 ```
 
-> :information_source: You have to install [Google Chrome], [Chromium], or [Microsoft Edge] to convert slide deck into PDF, PPTX, and image(s).
+> :information_source: You have to install [Google Chrome]<!--, [Chromium], --> or [Microsoft Edge] to convert slide deck into PDF, PPTX, and image(s).
 
 [google chrome]: https://www.google.com/chrome/
 [chromium]: https://www.chromium.org/
@@ -58,6 +58,8 @@ Don't you like installing Node.js and Chrome to local? We have [an official Dock
 [marp-cli-docker]: https://hub.docker.com/r/marpteam/marp-cli/
 
 ## Install
+
+Marp CLI is working only in [actively supported Node.js versions](https://endoflife.date/nodejs) so Node.js 14 and later is required to install.
 
 ### Use package manager
 
@@ -79,7 +81,7 @@ We recommend to install Marp CLI into your Node project. You may control the CLI
 npm install --save-dev @marp-team/marp-cli
 ```
 
-Node.js 12 and later is required to install Marp CLI. The installed `marp` command is available in [npm-scripts](https://docs.npmjs.com/misc/scripts) or `npx marp`.
+The installed `marp` command is available in [npm-scripts](https://docs.npmjs.com/misc/scripts) or `npx marp`.
 
 #### Global installation
 
@@ -91,7 +93,7 @@ npm install -g @marp-team/marp-cli
 
 ### [Standalone binary][releases]
 
-We also provide standalone binaries for Linux, macOS, and Windows.
+We also provide standalone binaries for Linux, macOS, and Windows. These have bundled Marp CLI with Node.js binary, so no need to install Node.js separately.
 
 **[:fast_forward: Download the latest standalone binary from release page.][releases]**
 
@@ -119,18 +121,18 @@ When you want to output the converted result to another directory with keeping t
 
 ### Convert to PDF (`--pdf`)
 
-If you passed `--pdf` option or the output filename specified by `--output` (`-o`) option ends with `.pdf`, Marp CLI will try to convert into PDF file by using [Google Chrome], [Chromium], [Microsoft Edge], or a Chromium based browser.
+If you passed `--pdf` option or the output filename specified by `--output` (`-o`) option ends with `.pdf`, Marp CLI will try to convert Markdown into PDF file through the browser.
 
 ```bash
 marp --pdf slide-deck.md
 marp slide-deck.md -o converted.pdf
 ```
 
-> :information_source: All kind of conversions except HTML require [Google Chrome], [Chromium], [Microsoft Edge], or a Chromium based browser. When an unexpected problem has occurred while converting, please update your browser to the latest version or try installing [Google Chrome Canary].
->
-> If you want to use a browser other than Google Chrome, Chromium, or Microsoft Edge, specify the path to a Chromium based browser using the `CHROME_PATH` environment variable. For example: `CHROME_PATH=$(which brave) marp --pdf slide-deck.md`
+All kind of conversions except HTML _require to install [Google Chrome]<!--, [Chromium]-->, [Microsoft Edge], or [Chromium] (flavored) browser._ When an unexpected problem has occurred while converting, please update your browser to the latest version or try installing [Google Chrome Canary].
 
 [google chrome canary]: https://www.google.com/chrome/canary/
+
+> :information_source: If you want to use Chromium or flavored browsers to convert, you have to specify the path to the browser binary through `CHROME_PATH` environment variable. For example: `CHROME_PATH=$(which brave) marp --pdf slide-deck.md`
 
 If your slide deck had included [Marpit presenter notes] as HTML comment, you can add note annotations to the lower left by using `--pdf-notes` option together with `--pdf`.
 
@@ -194,13 +196,23 @@ marp slide-deck.md -o title-slide@2x.png --image-scale 2
 >
 > It is also available for PPTX conversion. By default, Marp CLI will use `2` as the default scale factor in PPTX to suppress deterioration of slide rendering in full-screen presentation.
 
+### Export presenter notes (`--notes`)
+
+You can export [presenter notes][marpit presenter notes] in Marp / Marpit Markdown as a text file by using `--notes` option or specifying the output path with TXT extension.
+
+```bash
+# Export presenter notes as a text
+marp --notes slide-deck.md
+marp slide-deck.md -o output.txt
+```
+
 ### Security about local files
 
 Because of [the security reason](https://github.com/marp-team/marp-cli/pull/10#user-content-security), **PDF, PPTX and image(s) conversion cannot use local files by default.**
 
 Marp CLI would output incompleted result with warning if the blocked local file accessing is detected. We recommend uploading your assets to online.
 
-If you really need to use local files in these conversion, `--alow-local-files` option helps to find your local files. _Please use only to the trusted Markdown because there is a potential security risk._
+If you really need to use local files in these conversion, `--allow-local-files` option helps to find your local files. _Please use only to the trusted Markdown because there is a potential security risk._
 
 ```bash
 marp --pdf --allow-local-files slide-deck.md
@@ -261,9 +273,9 @@ The `bespoke` template is using [Bespoke.js](https://github.com/bespokejs/bespok
 - **Fragmented list**: Recognize [Marpit's fragmented list](https://github.com/marp-team/marpit/issues/145) and appear list one-by-one if used `*` and `1)` as the bullet marker.
 - **Presenter view**: Open presenter view in external window by hitting <kbd>p</kbd> key.
 - **Progress bar** (optional): By setting `--bespoke.progress` option, you can add a progress bar on the top of the deck.
-- [**Slide transitions** _(EXPERIMENTAL)_][transitions]: You may turn on slide transitions support powered by [Shared Element Transitions API proposal](https://github.com/WICG/shared-element-transitions) by `--bespoke.transition` option. Refer to [marp-team/marp-cli#382][transitions] for details.
+- [**Slide transitions** _(EXPERIMENTAL)_][transitions]: You may turn on slide transitions support powered by [Shared Element Transitions API proposal](https://github.com/WICG/shared-element-transitions) by `--bespoke.transition` option. Refer to [marp-team/marp-cli#447][transitions] for details.
 
-[transitions]: https://github.com/marp-team/marp-cli/issues/382
+[transitions]: https://github.com/marp-team/marp-cli/issues/447
 
 > ℹ️ Presenter view may be disabled if [the browser restricted using localStorage](https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API#Feature-detecting_localStorage) (e.g. Open HTML in the old Safari with private browsing, or open the _local_ HTML file with Chrome that has blocked 3rd party cookies in `chrome://settings/content/cookies`).
 
@@ -427,9 +439,9 @@ Marp CLI prefers to use _an installed core to local project by user_ than the bu
 If the current project has installed `@marp-team/marp-core` individually, it would show its version and the annotation: `w/ user-installed @marp-team/marp-core vX.X.X` or `w/ customized engine`.
 
 ```console
-$ npm i @marp-team/marp-cli @marp-team/marp-core@^3.0.0 --save-dev
+$ npm i @marp-team/marp-cli @marp-team/marp-core@^3.2.0 --save-dev
 $ npx marp --version
-@marp-team/marp-cli v1.x.x (w/ user-installed @marp-team/marp-core v3.0.0)
+@marp-team/marp-cli v2.x.x (w/ user-installed @marp-team/marp-core v3.2.0)
 ```
 
 ## Configuration file
@@ -441,7 +453,7 @@ Marp CLI can be configured options with file, such as `marp.config.js`, `marp.co
 {
   "marp": {
     "inputDir": "./slides",
-    "output":" ./public",
+    "output": "./public",
     "themeSet": "./themes"
   }
 }
@@ -491,6 +503,7 @@ If you want to prevent looking up a configuration file, you can pass `--no-confi
 | `jpegQuality`     |           number            |    `--jpeg-quality`    | Setting JPEG image quality (`85` by default)                                                                |
 | `keywords`        |     string \| string[]      |      `--keywords`      | Define keywords for the slide deck (Accepts comma-separated string and array of string)                     |
 | `lang`            |           string            |                        | Define the language of converted HTML                                                                       |
+| `notes`           |           boolean           |       `--notes`        | Convert slide deck notes into a text file                                                                   |
 | `ogImage`         |           string            |      `--og-image`      | Define [Open Graph] image URL                                                                               |
 | `options`         |           object            |                        | The base options for the constructor of engine                                                              |
 | `output`          |           string            |    `--output` `-o`     | Output file path (or directory when input-dir is passed)                                                    |

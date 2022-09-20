@@ -6,10 +6,7 @@ import { nodeResolve } from '@rollup/plugin-node-resolve'
 import replace from '@rollup/plugin-replace'
 import typescript from '@rollup/plugin-typescript'
 import url from '@rollup/plugin-url'
-import autoprefixer from 'autoprefixer'
 import builtinModules from 'builtin-modules'
-import cssnano from 'cssnano'
-import postcssUrl from 'postcss-url'
 import license from 'rollup-plugin-license'
 import postcss from 'rollup-plugin-postcss'
 import pugPlugin from 'rollup-plugin-pug'
@@ -40,18 +37,7 @@ const plugins = (opts = {}) => [
   }),
   commonjs(),
   typescript({ noEmitOnError: false }),
-  postcss({
-    inject: false,
-    plugins: [
-      postcssUrl({
-        filter: '**/assets/**/*.svg',
-        encodeType: 'base64',
-        url: 'inline',
-      }),
-      autoprefixer(),
-      cssnano({ preset: 'default' }),
-    ],
-  }),
+  postcss({ inject: false }),
   pugPlugin({ pugRuntime: 'pug-runtime' }),
   url({
     sourceDir: path.join(__dirname, 'lib'),

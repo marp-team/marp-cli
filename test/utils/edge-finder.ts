@@ -101,7 +101,7 @@ describe('#findEdgeInstallation', () => {
         '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge'
       )
       expect(findAccessiblePath.mock.calls[0][0]).toMatchInlineSnapshot(`
-        Array [
+        [
           "/Applications/Microsoft Edge Canary.app/Contents/MacOS/Microsoft Edge Canary",
           "/Applications/Microsoft Edge Dev.app/Contents/MacOS/Microsoft Edge Dev",
           "/Applications/Microsoft Edge Beta.app/Contents/MacOS/Microsoft Edge Beta",
@@ -126,7 +126,7 @@ describe('#findEdgeInstallation', () => {
         '/opt/microsoft/msedge/msedge'
       )
       expect(findAccessiblePath.mock.calls[0][0]).toMatchInlineSnapshot(`
-        Array [
+        [
           "/opt/microsoft/msedge-canary/msedge",
           "/opt/microsoft/msedge-dev/msedge",
           "/opt/microsoft/msedge-beta/msedge",

@@ -38,7 +38,6 @@ const runForObservation = async (argv: string[]) => {
 }
 
 jest.mock('fs')
-jest.mock('mkdirp')
 jest.mock('../src/preview')
 jest.mock('../src/watcher', () => jest.createMockFromModule('../src/watcher'))
 
@@ -225,7 +224,7 @@ describe('Marp CLI', () => {
     const files = assetFn('_files')
 
     let writeFile: jest.Mock
-    beforeEach(() => (writeFile = (<any>fs).__mockWriteFile()))
+    beforeEach(() => (writeFile = (fs as any).__mockWriteFile()))
 
     it('converts files in specified dir', async () => {
       jest.spyOn(cli, 'info').mockImplementation()
@@ -373,7 +372,7 @@ describe('Marp CLI', () => {
       info = jest.spyOn(cli, 'info')
 
       info.mockImplementation()
-      ;(<any>fs).__mockWriteFile()
+      ;(fs as any).__mockWriteFile()
     })
 
     describe('when passed value is theme name', () => {
@@ -396,7 +395,7 @@ describe('Marp CLI', () => {
         const { css } = (await convert.mock.results[0].value).rendered
         expect(css).toContain('/* @theme a */')
 
-        const converter = <Converter>convert.mock.instances[0]
+        const converter: Converter = convert.mock.instances[0]
         const { themeSet } = converter.options
         const theme = themeSet.themes.get(cssFile)
 
@@ -442,7 +441,7 @@ describe('Marp CLI', () => {
       observeSpy = jest.spyOn(ThemeSet.prototype, 'observe')
 
       jest.spyOn(cli, 'info').mockImplementation()
-      ;(<any>fs).__mockWriteFile()
+      ;(fs as any).__mockWriteFile()
     })
 
     describe('with specified single file', () => {
@@ -556,7 +555,7 @@ describe('Marp CLI', () => {
         await marpCli(cmd)
         expect(cvtFiles).toHaveBeenCalled()
 
-        return <any>cvtFiles.mock.instances[0]
+        return cvtFiles.mock.instances[0] as any
       } finally {
         cvtFiles.mockRestore()
         cliInfo.mockRestore()
@@ -565,7 +564,7 @@ describe('Marp CLI', () => {
 
     it('converts file', async () => {
       const cliInfo = jest.spyOn(cli, 'info').mockImplementation()
-      ;(<any>fs).__mockWriteFile()
+      ;(fs as any).__mockWriteFile()
 
       expect(await marpCli([onePath])).toBe(0)
 
@@ -608,6 +607,11 @@ describe('Marp CLI', () => {
         expect((await conversion(...cmd)).options.type).toBe(ConvertType.png)
       })
 
+      it('converts file with PNG type if the type was not specified', async () => {
+        const cmd = [onePath, '--image']
+        expect((await conversion(...cmd)).options.type).toBe(ConvertType.png)
+      })
+
       it('converts file with JPEG type by specified jpeg', async () => {
         const cmd = [onePath, '--image=jpeg']
         expect((await conversion(...cmd)).options.type).toBe(ConvertType.jpeg)
@@ -629,6 +633,12 @@ describe('Marp CLI', () => {
     describe('with --images option', () => {
       it('converts file with PNG type and enabled pages option by specified png', async () => {
         const converter = await conversion(onePath, '--images', 'png')
+        expect(converter.options.type).toBe(ConvertType.png)
+        expect(converter.options.pages).toBe(true)
+      })
+
+      it('converts file with PNG type if the type was not specified', async () => {
+        const converter = await conversion(onePath, '--images')
         expect(converter.options.type).toBe(ConvertType.png)
         expect(converter.options.pages).toBe(true)
       })
@@ -754,7 +764,7 @@ describe('Marp CLI', () => {
     describe('with -w option', () => {
       it('starts watching by Watcher.watch()', async () => {
         jest.spyOn(cli, 'info').mockImplementation()
-        ;(<any>fs).__mockWriteFile()
+        ;(fs as any).__mockWriteFile()
 
         await runForObservation([onePath, '-w'])
         expect(Watcher.watch).toHaveBeenCalledWith([onePath], expect.anything())
@@ -891,7 +901,7 @@ describe('Marp CLI', () => {
         it('does not open PPTX in preview window', async () => {
           await runForObservation([onePath, '-p', '--pptx', '--no-output'])
           expect(Preview.prototype.open).not.toHaveBeenCalled()
-        }, 30000)
+        }, 60000)
       })
 
       describe('when CLI is running in an official Docker image', () => {
@@ -918,6 +928,30 @@ describe('Marp CLI', () => {
         expect((await conversion(...cmdPptx)).options.type).toBe(
           ConvertType.pptx
         )
+      })
+    })
+
+    describe('with PUPPETEER_TIMEOUT env', () => {
+      beforeEach(() => {
+        process.env.PUPPETEER_TIMEOUT = '12345'
+      })
+
+      afterEach(() => {
+        delete process.env.PUPPETEER_TIMEOUT
+      })
+
+      it('follows specified timeout in conversion that is using Puppeteer', async () => {
+        expect(
+          (await conversion(onePath, '--pdf')).options.puppeteerTimeout
+        ).toBe(12345)
+      })
+
+      it('does not follows specified timeout if the env value is not valid number', async () => {
+        process.env.PUPPETEER_TIMEOUT = 'invalid'
+
+        expect(
+          (await conversion(onePath, '--pdf')).options.puppeteerTimeout
+        ).toBeUndefined()
       })
     })
   })
@@ -1036,7 +1070,7 @@ describe('Marp CLI', () => {
         .mockResolvedValue(Buffer.from('# markdown'))
 
       // reset cached stdin buffer
-      ;(<any>File).stdinBuffer = undefined
+      ;(File as any).stdinBuffer = undefined
     })
 
     it('converts markdown came from stdin and outputs to stdout', async () => {

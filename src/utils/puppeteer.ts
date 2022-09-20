@@ -1,7 +1,7 @@
 import fs from 'fs'
 import os from 'os'
 import path from 'path'
-import puppeteer from 'puppeteer-core'
+import { launch } from 'puppeteer-core'
 import { warn } from '../cli'
 import { CLIErrorCode, error, isError } from '../error'
 import { isDocker } from '../utils/docker'
@@ -48,17 +48,28 @@ export const generatePuppeteerDataDirPath = async (
   name: string,
   { wslHost }: { wslHost?: boolean } = {}
 ): Promise<string> => {
-  if (isWSL() && wslHost) {
-    // In WSL environment, Marp CLI will use Chrome on Windows. Thus, we have to
-    // specify Windows path when converting within WSL.
-    if (wslTmp === undefined) wslTmp = await resolveWindowsEnv('TMP')
-    if (wslTmp !== undefined) return path.win32.resolve(wslTmp, name)
+  const dataDir = await (async () => {
+    if (isWSL() && wslHost) {
+      // In WSL environment, Marp CLI may use Chrome on Windows. If Chrome has
+      // located in host OS (Windows), we have to specify Windows path.
+      if (wslTmp === undefined) wslTmp = await resolveWindowsEnv('TMP')
+      if (wslTmp !== undefined) return path.win32.resolve(wslTmp, name)
+    }
+    return path.resolve(os.tmpdir(), name)
+  })()
+
+  // Ensure the data directory is created
+  try {
+    await fs.promises.mkdir(dataDir, { recursive: true })
+  } catch (e: unknown) {
+    if (isError(e) && e.code !== 'EEXIST') throw e
   }
-  return path.resolve(os.tmpdir(), name)
+
+  return dataDir
 }
 
-export const generatePuppeteerLaunchArgs = () => {
-  const args = new Set<string>(['--export-tagged-pdf'])
+export const generatePuppeteerLaunchArgs = async () => {
+  const args = new Set<string>(['--export-tagged-pdf', '--test-type'])
 
   // Docker environment and WSL environment need to disable sandbox. :(
   if (isDocker() || isWSL()) args.add('--no-sandbox')
@@ -71,12 +82,18 @@ export const generatePuppeteerLaunchArgs = () => {
   // Enable DocumentTransition API
   if (!process.env.CI) args.add('--enable-blink-features=DocumentTransition')
 
+  // LayoutNG Printing
+  if (process.env.CHROME_LAYOUTNG_PRINTING)
+    args.add(
+      '--enable-blink-features=LayoutNGPrinting,LayoutNGTableFragmentation'
+    )
+
   // Resolve Chrome path to execute
   if (executablePath === false) {
     let findChromeError: Error | undefined
 
     try {
-      executablePath = findChromeInstallation()
+      executablePath = await findChromeInstallation()
     } catch (e: unknown) {
       if (isError(e)) findChromeError = e
     }
@@ -88,8 +105,14 @@ export const generatePuppeteerLaunchArgs = () => {
       if (!executablePath) {
         if (findChromeError) warn(findChromeError.message)
 
+        // https://github.com/marp-team/marp-cli/issues/475
+        // https://github.com/GoogleChrome/chrome-launcher/issues/278
+        const chromiumResolvable = process.platform === 'linux'
+
         error(
-          'You have to install Google Chrome, Chromium, or Microsoft Edge to convert slide deck with current options.',
+          `You have to install Google Chrome${
+            chromiumResolvable ? ', Chromium,' : ''
+          } or Microsoft Edge to convert slide deck with current options.`,
           CLIErrorCode.NOT_FOUND_CHROMIUM
         )
       }
@@ -112,16 +135,16 @@ export const generatePuppeteerLaunchArgs = () => {
 }
 
 export const launchPuppeteer = async (
-  ...[options]: Parameters<typeof puppeteer['launch']>
+  ...[options]: Parameters<typeof launch>
 ) => {
   try {
-    return await puppeteer.launch(options)
+    return await launch(options)
   } catch (e: unknown) {
     if (isError(e)) {
       // Retry to launch Chromium with WebSocket connection instead of pipe if failed to connect to Chromium
       // https://github.com/puppeteer/puppeteer/issues/6258
       if (options?.pipe && e.message.includes('Target.setDiscoverTargets')) {
-        return await puppeteer.launch({ ...options, pipe: false })
+        return await launch({ ...options, pipe: false })
       }
 
       // Warning when tried to spawn the snap chromium within the snapd container

@@ -14,7 +14,8 @@ export const findAccessiblePath = (paths: string[]): string | undefined =>
   })
 
 const linux = (): string | undefined => {
-  if (isWSL()) {
+  // WSL 1 should find Edge executable from host OS
+  if (isWSL() === 1) {
     const localAppData = resolveWindowsEnvSync('LOCALAPPDATA')
 
     return win32({

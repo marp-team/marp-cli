@@ -1,7 +1,7 @@
-/* eslint-disable import/export, @typescript-eslint/no-namespace */
+/* eslint-disable @typescript-eslint/no-namespace */
 import { EventEmitter } from 'events'
 import { nanoid } from 'nanoid'
-import puppeteer from 'puppeteer-core'
+import type puppeteer from 'puppeteer-core'
 import TypedEmitter from 'typed-emitter'
 import macDockIcon from './assets/mac-dock-icon.png'
 import { ConvertType, mimeTypes } from './converter'
@@ -15,12 +15,12 @@ import {
 import { isChromeInWSLHost } from './utils/wsl'
 
 export namespace Preview {
-  export interface Events {
-    close(window: any): void
-    exit(): void
-    launch(): void
-    open(window: any, location: string): void
-    opening(location: string): void
+  export type Events = {
+    close: (window: any) => void
+    exit: () => void
+    launch: () => void
+    open: (window: any, location: string) => void
+    opening: (location: string) => void
   }
 
   export interface Options {
@@ -140,7 +140,7 @@ export class Preview extends (EventEmitter as new () => TypedEmitter<Preview.Eve
   }
 
   private async launch(): Promise<Preview.Window> {
-    const baseArgs = generatePuppeteerLaunchArgs()
+    const baseArgs = await generatePuppeteerLaunchArgs()
 
     this.puppeteerInternal = await launchPuppeteer({
       ...baseArgs,
@@ -151,6 +151,7 @@ export class Preview extends (EventEmitter as new () => TypedEmitter<Preview.Eve
       ],
       defaultViewport: null as any,
       headless: process.env.NODE_ENV === 'test',
+      ignoreDefaultArgs: ['--enable-automation'],
       userDataDir: await generatePuppeteerDataDirPath('marp-cli-preview', {
         wslHost: isChromeInWSLHost(baseArgs.executablePath),
       }),

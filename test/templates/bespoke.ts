@@ -1,11 +1,18 @@
 /** @jest-environment jsdom */
+import '../_browser/matchMedia'
 import Marp from '@marp-team/marp-core'
 import { Element as MarpitElement } from '@marp-team/marpit'
 import { Key } from 'ts-key-enum'
 import bespoke from '../../src/templates/bespoke/bespoke'
-import { classes } from '../../src/templates/bespoke/presenter/presenter-view'
+import {
+  classes,
+  properties,
+} from '../../src/templates/bespoke/presenter/presenter-view'
+import { transitionStyleId } from '../../src/templates/bespoke/transition'
 import * as fullscreen from '../../src/templates/bespoke/utils/fullscreen'
+import * as transitionUtils from '../../src/templates/bespoke/utils/transition'
 import { _clearCachedWakeLockApi } from '../../src/templates/bespoke/wake-lock'
+import * as documentTransition from '../_browser/documentTransition'
 
 jest.useFakeTimers()
 
@@ -36,8 +43,11 @@ describe("Bespoke template's browser context", () => {
 
   const render = (
     md = defaultMarkdown,
-    targetDocument = document
+    targetDocument = document,
+    { resetHead = true }: { resetHead?: boolean } = {}
   ): HTMLElement => {
+    if (resetHead) targetDocument.head.innerHTML = ''
+
     let { html, comments } = marp.render(md) // eslint-disable-line prefer-const
 
     comments.forEach((c, i) => {
@@ -825,7 +835,7 @@ describe("Bespoke template's browser context", () => {
         md?: string
       ) =>
         replaceLocation('/?view=presenter', () => {
-          const parent = render(md)
+          const parent = render(md, document, { resetHead: false })
           const deck = bespoke()
 
           func({ deck, parent })
@@ -909,7 +919,24 @@ describe("Bespoke template's browser context", () => {
           })
         })
       })
-
+      describe('Presenter timer', () => {
+        it('timer should start at 00:00:00', () =>
+          testPresenterView(() => {
+            expect($p(classes.infoTimer).textContent).toBe('00:00:00')
+          }))
+        it('timer should be at 00:00:01 after one second', () =>
+          testPresenterView(() => {
+            jest.advanceTimersByTime(12000)
+            expect($p(classes.infoTimer).textContent).toBe('00:00:12')
+          }))
+        it('timer should be at 00:00:00 after clicking', () =>
+          testPresenterView(() => {
+            jest.advanceTimersByTime(12000)
+            $p(classes.infoTimer).click()
+            jest.advanceTimersByTime(1200)
+            expect($p(classes.infoTimer).textContent).toBe('00:00:01')
+          }))
+      })
       describe('Presenter note', () => {
         it('marks element with bespoke-marp-note class and current slide index as active', () =>
           testPresenterView(({ deck }) => {
@@ -930,6 +957,83 @@ describe("Bespoke template's browser context", () => {
             expect(noteA?.className).not.toContain('active')
             expect(noteB?.className).toContain('active')
           }, '<!-- A -->\n\n---\n\n<!-- B -->'))
+
+        describe('Font size', () => {
+          const fontSizeScale = () =>
+            $p(classes.noteContainer).style.getPropertyValue(
+              properties.noteFontScale
+            )
+
+          it('increases the font-size when clicked "+" button once', () =>
+            testPresenterView(() => {
+              $p(classes.noteButtonsBigger).click()
+              expect(fontSizeScale()).toBe('1.2000')
+            }))
+
+          it('increases the font-size when clicked "+" button twice', () =>
+            testPresenterView(() => {
+              $p(classes.noteButtonsBigger).click()
+              $p(classes.noteButtonsBigger).click()
+              expect(fontSizeScale()).toBe('1.4400') // 1.2 ** 2
+            }))
+
+          it('reduces the font-size when clicked "-" once', () =>
+            testPresenterView(() => {
+              $p(classes.noteButtonsSmaller).click()
+              expect(fontSizeScale()).toBe('0.8333') // 1.2 ** -1
+            }))
+
+          it('reduces the font-size on minus key', () =>
+            testPresenterView(() => {
+              keydown({ key: '-' })
+              expect(fontSizeScale()).toBe('0.8333') // 1.2 ** -1
+            }))
+
+          it('increases the font-size on plus key', () =>
+            testPresenterView(() => {
+              keydown({ key: '+' })
+              expect(fontSizeScale()).toBe('1.2000')
+            }))
+        })
+      })
+
+      describe('Drag resize', () => {
+        let spy
+
+        beforeAll(() => {
+          spy = jest
+            .spyOn(document.documentElement, 'clientWidth', 'get')
+            .mockReturnValue(1000)
+        })
+
+        afterAll(() => {
+          spy.mockRestore()
+        })
+
+        it('resizes on drag', () =>
+          testPresenterView(() => {
+            $p(classes.dragbar).dispatchEvent(new MouseEvent('mousedown'))
+            window.dispatchEvent(new MouseEvent('mousemove', { clientX: 200 }))
+
+            expect(
+              $p(classes.container).style.getPropertyValue(
+                '--bespoke-marp-presenter-split-ratio'
+              )
+            ).toBe('20%')
+
+            window.dispatchEvent(new MouseEvent('mouseup'))
+          }))
+
+        it('no resize without drag', () =>
+          testPresenterView(() => {
+            window.dispatchEvent(new MouseEvent('mousemove', { clientX: 200 }))
+
+            expect(
+              $p(classes.container).style.getPropertyValue(
+                '--bespoke-marp-presenter-split-ratio'
+              )
+            ).toBe('')
+          }))
       })
     })
 
@@ -1378,161 +1482,285 @@ describe("Bespoke template's browser context", () => {
   })
 
   describe('[Experimental] Transition', () => {
-    let documentTransition: Record<string, jest.Mock>
-
     beforeEach(() => {
-      documentTransition = {
-        prepare: jest.fn(async () => {
-          /* mock */
-        }),
-        start: jest.fn(async () => {
-          /* mock */
-        }),
-      }
-
-      Object.assign(document, { documentTransition })
+      transitionUtils._resetResolvedKeyframes()
+      jest
+        .spyOn(globalThis, 'requestAnimationFrame')
+        .mockImplementation((callback) => {
+          callback(0)
+          return 0
+        })
     })
 
-    afterEach(() => delete document['documentTransition'])
+    const initializeBespoke = async () => {
+      const deck = bespoke()
 
-    it('does not handle transitions if not defined transition effects in Markdown', () => {
+      jest.runOnlyPendingTimers()
+      deck.slide(0)
+      await waitAsync()
+      documentTransition.start.mockClear()
+
+      return deck
+    }
+
+    const defineKeyframesMock = (
+      keyframes: string[] = [],
+      opts: transitionUtils.MarpTransitionResolvableKeyframeSettings = {}
+    ) => {
+      jest
+        .spyOn(transitionUtils, '_testElementAnimation')
+        .mockImplementation((elm, resolve) => {
+          resolve(
+            keyframes.includes(elm.style.animationName)
+              ? { ...opts }
+              : undefined
+          )
+        })
+    }
+
+    const waitAsync = () =>
+      new Promise((res) => jest.requireActual('timers').setImmediate(res))
+
+    const getCSSText = (rules: CSSRuleList) => {
+      let style = ''
+      for (let i = 0; i < rules.length; i += 1) style += rules[i].cssText
+
+      return style
+    }
+
+    const getTransitionStyle = (): string | null => {
+      const style: HTMLStyleElement | null = document.getElementById(
+        transitionStyleId
+      ) as HTMLStyleElement | null
+
+      return style?.sheet ? getCSSText(style.sheet.cssRules) : null
+    }
+
+    it('does not trigger transitions if not defined transition effects in Markdown', async () => {
       render()
 
-      const deck = bespoke()
-      expect(deck.slide()).toBe(0)
+      const deck = await initializeBespoke()
 
       deck.next()
       expect(deck.slide()).toBe(1)
-      expect(documentTransition.prepare).not.toHaveBeenCalled()
       expect(documentTransition.start).not.toHaveBeenCalled()
 
       deck.prev()
       expect(deck.slide()).toBe(0)
-      expect(documentTransition.prepare).not.toHaveBeenCalled()
       expect(documentTransition.start).not.toHaveBeenCalled()
     })
 
-    it('handle transitions if defined transition effects in Markdown', async () => {
+    it('does not trigger transitions if not defined transition keyframes', async () => {
+      const parent = render()
+
+      // Set transition data (but not set any mocked keyframes)
+      parent.querySelectorAll('section').forEach((section) => {
+        section.dataset.transition = JSON.stringify({ name: 'test' })
+      })
+      defineKeyframesMock()
+
+      const deck = await initializeBespoke()
+
+      deck.next()
+      expect(deck.slide()).toBe(0)
+      await waitAsync()
+
+      expect(deck.slide()).toBe(1)
+      expect(documentTransition.start).not.toHaveBeenCalled()
+    })
+
+    it('triggers transitions if defined transition effects in Markdown', async () => {
       const parent = render()
 
       // Set transition data
       parent.querySelectorAll('section').forEach((section) => {
-        section.dataset.transition = 'cover-left'
-        section.dataset.transitionBack = 'cover-right'
+        section.dataset.transition = JSON.stringify({ name: 'built-in' })
+        section.dataset.transitionBack = JSON.stringify({
+          name: 'custom',
+          duration: '1s',
+        })
       })
 
-      // OSC is a shared element
-      const osc = document.createElement('div')
-      osc.className = 'bespoke-marp-osc'
-      document.body.appendChild(osc)
+      // Set mocked keyframes
+      defineKeyframesMock([
+        'marp-transition-__builtin__built-in',
+        'marp-incoming-transition-custom',
+      ])
 
-      const deck = bespoke()
-      expect(deck.slide()).toBe(0)
+      // Initialize
+      const deck = await initializeBespoke()
 
       // Forward
       deck.next()
       expect(deck.slide()).toBe(0) // Prevent navigation while prepare phase
-      expect(documentTransition.prepare).toHaveBeenCalledWith(
-        expect.objectContaining({
-          rootTransition: 'cover-left',
-          sharedElements: [osc],
-        })
-      )
-
-      await documentTransition.prepare.mock.results[0].value
+      await waitAsync()
 
       expect(deck.slide()).toBe(1)
-      expect(documentTransition.start).toHaveBeenCalledWith(
-        expect.objectContaining({ sharedElements: [osc] })
-      )
+      expect(documentTransition.start).toHaveBeenCalled()
 
       // Back
-      documentTransition.prepare.mockClear()
-      documentTransition.start.mockClear()
-
       deck.prev()
       expect(deck.slide()).toBe(1) // Prevent navigation while prepare phase
-      expect(documentTransition.prepare).toHaveBeenCalledWith(
-        expect.objectContaining({ rootTransition: 'cover-right' })
-      )
-
-      await documentTransition.prepare.mock.results[0].value
+      await waitAsync()
 
       expect(deck.slide()).toBe(0)
-      expect(documentTransition.start).toHaveBeenCalled()
-    })
+      expect(documentTransition.start).toHaveBeenCalledTimes(2)
 
-    it('applys a correct transition if moved to specific page', async () => {
-      history.replaceState(null, document.title, '#3')
-
-      const parent = render()
-
-      parent.querySelectorAll('section').forEach((section) => {
-        section.dataset.transition = 'cover-left'
-        section.dataset.transitionBack = 'cover-right'
+      // Cancel transition by double navigation
+      documentTransition.start.mockImplementationOnce(async (callback) => {
+        callback()
+        await new Promise(() => {
+          /* never resolved to simulate transition */
+        })
       })
 
-      const deck = bespoke()
-      jest.runAllTimers()
-
-      // Transition will not apply to an initial navigation by hash
-      expect(deck.slide()).toBe(2)
-      expect(documentTransition.prepare).not.toHaveBeenCalled()
-
-      // Same page navigation will not trigger transition
-      deck.slide(2)
-      expect(documentTransition.prepare).not.toHaveBeenCalled()
-
-      // Backward transition
-      deck.slide(0)
-      expect(deck.slide()).toBe(2) // Prevent navigation while prepare phase
-      expect(documentTransition.prepare).toHaveBeenCalledWith(
-        expect.objectContaining({ rootTransition: 'cover-right' })
-      )
-
-      await documentTransition.prepare.mock.results[0].value
-
-      expect(deck.slide()).toBe(0)
-      expect(documentTransition.start).toHaveBeenCalled()
-
-      // Forward transition
-      documentTransition.prepare.mockClear()
-      documentTransition.start.mockClear()
-
-      deck.slide(2)
-      expect(deck.slide()).toBe(0) // Prevent navigation while prepare phase
-      expect(documentTransition.prepare).toHaveBeenCalledWith(
-        expect.objectContaining({ rootTransition: 'cover-left' })
-      )
-
-      deck.slide(1) // This navigation will be ignored because #prepare Promise is not yet resolved
-      expect(documentTransition.prepare).toHaveBeenCalledTimes(1)
-
-      await documentTransition.prepare.mock.results[0].value
-
-      expect(deck.slide()).toBe(2)
-      expect(documentTransition.start).toHaveBeenCalled()
-    })
-
-    it('is ignored and applied only navigation if rejected documentTransition API', async () => {
-      const parent = render()
-
-      parent.querySelectorAll('section').forEach((section) => {
-        section.dataset.transition = 'cover-left'
-        section.dataset.transitionBack = 'cover-right'
-      })
-
-      const err = new Error('test')
-      documentTransition.prepare.mockRejectedValue(err)
-      documentTransition.start.mockRejectedValue(err)
-
-      const deck = bespoke()
       deck.next()
+      expect(deck.slide()).toBe(0)
+      await waitAsync()
 
-      await expect(
-        documentTransition.prepare.mock.results[0].value
-      ).rejects.toThrow('test')
+      const css = getTransitionStyle()
+      expect(css).toContain('marp-transition-__builtin__built-in')
+      expect(css).not.toContain('marp-incoming-transition-custom')
 
+      // Re-trigger navigation while prepare phase
+      deck.slide(0)
+      await waitAsync()
+
+      expect(documentTransition.abandon).toHaveBeenCalled()
+      expect(deck.slide()).toBe(1)
+    })
+
+    it('uses internal keyframe instead of specified transition if matched prefers-reduced-motion media query', async () => {
+      jest.spyOn(console, 'warn').mockImplementation()
+      jest
+        .spyOn(MediaQueryList.prototype, 'matches', 'get')
+        .mockReturnValue(true)
+
+      const parent = render()
+
+      parent.querySelectorAll('section').forEach((section) => {
+        section.dataset.transition = JSON.stringify({ name: 'test' })
+      })
+      defineKeyframesMock(['marp-transition-test'])
+
+      // Initialize
+      const deck = await initializeBespoke()
+
+      documentTransition.start.mockImplementationOnce(async (callback) => {
+        callback()
+        await new Promise(() => {
+          /* never resolved to simulate transition */
+        })
+      })
+
+      deck.next()
+      await waitAsync()
+
+      const css = getTransitionStyle()
+      expect(css).not.toContain('marp-transition-test')
+      expect(css).toContain('transition_reduced')
+    })
+
+    it('uses the default custom duration defined in a transition keyframe', async () => {
+      const parent = render()
+
+      // Set transition data
+      parent.querySelectorAll('section').forEach((section) => {
+        section.dataset.transition = JSON.stringify({ name: 'custom' })
+        section.dataset.transitionBack = JSON.stringify({ name: 'custom' })
+      })
+
+      // Set mocked keyframes
+      jest
+        .spyOn(transitionUtils, '_testElementAnimation')
+        .mockImplementation((elm, resolve) => {
+          if (elm.style.animationName === 'marp-incoming-transition-custom') {
+            return resolve({ defaultDuration: '3s' })
+          } else if (
+            elm.style.animationName ===
+            'marp-incoming-transition-backward-custom'
+          ) {
+            return resolve({})
+          }
+          resolve(undefined)
+        })
+
+      // Initialize
+      const deck = await initializeBespoke()
+
+      let resolveTransition: (() => void) | undefined
+
+      documentTransition.start.mockImplementation(async (callback) => {
+        callback()
+        await new Promise<void>((resolve) => {
+          resolveTransition = resolve
+        })
+      })
+
+      try {
+        deck.next()
+        await waitAsync()
+
+        expect(deck.slide()).toBe(1)
+        expect(documentTransition.start).toHaveBeenCalled()
+        expect(getTransitionStyle()).toContain(
+          '--marp-bespoke-transition-animation-duration: 3s;'
+        )
+      } finally {
+        resolveTransition?.()
+      }
+
+      await waitAsync()
+      expect(getTransitionStyle()).toBeNull()
+
+      try {
+        deck.prev()
+        await waitAsync()
+
+        expect(deck.slide()).toBe(0)
+        expect(documentTransition.start).toHaveBeenCalled()
+        expect(getTransitionStyle()).toContain(
+          '--marp-bespoke-transition-animation-duration: 3s;'
+        )
+      } finally {
+        resolveTransition?.()
+      }
+    })
+
+    it('makes page navigate surely even if thrown an error when calling documentTransition.start', async () => {
+      const parent = render()
+
+      // Set transition data
+      parent.querySelectorAll('section').forEach((section) => {
+        section.dataset.transition = JSON.stringify({ name: 'custom' })
+      })
+      defineKeyframesMock(['marp-incoming-transition-custom'])
+
+      // Initialize
+      const deck = await initializeBespoke()
+
+      // Error when calling documentTransition.start
+      documentTransition.start.mockRejectedValueOnce(new Error('test'))
+
+      deck.next()
+      expect(deck.slide()).toBe(0)
+      await waitAsync()
+
+      expect(documentTransition.start).toHaveBeenCalled()
+      expect(deck.slide()).toBe(1)
+
+      deck.slide(0)
+      await waitAsync()
+
+      // Error in callback: Prevent double navigation
+      documentTransition.start.mockImplementationOnce(async (callback) => {
+        callback()
+        throw new Error('ex')
+      })
+
+      deck.next()
+      expect(deck.slide()).toBe(0)
+      await waitAsync()
       expect(deck.slide()).toBe(1)
     })
   })

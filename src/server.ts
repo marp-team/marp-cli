@@ -1,4 +1,4 @@
-/* eslint-disable import/export, @typescript-eslint/no-namespace */
+/* eslint-disable @typescript-eslint/no-namespace */
 import EventEmitter from 'events'
 import fs from 'fs'
 import { Server as HttpServer } from 'http'
@@ -98,6 +98,8 @@ export class Server extends (EventEmitter as new () => TypedEmitter<Server.Event
       if (queryKeys.includes('png')) return ConvertType.png
       if (queryKeys.includes('jpg') || queryKeys.includes('jpeg'))
         return ConvertType.jpeg
+      if (queryKeys.includes('txt') || queryKeys.includes('notes'))
+        return ConvertType.notes
 
       return ConvertType.html
     })()
@@ -241,7 +243,7 @@ export class Server extends (EventEmitter as new () => TypedEmitter<Server.Event
 }
 
 export namespace Server {
-  export interface Events {
+  export type Events = {
     converted: ConvertedCallback
     error: (err: Error) => void
   }

@@ -117,31 +117,45 @@ export const marpCli = async (
           type: 'boolean',
         },
         pdf: {
-          conflicts: ['image', 'images', 'pptx'],
+          conflicts: ['image', 'images', 'pptx', 'notes'],
           describe: 'Convert slide deck into PDF',
           group: OptionGroup.Converter,
           type: 'boolean',
         },
         pptx: {
-          conflicts: ['pdf', 'image', 'images'],
+          conflicts: ['pdf', 'image', 'images', 'notes'],
           describe: 'Convert slide deck into PowerPoint document',
           group: OptionGroup.Converter,
           type: 'boolean',
         },
+        notes: {
+          conflicts: ['image', 'images', 'pptx', 'pdf'],
+          describe: 'Convert slide deck notes into a text file',
+          group: OptionGroup.Converter,
+          type: 'boolean',
+        },
         image: {
-          conflicts: ['pdf', 'images', 'pptx'],
+          conflicts: ['pdf', 'images', 'pptx', 'notes'],
           describe: 'Convert the first slide page into an image file',
           group: OptionGroup.Converter,
           choices: ['png', 'jpeg'],
-          coerce: (type: string) => (type === 'jpg' ? 'jpeg' : type),
+          coerce: (type: string) => {
+            if (type === '') return 'png'
+            if (type === 'jpg') return 'jpeg'
+            return type
+          },
           type: 'string',
         },
         images: {
-          conflicts: ['pdf', 'image', 'pptx'],
+          conflicts: ['pdf', 'image', 'pptx', 'notes'],
           describe: 'Convert slide deck into multiple image files',
           group: OptionGroup.Converter,
           choices: ['png', 'jpeg'],
-          coerce: (type: string) => (type === 'jpg' ? 'jpeg' : type),
+          coerce: (type: string) => {
+            if (type === '') return 'png'
+            if (type === 'jpg') return 'jpeg'
+            return type
+          },
           type: 'string',
         },
         'image-scale': {
@@ -276,7 +290,7 @@ export const marpCli = async (
     const cvtOpts = converter.options
 
     // Find target markdown files
-    const finder = async () => {
+    const finder = async (): Promise<File[]> => {
       if (cvtOpts.inputDir) {
         if (config.files.length > 0) {
           cli.error('Cannot pass files together with input directory.')
@@ -293,8 +307,8 @@ export const marpCli = async (
       const stdin = args.stdin ? await File.stdin() : undefined
 
       // Regular file finding powered by globby
-      return <File[]>(
-        [stdin, ...(await File.find(...config.files))].filter((f) => f)
+      return [stdin, ...(await File.find(...config.files))].filter(
+        (f): f is File => !!f
       )
     }
 

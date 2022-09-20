@@ -2,6 +2,177 @@
 
 ## [Unreleased]
 
+## v2.1.4 - 2022-09-10
+
+### Fixed
+
+- Don't suggest to install Chromium in error message if the current platform cannot resolve Chromium by `chrome-launcher` module ([#475](https://github.com/marp-team/marp-cli/issues/475), [#476](https://github.com/marp-team/marp-cli/pull/476))
+
+### Changed
+
+- Upgrade Marp Core to [v3.3.3](https://github.com/marp-team/marp-core/releases/v3.3.3) ([#474](https://github.com/marp-team/marp-cli/pull/474))
+- Upgrade Marpit to [v2.4.1](https://github.com/marp-team/marpit/releases/tag/v2.4.1) ([#477](https://github.com/marp-team/marp-cli/pull/477))
+- Upgrade Node.js and dependencies ([#473](https://github.com/marp-team/marp-cli/pull/473), [#477](https://github.com/marp-team/marp-cli/pull/477))
+
+## v2.1.3 - 2022-08-17
+
+### Changed
+
+- Re-packaged standalone binaries with no code changes
+
+## v2.1.2 - 2022-08-12
+
+### Changed
+
+- Upgrade Marp Core to [v3.3.2](https://github.com/marp-team/marp-core/releases/v3.3.2) ([#470](https://github.com/marp-team/marp-cli/pull/470))
+
+## v2.1.1 - 2022-08-11
+
+### Added
+
+- Allow enabling [LayoutNG](https://www.chromium.org/blink/layoutng/) while PDF conversion via `CHROME_LAYOUTNG_PRINTING` env ([#469](https://github.com/marp-team/marp-cli/pull/469))
+
+### Changed
+
+- Upgrade Marp Core to [v3.3.1](https://github.com/marp-team/marp-core/releases/v3.3.1) ([#468](https://github.com/marp-team/marp-cli/pull/468))
+
+## v2.1.0 - 2022-08-11
+
+### Added
+
+- macOS: Auto detection of executable path when `CHROME_PATH` env has pointed `.app` directory ([#460](https://github.com/marp-team/marp-cli/issues/460), [#463](https://github.com/marp-team/marp-cli/pull/463))
+
+### Changed
+
+- Docker image: Set `PATH` env to the project directory ([#462](https://github.com/marp-team/marp-cli/pull/462) by [@rhtenhove](https://github.com/rhtenhove))
+- Upgrade Marpit to [v2.4.0](https://github.com/marp-team/marpit/releases/v2.4.0) ([#467](https://github.com/marp-team/marp-cli/pull/467))
+- Upgrade Marp Core to [v3.3.0](https://github.com/marp-team/marp-core/releases/v3.3.0) ([#467](https://github.com/marp-team/marp-cli/pull/467))
+- Upgrade dependent packages to the latest version ([#467](https://github.com/marp-team/marp-cli/pull/467))
+
+## v2.0.4 - 2022-06-08
+
+### Added
+
+- [Experimental transition] Allow setting default duration in custom transition through `--marp-transition-duration` ([#459](https://github.com/marp-team/marp-cli/pull/459))
+
+## v2.0.3 - 2022-06-05
+
+### Changed
+
+- Upgrade Marp Core to [v3.2.1](https://github.com/marp-team/marp-core/releases/tag/v3.2.1) ([#458](https://github.com/marp-team/marp-cli/pull/458))
+- Upgrade dependent packages to the latest version ([#458](https://github.com/marp-team/marp-cli/pull/458))
+
+## v2.0.2 - 2022-06-04
+
+### Added
+
+- [Experimental transition] Parse custom transitions declared in `<style scoped>` ([#456](https://github.com/marp-team/marp-cli/pull/456))
+- [Experimental transition] A basic support of transition with shared elements (just like PowerPoint Morph and Keynote Magic Move) ([#457](https://github.com/marp-team/marp-cli/pull/457))
+
+## v2.0.1 - 2022-06-01
+
+### Fixed
+
+- [Experimental transition] Fix inconsistent transition by backward navigation via presenter view ([#452](https://github.com/marp-team/marp-cli/issues/452), [#455](https://github.com/marp-team/marp-cli/pull/455))
+- Preview mode has unexpected message in the information bar "You are using an unsupported command-line flag" ([#453](https://github.com/marp-team/marp-cli/issues/453), [#454](https://github.com/marp-team/marp-cli/pull/454))
+
+## v2.0.0 - 2022-05-24
+
+### ⚡️ Breaking
+
+- End-of-Lifed Node.js 12 is no longer supported, and required the latest Node.js 14 and later ([#450](https://github.com/marp-team/marp-cli/pull/450))
+- Upgrade Marp Core to [v3.2.0](https://github.com/marp-team/marp-core/releases/tag/v3.2.0) ([#450](https://github.com/marp-team/marp-cli/pull/450))
+  - This is the first version of using v3 core as a bundled engine. [Refer to major changes in Marp Core v3.0.0.](https://github.com/marp-team/marp-core/releases/tag/v3.0.0)
+
+### Changed
+
+- Upgrade Marpit to [v2.3.1](https://github.com/marp-team/marpit/releases/tag/v2.3.1) ([#450](https://github.com/marp-team/marp-cli/pull/450))
+- Updates of experimental transition for bespoke template `--bespoke.transition` ([#447](https://github.com/marp-team/marp-cli/issues/447), [#448](https://github.com/marp-team/marp-cli/pull/448))
+  - More built-in transitions (5 transitions -> 33 transitions)
+  - Define custom transitions by `@keyframes` declaration in CSS
+  - Update spec of `transition` local directive
+  - Opt-out transition animation by preferring `prefers-reduced-motion` media query
+
+### Deprecated
+
+- [Marpit v2.3.0](https://github.com/marp-team/marpit/releases/tag/v2.3.0): Shorthand syntax for setting colors `![](red)` has been deprecated ([#450](https://github.com/marp-team/marp-cli/pull/450))
+
+## v1.7.2 - 2022-04-24
+
+### Changed
+
+- Upgrade Marp Core to [v2.4.2](https://github.com/marp-team/marp-core/releases/tag/v2.4.2) ([#446](https://github.com/marp-team/marp-cli/pull/446))
+  - Make compatible with a patched markdown-it-emoji ([#445](https://github.com/marp-team/marp-cli/pull/445))
+- Upgrade dependent packages to the latest version ([#446](https://github.com/marp-team/marp-cli/pull/446))
+
+## v1.7.1 - 2022-04-12
+
+### Fixed
+
+- Cannot output the conversion result into the drive root ([#442](https://github.com/marp-team/marp-cli/issues/442), [#443](https://github.com/marp-team/marp-cli/pull/443))
+
+### Changed
+
+- Upgrade Marpit to [v2.2.4](https://github.com/marp-team/marpit/releases/tag/v2.2.4) ([#441](https://github.com/marp-team/marp-cli/pull/441))
+  - Fixed: Scoped style does not style pseudo elements `section::before` and `section::after` in advanced background
+- Upgrade Marp Core to [v2.4.1](https://github.com/marp-team/marp-core/releases/tag/v2.4.1) ([#441](https://github.com/marp-team/marp-cli/pull/441))
+  - Added Unicode 14.0 emoji support ([Marp Core v2.4.0](https://github.com/marp-team/marp-core/releases/tag/v2.4.0) / [#438](https://github.com/marp-team/marp-cli/pull/438))
+- Bump Node LTS, and improve CI settings ([#437](https://github.com/marp-team/marp-cli/pull/437))
+- Upgrade dependent packages to the latest version ([#441](https://github.com/marp-team/marp-cli/pull/441))
+
+## v1.7.0 - 2022-02-23
+
+### Added
+
+- `--notes` option to export presenter notes as text file ([#278](https://github.com/marp-team/marp-cli/issues/278), [#429](https://github.com/marp-team/marp-cli/pull/429) by [@chrisns](https://github.com/chrisns), [#432](https://github.com/marp-team/marp-cli/pull/432))
+- Timer for the presenter view of bespoke template ([#314](https://github.com/marp-team/marp-cli/issues/314), [#430](https://github.com/marp-team/marp-cli/pull/430) by [@chrisns](https://github.com/chrisns))
+- The draggable splitter in the presenter view of bespoke template ([#427](https://github.com/marp-team/marp-cli/pull/427) by [@chrisns](https://github.com/chrisns), [#433](https://github.com/marp-team/marp-cli/pull/433))
+- Make notes font size changeable in bespoke template ([#428](https://github.com/marp-team/marp-cli/pull/428) by [@chrisns](https://github.com/chrisns), [#431](https://github.com/marp-team/marp-cli/pull/431))
+
+### Changed
+
+- Upgrade Node and dependent packages to the latest version ([#434](https://github.com/marp-team/marp-cli/pull/434))
+
+## v1.6.0 - 2022-02-12
+
+### Added
+
+- Experimental `transition` directive for bespoke template is now configurable by YAML object ([#382](https://github.com/marp-team/marp-cli/issues/382), [#425](https://github.com/marp-team/marp-cli/pull/425))
+
+### Fixed
+
+- Disable automation flag in preview window ([#421](https://github.com/marp-team/marp-cli/pull/421))
+
+### Changed
+
+- Upgrade dependent packages to the latest version ([#422](https://github.com/marp-team/marp-cli/pull/422), [#426](https://github.com/marp-team/marp-cli/pull/426))
+
+## v1.5.2 - 2022-01-23
+
+### Changed
+
+- Upgrade Marpit to [v2.2.2](https://github.com/marp-team/marpit/releases/tag/v2.2.2) ([#418](https://github.com/marp-team/marp-cli/pull/418))
+- Upgrade Marp Core to [v2.3.2](https://github.com/marp-team/marp-core/releases/tag/v2.3.2) ([#418](https://github.com/marp-team/marp-cli/pull/418))
+- Upgrade dependent packages to the latest version ([#418](https://github.com/marp-team/marp-cli/pull/418))
+
+## v1.5.1 - 2022-01-16
+
+### Added
+
+- Allow to set timeout for Puppeteer actions by `PUPPETEER_TIMEOUT` env ([#409](https://github.com/marp-team/marp-cli/pull/409))
+
+### Fixed
+
+- Improved WSL 2 detection and browser resolution ([#410](https://github.com/marp-team/marp-cli/pull/410))
+- Update Dockerfile to install required dependency `wayland-dev@edge` ([#411](https://github.com/marp-team/marp-cli/issues/411), [#415](https://github.com/marp-team/marp-cli/pull/415))
+
+### Changed
+
+- Upgrade Marpit to [v2.2.1](https://github.com/marp-team/marpit/releases/tag/v2.2.1) ([#408](https://github.com/marp-team/marp-cli/pull/408))
+- Upgrade Marp Core to [v2.3.1](https://github.com/marp-team/marp-core/releases/tag/v2.3.1) ([#408](https://github.com/marp-team/marp-cli/pull/408))
+- Upgrade dependent packages to the latest version ([#408](https://github.com/marp-team/marp-cli/pull/408))
+- Set `png` as the default type for CLI image options ([#416](https://github.com/marp-team/marp-cli/pull/416))
+
 ## v1.5.0-4 - 2021-11-27
 
 ### Changed

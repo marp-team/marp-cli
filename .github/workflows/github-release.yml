@@ -5,6 +5,9 @@ on:
     tags:
       - v*
 
+  # For debugging standalone packages
+  workflow_dispatch:
+
 env:
   YARN_VERSION: '^1.22.17'
 
@@ -12,11 +15,14 @@ jobs:
   github-release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+        if: github.event_name == 'push'
+
       - uses: marp-team/actions@v1
         with:
           task: release
           token: ${{ secrets.GITHUB_TOKEN }}
+        if: github.event_name == 'push'
 
   upload-standalone-binary:
     needs: github-release
@@ -31,14 +37,11 @@ jobs:
           - macOS-latest
 
     steps:
-      - uses: actions/checkout@v2
-      - name: Detect Node version from .nvmrc
-        id: node_version
-        run: echo "::set-output name=nvmrc::$(cat .nvmrc)"
+      - uses: actions/checkout@v3
       - name: Use Node.js
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
-          node-version: ${{ steps.node_version.outputs.nvmrc }}
+          node-version-file: '.nvmrc'
       - name: Install yarn
         run: cd $HOME && yarn policies set-version $YARN_VERSION
       - run: yarn install --frozen-lockfile
@@ -48,12 +51,13 @@ jobs:
         run: yarn standalone:pack
         env:
           MATRIX_OS: ${{ matrix.os }}
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: assets
           path: dist
       - name: Upload created asset to GitHub Release
         uses: marp-team/actions@v1
+        if: github.event_name == 'push'
         with:
           task: upload
           token: ${{ secrets.GITHUB_TOKEN }}

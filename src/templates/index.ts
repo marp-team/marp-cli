@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import { Element, Marpit, Options, RenderResult } from '@marp-team/marpit'
-import transitionPlugin from '../engine/transition-plugin'
+import transitionPlugin, { EngineTransition } from '../engine/transition-plugin'
 import barePug from './bare/bare.pug'
 import bareScss from './bare/bare.scss'
 import bespokePug from './bespoke/bespoke.pug'
@@ -11,6 +11,7 @@ type RendererResult = RenderResult &
   TemplateMeta & {
     length: number
     size: RenderedSize
+    transition?: EngineTransition
   }
 
 interface TemplateRendererOptions extends Options {
@@ -107,6 +108,7 @@ export const bespoke: Template<TemplateBespokeOption> = async (opts) => {
         js: await libJs('bespoke.js'),
         osc: opts.osc ?? true,
         progress: opts.progress,
+        transitionStyle: rendered.transition?.builtinTransitionStyle,
       },
       watchJs: await watchJs(opts.notifyWS),
     }),

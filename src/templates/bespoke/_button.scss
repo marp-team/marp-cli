@@ -69,4 +69,12 @@
   %button-presenter {
     @include button-icon-internal('../../assets/osc-presenter.svg');
   }
+
+  %button-plus {
+    @include button-icon-internal('../../assets/plus.svg');
+  }
+
+  %button-minus {
+    @include button-icon-internal('../../assets/minus.svg');
+  }
 }

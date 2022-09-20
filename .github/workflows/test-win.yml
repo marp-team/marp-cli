@@ -4,8 +4,12 @@ on:
   - pull_request
   - push
 
+# concurrency:
+#   group: ${{ github.workflow }}-${{ (github.ref_name == 'main' && github.run_id) || format('{0}-{1}', github.actor, github.head_ref || github.ref_name) }}
+#   cancel-in-progress: true
+
 env:
-  YARN_VERSION: '^1.22.17'
+  YARN_VERSION: '^1.22.19'
 
 jobs:
   win-test:
@@ -15,15 +19,17 @@ jobs:
       fail-fast: false
       matrix:
         node-version:
-          - '^12.22.7'
           - '^14.18.1'
-          - '16.13.0'
+          - '16.16.0'
 
     steps:
-      - uses: actions/checkout@v2
+      # - name: Output concurrency group
+      #   run: echo "${{ github.workflow }}-${{ (github.ref_name == 'main' && github.run_id) || format('{0}-{1}', github.actor, github.head_ref || github.ref_name) }}"
+
+      - uses: actions/checkout@v3
 
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
 
@@ -34,7 +40,7 @@ jobs:
           echo "::set-output name=cache_dir::$(yarn cache dir)"
 
       - name: Cache yarn
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ${{ steps.yarn.outputs.cache_dir }}
           key: yarn_cache-${{ runner.os }}-${{ matrix.node-version }}-${{ hashFiles('**/yarn.lock') }}
@@ -49,13 +55,13 @@ jobs:
       # https://stackoverflow.com/a/59365905
       - name: Jest
         run: >-
-          yarn test:coverage --ci -i --reporters=default --reporters=jest-junit ||
-          yarn test:coverage --ci -i --reporters=default --reporters=jest-junit --no-cache ||
-          yarn test:coverage --ci -i --reporters=default --reporters=jest-junit --no-cache
+          yarn test:coverage --ci -i --reporters=default --reporters=jest-junit --forceExit ||
+          yarn test:coverage --ci -i --reporters=default --reporters=jest-junit --forceExit --no-cache ||
+          yarn test:coverage --ci -i --reporters=default --reporters=jest-junit --forceExit --no-cache
         env:
           CI: true
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: coverage
           path: coverage
@@ -64,3 +70,4 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: windows
+          version: v0.1.15

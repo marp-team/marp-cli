@@ -1,0 +1,34 @@
+@keyframes marp-outgoing-transition-__builtin__rotate {
+  from {
+    z-index: 1;
+    transform: perspective(100vw) translateZ(-40vw) rotateY(0deg)
+      translateZ(40vw);
+    animation-timing-function: ease-in-out;
+  }
+
+  to {
+    z-index: 0;
+    transform: perspective(100vw) translateZ(-40vw)
+      rotateY(calc(var(--marp-transition-direction, 1) * -180deg))
+      translateZ(40vw)
+      rotateY(calc(var(--marp-transition-direction, 1) * 180deg));
+    opacity: 0;
+  }
+}
+@keyframes marp-incoming-transition-__builtin__rotate {
+  from {
+    opacity: 0;
+    z-index: 0;
+    transform: perspective(100vw) translateZ(-40vw)
+      rotateY(calc(var(--marp-transition-direction, 1) * 180deg))
+      translateZ(40vw)
+      rotateY(calc(var(--marp-transition-direction, 1) * -180deg));
+    animation-timing-function: ease-in-out;
+  }
+
+  to {
+    z-index: 1;
+    transform: perspective(100vw) translateZ(-40vw) rotateY(0deg)
+      translateZ(40vw);
+  }
+}

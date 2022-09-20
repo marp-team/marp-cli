@@ -33,15 +33,23 @@ export const resolveWindowsEnvSync = (key: string): string | undefined => {
 export const isWSL = (): number => {
   if (isWsl === undefined) {
     if (require('is-wsl')) {
-      isWsl = 1
+      // Detect whether WSL version is 2
+      // https://github.com/microsoft/WSL/issues/4555#issuecomment-700213318
+      const isWSL2 = (() => {
+        if (process.env.WSL_DISTRO_NAME && process.env.WSL_INTEROP) return true
 
-      try {
-        // https://github.com/microsoft/WSL/issues/423#issuecomment-611086412
-        const release = readFileSync('/proc/sys/kernel/osrelease').toString()
-        if (release.includes('WSL2')) isWsl = 2
-      } catch (e: unknown) {
-        // no ops
-      }
+        try {
+          const verStr = readFileSync('/proc/version', 'utf8').toLowerCase()
+          if (verStr.includes('microsoft-standard-wsl2')) return true
+
+          const gccMatched = verStr.match(/gcc[^,]+?(\d+)\.\d+\.\d+/)
+          if (gccMatched && Number.parseInt(gccMatched[1], 10) >= 8) return true
+        } catch (e: unknown) {
+          // no ops
+        }
+      })()
+
+      isWsl = isWSL2 ? 2 : 1
     } else {
       isWsl = 0
     }

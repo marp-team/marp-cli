@@ -1,0 +1,89 @@
+/* stylelint-disable keyframes-name-pattern */
+@keyframes __bespoke_marp_transition_reduced_outgoing__ {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes __bespoke_marp_transition_reduced_incoming__ {
+  0% {
+    opacity: 0;
+    mix-blend-mode: plus-lighter;
+  }
+
+  100% {
+    opacity: 1;
+    mix-blend-mode: plus-lighter;
+  }
+}
+/* stylelint-enable keyframes-name-pattern */
+
+@mixin transition {
+  @at-root {
+    ::page-transition-container(*) {
+      animation-duration: var(
+        --marp-bespoke-transition-animation-duration,
+        0.5s
+      );
+      animation-timing-function: ease;
+    }
+
+    ::page-transition-outgoing-image(*),
+    ::page-transition-incoming-image(*) {
+      animation-name: var(
+        --marp-bespoke-transition-animation-name,
+        var(
+          --marp-bespoke-transition-animation-name-fallback,
+          __bespoke_marp_transition_no_animation__
+        )
+      );
+      animation-duration: var(
+        --marp-bespoke-transition-animation-duration,
+        0.5s
+      );
+      animation-delay: 0s;
+      animation-fill-mode: both;
+      animation-direction: var(
+        --marp-bespoke-transition-animation-direction,
+        normal
+      );
+      mix-blend-mode: normal;
+    }
+
+    ::page-transition-outgoing-image(*) {
+      --marp-bespoke-transition-animation-name-fallback: __bespoke_marp_transition_reduced_outgoing__;
+
+      animation-timing-function: ease;
+    }
+
+    ::page-transition-incoming-image(*) {
+      --marp-bespoke-transition-animation-name-fallback: __bespoke_marp_transition_reduced_incoming__;
+
+      animation-timing-function: ease;
+    }
+
+    ::page-transition-outgoing-image(root),
+    ::page-transition-incoming-image(root) {
+      animation-timing-function: linear;
+    }
+
+    ::page-transition-outgoing-image(__bespoke_marp_transition_osc__),
+    ::page-transition-incoming-image(__bespoke_marp_transition_osc__) {
+      animation-name: __bespoke_marp_transition_osc__ !important; /* no animation */
+      animation-duration: 0s !important;
+    }
+
+    ::page-transition-incoming-image(__bespoke_marp_transition_osc__) {
+      opacity: 0 !important;
+    }
+
+    .bespoke-marp-transition-warming-up::page-transition-container(*),
+    .bespoke-marp-transition-warming-up::page-transition-incoming-image(*),
+    .bespoke-marp-transition-warming-up::page-transition-outgoing-image(*) {
+      animation-play-state: paused !important;
+    }
+  }
+}

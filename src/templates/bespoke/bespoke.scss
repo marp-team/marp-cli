@@ -1,4 +1,5 @@
 @use './button';
+@use './transition';
 
 $progress-height: 5px;
 
@@ -10,6 +11,8 @@ $progress-height: 5px;
 }
 
 @media screen {
+  @include transition.transition;
+
   html,
   body {
     height: 100%;
@@ -29,6 +32,13 @@ $progress-height: 5px;
     /* Fallback */
     pointer-events: none;
     opacity: 0;
+
+    &:not(.bespoke-marp-active) {
+      * {
+        /* Unset page-transition-tag in inactive pages because it must be unique for a document */
+        page-transition-tag: none !important;
+      }
+    }
 
     &.bespoke-marp-active {
       content-visibility: visible;
@@ -53,6 +63,13 @@ $progress-height: 5px;
         &.bespoke-marp-active {
           display: block;
         }
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        /* Disable shared element transition declared by users */
+        page-transition-tag: none !important;
       }
     }
   }
@@ -94,6 +111,9 @@ $progress-height: 5px;
 
         /* Hack for Chrome to show OSC overlay onto video correctly */
         will-change: transform;
+
+        /* Page transition API */
+        page-transition-tag: __bespoke_marp_transition_osc__;
 
         > * {
           margin-left: 6px;
@@ -195,10 +215,12 @@ $progress-height: 5px;
       // Grid layout for presenter view
       display: grid;
       grid-template:
-        'current next' minmax(140px, 1fr)
-        'current note' 2fr
-        'info    note' 3em /
-        2fr 1fr;
+        'current dragbar next' minmax(140px, 1fr)
+        'current dragbar note' 2fr
+        'info    dragbar note' 3em;
+      grid-template-columns:
+        minmax(3px, var(--bespoke-marp-presenter-split-ratio, 66%))
+        0 minmax(3px, 1fr);
 
       .bespoke-marp-parent {
         grid-area: current;
@@ -217,6 +239,28 @@ $progress-height: 5px;
           &.bespoke-marp-active {
             filter: drop-shadow(0 3px 10px rgba(#000, 0.5));
           }
+        }
+      }
+
+      // Dragbar
+      .bespoke-marp-presenter-dragbar-container {
+        grid-area: dragbar;
+        background: #0288d1; // Marp brand color
+        cursor: col-resize;
+        width: 6px;
+        margin-left: -3px;
+        position: relative;
+        z-index: 10;
+        opacity: 0;
+        transition: opacity 0.4s linear 0.1s;
+
+        &:hover {
+          opacity: 1;
+        }
+
+        &.active {
+          opacity: 1;
+          transition-delay: 0s;
         }
       }
 
@@ -252,14 +296,61 @@ $progress-height: 5px;
       .bespoke-marp-presenter-note-container {
         background: #222;
         color: $text-color;
+        position: relative;
         grid-area: note;
+        z-index: 1;
+
+        button {
+          @extend %button;
+          @include button.button-size(1.5em);
+
+          &.bespoke-marp-presenter-note-bigger {
+            @extend %button-plus;
+          }
+
+          &.bespoke-marp-presenter-note-smaller {
+            @extend %button-minus;
+          }
+        }
+
+        .bespoke-marp-presenter-note-wrapper {
+          bottom: 0;
+          display: block;
+          left: 0;
+          position: absolute;
+          right: 0;
+          top: 0;
+        }
+
+        .bespoke-marp-presenter-note-buttons {
+          background: rgba(#000, 0.65);
+          border-radius: 4px;
+          bottom: 0;
+          display: flex;
+          gap: 4px;
+          margin: 12px;
+          opacity: 0;
+          padding: 6px;
+          pointer-events: none;
+          position: absolute;
+          right: 0;
+          transition: opacity 0.2s linear;
+        }
+
+        &:hover .bespoke-marp-presenter-note-buttons,
+        .bespoke-marp-presenter-note-buttons:focus-within,
+        .bespoke-marp-presenter-note-wrapper:focus-within
+          + .bespoke-marp-presenter-note-buttons {
+          opacity: 1;
+          pointer-events: auto;
+        }
 
         .bespoke-marp-note {
           margin: 20px;
           width: calc(100% - 40px);
           height: calc(100% - 40px);
           box-sizing: border-box;
-          font-size: 1.1em;
+          font-size: calc(1.1em * var(--bespoke-marp-note-font-scale, 1));
           overflow: auto;
           padding-right: 3px;
           white-space: pre-wrap;
@@ -312,6 +403,7 @@ $progress-height: 5px;
         flex-wrap: nowrap;
         grid-area: info;
         justify-content: center;
+        overflow: hidden;
         padding: 0 10px;
 
         %info-element {
@@ -362,6 +454,10 @@ $progress-height: 5px;
           color: #999;
           order: 3;
           text-align: right;
+
+          &:hover {
+            cursor: pointer;
+          }
         }
       }
     }

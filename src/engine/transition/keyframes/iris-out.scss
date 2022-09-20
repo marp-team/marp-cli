@@ -1,0 +1,26 @@
+@use './utils';
+
+@keyframes marp-outgoing-transition-__builtin__iris-out {
+  from {
+    clip-path: circle(75vmax);
+  }
+
+  to {
+    clip-path: circle(0);
+  }
+}
+@keyframes marp-incoming-transition-__builtin__iris-out {
+  @include utils.send-backward;
+}
+
+@keyframes marp-incoming-transition-backward-__builtin__iris-out {
+  from {
+    clip-path: circle(0);
+  }
+
+  to {
+    clip-path: circle(75vmax);
+  }
+}
+@keyframes marp-outgoing-transition-backward-__builtin__iris-out {
+}

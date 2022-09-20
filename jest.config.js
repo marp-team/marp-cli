@@ -8,6 +8,7 @@ const esModules = [
   'globby',
   'is-docker',
   'locate-path',
+  'nanoid',
   'os-locale',
   'p-limit',
   'p-locate',

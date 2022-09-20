@@ -31,11 +31,42 @@ beforeEach(() => jest.resetModules())
 afterEach(() => jest.restoreAllMocks())
 
 describe('#generatePuppeteerDataDirPath', () => {
-  it('returns data dir path for OS specific temporary directory', async () => {
+  let mkdirSpy: jest.SpyInstance
+
+  beforeEach(async () => {
+    const { promises } = await import('fs')
+
+    mkdirSpy = jest.spyOn(promises, 'mkdir')
+    mkdirSpy.mockImplementation(() => Promise.resolve(undefined))
+  })
+
+  it('returns the path of created data dir for OS specific temporary directory', async () => {
     const dataDir = await puppeteerUtils().generatePuppeteerDataDirPath(
       'tmp-name'
     )
-    expect(dataDir).toBe(path.resolve(os.tmpdir(), 'tmp-name'))
+    const expectedDir = path.resolve(os.tmpdir(), 'tmp-name')
+
+    expect(dataDir).toBe(expectedDir)
+    expect(mkdirSpy).toHaveBeenCalledWith(expectedDir, { recursive: true })
+  })
+
+  it('ignores EEXIST error thrown by mkdir', async () => {
+    // EEXIST error
+    mkdirSpy.mockRejectedValueOnce(
+      Object.assign(new Error('EEXIST'), { code: 'EEXIST' })
+    )
+
+    await expect(
+      puppeteerUtils().generatePuppeteerDataDirPath('tmp-name')
+    ).resolves.toStrictEqual(expect.any(String))
+
+    // Regular error
+    const err = new Error('Regular error')
+    mkdirSpy.mockRejectedValueOnce(err)
+
+    await expect(
+      puppeteerUtils().generatePuppeteerDataDirPath('tmp-name')
+    ).rejects.toBe(err)
   })
 
   describe('with wslPath option', () => {
@@ -66,32 +97,32 @@ describe('#generatePuppeteerDataDirPath', () => {
 })
 
 describe('#generatePuppeteerLaunchArgs', () => {
-  it('finds out installed Chrome through chrome finder', () => {
+  it('finds out installed Chrome through chrome finder', async () => {
     const getFirstInstallation = jest
       .spyOn(chromeFinder(), 'findChromeInstallation')
-      .mockImplementation(() => '/usr/bin/chromium')
+      .mockResolvedValue('/usr/bin/chromium')
 
-    const args = puppeteerUtils().generatePuppeteerLaunchArgs()
+    const args = await puppeteerUtils().generatePuppeteerLaunchArgs()
     expect(args.executablePath).toBe('/usr/bin/chromium')
     expect(getFirstInstallation).toHaveBeenCalledTimes(1)
 
     // Cache found result
-    puppeteerUtils().generatePuppeteerLaunchArgs()
+    await puppeteerUtils().generatePuppeteerLaunchArgs()
     expect(getFirstInstallation).toHaveBeenCalledTimes(1)
   })
 
-  it('finds out installed Edge as the fallback if not found Chrome', () => {
+  it('finds out installed Edge as the fallback if not found Chrome', async () => {
     jest.spyOn(chromeFinder(), 'findChromeInstallation').mockImplementation()
     jest
       .spyOn(edgeFinder(), 'findEdgeInstallation')
       .mockImplementation(() => '/usr/bin/msedge')
 
-    const args = puppeteerUtils().generatePuppeteerLaunchArgs()
+    const args = await puppeteerUtils().generatePuppeteerLaunchArgs()
     expect(args.executablePath).toBe('/usr/bin/msedge')
     expect(edgeFinder().findEdgeInstallation).toHaveBeenCalledTimes(1)
   })
 
-  it('throws CLIError with specific error code if not found executable path', () => {
+  it('throws CLIError with specific error code if not found executable path', async () => {
     const warn = jest.spyOn(console, 'warn').mockImplementation()
 
     jest
@@ -101,50 +132,119 @@ describe('#generatePuppeteerLaunchArgs', () => {
       })
     jest.spyOn(edgeFinder(), 'findEdgeInstallation').mockImplementation()
 
-    expect(puppeteerUtils().generatePuppeteerLaunchArgs).toThrow(
-      new (CLIError())(
-        'You have to install Google Chrome, Chromium, or Microsoft Edge to convert slide deck with current options.',
-        CLIErrorCode.NOT_FOUND_CHROMIUM
-      )
+    await expect(puppeteerUtils().generatePuppeteerLaunchArgs).rejects.toThrow(
+      'You have to install Google Chrome'
     )
     expect(warn).toHaveBeenCalledWith(
       expect.stringContaining('Error in chrome finder')
     )
   })
 
-  it('uses custom executable path if CHROME_PATH environment value was defined as executable path', () => {
+  it('uses custom executable path if CHROME_PATH environment value was defined as executable path', async () => {
     jest.dontMock('../../src/utils/chrome-finder')
 
     try {
       process.env.CHROME_PATH = path.resolve(__dirname, '../../marp-cli.js')
 
-      const args = puppeteerUtils().generatePuppeteerLaunchArgs()
+      const args = await puppeteerUtils().generatePuppeteerLaunchArgs()
       expect(args.executablePath).toBe(process.env.CHROME_PATH)
     } finally {
       delete process.env.CHROME_PATH
     }
   })
 
-  it('uses specific settings if running within a Docker container', () => {
+  it('uses specific settings if running within a Docker container', async () => {
     jest.spyOn(docker(), 'isDocker').mockImplementation(() => true)
     jest
       .spyOn(chromeFinder(), 'findChromeInstallation')
-      .mockImplementation(() => '/usr/bin/chromium')
+      .mockResolvedValue('/usr/bin/chromium')
 
-    const args = puppeteerUtils().generatePuppeteerLaunchArgs()
+    const args = await puppeteerUtils().generatePuppeteerLaunchArgs()
     expect(args.args).toContain('--no-sandbox')
     expect(args.args).toContain('--disable-features=VizDisplayCompositor')
   })
 
-  it("ignores puppeteer's --disable-extensions option if defined CHROME_ENABLE_EXTENSIONS environment value", () => {
+  it("ignores puppeteer's --disable-extensions option if defined CHROME_ENABLE_EXTENSIONS environment value", async () => {
     try {
       process.env.CHROME_ENABLE_EXTENSIONS = 'true'
 
-      const args = puppeteerUtils().generatePuppeteerLaunchArgs()
+      const args = await puppeteerUtils().generatePuppeteerLaunchArgs()
       expect(args.ignoreDefaultArgs).toContain('--disable-extensions')
     } finally {
       delete process.env.CHROME_ENABLE_EXTENSIONS
     }
+  })
+
+  it('enables LayoutNGPrinting and LayoutNGTableFragmentation if defined CHROME_LAYOUTNG_PRINTING environment value', async () => {
+    try {
+      process.env.CHROME_LAYOUTNG_PRINTING = '1'
+
+      const args = await puppeteerUtils().generatePuppeteerLaunchArgs()
+      expect(args.args).toContain(
+        '--enable-blink-features=LayoutNGPrinting,LayoutNGTableFragmentation'
+      )
+    } finally {
+      delete process.env.CHROME_LAYOUTNG_PRINTING
+    }
+  })
+
+  describe('with CHROME_PATH env in macOS', () => {
+    let originalPlatform: string | undefined
+
+    beforeEach(() => {
+      originalPlatform = process.platform
+      Object.defineProperty(process, 'platform', { value: 'darwin' })
+
+      jest.dontMock('../../src/utils/chrome-finder')
+
+      // Set Edge fallback as a sentinel
+      jest
+        .spyOn(edgeFinder(), 'findEdgeInstallation')
+        .mockImplementation(() => '/usr/bin/msedge')
+    })
+
+    afterEach(() => {
+      if (originalPlatform !== undefined) {
+        Object.defineProperty(process, 'platform', { value: originalPlatform })
+      }
+      originalPlatform = undefined
+
+      delete process.env.CHROME_PATH
+    })
+
+    it('does not apply custom path if CHROME_PATH was undefined', async () => {
+      process.env.CHROME_PATH = undefined
+
+      const args = await puppeteerUtils().generatePuppeteerLaunchArgs()
+      expect(args.executablePath).toBeTruthy()
+    })
+
+    it('tries to resolve the executable binary if CHROME_PATH was pointed to valid app bundle', async () => {
+      const validAppPath = path.resolve(__dirname, './_mac_bundles/Valid.app')
+      const validAppExecutable = path.resolve(
+        __dirname,
+        './_mac_bundles/Valid.app/Contents/MacOS/Valid app'
+      )
+
+      process.env.CHROME_PATH = validAppPath
+
+      const args = await puppeteerUtils().generatePuppeteerLaunchArgs()
+      expect(args.executablePath).toBe(validAppExecutable)
+      expect(process.env.CHROME_PATH).toBe(validAppPath)
+    })
+
+    it('fallbacks to an original custom path if CHROME_PATH was pointed to invalid app bundle', async () => {
+      const invalidAppPath = path.resolve(
+        __dirname,
+        './_mac_bundles/Invalid.app'
+      )
+
+      process.env.CHROME_PATH = invalidAppPath
+
+      const args = await puppeteerUtils().generatePuppeteerLaunchArgs()
+      expect(args.executablePath).toBe(invalidAppPath)
+      expect(process.env.CHROME_PATH).toBe(invalidAppPath)
+    })
   })
 })
 

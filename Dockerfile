@@ -1,4 +1,4 @@
-FROM node:16.13.0-alpine
+FROM node:16.16.0-alpine
 LABEL maintainer "Marp team"
 
 RUN apk update && apk upgrade && \
@@ -17,6 +17,7 @@ RUN apk update && apk upgrade && \
       font-noto-arabic@edge \
       font-noto-bengali@edge \
       nss@edge \
+      wayland-dev@edge \
       su-exec
 
 RUN addgroup -S marp && adduser -S -g marp marp \
@@ -34,7 +35,8 @@ RUN yarn install --production --frozen-lockfile && yarn cache clean && node marp
 # Setup workspace for user
 USER root
 ENV MARP_USER marp:marp
+ENV PATH $PATH:/home/marp/.cli
 
 WORKDIR /home/marp/app
-ENTRYPOINT ["/home/marp/.cli/docker-entrypoint"]
+ENTRYPOINT ["docker-entrypoint"]
 CMD ["--help"]

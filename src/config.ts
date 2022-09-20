@@ -35,6 +35,7 @@ interface IMarpCLIArguments {
   inputDir?: string
   jpegQuality?: number
   keywords?: string
+  notes?: boolean
   ogImage?: string
   output?: string | false
   pdf?: boolean
@@ -131,7 +132,7 @@ export class MarpCLIConfig {
               (preview
                 ? ''
                 : `Recommend to use with ${chalk.yellow`--preview`} option for trying transitions. `) +
-              `Track the latest information at ${chalk.blueBright`https://github.com/marp-team/marp-cli/issues/382`}.`
+              `Track the latest information at ${chalk.blueBright`https://github.com/marp-team/marp-cli/issues/447`}.`
           )
         }
 
@@ -171,6 +172,7 @@ export class MarpCLIConfig {
       // CLI options
       if (this.args.pdf || this.conf.pdf) return ConvertType.pdf
       if (this.args.pptx || this.conf.pptx) return ConvertType.pptx
+      if (this.args.notes || this.conf.notes) return ConvertType.notes
 
       const image =
         this.args.images ||
@@ -190,6 +192,7 @@ export class MarpCLIConfig {
       if (lowerOutput.endsWith('.pptx')) return ConvertType.pptx
       if (lowerOutput.endsWith('.jpg') || lowerOutput.endsWith('.jpeg'))
         return ConvertType.jpeg
+      if (lowerOutput.endsWith('.txt')) return ConvertType.notes
 
       // Prefer PDF than HTML if enabled presenter notes for PDF
       if (this.args.pdfNotes || this.conf.pdfNotes) return ConvertType.pdf
@@ -216,11 +219,20 @@ export class MarpCLIConfig {
       return scale
     })()
 
+    const puppeteerTimeout = (() => {
+      if (process.env['PUPPETEER_TIMEOUT']) {
+        const envTimeout = Number.parseInt(process.env['PUPPETEER_TIMEOUT'], 10)
+        if (!Number.isNaN(envTimeout)) return envTimeout
+      }
+      return undefined
+    })()
+
     return {
       imageScale,
       inputDir,
       output,
       preview,
+      puppeteerTimeout,
       server,
       template,
       templateOption,

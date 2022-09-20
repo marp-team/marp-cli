@@ -82,7 +82,23 @@ describe('#resolveWindowsEnvSync', () => {
 })
 
 describe('#isWSL', () => {
-  afterEach(() => jest.dontMock('is-wsl'))
+  let originalWSLDistroName: string | undefined
+  let originalWSLInterop: string | undefined
+
+  beforeEach(() => {
+    originalWSLDistroName = process.env.WSL_DISTRO_NAME
+    originalWSLInterop = process.env.WSL_INTEROP
+
+    process.env.WSL_DISTRO_NAME = ''
+    process.env.WSL_INTEROP = ''
+  })
+
+  afterEach(() => {
+    process.env.WSL_DISTRO_NAME = originalWSLDistroName
+    process.env.WSL_INTEROP = originalWSLInterop
+
+    jest.dontMock('is-wsl')
+  })
 
   it('returns 0 if is-wsl module returned false', () => {
     jest.doMock('is-wsl', () => false)
@@ -94,7 +110,9 @@ describe('#isWSL', () => {
 
     const readFileSync = jest
       .spyOn(fs, 'readFileSync')
-      .mockImplementation(() => '4.19.128-microsoft-standard')
+      .mockImplementation(
+        () => 'Linux version 4.5.6-12345-Microsoft (gcc version 5.4.0 (GCC) )'
+      )
 
     expect(wsl().isWSL()).toBe(1)
     expect(readFileSync).toHaveBeenCalledTimes(1)
@@ -104,15 +122,55 @@ describe('#isWSL', () => {
     expect(readFileSync).toHaveBeenCalledTimes(1)
   })
 
-  it('returns 2 if running on WSL 2', () => {
+  it('returns 2 if running on WSL 2 (Fast check by environment values)', () => {
     jest.doMock('is-wsl', () => true)
 
-    // https://github.com/microsoft/WSL/issues/423#issuecomment-611086412
-    jest
-      .spyOn(fs, 'readFileSync')
-      .mockImplementation(() => '4.19.128-microsoft-WSL2-standard')
+    const readFileSync = jest.spyOn(fs, 'readFileSync')
+
+    // WSL 2 has WSL_DISTRO_NAME and WSL_INTEROP
+    process.env.WSL_DISTRO_NAME = 'Ubuntu'
+    process.env.WSL_INTEROP = '/run/WSL/11_interop'
 
     expect(wsl().isWSL()).toBe(2)
+    expect(readFileSync).not.toHaveBeenCalled()
+  })
+
+  it('returns 2 if running on WSL 2 (Check WSL2 annotation in /proc/version string)', () => {
+    jest.doMock('is-wsl', () => true)
+
+    const readFileSync = jest
+      .spyOn(fs, 'readFileSync')
+      .mockImplementation(() => 'Linux version 4.5.6-Microsoft-Standard-WSL2')
+
+    expect(wsl().isWSL()).toBe(2)
+    expect(readFileSync).toHaveBeenCalledTimes(1)
+  })
+
+  it('returns 2 if running on WSL 2 (Check gcc version in /proc/version string)', () => {
+    jest.doMock('is-wsl', () => true)
+
+    const readFileSync = jest
+      .spyOn(fs, 'readFileSync')
+      .mockImplementation(
+        () => 'Linux version 4.5.6-12345-Microsoft (gcc version 8.4.0 (GCC) )'
+      )
+
+    expect(wsl().isWSL()).toBe(2)
+    expect(readFileSync).toHaveBeenCalledTimes(1)
+  })
+
+  it('returns 2 if running on WSL 2 (The latest format of /proc/version string)', () => {
+    jest.doMock('is-wsl', () => true)
+
+    const readFileSync = jest
+      .spyOn(fs, 'readFileSync')
+      .mockImplementation(
+        () =>
+          'Linux version 5.10.74.3 (x86_64-msft-linux-gcc (GCC) 9.3.0, GNU ld (GNU Binutils) 2.34.0.20200220)'
+      )
+
+    expect(wsl().isWSL()).toBe(2)
+    expect(readFileSync).toHaveBeenCalledTimes(1)
   })
 })
 

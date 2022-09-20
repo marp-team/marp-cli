@@ -10,6 +10,24 @@ rules:
   property-no-unknown:
     - true
     - ignoreProperties:
-        - content-visibility
+        - page-transition-tag
+  selector-pseudo-element-no-unknown:
+    - true
+    - ignorePseudoElements:
+        - /^page-transition-/
+  selector-type-no-unknown:
+    - true
+    - ignoreTypes:
+        - __bespoke_marp_transition_osc__
   scss/at-rule-no-unknown:
     - true
+
+overrides:
+  - files:
+      - src/engine/transition/keyframes/**/*.scss
+      - src/engine/transition/keyframes/**/*.css
+    rules:
+      block-no-empty:
+        - null
+      keyframes-name-pattern:
+        - marp-(incoming-|outgoing-)?transition-(backward-)?__builtin__[a-z0-9-]+

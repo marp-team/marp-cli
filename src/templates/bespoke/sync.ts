@@ -74,7 +74,10 @@ const bespokeSync = (opts: BespokeSyncOption = {}) => {
         ) {
           try {
             updateFragment = false
-            deck.slide(current.index, { fragment: current.fragmentIndex })
+            deck.slide(current.index, {
+              fragment: current.fragmentIndex,
+              forSync: true,
+            })
           } finally {
             updateFragment = true
           }

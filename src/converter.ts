@@ -3,11 +3,12 @@ import { URL } from 'url'
 import type { MarpOptions } from '@marp-team/marp-core'
 import { Marpit, Options as MarpitOptions } from '@marp-team/marpit'
 import chalk from 'chalk'
-import puppeteer from 'puppeteer-core'
+import type puppeteer from 'puppeteer-core'
 import { silence, warn } from './cli'
 import { Engine, ResolvedEngine } from './engine'
 import infoPlugin, { engineInfo, EngineInfo } from './engine/info-plugin'
 import metaPlugin from './engine/meta-plugin'
+import { engineTransition, EngineTransition } from './engine/transition-plugin'
 import { error } from './error'
 import { File, FileType } from './file'
 import templates, {
@@ -36,6 +37,7 @@ export enum ConvertType {
   png = 'png',
   pptx = 'pptx',
   jpeg = 'jpg',
+  notes = 'notes',
 }
 
 export const mimeTypes = {
@@ -45,6 +47,7 @@ export const mimeTypes = {
   [ConvertType.pptx]:
     'application/vnd.openxmlformats-officedocument.presentationml.presentation',
   [ConvertType.jpeg]: 'image/jpeg',
+  [ConvertType.notes]: 'text/plain',
 }
 
 export interface ConverterOption {
@@ -61,6 +64,7 @@ export interface ConverterOption {
   pages?: boolean | number[]
   pdfNotes?: boolean
   preview?: boolean
+  puppeteerTimeout?: number
   jpegQuality?: number
   server?: boolean
   template: string
@@ -110,6 +114,10 @@ export class Converter {
     return template
   }
 
+  get puppeteerTimeout(): number {
+    return this.options.puppeteerTimeout ?? 180000
+  }
+
   async convert(
     markdown: string,
     file?: File,
@@ -126,7 +134,9 @@ export class Converter {
       if (this.options.baseUrl) return this.options.baseUrl
 
       if (isFile(f) && type !== ConvertType.html) {
-        return isChromeInWSLHost(generatePuppeteerLaunchArgs().executablePath)
+        return isChromeInWSLHost(
+          (await generatePuppeteerLaunchArgs()).executablePath
+        )
           ? `file:${await resolveWSLPathToHost(f.absolutePath)}`
           : f.absoluteFileScheme
       }
@@ -161,11 +171,13 @@ export class Converter {
 
         const ret = engine.render(stripBOM(`${markdown}${additionals}`))
         const info = engine[engineInfo]
+        const transition: EngineTransition | undefined =
+          engine[engineTransition]
 
         if (isFile(file))
           this.options.themeSet.observe(file.absolutePath, info?.theme)
 
-        return { ...ret, ...info! }
+        return { ...ret, ...info!, transition }
       },
     })
   }
@@ -191,7 +203,6 @@ export class Converter {
 
     if (!opts.onlyScanning) {
       const files: File[] = []
-
       switch (this.options.type) {
         case ConvertType.pdf:
           template = await useTemplate(true)
@@ -218,6 +229,10 @@ export class Converter {
               scale: this.options.imageScale ?? 2,
             })
           )
+          break
+        case ConvertType.notes:
+          template = await useTemplate(false)
+          files.push(await this.convertFileToNotes(template, file))
           break
         default:
           template = await useTemplate()
@@ -255,6 +270,20 @@ export class Converter {
     return ret
   }
 
+  private convertFileToNotes(tpl: TemplateResult, file: File): File {
+    const ret = file.convert(this.options.output, { extension: 'txt' })
+    const comments = tpl.rendered.comments
+    if (comments.flat().length === 0) {
+      warn(`${file.relativePath()} contains no notes.`)
+      ret.buffer = Buffer.from('')
+    } else {
+      ret.buffer = Buffer.from(
+        comments.map((c) => c.join('\n\n')).join('\n\n---\n\n')
+      )
+    }
+    return ret
+  }
+
   private async convertFileToPDF(
     tpl: TemplateResult,
     file: File
@@ -266,7 +295,11 @@ export class Converter {
 
     ret.buffer = await this.usePuppeteer(html, async (page, uri) => {
       await page.goto(uri, { waitUntil: ['domcontentloaded', 'networkidle0'] })
-      return await page.pdf({ printBackground: true, preferCSSPageSize: true, timeout: 180000 })
+      return await page.pdf({
+        printBackground: true,
+        preferCSSPageSize: true,
+        timeout: this.puppeteerTimeout,
+      })
     })
 
     // Apply PDF metadata and annotations
@@ -543,7 +576,9 @@ export class Converter {
     })()
 
     try {
-      const browser = await Converter.runBrowser()
+      const browser = await Converter.runBrowser({
+        timeout: this.puppeteerTimeout,
+      })
 
       const uri = await (async () => {
         if (tmpFile) {
@@ -557,6 +592,8 @@ export class Converter {
       })()
 
       const page = await browser.newPage()
+      page.setDefaultTimeout(this.puppeteerTimeout)
+
       const { missingFileSet, failedFileSet } =
         this.trackFailedLocalFileAccess(page)
 
@@ -621,12 +658,13 @@ export class Converter {
 
   private static browser?: puppeteer.Browser
 
-  private static async runBrowser() {
+  private static async runBrowser({ timeout }: { timeout?: number }) {
     if (!Converter.browser) {
-      const baseArgs = generatePuppeteerLaunchArgs()
+      const baseArgs = await generatePuppeteerLaunchArgs()
 
       Converter.browser = await launchPuppeteer({
         ...baseArgs,
+        timeout,
         userDataDir: await generatePuppeteerDataDirPath('marp-cli-conversion', {
           wslHost: isChromeInWSLHost(baseArgs.executablePath),
         }),

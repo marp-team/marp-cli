@@ -1,0 +1,20 @@
+@keyframes marp-outgoing-transition-__builtin__fade {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+@keyframes marp-incoming-transition-__builtin__fade {
+  from {
+    mix-blend-mode: plus-lighter;
+    opacity: 0;
+  }
+
+  to {
+    mix-blend-mode: plus-lighter;
+    opacity: 1;
+  }
+}

@@ -1,0 +1,38 @@
+@keyframes marp-outgoing-transition-__builtin__in-out {
+  0% {
+    animation-timing-function: ease-out;
+  }
+
+  50% {
+    filter: brightness(1);
+    transform: translateX(calc(var(--marp-transition-direction, 1) * -25%))
+      scale(0.45);
+    animation-timing-function: ease-out;
+  }
+
+  100% {
+    filter: brightness(0.75);
+    transform: translateX(calc(var(--marp-transition-direction, 1) * -25%))
+      scale(0.45) translateX(calc(var(--marp-transition-direction, 1) * -25vw));
+  }
+}
+@keyframes marp-incoming-transition-__builtin__in-out {
+  0% {
+    z-index: -1;
+    filter: brightness(0.75);
+    transform: translateX(calc(var(--marp-transition-direction, 1) * 25%))
+      scale(0.45) translateX(calc(var(--marp-transition-direction, 1) * 25vw));
+    animation-timing-function: ease-out;
+  }
+
+  50% {
+    filter: brightness(1);
+    transform: translateX(calc(var(--marp-transition-direction, 1) * 25%))
+      scale(0.45);
+    animation-timing-function: ease-out;
+  }
+
+  100% {
+    z-index: 0;
+  }
+}

@@ -1,8 +1,8 @@
 export const showAllKey = 'marp-cli-show-all'
 
 export default function serverIndex() {
-  const showAll = <HTMLInputElement>document.getElementById('show-all')
-  const index = <HTMLElement>document.getElementById('index')
+  const showAll = document.getElementById('show-all') as HTMLInputElement
+  const index = document.getElementById('index') as HTMLElement
 
   const applyShowAll = (state: boolean) => {
     showAll.checked = state

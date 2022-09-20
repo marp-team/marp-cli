@@ -1,38 +1,107 @@
 import { Marpit } from '@marp-team/marpit'
 import type MarkdownIt from 'markdown-it'
+import {
+  isTransitionData,
+  type MarpTransitionData,
+} from '../templates/bespoke/utils/transition'
 
-const inverted = {
-  'reveal-left': 'reveal-right',
-  'reveal-right': 'reveal-left',
-  'reveal-up': 'reveal-down',
-  'reveal-down': 'reveal-up',
-  'cover-left': 'cover-right',
-  'cover-right': 'cover-left',
-  'cover-up': 'cover-down',
-  'cover-down': 'cover-up',
-  fade: 'fade',
-  explode: 'implode',
-  implode: 'explode',
+import clockwise from './transition/keyframes/clockwise.scss'
+import counterclockwise from './transition/keyframes/counterclockwise.scss'
+import cover from './transition/keyframes/cover.scss'
+import coverflow from './transition/keyframes/coverflow.scss'
+import cube from './transition/keyframes/cube.scss'
+import cylinder from './transition/keyframes/cylinder.scss'
+import diamond from './transition/keyframes/diamond.scss'
+import drop from './transition/keyframes/drop.scss'
+import explode from './transition/keyframes/explode.scss'
+import fadeOut from './transition/keyframes/fade-out.scss'
+import fade from './transition/keyframes/fade.scss'
+import fall from './transition/keyframes/fall.scss'
+import flip from './transition/keyframes/flip.scss'
+import glow from './transition/keyframes/glow.scss'
+import implode from './transition/keyframes/implode.scss'
+import inOut from './transition/keyframes/in-out.scss'
+import irisIn from './transition/keyframes/iris-in.scss'
+import irisOut from './transition/keyframes/iris-out.scss'
+import melt from './transition/keyframes/melt.scss'
+import overlap from './transition/keyframes/overlap.scss'
+import pivot from './transition/keyframes/pivot.scss'
+import pull from './transition/keyframes/pull.scss'
+import push from './transition/keyframes/push.scss'
+import reveal from './transition/keyframes/reveal.scss'
+import rotate from './transition/keyframes/rotate.scss'
+import slide from './transition/keyframes/slide.scss'
+import star from './transition/keyframes/star.scss'
+import swap from './transition/keyframes/swap.scss'
+import swipe from './transition/keyframes/swipe.scss'
+import swoosh from './transition/keyframes/swoosh.scss'
+import wipe from './transition/keyframes/wipe.scss'
+import wiper from './transition/keyframes/wiper.scss'
+import zoom from './transition/keyframes/zoom.scss'
+
+export const engineTransition = Symbol()
+
+export interface EngineTransition {
+  builtinTransitionStyle: string
 }
 
-const transitions: Record<string, string> = {
-  ...Object.keys(inverted).reduce<Record<string, string>>(
-    (acc, transition) => ({ ...acc, [transition]: transition }),
-    {}
-  ),
-  reveal: 'reveal-left',
-  cover: 'cover-left',
+interface TransitionMeta {
+  transition?: MarpTransitionData
 }
+
+const keyframeMatcher =
+  /^marp-(?:(?:outgoing|incoming)-)?transition-(?:backward-)?(.+)$/
+
+const builtinTransitions = {
+  clockwise,
+  counterclockwise,
+  cover,
+  coverflow,
+  cube,
+  cylinder,
+  diamond,
+  drop,
+  explode,
+  fade,
+  'fade-out': fadeOut,
+  fall,
+  flip,
+  glow,
+  implode,
+  'in-out': inOut,
+  'iris-in': irisIn,
+  'iris-out': irisOut,
+  melt,
+  overlap,
+  pivot,
+  pull,
+  push,
+  reveal,
+  rotate,
+  slide,
+  star,
+  swap,
+  swipe,
+  swoosh,
+  wipe,
+  wiper,
+  zoom,
+
+  // Reserved transition to disable
+  none: false,
+} as const
 
 export default function transitionPlugin(md: MarkdownIt & { marpit: Marpit }) {
-  md.marpit.customDirectives.local.transition = (value) => {
-    if (typeof value !== 'string') return {}
+  const { marpit } = md
 
-    const transition = transitions[value]
-    if (!transition) return { transition: undefined, transitionBack: undefined }
+  marpit.customDirectives.local.transition = (value): TransitionMeta => {
+    if (typeof value === 'string') {
+      const [name, duration] = value.trim().split(/\s+/)
+      const transition = { name, duration }
 
-    const transitionBack: string | undefined = inverted[transition]
-    return { transition, ...(transitionBack ? { transitionBack } : {}) }
+      if (isTransitionData(transition)) return { transition }
+    }
+    return {}
   }
 
   md.core.ruler.after(
@@ -41,16 +110,65 @@ export default function transitionPlugin(md: MarkdownIt & { marpit: Marpit }) {
     (state) => {
       if (state.inlineMode) return false
 
-      for (const token of state.tokens) {
-        const { marpitDirectives } = token.meta || {}
+      const builtinTransitionStyles = new Map<string, string>()
 
-        if (marpitDirectives?.transition) {
-          token.attrSet(`data-transition`, marpitDirectives.transition)
+      let previousTransitionBack: string | undefined
+
+      for (const token of state.tokens) {
+        const { marpitDirectives, marpitStyleScoped } = token.meta || {}
+
+        // Apply stored transition for backward direction in the next slide of defined slide
+        if (token.type === 'marpit_slide_open' && previousTransitionBack) {
+          token.attrSet('data-transition-back', previousTransitionBack)
+          previousTransitionBack = undefined
         }
-        if (marpitDirectives?.transitionBack) {
-          token.attrSet(`data-transition-back`, marpitDirectives.transitionBack)
+
+        if (typeof marpitDirectives?.transition === 'object') {
+          const transition = { ...marpitDirectives.transition }
+
+          if (isTransitionData(transition)) {
+            // Inject built-in transition style
+            if (builtinTransitions[transition.name]) {
+              builtinTransitionStyles.set(
+                transition.name,
+                builtinTransitions[transition.name]
+              )
+              transition.builtinFallback = true
+            }
+
+            // Detect keyframes in the scoped style
+            const scopedKey: string | undefined = marpitStyleScoped?.key
+
+            if (scopedKey) {
+              const scopedKeyframeSet: Set<string> | undefined =
+                marpitStyleScoped?.keyframeSet
+
+              for (const keyframe of scopedKeyframeSet?.values() ?? []) {
+                const matched = keyframe.match(keyframeMatcher)
+
+                if (matched && transition.name === matched[1]) {
+                  transition.name = `${transition.name}-${scopedKey}`
+                  transition.builtinFallback = false
+
+                  break
+                }
+              }
+            }
+
+            // Assign data JSON
+            const json = JSON.stringify(transition)
+            token.attrSet('data-transition', json)
+
+            previousTransitionBack = json
+          }
         }
       }
+
+      const transitionEngineInfo: EngineTransition = {
+        builtinTransitionStyle: [...builtinTransitionStyles.values()].join(''),
+      }
+
+      marpit[engineTransition] = transitionEngineInfo
 
       return true
     }

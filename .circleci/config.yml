@@ -1,7 +1,8 @@
 version: 2.1
 
 orbs:
-  codecov: codecov/codecov@3.2.0
+  browser-tools: circleci/browser-tools@1.2.4
+  codecov: codecov/codecov@3.2.2
 
 executors:
   node:
@@ -11,20 +12,15 @@ executors:
         default: false
       version:
         type: string
-        default: '16.13.0' # Specify LTS version for development
+        default: '16.16' # Specify LTS major and minor for development
     docker:
-      - image: circleci/node:<< parameters.version >><<# parameters.browser >>-browsers<</ parameters.browser >>
-        entrypoint:
-          - docker-init
-          - --
-          - <<# parameters.browser >>/<</ parameters.browser >>docker-entrypoint.sh
-        command:
-          - /bin/sh
+      - image: cimg/node:<< parameters.version >><<# parameters.browser >>-browsers<</ parameters.browser >>
     working_directory: ~/marp-cli
 
   docker:
     machine:
-      image: ubuntu-2004:202101-01
+      image: ubuntu-2004:202111-02
+      docker_layer_caching: true
     working_directory: ~/marp-cli
     environment:
       DOCKER_BUILDKIT: 1
@@ -65,11 +61,20 @@ commands:
             - run: yarn -s check:audit
 
   test:
+    parameters:
+      browser:
+        type: boolean
+        default: false
     steps:
       - run: node --version
 
       - checkout
       - install
+
+      - when:
+          condition: << parameters.browser >>
+          steps:
+            - browser-tools/install-chrome
 
       - run:
           name: Prettier formatting
@@ -93,7 +98,8 @@ commands:
           environment:
             JEST_JUNIT_OUTPUT_DIR: tmp/test-results
 
-      - codecov/upload
+      - codecov/upload:
+          version: v0.1.15
 
       - store_test_results:
           path: tmp/test-results
@@ -147,7 +153,7 @@ commands:
       - run:
           name: Install Docker buildx
           command: |
-            docker build --platform=local --quiet -o ~ git://github.com/docker/buildx.git#v0.6.3
+            docker build --platform=local --quiet -o ~ "https://github.com/docker/buildx.git#v0.8.1"
             mkdir -p ~/.docker/cli-plugins
             mv ~/buildx ~/.docker/cli-plugins/docker-buildx
           environment:
@@ -172,28 +178,22 @@ jobs:
     steps:
       - audit
 
-  test-node12:
-    executor:
-      name: node
-      browser: true
-      version: '12.22'
-    steps:
-      - test
-
   test-node14:
     executor:
       name: node
       browser: true
-      version: '14.18'
+      version: '14.19'
     steps:
-      - test
+      - test:
+          browser: true
 
   test-node16:
     executor:
       name: node
       browser: true
     steps:
-      - test
+      - test:
+          browser: true
 
   docker-build-latest:
     executor: node
@@ -224,9 +224,6 @@ workflows:
     jobs:
       # Test
       - audit
-      - test-node12:
-          requires:
-            - audit
       - test-node14:
           requires:
             - audit
@@ -237,7 +234,6 @@ workflows:
       # Docker (latest)
       - docker-build-latest:
           requires:
-            - test-node12
             - test-node14
             - test-node16
           filters:

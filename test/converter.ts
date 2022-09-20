@@ -5,10 +5,11 @@ import { URL } from 'url'
 import { promisify } from 'util'
 import { Marp } from '@marp-team/marp-core'
 import { Options } from '@marp-team/marpit'
-import cheerio from 'cheerio'
+import { load } from 'cheerio'
 import { imageSize } from 'image-size'
 import { PDFDocument, PDFDict, PDFName, PDFHexString } from 'pdf-lib'
-import { Page } from 'puppeteer-core/lib/cjs/puppeteer/common/Page'
+import { TimeoutError } from 'puppeteer-core'
+import { Page } from 'puppeteer-core/lib/cjs/puppeteer/common/Page.js'
 import yauzl from 'yauzl'
 import { Converter, ConvertType, ConverterOption } from '../src/converter'
 import { CLIError } from '../src/error'
@@ -17,9 +18,15 @@ import { bare as bareTpl } from '../src/templates'
 import { ThemeSet } from '../src/theme'
 import { WatchNotifier } from '../src/watcher'
 
-const puppeteerTimeoutMs = 30000
+const puppeteerTimeoutMs = 60000
+
+let mkdirSpy: jest.SpiedFunction<typeof fs.promises.mkdir>
 
 jest.mock('fs')
+
+beforeEach(() => {
+  mkdirSpy = jest.spyOn(fs.promises, 'mkdir').mockImplementation()
+})
 
 afterAll(() => Converter.closeBrowser())
 afterEach(() => jest.restoreAllMocks())
@@ -57,7 +64,7 @@ describe('Converter', () => {
         globalDirectives: { theme: 'default' },
         imageScale: 2,
         lang: 'fr',
-        options: <Options>{ html: true },
+        options: { html: true } as Options,
         server: false,
         template: 'test-template',
         templateOption: {},
@@ -77,6 +84,17 @@ describe('Converter', () => {
     it('throws CLIError when specified template is not defined', () => {
       const throwErr = () => instance({ template: 'not_defined' }).template
       expect(throwErr).toThrow(CLIError)
+    })
+  })
+
+  describe('get #puppeteerTimeout', () => {
+    it('returns specified timeout', () => {
+      expect(instance({ puppeteerTimeout: 1000 }).puppeteerTimeout).toBe(1000)
+      expect(instance({ puppeteerTimeout: 0 }).puppeteerTimeout).toBe(0)
+    })
+
+    it('returns the default timeout 30000ms if not specified', () => {
+      expect(instance().puppeteerTimeout).toBe(30000)
     })
   })
 
@@ -301,8 +319,9 @@ describe('Converter', () => {
 
     describe('Template specifics', () => {
       it('uses bespoke template specific Marpit plugins if enabled transition option', async () => {
-        // Footer directive is for testing the condition about inline mode
-        const transitionMd = '<!-- transition: cover -->\n<!-- footer: test -->'
+        // Footer directive is required for testing the condition about inline mode
+        const transitionMd =
+          '<!-- transition: cover -->\n<!-- footer: test -->\n\n---\n\n'
 
         // Disabled
         const { result: disabledResult } = await instance({
@@ -310,10 +329,10 @@ describe('Converter', () => {
           templateOption: { transition: false },
         }).convert(transitionMd)
 
-        expect(disabledResult).not.toContain('data-transition="cover-left"')
-        expect(disabledResult).not.toContain(
-          'data-transition-back="cover-right"'
-        )
+        const $disabled = load(disabledResult)
+
+        expect($disabled('[data-transition]')).toHaveLength(0)
+        expect($disabled('[data-transition-back]')).toHaveLength(0)
 
         // Enabled
         const { result: enabledResult } = await instance({
@@ -321,27 +340,103 @@ describe('Converter', () => {
           templateOption: { transition: true },
         }).convert(transitionMd)
 
-        expect(enabledResult).toContain('data-transition="cover-left"')
-        expect(enabledResult).toContain('data-transition-back="cover-right"')
+        const $enabled = load(enabledResult)
+
+        expect($enabled('[data-transition]').length).toBeGreaterThanOrEqual(1)
+        expect(
+          $enabled('[data-transition-back]').length
+        ).toBeGreaterThanOrEqual(1)
+
+        const enabledData = $enabled('[data-transition]').data('transition')
+        const enabledDataBack = $enabled('[data-transition-back]').data(
+          'transitionBack'
+        )
+
+        expect(enabledData.name).toBe('cover')
+        expect(enabledData.builtinFallback).toBe(true)
+        expect(enabledDataBack.name).toBe('cover')
+        expect(enabledDataBack.builtinFallback).toBe(true)
+
+        // Non built-in transition will remain for custom transition
+        const { result: unknownResult } = await instance({
+          template: 'bespoke',
+          templateOption: { transition: true },
+        }).convert('<!-- transition: unknown -->')
+
+        const $unknown = load(unknownResult)
+        expect($unknown('[data-transition]')).toHaveLength(1)
+
+        const unknownData = $unknown('[data-transition]').data('transition')
+        expect(unknownData.name).toBe('unknown')
+        expect(unknownData.builtinFallback).toBeFalsy()
 
         // Turn on and off
         const { result: toggleResult } = await instance({
           template: 'bespoke',
           templateOption: { transition: true },
         }).convert(
-          '<!-- transition: reveal -->\n\n---\n\n<!-- transition: {"invalid-format":"will-be-ignored"} -->\n\n---\n\n<!-- transition: false -->'
+          '<!-- transition: reveal -->\n\n---\n\n<!-- transition: none -->\n\n---\n\n'
         )
 
-        const $ = cheerio.load(toggleResult)
-        const sections = $('section')
+        const $toggle = load(toggleResult)
+        const sections = $toggle('section')
 
         expect(sections).toHaveLength(3)
-        expect($(sections[0]).attr('data-transition')).toBe('reveal-left')
-        expect($(sections[0]).attr('data-transition-back')).toBe('reveal-right')
-        expect($(sections[1]).attr('data-transition')).toBe('reveal-left')
-        expect($(sections[1]).attr('data-transition-back')).toBe('reveal-right')
-        expect($(sections[2]).attr('data-transition')).toBeUndefined()
-        expect($(sections[2]).attr('data-transition-back')).toBeUndefined()
+
+        expect($toggle(sections[0]).data('transition').name).toBe('reveal')
+        expect($toggle(sections[1]).data('transition').name).toBe('none')
+        expect($toggle(sections[2]).data('transition').name).toBe('none')
+
+        // Assigning slides are shifted in backward transition
+        expect($toggle(sections[0]).data('transitionBack')).toBeUndefined()
+        expect($toggle(sections[1]).data('transitionBack').name).toBe('reveal')
+        expect($toggle(sections[2]).data('transitionBack').name).toBe('none')
+      })
+    })
+
+    describe('with space-separated duration', () => {
+      it('defines configured values', async () => {
+        const converter = instance({
+          template: 'bespoke',
+          templateOption: { transition: true },
+        })
+
+        const { result } = await converter.convert(
+          '<!-- transition: reveal 1s -->'
+        )
+
+        const $result = load(result)
+        const data = $result('section').first().data('transition')
+
+        expect(data.name).toBe('reveal')
+        expect(data.duration).toBe('1s')
+      })
+    })
+
+    describe('with scoped style', () => {
+      it('assigns transition data with the scoped name of keyframes', async () => {
+        const converter = instance({
+          template: 'bespoke',
+          templateOption: { transition: true },
+        })
+
+        const { result } = await converter.convert(
+          [
+            '<!-- transition: hello -->',
+            '<style scoped>',
+            '  @keyframes marp-transition-hello { to { opacity: 0; } }',
+            '</style>',
+            '\n---\n',
+          ].join('\n')
+        )
+        const $result = load(result)
+
+        const data = $result('section').first().data('transition')
+        expect(data.name).toMatch(/^hello-\w+$/)
+
+        const bData = $result($result('section').get(1)).data('transitionBack')
+        expect(bData.name).toMatch(/^hello-\w+$/)
+        expect(bData.name).toBe(data.name)
       })
     })
   })
@@ -349,12 +444,12 @@ describe('Converter', () => {
   describe('#convertFile', () => {
     it('rejects Promise when specified file is not found', () =>
       expect(
-        (instance() as any).convertFile(new File('_NOT_FOUND_MARKDOWN_'))
+        instance().convertFile(new File('_NOT_FOUND_MARKDOWN_'))
       ).rejects.toBeTruthy())
 
     it('converts markdown file and save as html file by default', async () => {
-      const write = (<any>fs).__mockWriteFile()
-      await (<any>instance()).convertFile(new File(onePath))
+      const write = (fs as any).__mockWriteFile()
+      await instance().convertFile(new File(onePath))
 
       expect(write).toHaveBeenCalledWith(
         `${onePath.slice(0, -3)}.html`,
@@ -364,9 +459,9 @@ describe('Converter', () => {
     })
 
     it('converts markdown file and save to specified path when output is defined', async () => {
-      const write = (<any>fs).__mockWriteFile()
+      const write = (fs as any).__mockWriteFile()
       const output = './specified.html'
-      await (<any>instance({ output })).convertFile(new File(twoPath))
+      await instance({ output }).convertFile(new File(twoPath))
 
       expect(write).toHaveBeenCalledWith(
         output,
@@ -375,19 +470,40 @@ describe('Converter', () => {
       )
     })
 
+    it('tries to create the directory of output file when saving', async () => {
+      const write = (fs as any).__mockWriteFile()
+      const output = path.resolve(__dirname, '__test_dir__/out.html')
+
+      await instance({ output }).convertFile(new File(twoPath))
+
+      expect(write).toHaveBeenCalled()
+      expect(mkdirSpy).toHaveBeenCalledWith(
+        path.resolve(__dirname, '__test_dir__'),
+        { recursive: true }
+      )
+    })
+
+    it('does not try to create the directory of output file when saving to the root', async () => {
+      const write = (fs as any).__mockWriteFile()
+      const output = '/out.html'
+
+      await instance({ output }).convertFile(new File(twoPath))
+
+      expect(write).toHaveBeenCalled()
+      expect(mkdirSpy).not.toHaveBeenCalled()
+    })
+
     it('converts markdown file but not save when output is stdout', async () => {
-      const write = (<any>fs).__mockWriteFile()
+      const write = (fs as any).__mockWriteFile()
       const stdout = jest.spyOn(process.stdout, 'write').mockImplementation()
 
       const output = '-'
-      const ret = await (<any>instance({ output })).convertFile(
-        new File(threePath)
-      )
+      const ret = await instance({ output }).convertFile(new File(threePath))
 
       expect(write).not.toHaveBeenCalled()
       expect(stdout).toHaveBeenCalledTimes(1)
       expect(ret.file.path).toBe(threePath)
-      expect(ret.newFile.type).toBe(FileType.StandardIO)
+      expect(ret.newFile?.type).toBe(FileType.StandardIO)
     })
 
     describe('when convert type is PDF', () => {
@@ -397,7 +513,7 @@ describe('Converter', () => {
       it(
         'converts markdown file into PDF',
         async () => {
-          const write = (<any>fs).__mockWriteFile()
+          const write = (fs as any).__mockWriteFile()
           const opts = { output: 'test.pdf' }
           const ret = await pdfInstance(opts).convertFile(new File(onePath))
           const pdf: Buffer = write.mock.calls[0][1]
@@ -415,7 +531,7 @@ describe('Converter', () => {
         it(
           'assigns meta info thorugh pdf-lib',
           async () => {
-            const write = (<any>fs).__mockWriteFile()
+            const write = (fs as any).__mockWriteFile()
 
             await pdfInstance({
               output: 'test.pdf',
@@ -444,7 +560,7 @@ describe('Converter', () => {
           async () => {
             const file = new File(onePath)
 
-            const fileCleanup = jest.spyOn(<any>File.prototype, 'cleanup')
+            const fileCleanup = jest.spyOn(File.prototype as any, 'cleanup')
             const fileSave = jest
               .spyOn(File.prototype, 'save')
               .mockImplementation()
@@ -478,7 +594,7 @@ describe('Converter', () => {
         it(
           'assigns presenter notes as annotation of PDF',
           async () => {
-            const write = (<any>fs).__mockWriteFile()
+            const write = (fs as any).__mockWriteFile()
 
             await pdfInstance({
               output: 'test.pdf',
@@ -501,7 +617,7 @@ describe('Converter', () => {
         )
 
         it('sets a comment author to notes if set author global directive', async () => {
-          const write = (<any>fs).__mockWriteFile()
+          const write = (fs as any).__mockWriteFile()
 
           await pdfInstance({
             output: 'test.pdf',
@@ -518,13 +634,26 @@ describe('Converter', () => {
           )
         })
       })
+
+      describe('with custom puppeteer timeout', () => {
+        it('follows setting timeout', async () => {
+          ;(fs as any).__mockWriteFile()
+
+          await expect(
+            pdfInstance({
+              output: 'test.pdf',
+              puppeteerTimeout: 1,
+            }).convertFile(new File(onePath))
+          ).rejects.toThrow(TimeoutError)
+        })
+      })
     })
 
     describe('when convert type is PPTX', () => {
       let write: jest.Mock
 
       beforeEach(() => {
-        write = (<any>fs).__mockWriteFile()
+        write = (fs as any).__mockWriteFile()
       })
 
       const converter = (opts: Partial<ConverterOption> = {}) =>
@@ -551,7 +680,7 @@ describe('Converter', () => {
 
                 readStream.on('data', (chunk) => readBuffer.push(chunk))
                 readStream.on('end', () => {
-                  const $ = cheerio.load(Buffer.concat(readBuffer).toString())
+                  const $ = load(Buffer.concat(readBuffer).toString())
                   const coreProps = $('cp\\:coreProperties')
 
                   coreProps.children().each((_, elm) => {
@@ -632,7 +761,7 @@ describe('Converter', () => {
       let write: jest.Mock
 
       beforeEach(() => {
-        write = (<any>fs).__mockWriteFile()
+        write = (fs as any).__mockWriteFile()
       })
 
       it(
@@ -702,7 +831,7 @@ describe('Converter', () => {
       let write: jest.Mock
 
       beforeEach(() => {
-        write = (<any>fs).__mockWriteFile()
+        write = (fs as any).__mockWriteFile()
       })
 
       it(
@@ -780,7 +909,7 @@ describe('Converter', () => {
           pages: true,
           type: ConvertType.png,
         })
-        write = (<any>fs).__mockWriteFile()
+        write = (fs as any).__mockWriteFile()
       })
 
       it(
@@ -795,12 +924,54 @@ describe('Converter', () => {
         puppeteerTimeoutMs
       )
     })
+
+    describe('when convert type is notes', () => {
+      it('converts markdown file to notes text and save to specified path when output is defined', async () => {
+        const notesInstance = (opts: Partial<ConverterOption> = {}) =>
+          instance({ ...opts, type: ConvertType.notes })
+
+        const write = (fs as any).__mockWriteFile()
+        const output = './specified.txt'
+        const ret = await notesInstance({ output }).convertFile(
+          new File(threePath)
+        )
+        const notes: Buffer = write.mock.calls[0][1]
+
+        expect(write).toHaveBeenCalled()
+        expect(write.mock.calls[0][0]).toBe('./specified.txt')
+        expect(notes.toString()).toBe('presenter note')
+        expect(ret.newFile?.path).toBe('./specified.txt')
+        expect(ret.newFile?.buffer).toBe(notes)
+      })
+
+      it('converts markdown file to empty text and save to specified path when output is defined but no notes exist', async () => {
+        const warn = jest.spyOn(console, 'warn').mockImplementation()
+        const notesInstance = (opts: Partial<ConverterOption> = {}) =>
+          instance({ ...opts, type: ConvertType.notes })
+
+        const write = (fs as any).__mockWriteFile()
+        const output = './specified.txt'
+        const ret = await notesInstance({ output }).convertFile(
+          new File(onePath)
+        )
+        const notes: Buffer = write.mock.calls[0][1]
+
+        expect(warn).toHaveBeenCalledWith(
+          expect.stringContaining('contains no notes')
+        )
+        expect(write).toHaveBeenCalled()
+        expect(write.mock.calls[0][0]).toBe('./specified.txt')
+        expect(notes.toString()).toBe('')
+        expect(ret.newFile?.path).toBe('./specified.txt')
+        expect(ret.newFile?.buffer).toBe(notes)
+      })
+    })
   })
 
   describe('#convertFiles', () => {
     describe('with multiple files', () => {
       it('converts passed files', async () => {
-        const write = (<any>fs).__mockWriteFile()
+        const write = (fs as any).__mockWriteFile()
 
         await instance().convertFiles([new File(onePath), new File(twoPath)])
         expect(write).toHaveBeenCalledTimes(2)
@@ -817,7 +988,7 @@ describe('Converter', () => {
         ).rejects.toBeInstanceOf(CLIError))
 
       it('converts passed files when output is stdout', async () => {
-        const write = (<any>fs).__mockWriteFile()
+        const write = (fs as any).__mockWriteFile()
         const stdout = jest.spyOn(process.stdout, 'write').mockImplementation()
         const files = [new File(onePath), new File(twoPath)]
 

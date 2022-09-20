@@ -1,0 +1,32 @@
+@keyframes marp-outgoing-transition-__builtin__cube {
+  from {
+    z-index: 1;
+    transform: perspective(100vw) translateZ(-50vw) rotateY(0deg)
+      translateZ(50vw);
+    animation-timing-function: ease-in-out;
+  }
+
+  to {
+    z-index: 0;
+    filter: brightness(0.5);
+    transform: perspective(100vw) translateZ(-50vw)
+      rotateY(calc(var(--marp-transition-direction, 1) * -90deg))
+      translateZ(50vw);
+  }
+}
+@keyframes marp-incoming-transition-__builtin__cube {
+  from {
+    z-index: 0;
+    filter: brightness(0.5);
+    transform: perspective(100vw) translateZ(-50vw)
+      rotateY(calc(var(--marp-transition-direction, 1) * 90deg))
+      translateZ(50vw);
+    animation-timing-function: ease-in-out;
+  }
+
+  to {
+    z-index: 1;
+    transform: perspective(100vw) translateZ(-50vw) rotateY(0deg)
+      translateZ(50vw);
+  }
+}

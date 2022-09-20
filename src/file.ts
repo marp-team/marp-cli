@@ -1,4 +1,4 @@
-/* eslint-disable import/export, @typescript-eslint/no-namespace */
+/* eslint-disable @typescript-eslint/no-namespace */
 import fs from 'fs'
 import os from 'os'
 import path from 'path'
@@ -147,9 +147,12 @@ export class File {
   }
 
   private async saveToFile(savePath: string = this.path) {
-    await fs.promises.mkdir(path.dirname(path.resolve(savePath)), {
-      recursive: true,
-    })
+    const directory = path.dirname(path.resolve(savePath))
+
+    if (path.dirname(directory) !== directory) {
+      await fs.promises.mkdir(directory, { recursive: true })
+    }
+
     await fs.promises.writeFile(savePath, this.buffer!) // eslint-disable-line @typescript-eslint/no-non-null-assertion
   }
 
