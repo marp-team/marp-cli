@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## v2.1.4-1 - 2022-09-20
+
+### Changed
+
+- Merge upstream/main
+
 ## v2.1.4 - 2022-09-10
 
 ### Fixed
