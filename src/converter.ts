@@ -426,7 +426,7 @@ export class Converter {
 
         await start(page);
         while (timestamp == 0 || lastTimestamp - timestamp < opts.duration!) {
-          await page.waitFor(opts.duration! - (lastTimestamp - timestamp))
+          await page.waitForTimeout(opts.duration! - (lastTimestamp - timestamp))
         }
         await stop();
 
