@@ -1281,10 +1281,10 @@
   resolved "https://registry.yarnpkg.com/@marp-team/marpit-svg-polyfill/-/marpit-svg-polyfill-2.0.0.tgz#4efbf248c86b48f2dac0d5e6b4d8bf5bac7dd0b2"
   integrity sha512-KIp5EaUkwFaeYOAb0b9B7+3XAjZYAUDJi3LRSnH1y27jJY2TCKrXnKIATfPJXSkn9QjTy69fbwCZ07B93QhupA==
 
-"@marp-team/marpit@^2.4.0", "@marp-team/marpit@^2.4.1":
-  version "2.4.1"
-  resolved "https://registry.yarnpkg.com/@marp-team/marpit/-/marpit-2.4.1.tgz#0581cb908a5cc1aee8a8bafa87ff2d9c5ecd8ad8"
-  integrity sha512-GcsvYmdaUOGkLINvIxMGkL6XSqOXPSBaHD2dCWLXfD5DhjQMEDnrLYImpeKRwv4FS6xorCB44ylzxWDP3GzgCg==
+"@marp-team/marpit@^2.4.0", "@marp-team/marpit@^2.4.2":
+  version "2.4.2"
+  resolved "https://registry.yarnpkg.com/@marp-team/marpit/-/marpit-2.4.2.tgz#f74240f14c15a4c5f0bd6b51afabc674750799be"
+  integrity sha512-MBCMaSjkeDzF+Exq8CmhmwsMTzU7fK4NyzA7zl+hreBGppAPvOq5NCnIR2O6nOm9F0QJ9Vmxhs7ZP/BXZ+lWBw==
   dependencies:
     color-string "^1.9.1"
     cssesc "^3.0.0"
@@ -1292,7 +1292,7 @@
     lodash.kebabcase "^4.1.1"
     markdown-it "^13.0.1"
     markdown-it-front-matter "^0.2.3"
-    postcss "^8.4.16"
+    postcss "^8.4.19"
 
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
@@ -6222,10 +6222,10 @@ postcss-value-parser@^4.1.0, postcss-value-parser@^4.2.0:
   resolved "https://registry.yarnpkg.com/postcss-value-parser/-/postcss-value-parser-4.2.0.tgz#723c09920836ba6d3e5af019f92bc0971c02e514"
   integrity sha512-1NNCs6uurfkVbeXG4S8JFT9t19m45ICnif8zWLd5oPSZ50QnwMfK+H3jv408d4jw/7Bttv5axS5IiHoLaVNHeQ==
 
-postcss@^8.4.16:
-  version "8.4.16"
-  resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.4.16.tgz#33a1d675fac39941f5f445db0de4db2b6e01d43c"
-  integrity sha512-ipHE1XBvKzm5xI7hiHCZJCSugxvsdq2mPnsq5+UF+VHCjiBvtDrlxJfMBToWaP9D5XlgNmcFGqoHmUn0EYEaRQ==
+postcss@^8.4.16, postcss@^8.4.19:
+  version "8.4.19"
+  resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.4.19.tgz#61178e2add236b17351897c8bcc0b4c8ecab56fc"
+  integrity sha512-h+pbPsyhlYj6N2ozBmHhHrs9DzGmbaarbLvWipMRO7RLS+v4onj26MPFXA5OBYFxyqYhUJK456SwDcY9H2/zsA==
   dependencies:
     nanoid "^3.3.4"
     picocolors "^1.0.0"
