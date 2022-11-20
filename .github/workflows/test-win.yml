@@ -19,8 +19,9 @@ jobs:
       fail-fast: false
       matrix:
         node-version:
-          - '^14.18.1'
-          - '16.16.0'
+          - '^14.21.1'
+          - '^16.18.1'
+          - '18.12.1'
 
     steps:
       # - name: Output concurrency group
