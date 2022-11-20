@@ -1,5 +1,5 @@
 @keyframes marp-incoming-transition-__builtin__melt {
-  from {
+  0% {
     clip-path: polygon(
       100% -50%,
       0% -50%,
@@ -86,7 +86,7 @@
     animation-timing-function: ease-out;
   }
 
-  to {
+  100% {
     clip-path: polygon(
       100% -50%,
       0% -50%,
@@ -167,7 +167,7 @@
 }
 
 @keyframes marp-incoming-transition-backward-__builtin__melt {
-  from {
+  0% {
     clip-path: polygon(
       100% 150%,
       0% 150%,
@@ -254,7 +254,7 @@
     animation-timing-function: ease-out;
   }
 
-  to {
+  100% {
     clip-path: polygon(
       100% 150%,
       0% 150%,

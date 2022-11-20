@@ -1,4 +1,6 @@
-import path from 'path'
+import { createRequire } from 'node:module'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import alias from '@rollup/plugin-alias'
 import commonjs from '@rollup/plugin-commonjs'
 import json from '@rollup/plugin-json'
@@ -11,7 +13,10 @@ import license from 'rollup-plugin-license'
 import postcss from 'rollup-plugin-postcss'
 import pugPlugin from 'rollup-plugin-pug'
 import { terser } from 'rollup-plugin-terser'
-import { dependencies, name, version } from './package.json'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const require = createRequire(import.meta.url)
+const { dependencies, name, version } = require('./package.json')
 
 const compact = !process.env.ROLLUP_WATCH
 

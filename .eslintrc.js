@@ -6,7 +6,10 @@ module.exports = {
     node: true,
   },
   extends: ['eslint:recommended', 'plugin:import/recommended', 'prettier'],
-  parserOptions: { ecmaFeatures: { jsx: true } },
+  parserOptions: {
+    ecmaVersion: 'latest',
+    ecmaFeatures: { jsx: true },
+  },
   rules: {
     'import/no-unresolved': ['error', { ignore: ['chalk', 'ts-key-enum'] }],
     'import/order': ['error', { alphabetize: { order: 'asc' } }],
