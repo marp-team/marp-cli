@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v2.2.1 - 2022-11-20
+
 ### Added
 
 - Test against Node.js 18 LTS ([#486](https://github.com/marp-team/marp-cli/pull/486))
