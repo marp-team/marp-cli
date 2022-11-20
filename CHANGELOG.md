@@ -2,6 +2,18 @@
 
 ## [Unreleased]
 
+### Added
+
+- Test against Node.js 18 LTS ([#486](https://github.com/marp-team/marp-cli/pull/486))
+
+### Changed
+
+- Upgrade development Node.js and dependent packages ([#486](https://github.com/marp-team/marp-cli/pull/486))
+
+### Fixed
+
+- Docker image: Use CDN instead of specific mirrors for apk repositories ([#481](https://github.com/marp-team/marp-cli/pull/481) by [@rhtenhove](https://github.com/rhtenhove))
+
 ## v2.2.0 - 2022-09-20
 
 ### Added
