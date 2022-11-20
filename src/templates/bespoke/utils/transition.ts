@@ -243,7 +243,7 @@ export const resolveAnimationStyles = (
     resolveDefaultDuration(opts.backward ? 'backward' : 'forward')
 
   if (duration !== undefined) {
-    rules.push(`::page-transition-container(*){${durationCSSVar}:${duration};}`)
+    rules.push(`::view-transition-group(*){${durationCSSVar}:${duration};}`)
   }
 
   const getStyleMap = (vars: ReturnType<typeof resolveAnimationVariables>) =>
@@ -252,10 +252,10 @@ export const resolveAnimationStyles = (
       .join('')
 
   rules.push(
-    `::page-transition-outgoing-image(root){${getStyleMap(
+    `::view-transition-old(root){${getStyleMap(
       resolveAnimationVariables(keyframes, { ...opts, type: 'outgoing' })
     )}}`,
-    `::page-transition-incoming-image(root){${getStyleMap(
+    `::view-transition-new(root){${getStyleMap(
       resolveAnimationVariables(keyframes, { ...opts, type: 'incoming' })
     )}}`
   )
