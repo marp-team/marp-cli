@@ -41,10 +41,11 @@ export class ResolvedEngine {
       process.env.NODE_ENV === 'test'
     ) {
       ResolvedEngine._defaultEngine = await ResolvedEngine.resolve([
-        '@marp-team/marp-core',
-        delayedEngineResolver(
-          async () => (await import('@marp-team/marp-core')).Marp
-        ),
+        '@marp-team/marp-core', // Manually-installed Marp Core
+
+        // Bundled Marp Core
+        // eslint-disable-next-line @typescript-eslint/no-var-requires -- import statement brings segmentation fault: https://github.com/marp-team/marp-cli/issues/487
+        delayedEngineResolver(async () => require('@marp-team/marp-core').Marp),
       ])
     }
     return ResolvedEngine._defaultEngine
@@ -62,7 +63,9 @@ export class ResolvedEngine {
           (from && importFrom.silent(path.dirname(path.resolve(from)), eng)) ||
           importFrom.silent(process.cwd(), eng)
 
-        if (resolved?.__esModule) resolved = resolved.default
+        if (resolved && typeof resolved === 'object' && 'default' in resolved) {
+          resolved = resolved.default
+        }
       } else if (typeof eng === 'object' && eng[delayedEngineResolverSymbol]) {
         resolved = await eng[delayedEngineResolverSymbol]()
       } else {
@@ -97,7 +100,9 @@ export class ResolvedEngine {
 
       if (
         expt === klass ||
-        (expt?.__esModule && Object.values(expt).includes(klass))
+        (expt &&
+          typeof expt === 'object' &&
+          Object.values(expt).includes(klass))
       )
         return moduleId
     }
