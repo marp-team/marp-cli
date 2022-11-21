@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix segmentation fault that brings while resolving bundled engine ([#487](https://github.com/marp-team/marp-cli/issues/487), [#488](https://github.com/marp-team/marp-cli/pull/488))
+
 ## v2.2.1 - 2022-11-20
 
 ### Added
