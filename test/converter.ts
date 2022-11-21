@@ -7,9 +7,9 @@ import { Marp } from '@marp-team/marp-core'
 import { Options } from '@marp-team/marpit'
 import { load } from 'cheerio'
 import { imageSize } from 'image-size'
-import { PDFDocument, PDFDict, PDFName, PDFHexString } from 'pdf-lib'
+import { PDFDocument, PDFDict, PDFName, PDFHexString, PDFNumber } from 'pdf-lib'
 import { TimeoutError } from 'puppeteer-core'
-import { Page } from 'puppeteer-core/lib/cjs/puppeteer/common/Page.js'
+import { CDPPage as Page } from 'puppeteer-core/lib/cjs/puppeteer/common/Page'
 import yauzl from 'yauzl'
 import { Converter, ConvertType, ConverterOption } from '../src/converter'
 import { CLIError } from '../src/error'
@@ -631,6 +631,236 @@ describe('Converter', () => {
 
           expect(annotation.get(PDFName.of('T'))).toStrictEqual(
             PDFHexString.fromText('author')
+          )
+        })
+      })
+
+      describe('with pdfOutlines option', () => {
+        type SerializedOutline = [
+          name: string | undefined,
+          children: SerializedOutline[]
+        ]
+
+        const getOutline = (outline: PDFDict): SerializedOutline => {
+          const title = outline
+            .lookupMaybe(PDFName.of('Title'), PDFHexString)
+            ?.decodeText()
+
+          const childDicts: PDFDict[] = []
+          let child = outline.lookupMaybe(PDFName.of('First'), PDFDict)
+
+          while (child) {
+            childDicts.push(child)
+            child = child.lookupMaybe(PDFName.of('Next'), PDFDict)
+          }
+
+          return [title, childDicts.map(getOutline)]
+        }
+
+        const baseFile = () => {
+          const file = new File(onePath)
+          file.buffer = Buffer.from(
+            [
+              '# 1',
+              '## 2',
+              '#### 4',
+              '### 3',
+              '\n---\n',
+              '##### 5',
+              '## 2-2',
+              '\n---\n',
+              '### 4-2',
+            ].join('\n')
+          )
+
+          return file
+        }
+
+        describe('with full detailed options', () => {
+          it(
+            'assigns outlines for pages and headings to PDF',
+            async () => {
+              const write = (fs as any).__mockWriteFile()
+
+              await pdfInstance({
+                output: 'test.pdf',
+                pdfOutlines: { pages: true, headings: true },
+              }).convertFile(baseFile())
+
+              const pdf = await PDFDocument.load(write.mock.calls[0][1])
+              const outlines = pdf.catalog.lookup(
+                PDFName.of('Outlines'),
+                PDFDict
+              )
+
+              expect(outlines.lookup(PDFName.of('Type'))).toStrictEqual(
+                PDFName.of('Outlines')
+              )
+              expect(outlines.lookup(PDFName.of('Count'))).toStrictEqual(
+                PDFNumber.of(10) // Opening 3 pages + 7 headings
+              )
+
+              expect(getOutline(outlines)[1]).toMatchInlineSnapshot(`
+                [
+                  [
+                    "Page 1",
+                    [
+                      [
+                        "1",
+                        [
+                          [
+                            "2",
+                            [
+                              [
+                                "4",
+                                [],
+                              ],
+                              [
+                                "3",
+                                [],
+                              ],
+                            ],
+                          ],
+                        ],
+                      ],
+                    ],
+                  ],
+                  [
+                    "Page 2",
+                    [
+                      [
+                        "5",
+                        [],
+                      ],
+                      [
+                        "2-2",
+                        [],
+                      ],
+                    ],
+                  ],
+                  [
+                    "Page 3",
+                    [
+                      [
+                        "4-2",
+                        [],
+                      ],
+                    ],
+                  ],
+                ]
+              `)
+            },
+            puppeteerTimeoutMs
+          )
+        })
+
+        describe('only with pages options', () => {
+          it(
+            'assigns page outlines to PDF',
+            async () => {
+              const write = (fs as any).__mockWriteFile()
+
+              await pdfInstance({
+                output: 'test.pdf',
+                pdfOutlines: { pages: true, headings: false },
+              }).convertFile(baseFile())
+
+              const pdf = await PDFDocument.load(write.mock.calls[0][1])
+              const outlines = pdf.catalog.lookup(
+                PDFName.of('Outlines'),
+                PDFDict
+              )
+
+              expect(outlines.lookup(PDFName.of('Type'))).toStrictEqual(
+                PDFName.of('Outlines')
+              )
+              expect(outlines.lookup(PDFName.of('Count'))).toStrictEqual(
+                PDFNumber.of(3) // 3 pages
+              )
+
+              expect(getOutline(outlines)[1]).toMatchInlineSnapshot(`
+                [
+                  [
+                    "Page 1",
+                    [],
+                  ],
+                  [
+                    "Page 2",
+                    [],
+                  ],
+                  [
+                    "Page 3",
+                    [],
+                  ],
+                ]
+              `)
+            },
+            puppeteerTimeoutMs
+          )
+        })
+
+        describe('only with headings options', () => {
+          it(
+            'assigns heading outlines to PDF',
+            async () => {
+              const write = (fs as any).__mockWriteFile()
+
+              await pdfInstance({
+                output: 'test.pdf',
+                pdfOutlines: { pages: false, headings: true },
+              }).convertFile(baseFile())
+
+              const pdf = await PDFDocument.load(write.mock.calls[0][1])
+              const outlines = pdf.catalog.lookup(
+                PDFName.of('Outlines'),
+                PDFDict
+              )
+
+              expect(outlines.lookup(PDFName.of('Type'))).toStrictEqual(
+                PDFName.of('Outlines')
+              )
+              expect(outlines.lookup(PDFName.of('Count'))).toStrictEqual(
+                PDFNumber.of(7) // 7 headings
+              )
+
+              expect(getOutline(outlines)[1]).toMatchInlineSnapshot(`
+                [
+                  [
+                    "1",
+                    [
+                      [
+                        "2",
+                        [
+                          [
+                            "4",
+                            [],
+                          ],
+                          [
+                            "3",
+                            [
+                              [
+                                "5",
+                                [],
+                              ],
+                            ],
+                          ],
+                        ],
+                      ],
+                      [
+                        "2-2",
+                        [
+                          [
+                            "4-2",
+                            [],
+                          ],
+                        ],
+                      ],
+                    ],
+                  ],
+                ]
+              `)
+            },
+            puppeteerTimeoutMs
           )
         })
       })

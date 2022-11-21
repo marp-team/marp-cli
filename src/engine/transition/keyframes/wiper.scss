@@ -1,5 +1,5 @@
 @keyframes marp-incoming-transition-__builtin__wiper {
-  from {
+  0% {
     clip-path: polygon(50% 100%, 0% 100%, 0% 100%, 0% 100%, 0% 100%);
     animation-timing-function: ease-in;
   }
@@ -14,12 +14,12 @@
     animation-timing-function: ease-out;
   }
 
-  to {
+  100% {
     clip-path: polygon(50% 100%, 0% 100%, 0% 0%, 100% 0%, 100% 100%);
   }
 }
 @keyframes marp-incoming-transition-backward-__builtin__wiper {
-  from {
+  0% {
     clip-path: polygon(50% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%);
     animation-timing-function: ease-in;
   }
@@ -34,7 +34,7 @@
     animation-timing-function: ease-out;
   }
 
-  to {
+  100% {
     clip-path: polygon(50% 100%, 100% 100%, 100% 0%, 0% 0%, 0% 100%);
   }
 }

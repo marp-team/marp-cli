@@ -2,6 +2,36 @@
 
 ## [Unreleased]
 
+## v2.2.2 - 2022-11-21
+
+### Fixed
+
+- Fix segmentation fault that brings while resolving bundled engine ([#487](https://github.com/marp-team/marp-cli/issues/487), [#488](https://github.com/marp-team/marp-cli/pull/488))
+
+## v2.2.1 - 2022-11-20
+
+### Added
+
+- Test against Node.js 18 LTS ([#486](https://github.com/marp-team/marp-cli/pull/486))
+
+### Changed
+
+- Upgrade development Node.js and dependent packages ([#486](https://github.com/marp-team/marp-cli/pull/486))
+
+### Fixed
+
+- Docker image: Use CDN instead of specific mirrors for apk repositories ([#481](https://github.com/marp-team/marp-cli/pull/481) by [@rhtenhove](https://github.com/rhtenhove))
+
+## v2.2.0 - 2022-09-20
+
+### Added
+
+- [`--pdf-outlines` option(s)](https://github.com/marp-team/marp-cli#pdf-output-options) to assign PDF outlines based on slide pages and Markdown headings ([#478](https://github.com/marp-team/marp-cli/issues/478), [#479](https://github.com/marp-team/marp-cli/pull/479))
+
+### Changed
+
+- Upgrade dependent packages to the latest version ([#480](https://github.com/marp-team/marp-cli/pull/480))
+
 ## v2.1.4-1 - 2022-09-20
 
 ### Changed

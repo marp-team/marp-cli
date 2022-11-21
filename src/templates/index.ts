@@ -1,6 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import { Element, Marpit, Options, RenderResult } from '@marp-team/marpit'
+import { OutlinePage } from '../engine/pdf/outline-plugin'
 import transitionPlugin, { EngineTransition } from '../engine/transition-plugin'
 import barePug from './bare/bare.pug'
 import bareScss from './bare/bare.scss'
@@ -12,6 +13,7 @@ type RendererResult = RenderResult &
     length: number
     size: RenderedSize
     transition?: EngineTransition
+    outline?: OutlinePage[]
   }
 
 interface TemplateRendererOptions extends Options {

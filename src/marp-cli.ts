@@ -18,6 +18,7 @@ enum OptionGroup {
   Basic = 'Basic Options:',
   Converter = 'Converter Options:',
   Template = 'Template Options:',
+  PDF = 'PDF Options:',
   Meta = 'Metadata Options:',
   Marp = 'Marp / Marpit Options:',
 }
@@ -50,6 +51,7 @@ export const marpCli = async (
   try {
     const base: Argv = yargs(argv)
     const program = base
+      .parserConfiguration({ 'dot-notation': false })
       .usage(usage)
       .help(false)
       .version(false)
@@ -202,6 +204,28 @@ export const marpCli = async (
           group: OptionGroup.Template,
           type: 'boolean',
         },
+        'pdf-notes': {
+          describe: 'Add presenter notes to PDF as annotations',
+          group: OptionGroup.PDF,
+          type: 'boolean',
+        },
+        'pdf-outlines': {
+          describe: 'Add outlines (bookmarks) to PDF',
+          group: OptionGroup.PDF,
+          type: 'boolean',
+        },
+        'pdf-outlines.pages': {
+          describe: 'Make outlines from slide pages',
+          defaultDescription: 'true',
+          group: OptionGroup.PDF,
+          type: 'boolean',
+        },
+        'pdf-outlines.headings': {
+          describe: 'Make outlines from Markdown headings',
+          defaultDescription: 'true',
+          group: OptionGroup.PDF,
+          type: 'boolean',
+        },
         title: {
           describe: 'Define title of the slide deck',
           group: OptionGroup.Meta,
@@ -231,11 +255,6 @@ export const marpCli = async (
           describe: 'Define Open Graph image URL',
           group: OptionGroup.Meta,
           type: 'string',
-        },
-        'pdf-notes': {
-          describe: 'Add presenter notes to PDF as annotations',
-          group: OptionGroup.Meta,
-          type: 'boolean',
         },
         engine: {
           describe: 'Select Marpit based engine by module name or path',

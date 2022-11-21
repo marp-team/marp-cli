@@ -20,11 +20,9 @@ interface IMarpCLIArguments {
   allowLocalFiles?: boolean
   author?: string
   baseUrl?: string
-  bespoke?: {
-    osc?: boolean
-    progress?: boolean
-    transition?: boolean
-  }
+  'bespoke.osc'?: boolean
+  'bespoke.progress'?: boolean
+  'bespoke.transition'?: boolean
   configFile?: string | false
   description?: string
   engine?: string
@@ -40,6 +38,9 @@ interface IMarpCLIArguments {
   output?: string | false
   pdf?: boolean
   pdfNotes?: boolean
+  pdfOutlines?: boolean
+  'pdfOutlines.pages'?: boolean
+  'pdfOutlines.headings'?: boolean
   pptx?: boolean
   preview?: boolean
   server?: boolean
@@ -54,13 +55,34 @@ interface IMarpCLIArguments {
 }
 
 export type IMarpCLIConfig = Overwrite<
-  Omit<IMarpCLIArguments, 'configFile' | '_'>,
+  Omit<
+    IMarpCLIArguments,
+    | '_'
+    | 'configFile'
+    | 'bespoke.osc'
+    | 'bespoke.progress'
+    | 'bespoke.transition'
+    | 'pdfOutlines'
+    | 'pdfOutlines.pages'
+    | 'pdfOutlines.headings'
+  >,
   {
+    bespoke?: {
+      osc?: boolean
+      progress?: boolean
+      transition?: boolean
+    }
     engine?: ResolvableEngine | ResolvableEngine[]
     html?: ConverterOption['html']
     keywords?: string | string[]
     lang?: string
     options?: ConverterOption['options']
+    pdfOutlines?:
+      | boolean
+      | {
+          pages?: boolean
+          headings?: boolean
+        }
     themeSet?: string | string[]
   }
 >
@@ -123,7 +145,7 @@ export class MarpCLIConfig {
     const templateOption: TemplateOption = (() => {
       if (template === 'bespoke') {
         const bespoke = this.conf.bespoke || {}
-        const transition = this.args.bespoke?.transition ?? bespoke.transition
+        const transition = this.args['bespoke.transition'] ?? bespoke.transition
 
         if (transition) {
           info(
@@ -137,8 +159,8 @@ export class MarpCLIConfig {
         }
 
         return {
-          osc: this.args.bespoke?.osc ?? bespoke.osc,
-          progress: this.args.bespoke?.progress ?? bespoke.progress,
+          osc: this.args['bespoke.osc'] ?? bespoke.osc,
+          progress: this.args['bespoke.progress'] ?? bespoke.progress,
           transition,
         }
       }
@@ -168,6 +190,28 @@ export class MarpCLIConfig {
     )
       warn('Not found additional theme CSS files.')
 
+    const pdfNotes = !!(this.args.pdfNotes || this.conf.pdfNotes)
+    const pdfOutlines =
+      this.args.pdfOutlines ?? this.conf.pdfOutlines
+        ? (() => {
+            const defaultPdfOutlines = { pages: true, headings: true } as const
+            const getConf = (key: keyof typeof defaultPdfOutlines) => {
+              const argOption = this.args[`pdfOutlines.${key}`]
+              if (argOption !== undefined) return argOption
+              if (typeof this.conf.pdfOutlines === 'object')
+                return !!this.conf.pdfOutlines[key]
+
+              return defaultPdfOutlines[key]
+            }
+
+            const pages = getConf('pages')
+            const headings = getConf('headings')
+
+            if (!pages && !headings) return false
+            return { pages, headings }
+          })()
+        : false
+
     const type = ((): ConvertType => {
       // CLI options
       if (this.args.pdf || this.conf.pdf) return ConvertType.pdf
@@ -194,8 +238,10 @@ export class MarpCLIConfig {
         return ConvertType.jpeg
       if (lowerOutput.endsWith('.txt')) return ConvertType.notes
 
-      // Prefer PDF than HTML if enabled presenter notes for PDF
-      if (this.args.pdfNotes || this.conf.pdfNotes) return ConvertType.pdf
+      // Prefer PDF than HTML if enabled any PDF options
+      if ((this.args.pdf ?? this.conf.pdf) !== false) {
+        if (pdfNotes || pdfOutlines) return ConvertType.pdf
+      }
 
       return ConvertType.html
     })()
@@ -231,6 +277,8 @@ export class MarpCLIConfig {
       imageScale,
       inputDir,
       output,
+      pdfNotes,
+      pdfOutlines,
       preview,
       puppeteerTimeout,
       server,
@@ -256,7 +304,6 @@ export class MarpCLIConfig {
       lang: this.conf.lang || (await osLocale()).replace(/@/g, '-'),
       options: this.conf.options || {},
       pages: !!(this.args.images || this.conf.images),
-      pdfNotes: !!(this.args.pdfNotes || this.conf.pdfNotes),
       watch: (this.args.watch ?? this.conf.watch) || preview || server || false,
       duration: this.args.duration ?? this.conf.duration,
       slide: this.args.slide ?? this.conf.slide

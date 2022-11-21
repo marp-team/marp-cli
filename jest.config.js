@@ -22,6 +22,7 @@ const esModules = [
 module.exports = {
   collectCoverageFrom: ['src/**/*.ts', 'src/**/*.tsx'],
   coveragePathIgnorePatterns: ['/node_modules/', '.*\\.d\\.ts'],
+  coverageProvider: 'v8',
   coverageThreshold: { global: { lines: 95 } },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   setupFiles: ['./jest.setup.js'],

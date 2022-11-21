@@ -7,6 +7,8 @@ theme: uncover
 
 Write and convert your presentation deck with just a plain Markdown!
 
+<!-- You can also write down presenter notes in HTML comments. -->
+
 ---
 
 <!-- backgroundColor: beige -->
