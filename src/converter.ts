@@ -433,13 +433,16 @@ export class Converter {
         if (opts.duration == null)
           return (await page.screenshot({ clip, type: 'png' })) as Buffer
 
+        const Config = {
+          fps: 25,
+          ffmpeg_Path: process.env.FFMPEG_PATH,
+        };
+        const recorder = new PuppeteerScreenRecorder(page, Config);
         var os = require('os');
-        const recorder = new PuppeteerScreenRecorder(page);
         const mp4File = os.tmpdir() + '/temp.mp4';
         await recorder.start(mp4File);
 
         await new Promise(r => setTimeout(r, opts.duration!));
-        //await page.waitForTimeout(opts.duration!)
 
         await recorder.stop();
         var fs = require('fs');

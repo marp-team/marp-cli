@@ -1,4 +1,5 @@
 import chalk from 'chalk'
+import { info } from 'console'
 import { Argv } from 'yargs'
 import yargs from 'yargs/yargs'
 import * as cli from './cli'
@@ -152,7 +153,7 @@ export const marpCli = async (
           conflicts: ['pdf', 'image', 'pptx', 'notes'],
           describe: 'Convert slide deck into multiple image files',
           group: OptionGroup.Converter,
-          choices: ['png', 'jpeg'],
+          choices: ['png', 'jpeg', 'mp4'],
           coerce: (type: string) => {
             if (type === '') return 'png'
             if (type === 'jpg') return 'jpeg'
@@ -287,6 +288,10 @@ export const marpCli = async (
           group: OptionGroup.Converter,
           type: 'number',
         },
+        'ffmpeg': {
+          describe: 'Path to ffmpeg binary',
+          type: 'string',
+        }
       })
 
     const argvRet = await program.argv
@@ -303,6 +308,8 @@ export const marpCli = async (
 
     const config = await fromArguments(args)
     if (args.version) return await version(config)
+
+    if (args.ffmpeg) process.env.FFMPEG_PATH = args.ffmpeg
 
     // Initialize converter
     const converter = new Converter(await config.converterOption())
