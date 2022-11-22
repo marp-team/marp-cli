@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## v2.2.2-3 - 2022-11-22
+
+### Fixed
+
+- Add extra wait before recording
+
 ## v2.2.2-2 - 2022-11-22
 
 ### Fixed

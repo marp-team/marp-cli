@@ -440,6 +440,7 @@ export class Converter {
         const recorder = new PuppeteerScreenRecorder(page, Config);
         var os = require('os');
         const mp4File = os.tmpdir() + '/temp.mp4';
+        await new Promise(r => setTimeout(r, 3000));// Lets wait a bit for chrome to render
         await recorder.start(mp4File);
 
         await new Promise(r => setTimeout(r, opts.duration!));
