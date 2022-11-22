@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## v2.2.2-2 - 2022-11-22
+
+### Fixed
+
+- Pass ffmpeg path as argumet (--ffmpeg)
+
 ## v2.2.2-1 - 2022-11-22
 
 ### Changed
