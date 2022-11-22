@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## v2.2.2-4 - 2022-11-22
+
+### Changed
+
+- Use fake screenshot instead of wait
+
 ## v2.2.2-3 - 2022-11-22
 
 ### Fixed
