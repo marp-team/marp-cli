@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## v2.2.2-1 - 2022-11-22
+
+### Changed
+
+- Replace aPNG by MP4
+
 ## v2.2.2 - 2022-11-21
 
 ### Fixed

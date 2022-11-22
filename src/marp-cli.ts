@@ -140,7 +140,7 @@ export const marpCli = async (
           conflicts: ['pdf', 'images', 'pptx', 'notes'],
           describe: 'Convert the first slide page into an image file',
           group: OptionGroup.Converter,
-          choices: ['png', 'jpeg'],
+          choices: ['png', 'jpeg', 'mp4'],
           coerce: (type: string) => {
             if (type === '') return 'png'
             if (type === 'jpg') return 'jpeg'
@@ -278,12 +278,12 @@ export const marpCli = async (
           type: 'string',
         },
         'duration': {
-          describe: 'Duration of each slide (aPNG only) in ms',
+          describe: 'Duration of each slide (MP4 only) in ms',
           group: OptionGroup.Converter,
           type: 'number',
         },
         'slide': {
-          describe: 'Slide number to be converted (aPNG only)',
+          describe: 'Slide number to be converted (MP4 only)',
           group: OptionGroup.Converter,
           type: 'number',
         },

@@ -148,12 +148,12 @@
   "dependencies": {
     "@marp-team/marp-core": "^3.4.0",
     "@marp-team/marpit": "^2.4.2",
-    "@pdf-lib/upng": "^1.0.1",
     "chokidar": "^3.5.3",
     "cosmiconfig": "^7.1.0",
     "import-from": "^4.0.0",
     "is-wsl": "^2.2.0",
     "puppeteer-core": "19.2.2",
+    "puppeteer-screen-recorder": "^2.1.2",
     "remove": "^0.1.5",
     "serve-index": "^1.9.1",
     "tmp": "^0.2.1",

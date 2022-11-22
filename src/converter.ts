@@ -36,7 +36,7 @@ import {
 } from './utils/puppeteer'
 import { isChromeInWSLHost, resolveWSLPathToHost } from './utils/wsl'
 import { notifier } from './watcher'
-import UPNG from '@pdf-lib/upng'
+import { PuppeteerScreenRecorder } from 'puppeteer-screen-recorder';
 
 const CREATED_BY_MARP = 'Created by Marp'
 
@@ -47,6 +47,7 @@ export enum ConvertType {
   pptx = 'pptx',
   jpeg = 'jpg',
   notes = 'notes',
+  mp4 = 'mp4',
 }
 
 export const mimeTypes = {
@@ -57,6 +58,7 @@ export const mimeTypes = {
     'application/vnd.openxmlformats-officedocument.presentationml.presentation',
   [ConvertType.jpeg]: 'image/jpeg',
   [ConvertType.notes]: 'text/plain',
+  [ConvertType.mp4]: 'video/mp4',
 }
 
 export interface ConverterOption {
@@ -100,7 +102,7 @@ export interface ConvertImageOption {
   pages?: boolean | number[]
   quality?: number
   scale?: number
-  type: ConvertType.png | ConvertType.jpeg
+  type: ConvertType.png | ConvertType.jpeg | ConvertType.mp4
   duration?: number
   slide?: number
 }
@@ -225,6 +227,7 @@ export class Converter {
           template = await useTemplate(true)
           files.push(await this.convertFileToPDF(template, file))
           break
+        case ConvertType.mp4:
         case ConvertType.png:
         case ConvertType.jpeg:
           template = await useTemplate(true)
@@ -430,57 +433,20 @@ export class Converter {
         if (opts.duration == null)
           return (await page.screenshot({ clip, type: 'png' })) as Buffer
 
-        let timestamp = 0;
-        let session;
-        let images: Buffer[] = [];
-        let tss: number[] = [];
-        let lastTimestamp = 0;
+        var os = require('os');
+        const recorder = new PuppeteerScreenRecorder(page);
+        const mp4File = os.tmpdir() + '/temp.mp4';
+        await recorder.start(mp4File);
 
-        async function start(page) {
-          session = await page.target().createCDPSession();
-          await session.send('Page.startScreencast');
-          session.on('Page.screencastFrame', ({ data, metadata, sessionId }) => {
-            if (metadata.scrollOffsetY != expectedOffsetY) {
-              // Skip: This is an "invalid" frame. The Y offset does not match the expected
-            } else {
-              if (timestamp == 0)
-                timestamp = metadata.timestamp * 1000;
-              const buffer = Buffer.from(data, 'base64');
-              lastTimestamp = metadata.timestamp * 1000;
-              images.push(buffer);
-              tss.push(lastTimestamp);
-            }
-            session.send('Page.screencastFrameAck', { sessionId }).catch(() => { });
-          });
-        }
+        await new Promise(r => setTimeout(r, opts.duration!));
+        //await page.waitForTimeout(opts.duration!)
 
-        async function stop() {
-          await session.send('Page.stopScreencast');
-        }
+        await recorder.stop();
+        var fs = require('fs');
+        var data = fs.readFileSync(mp4File);
+        fs.unlinkSync(mp4File);
 
-        await start(page);
-        while (timestamp == 0 || lastTimestamp - timestamp < opts.duration!) {
-          await page.waitForTimeout(opts.duration! - (lastTimestamp - timestamp))
-        }
-        await stop();
-
-        let apngImgs: ArrayBuffer[] = [];
-        let delays: number[] = [];
-        let ts = timestamp;
-        let w = 0, h = 0;
-        while (images.length > 0) {
-          let img = UPNG.decode(images.shift()!);
-          let current = tss.shift()!;
-          let delay = current - ts;
-          ts = current;
-          apngImgs.push(img.data);
-          delays.push(delay);
-          if (w == 0) w = img.width;
-          if (h == 0) h = img.height;
-        }
-
-        let apng = UPNG.encode(apngImgs, w, h, 0, delays);
-        return Buffer.from(apng);
+        return data;
       }
 
       if (opts.slide == null && opts.pages) {

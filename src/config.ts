@@ -237,6 +237,7 @@ export class MarpCLIConfig {
       if (lowerOutput.endsWith('.jpg') || lowerOutput.endsWith('.jpeg'))
         return ConvertType.jpeg
       if (lowerOutput.endsWith('.txt')) return ConvertType.notes
+      if (lowerOutput.endsWith('.mp4')) return ConvertType.mp4
 
       // Prefer PDF than HTML if enabled any PDF options
       if ((this.args.pdf ?? this.conf.pdf) !== false) {
