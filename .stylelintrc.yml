@@ -10,11 +10,11 @@ rules:
   property-no-unknown:
     - true
     - ignoreProperties:
-        - page-transition-tag
+        - view-transition-name
   selector-pseudo-element-no-unknown:
     - true
     - ignorePseudoElements:
-        - /^page-transition-/
+        - /^view-transition-/
   selector-type-no-unknown:
     - true
     - ignoreTypes:

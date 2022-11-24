@@ -79,8 +79,8 @@ export const generatePuppeteerLaunchArgs = async () => {
   if (isDocker() || process.env.CI)
     args.add('--disable-features=VizDisplayCompositor')
 
-  // Enable DocumentTransition API
-  if (!process.env.CI) args.add('--enable-blink-features=DocumentTransition')
+  // Enable View transition API
+  if (!process.env.CI) args.add('--enable-blink-features=ViewTransition')
 
   // LayoutNG Printing
   if (process.env.CHROME_LAYOUTNG_PRINTING)
