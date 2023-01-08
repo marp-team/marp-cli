@@ -8,6 +8,7 @@
 
 ### Changed
 
+- Upgrade Marp Core to [v3.4.2](https://github.com/marp-team/marp-core/releases/v3.4.2) ([#493](https://github.com/marp-team/marp-cli/pull/493))
 - Upgrade Node.js and dependent packages ([#493](https://github.com/marp-team/marp-cli/pull/493))
 
 ## v2.2.2 - 2022-11-21
