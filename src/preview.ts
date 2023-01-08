@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 import { EventEmitter } from 'events'
 import { nanoid } from 'nanoid'
-import type puppeteer from 'puppeteer-core'
+import type { Page, Browser, Target } from 'puppeteer-core'
 import TypedEmitter from 'typed-emitter'
 import macDockIcon from './assets/mac-dock-icon.png'
 import { ConvertType, mimeTypes } from './converter'
@@ -29,7 +29,7 @@ export namespace Preview {
   }
 
   export interface Window extends EventEmitter {
-    page: puppeteer.Page
+    page: Page
     close: () => Promise<void>
     load: (uri: string) => Promise<void>
   }
@@ -38,7 +38,7 @@ export namespace Preview {
 export class Preview extends (EventEmitter as new () => TypedEmitter<Preview.Events>) {
   readonly options: Preview.Options
 
-  private puppeteerInternal: puppeteer.Browser | undefined
+  private puppeteerInternal: Browser | undefined
 
   constructor(opts: Partial<Preview.Options> = {}) {
     super()
@@ -48,7 +48,7 @@ export class Preview extends (EventEmitter as new () => TypedEmitter<Preview.Eve
     }
   }
 
-  get puppeteer(): puppeteer.Browser | undefined {
+  get puppeteer(): Browser | undefined {
     return this.puppeteerInternal
   }
 
@@ -73,7 +73,7 @@ export class Preview extends (EventEmitter as new () => TypedEmitter<Preview.Eve
     }
   }
 
-  private createWindowObject(page: puppeteer.Page): Preview.Window {
+  private createWindowObject(page: Page): Preview.Window {
     const window = new EventEmitter()
 
     page.on('close', async () => window.emit('close'))
@@ -106,12 +106,12 @@ export class Preview extends (EventEmitter as new () => TypedEmitter<Preview.Eve
   private async createWindow() {
     try {
       return this.createWindowObject(
-        await new Promise<puppeteer.Page>((res, rej) => {
+        await new Promise<Page>((res, rej) => {
           const pptr = this.puppeteer
           if (!pptr) return rej(false)
 
           const id = nanoid()
-          const idMatcher = (target: puppeteer.Target) => {
+          const idMatcher = (target: Target) => {
             const url = new URL(target.url())
 
             if (url.searchParams.get('__marp_cli_id') === id) {
