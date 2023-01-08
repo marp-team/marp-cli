@@ -11,10 +11,11 @@ interface TransitionCallbackOption {
   cond: (e: any) => boolean
 }
 
-interface DocumentTransition {
-  start(callback: () => void): Promise<void>
-  setElement(element: Element, tag: string, options?: any): void
-  abandon(): void
+interface ViewTransition {
+  domUpdated: Promise<void>
+  finished: Promise<void>
+  ready: Promise<void>
+  skipTransition: () => void
 }
 
 export const transitionStyleId = '_tSId' as const
@@ -46,12 +47,11 @@ const reducedKeyframes: MarpTransitionKeyframes = {
 }
 
 const bespokeTransition = (deck) => {
-  const createDocumentTransition: any = document['createDocumentTransition']
-  if (!createDocumentTransition) return
+  if (!document['startViewTransition']) return
 
   const transitionDuringState = (
-    value?: boolean | DocumentTransition
-  ): boolean | DocumentTransition | undefined => {
+    value?: boolean | ViewTransition
+  ): boolean | ViewTransition | undefined => {
     if (value !== undefined) deck[transitionDuring] = value
     return deck[transitionDuring]
   }
@@ -59,23 +59,6 @@ const bespokeTransition = (deck) => {
   let currentFragment: any
 
   transitionDuringState(false)
-
-  const doTransition = (
-    transition: DocumentTransition | true, // true means no transition
-    callback: () => void | Promise<void>
-  ) => {
-    requestAnimationFrame(async () => {
-      transitionDuringState(transition)
-
-      try {
-        await callback()
-      } catch (e) {
-        console.warn(e)
-      } finally {
-        transitionDuringState(false)
-      }
-    })
-  }
 
   // Prefetch using keyframes
   prepareMarpTransitions(
@@ -115,7 +98,7 @@ const bespokeTransition = (deck) => {
       if (currentTransition) {
         if (e[transitionApply]) return true
         if (typeof currentTransition === 'object') {
-          currentTransition.abandon()
+          currentTransition.skipTransition()
           if (e.forSync) return true
         }
         return false
@@ -143,14 +126,25 @@ const bespokeTransition = (deck) => {
       getMarpTransitionKeyframes(transitionData.name, {
         builtinFallback: transitionData.builtinFallback,
       }).then((keyframes) => {
-        if (!keyframes) return doTransition(true, () => fn(e))
+        if (!keyframes) {
+          // Fallback to default navigation
+          transitionDuringState(true) // true means no transition
+
+          try {
+            fn(e)
+          } finally {
+            transitionDuringState(false)
+          }
+
+          return
+        }
 
         // Normalize keyframes for preferred reduced motion
         let normalizedKeyframes = keyframes
 
         if (prefersReducedMotion.matches) {
           console.warn(
-            'Use a constant animation to transition because preferring reduced motion by viewer has detected. '
+            'Use a constant animation to transition because preferring reduced motion by viewer has detected.'
           )
           normalizedKeyframes = reducedKeyframes
         }
@@ -170,38 +164,41 @@ const bespokeTransition = (deck) => {
           duration: transitionData.duration,
         }).forEach((styleText) => style.sheet?.insertRule(styleText))
 
-        try {
-          // Start transition
-          const transition: DocumentTransition =
-            document['createDocumentTransition']()
+        // Start transition
+        const rootClassList = document.documentElement.classList
+        rootClassList.add(transitionWarmUpClass)
 
-          const rootClassList = document.documentElement.classList
-          rootClassList.add(transitionWarmUpClass)
+        let navigated = false
 
-          let navigated = false
+        const navigate = () => {
+          if (navigated) return
 
-          const navigate = () => {
-            if (navigated) return
+          fn(e)
+          navigated = true
 
-            fn(e)
-            navigated = true
+          rootClassList.remove(transitionWarmUpClass)
+        }
 
-            rootClassList.remove(transitionWarmUpClass)
-          }
-
-          doTransition(transition, async () => {
-            try {
-              await transition.start(navigate)
-            } catch (err) {
-              console.error(err)
-              navigate()
-            } finally {
-              style.remove()
-              rootClassList.remove(transitionWarmUpClass)
-            }
-          })
-        } catch (e) {
+        const finalize = () => {
           transitionDuringState(false)
+
+          style.remove()
+          rootClassList.remove(transitionWarmUpClass)
+        }
+
+        try {
+          transitionDuringState(true) // to prevent unexpected navigation
+
+          const transition: ViewTransition =
+            document['startViewTransition'](navigate)
+
+          transitionDuringState(transition)
+          transition.finished.finally(finalize)
+        } catch (e) {
+          console.error(e)
+
+          navigate()
+          finalize()
         }
       })
 

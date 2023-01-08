@@ -517,7 +517,7 @@ describe('Marp CLI', () => {
     })
 
     const matcher = expect.stringContaining(
-      'transition support for bespoke template is enabled'
+      'transition support for bespoke template has been enabled'
     )
     const previewRecommendation = expect.stringContaining('--preview')
 

@@ -12,7 +12,7 @@ import { transitionStyleId } from '../../src/templates/bespoke/transition'
 import * as fullscreen from '../../src/templates/bespoke/utils/fullscreen'
 import * as transitionUtils from '../../src/templates/bespoke/utils/transition'
 import { _clearCachedWakeLockApi } from '../../src/templates/bespoke/wake-lock'
-import * as documentTransition from '../_browser/documentTransition'
+import * as viewTransition from '../_browser/viewTransition'
 
 jest.useFakeTimers()
 
@@ -1498,7 +1498,7 @@ describe("Bespoke template's browser context", () => {
       jest.runOnlyPendingTimers()
       deck.slide(0)
       await waitAsync()
-      documentTransition.start.mockClear()
+      document['startViewTransition'].mockClear()
 
       return deck
     }
@@ -1543,11 +1543,11 @@ describe("Bespoke template's browser context", () => {
 
       deck.next()
       expect(deck.slide()).toBe(1)
-      expect(documentTransition.start).not.toHaveBeenCalled()
+      expect(document['startViewTransition']).not.toHaveBeenCalled()
 
       deck.prev()
       expect(deck.slide()).toBe(0)
-      expect(documentTransition.start).not.toHaveBeenCalled()
+      expect(document['startViewTransition']).not.toHaveBeenCalled()
     })
 
     it('does not trigger transitions if not defined transition keyframes', async () => {
@@ -1566,7 +1566,7 @@ describe("Bespoke template's browser context", () => {
       await waitAsync()
 
       expect(deck.slide()).toBe(1)
-      expect(documentTransition.start).not.toHaveBeenCalled()
+      expect(document['startViewTransition']).not.toHaveBeenCalled()
     })
 
     it('triggers transitions if defined transition effects in Markdown', async () => {
@@ -1596,7 +1596,7 @@ describe("Bespoke template's browser context", () => {
       await waitAsync()
 
       expect(deck.slide()).toBe(1)
-      expect(documentTransition.start).toHaveBeenCalled()
+      expect(document['startViewTransition']).toHaveBeenCalled()
 
       // Back
       deck.prev()
@@ -1604,13 +1604,20 @@ describe("Bespoke template's browser context", () => {
       await waitAsync()
 
       expect(deck.slide()).toBe(0)
-      expect(documentTransition.start).toHaveBeenCalledTimes(2)
+      expect(document['startViewTransition']).toHaveBeenCalledTimes(2)
 
       // Cancel transition by double navigation
-      documentTransition.start.mockImplementationOnce(async (callback) => {
+      document['startViewTransition'].mockImplementationOnce((callback) => {
         callback()
-        await new Promise(() => {
-          /* never resolved to simulate transition */
+
+        return Object.create(viewTransition.ViewTransition, {
+          domUpdated: { value: Promise.resolve() },
+          ready: { value: Promise.resolve() },
+          finished: {
+            value: new Promise(() => {
+              /* never resolved to simulate transition */
+            }),
+          },
         })
       })
 
@@ -1626,7 +1633,7 @@ describe("Bespoke template's browser context", () => {
       deck.slide(0)
       await waitAsync()
 
-      expect(documentTransition.abandon).toHaveBeenCalled()
+      expect(viewTransition.skipTransition).toHaveBeenCalled()
       expect(deck.slide()).toBe(1)
     })
 
@@ -1646,10 +1653,17 @@ describe("Bespoke template's browser context", () => {
       // Initialize
       const deck = await initializeBespoke()
 
-      documentTransition.start.mockImplementationOnce(async (callback) => {
+      document['startViewTransition'].mockImplementationOnce((callback) => {
         callback()
-        await new Promise(() => {
-          /* never resolved to simulate transition */
+
+        return Object.create(viewTransition.ViewTransition, {
+          domUpdated: { value: Promise.resolve() },
+          ready: { value: Promise.resolve() },
+          finished: {
+            value: new Promise(() => {
+              /* never resolved to simulate transition */
+            }),
+          },
         })
       })
 
@@ -1690,10 +1704,17 @@ describe("Bespoke template's browser context", () => {
 
       let resolveTransition: (() => void) | undefined
 
-      documentTransition.start.mockImplementation(async (callback) => {
+      document['startViewTransition'].mockImplementation((callback) => {
         callback()
-        await new Promise<void>((resolve) => {
-          resolveTransition = resolve
+
+        const finished = new Promise<void>((resolve) => {
+          resolveTransition = () => resolve()
+        })
+
+        return Object.create(viewTransition.ViewTransition, {
+          domUpdated: { value: Promise.resolve() },
+          ready: { value: Promise.resolve() },
+          finished: { value: finished },
         })
       })
 
@@ -1702,7 +1723,7 @@ describe("Bespoke template's browser context", () => {
         await waitAsync()
 
         expect(deck.slide()).toBe(1)
-        expect(documentTransition.start).toHaveBeenCalled()
+        expect(document['startViewTransition']).toHaveBeenCalled()
         expect(getTransitionStyle()).toContain(
           '--marp-bespoke-transition-animation-duration: 3s;'
         )
@@ -1718,7 +1739,7 @@ describe("Bespoke template's browser context", () => {
         await waitAsync()
 
         expect(deck.slide()).toBe(0)
-        expect(documentTransition.start).toHaveBeenCalled()
+        expect(document['startViewTransition']).toHaveBeenCalled()
         expect(getTransitionStyle()).toContain(
           '--marp-bespoke-transition-animation-duration: 3s;'
         )
@@ -1739,21 +1760,23 @@ describe("Bespoke template's browser context", () => {
       // Initialize
       const deck = await initializeBespoke()
 
-      // Error when calling documentTransition.start
-      documentTransition.start.mockRejectedValueOnce(new Error('test'))
+      // Error when calling startViewTransition
+      document['startViewTransition'].mockImplementationOnce(() => {
+        throw new Error('test')
+      })
 
       deck.next()
       expect(deck.slide()).toBe(0)
       await waitAsync()
 
-      expect(documentTransition.start).toHaveBeenCalled()
+      expect(document['startViewTransition']).toHaveBeenCalled()
       expect(deck.slide()).toBe(1)
 
       deck.slide(0)
       await waitAsync()
 
       // Error in callback: Prevent double navigation
-      documentTransition.start.mockImplementationOnce(async (callback) => {
+      document['startViewTransition'].mockImplementationOnce((callback) => {
         callback()
         throw new Error('ex')
       })

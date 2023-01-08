@@ -147,11 +147,13 @@ export class MarpCLIConfig {
 
         if (transition) {
           info(
-            'An EXPERIMENTAL transition support for bespoke template is enabled. ' +
-              'It is using the shared element transition API proposal and it is not yet stable. ' +
+            'An EXPERIMENTAL transition support for bespoke template has been enabled. ' +
+              `It is powered by View Transitions API proposal that is ${chalk.yellow`currently available only in Chrome 109 and later.`} ` +
               (preview
                 ? ''
-                : `Recommend to use with ${chalk.yellow`--preview`} option for trying transitions. `) +
+                : `Recommend to use with ${chalk.yellow`--preview`} option for trying transitions surely. `) +
+              `And please don't forget ${chalk.bold
+                .redBright`you're using not yet stable feature`}. ` +
               `Track the latest information at ${chalk.blueBright`https://github.com/marp-team/marp-cli/issues/447`}.`
           )
         }

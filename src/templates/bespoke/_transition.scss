@@ -23,7 +23,7 @@
 
 @mixin transition {
   @at-root {
-    ::page-transition-container(*) {
+    ::view-transition-group(*) {
       animation-duration: var(
         --marp-bespoke-transition-animation-duration,
         0.5s
@@ -31,8 +31,8 @@
       animation-timing-function: ease;
     }
 
-    ::page-transition-outgoing-image(*),
-    ::page-transition-incoming-image(*) {
+    ::view-transition-old(*),
+    ::view-transition-new(*) {
       animation-name: var(
         --marp-bespoke-transition-animation-name,
         var(
@@ -53,36 +53,36 @@
       mix-blend-mode: normal;
     }
 
-    ::page-transition-outgoing-image(*) {
+    ::view-transition-old(*) {
       --marp-bespoke-transition-animation-name-fallback: __bespoke_marp_transition_reduced_outgoing__;
 
       animation-timing-function: ease;
     }
 
-    ::page-transition-incoming-image(*) {
+    ::view-transition-new(*) {
       --marp-bespoke-transition-animation-name-fallback: __bespoke_marp_transition_reduced_incoming__;
 
       animation-timing-function: ease;
     }
 
-    ::page-transition-outgoing-image(root),
-    ::page-transition-incoming-image(root) {
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
       animation-timing-function: linear;
     }
 
-    ::page-transition-outgoing-image(__bespoke_marp_transition_osc__),
-    ::page-transition-incoming-image(__bespoke_marp_transition_osc__) {
+    ::view-transition-old(__bespoke_marp_transition_osc__),
+    ::view-transition-new(__bespoke_marp_transition_osc__) {
       animation-name: __bespoke_marp_transition_osc__ !important; /* no animation */
       animation-duration: 0s !important;
     }
 
-    ::page-transition-incoming-image(__bespoke_marp_transition_osc__) {
+    ::view-transition-new(__bespoke_marp_transition_osc__) {
       opacity: 0 !important;
     }
 
-    .bespoke-marp-transition-warming-up::page-transition-container(*),
-    .bespoke-marp-transition-warming-up::page-transition-incoming-image(*),
-    .bespoke-marp-transition-warming-up::page-transition-outgoing-image(*) {
+    .bespoke-marp-transition-warming-up::view-transition-group(*),
+    .bespoke-marp-transition-warming-up::view-transition-new(*),
+    .bespoke-marp-transition-warming-up::view-transition-old(*) {
       animation-play-state: paused !important;
     }
   }
