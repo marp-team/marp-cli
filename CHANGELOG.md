@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v2.3.0 - 2023-01-08
+
 ### Breaking
 
 - [Experimental transition] Adopt the latest spec of [View Transitions](https://www.w3.org/TR/css-view-transitions-1/) that is available in Chrome 109 and later ([#447](https://github.com/marp-team/marp-cli/issues/447), [#483](https://github.com/marp-team/marp-cli/issues/483), [#489](https://github.com/marp-team/marp-cli/pull/489))
