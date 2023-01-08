@@ -3,7 +3,7 @@ import { URL } from 'url'
 import type { MarpOptions } from '@marp-team/marp-core'
 import { Marpit, Options as MarpitOptions } from '@marp-team/marpit'
 import chalk from 'chalk'
-import type puppeteer from 'puppeteer-core'
+import type { Browser, Page, HTTPRequest } from 'puppeteer-core'
 import { silence, warn } from './cli'
 import { Engine, ResolvedEngine } from './engine'
 import infoPlugin, { engineInfo, EngineInfo } from './engine/info-plugin'
@@ -533,7 +533,7 @@ export class Converter {
 
   private async usePuppeteer<T>(
     baseFile: File,
-    processer: (page: puppeteer.Page, uri: string) => Promise<T>
+    processer: (page: Page, uri: string) => Promise<T>
   ) {
     const tmpFile: File.TmpFileInterface | undefined = await (() => {
       if (!this.options.allowLocalFiles) return undefined
@@ -603,14 +603,14 @@ export class Converter {
     }
   }
 
-  private trackFailedLocalFileAccess(page: puppeteer.Page): {
+  private trackFailedLocalFileAccess(page: Page): {
     missingFileSet: Set<string>
     failedFileSet: Set<string>
   } {
     const missingFileSet = new Set<string>()
     const failedFileSet = new Set<string>()
 
-    page.on('requestfailed', (req: puppeteer.HTTPRequest) => {
+    page.on('requestfailed', (req: HTTPRequest) => {
       try {
         const url = new URL(req.url())
         if (url.protocol === 'file:') {
@@ -632,7 +632,7 @@ export class Converter {
     if (Converter.browser) await Converter.browser.close()
   }
 
-  private static browser?: puppeteer.Browser
+  private static browser?: Browser
 
   private static async runBrowser({ timeout }: { timeout?: number }) {
     if (!Converter.browser) {
