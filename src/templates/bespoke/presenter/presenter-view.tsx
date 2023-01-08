@@ -95,7 +95,7 @@ const presenterView = (deck) => {
 
   const $cache: { -readonly [T in keyof typeof classes]?: HTMLElement } = {}
   const $ = <T extends HTMLElement>(
-    klass: typeof classes[keyof typeof classes]
+    klass: (typeof classes)[keyof typeof classes]
   ): T => {
     $cache[klass] = $cache[klass] || document.querySelector<T>(`.${klass}`)
 

@@ -30,7 +30,7 @@ export const generateURLfromParams = (
 }
 
 export const getViewMode = () =>
-  body.dataset.bespokeView as typeof viewModes[number]
+  body.dataset.bespokeView as (typeof viewModes)[number]
 
 export const readQuery = (name: string) =>
   new URLSearchParams(location.search).get(name)

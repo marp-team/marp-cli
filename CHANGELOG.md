@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Upgrade Node.js and dependent packages ([#493](https://github.com/marp-team/marp-cli/pull/493))
+
 ## v2.2.2 - 2022-11-21
 
 ### Fixed
