@@ -59,23 +59,35 @@ Don't you like installing Node.js and Chrome to local? We have [an official Dock
 
 ## Install
 
-Marp CLI is working only in [actively supported Node.js versions](https://endoflife.date/nodejs) so Node.js 14 and later is required to install.
-
 ### Use package manager
 
-You can use the package manager to install/update Marp CLI easily.
-
-- **macOS**
-  - **[Homebrew](https://brew.sh/)**: `brew install marp-cli` ([Refer to the formula...](https://github.com/Homebrew/homebrew-core/blob/master/Formula/marp-cli.rb))
-
-* **Windows**
-  - **[Scoop](https://scoop.sh/)**: `scoop install marp` ([Refer to the manifest in Main bucket...](https://github.com/ScoopInstaller/Main/blob/master/bucket/marp.json))
+You can use the package manager to install and update Marp CLI easily.
 
 _Disclaimer: Package manifests are maintained by the community, not Marp team._
 
+<!-- For contributors: For contributors: This section describes only package managers that Marp manifest has been actively maintained. Each tools are following update within a few days of the latest CLI update. -->
+
+#### macOS: **[Homebrew](https://brew.sh/)**
+
+```bash
+brew install marp-cli
+```
+
+<!-- https://github.com/Homebrew/homebrew-core/blob/master/Formula/marp-cli.rb -->
+
+#### Windows: **[Scoop](https://scoop.sh/)**
+
+```cmd
+scoop install marp
+```
+
+<!-- https://github.com/ScoopInstaller/Main/blob/master/bucket/marp.json -->
+
 ### Local installation
 
-We recommend to install Marp CLI into your Node project. You may control the CLI (and engine) version exactly.
+We recommend to install Marp CLI into your Node.js project. You may control the CLI version (and engine if you want) exactly.
+
+> :information_source: Marp CLI is working only with [actively supported Node.js versions](https://endoflife.date/nodejs), so Node.js 14 and later is required when installing into your Node.js project.
 
 ```bash
 npm install --save-dev @marp-team/marp-cli
