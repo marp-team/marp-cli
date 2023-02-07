@@ -263,7 +263,7 @@ You would get the converted PDF, PPTX, PNG, and JPEG by adding corresponded quer
 
 Marp CLI server will provide the list of served files by default, but you can place the default Markdown deck like a common web server's `index.html`.
 
-Place Markdown named `index.md` or `PITCHME.md` ([GitPitch style](https://gitpitch.com/docs/getting-started/pitchme/)) to served directory. It would be redirected just accessing to `http://localhost:8080/`.
+Place Markdown named `index.md` or `PITCHME.md` ([GitPitch style](https://gitpitch.github.io/gitpitch/#/conventions/pitchme-md)) to served directory. It would be redirected just accessing to `http://localhost:8080/`.
 
 ### Preview window (`--preview` / `-p`)
 
