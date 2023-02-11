@@ -77,12 +77,10 @@
       100% 0%
     );
     opacity: 0.8;
-    filter: blur(8px);
   }
 
   30% {
     opacity: 1;
-    filter: blur(2px);
     animation-timing-function: ease-out;
   }
 
@@ -245,12 +243,10 @@
       100% 100%
     );
     opacity: 0.8;
-    filter: blur(8px);
   }
 
   30% {
     opacity: 1;
-    filter: blur(2px);
     animation-timing-function: ease-out;
   }
 
