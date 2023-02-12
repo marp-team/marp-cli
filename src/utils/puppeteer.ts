@@ -79,7 +79,7 @@ export const generatePuppeteerLaunchArgs = async () => {
   if (isDocker() || process.env.CI)
     args.add('--disable-features=VizDisplayCompositor')
 
-  // Enable View transition API
+  // Enable View transitions API
   if (!process.env.CI) args.add('--enable-blink-features=ViewTransition')
 
   // LayoutNG Printing

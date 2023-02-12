@@ -199,7 +199,7 @@ export const marpCli = async (
         },
         'bespoke.transition': {
           describe:
-            '[Bespoke] Use transitions (Only in browsers supported View Transition API)',
+            '[Bespoke] Use transitions (Only in browsers supported View Transitions API)',
           defaultDescription: 'true',
           group: OptionGroup.Template,
           type: 'boolean',

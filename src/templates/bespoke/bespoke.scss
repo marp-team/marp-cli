@@ -68,7 +68,7 @@ $progress-height: 5px;
 
     @media (prefers-reduced-motion: reduce) {
       * {
-        /* Disable view transition declared by users */
+        /* Disable view transitions declared by users */
         view-transition-name: none !important;
       }
     }
@@ -112,7 +112,7 @@ $progress-height: 5px;
         /* Hack for Chrome to show OSC overlay onto video correctly */
         will-change: transform;
 
-        /* View Transition */
+        /* View Transitions */
         view-transition-name: __bespoke_marp_transition_osc__;
 
         > * {

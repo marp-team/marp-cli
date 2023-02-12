@@ -367,7 +367,7 @@ If you want to swap the order of layers during animation, try to animate `z-inde
 
 ## Morphing animations
 
-View Transition API also provides smooth moving animation during the transition, for specific two elements in before and after the transition. It's very similar to PowerPoint's Morph transition and Keynote's Magic Move.
+View Transitions API also provides smooth moving animation during the transition, for specific two elements in before and after the transition. It's very similar to PowerPoint's Morph transition and Keynote's Magic Move.
 
 If there were marked elements with the same name by [`view-transition-name` CSS property][view-transition-name] in a old page and new page between transition, the `bespoke` template will apply morphing animation automatically.
 
