@@ -68,7 +68,7 @@ $progress-height: 5px;
 
     @media (prefers-reduced-motion: reduce) {
       * {
-        /* Disable shared element transition declared by users */
+        /* Disable view transition declared by users */
         view-transition-name: none !important;
       }
     }

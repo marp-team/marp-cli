@@ -91,10 +91,14 @@ export const bespoke: Template<TemplateBespokeOption> = async (opts) => {
     slideContainer: [],
   }
 
+  const osc = opts.osc ?? true
+  const progress = opts.progress ?? false
+  const transition = opts.transition ?? true
+
   // Hide template-specific modifier from options which have exposed to the functional engine
   Object.defineProperty(rendererOptions, 'modifier', {
     value: (marpit) => {
-      if (opts.transition) marpit.use(transitionPlugin)
+      if (transition) marpit.use(transitionPlugin)
     },
   })
 
@@ -108,8 +112,8 @@ export const bespoke: Template<TemplateBespokeOption> = async (opts) => {
       bespoke: {
         css: bespokeScss,
         js: await libJs('bespoke.js'),
-        osc: opts.osc ?? true,
-        progress: opts.progress,
+        osc,
+        progress,
         transitionStyle: rendered.transition?.builtinTransitionStyle,
       },
       watchJs: await watchJs(opts.notifyWS),

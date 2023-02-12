@@ -98,8 +98,9 @@ const resolveKeyframeSetting = (keyframe: string) =>
     if (durationVar) {
       setting.defaultDuration = durationVar
     }
-    // TODO: Abuse animatable property with custom-ident if Shared Element
-    // Transition API had supported in cross-browser.
+    // TODO: Consider to abuse animatable property with custom-ident if View
+    // Transition API had supported in cross-browser and `@property` CSS at-rule
+    // was not yet supported in other browsers well
     //
     // else if (
     //   // CSS variable that is setting within the keyframe cannot read in some

@@ -143,25 +143,11 @@ export class MarpCLIConfig {
     const templateOption: TemplateOption = (() => {
       if (template === 'bespoke') {
         const bespoke = this.conf.bespoke || {}
-        const transition = this.args['bespoke.transition'] ?? bespoke.transition
-
-        if (transition) {
-          info(
-            'An EXPERIMENTAL transition support for bespoke template has been enabled. ' +
-              `It is powered by View Transitions API proposal that is ${chalk.yellow`currently available only in Chrome 109 and later.`} ` +
-              (preview
-                ? ''
-                : `Recommend to use with ${chalk.yellow`--preview`} option for trying transitions surely. `) +
-              `And please don't forget ${chalk.bold
-                .redBright`you're using not yet stable feature`}. ` +
-              `Track the latest information at ${chalk.blueBright`https://github.com/marp-team/marp-cli/issues/447`}.`
-          )
-        }
 
         return {
           osc: this.args['bespoke.osc'] ?? bespoke.osc,
           progress: this.args['bespoke.progress'] ?? bespoke.progress,
-          transition,
+          transition: this.args['bespoke.transition'] ?? bespoke.transition,
         }
       }
       return {}

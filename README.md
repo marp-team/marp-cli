@@ -294,11 +294,16 @@ The `bespoke` template is using [Bespoke.js](https://github.com/bespokejs/bespok
 - **Fragmented list**: Recognize [Marpit's fragmented list](https://github.com/marp-team/marpit/issues/145) and appear list one-by-one if used `*` and `1)` as the bullet marker.
 - **Presenter view**: Open presenter view in external window by hitting <kbd>p</kbd> key.
 - **Progress bar** (optional): By setting `--bespoke.progress` option, you can add a progress bar on the top of the deck.
-- [**Slide transitions** _(EXPERIMENTAL)_][transitions]: You may turn on slide transitions support powered by [Shared Element Transitions API proposal](https://github.com/WICG/shared-element-transitions) by `--bespoke.transition` option. Refer to [marp-team/marp-cli#447][transitions] for details.
+- [**Slide transitions**][transitions]: Support transitions (`transition` local directive) powered by [View Transition API].
 
-[transitions]: https://github.com/marp-team/marp-cli/issues/447
+[transitions]: ./docs/bespoke-template/transitions.md
+[view transition api]: https://www.w3.org/TR/css-view-transitions-1/
 
 > ℹ️ Presenter view may be disabled if [the browser restricted using localStorage](https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API#Feature-detecting_localStorage) (e.g. Open HTML in the old Safari with private browsing, or open the _local_ HTML file with Chrome that has blocked 3rd party cookies in `chrome://settings/content/cookies`).
+
+#### Docs
+
+- **[Slide transitions in `bespoke` template][transitions]**
 
 ### `bare` template
 
@@ -513,7 +518,7 @@ If you want to prevent looking up a configuration file, you can pass `--no-confi
 | `bespoke`         |           object            |                           | Setting options for `bespoke` template                                                                      |
 | ┗ `osc`           |           boolean           |      `--bespoke.osc`      | \[Bespoke\] Use on-screen controller (`true` by default)                                                    |
 | ┗ `progress`      |           boolean           |   `--bespoke.progress`    | \[Bespoke\] Use progress bar (`false` by default)                                                           |
-| ┗ `transition`    |           boolean           |  `--bespoke.transition`   | \[Bespoke\] [Enable transitions powered by Shared Element Transitions API][transitions] (EXPERIMENTAL)      |
+| ┗ `transition`    |           boolean           |  `--bespoke.transition`   | \[Bespoke\] Use [transitions] (Only in browsers supported [View Transition API]: `true` by default)         |
 | `description`     |           string            |      `--description`      | Define description of the slide deck                                                                        |
 | `engine`          | string \| Class \| Function |        `--engine`         | Specify Marpit based engine                                                                                 |
 | `html`            |      boolean \| object      |         `--html`          | Enable or disable HTML tags (Configuration file can pass [the whitelist object] if you are using Marp Core) |
