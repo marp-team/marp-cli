@@ -12,10 +12,10 @@ interface TransitionCallbackOption {
 }
 
 interface ViewTransition {
-  domUpdated: Promise<void>
   finished: Promise<void>
   ready: Promise<void>
   skipTransition: () => void
+  updateCallbackDone: Promise<void>
 }
 
 export const transitionStyleId = '_tSId' as const

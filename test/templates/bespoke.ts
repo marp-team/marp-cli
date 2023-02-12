@@ -1611,7 +1611,7 @@ describe("Bespoke template's browser context", () => {
         callback()
 
         return Object.create(viewTransition.ViewTransition, {
-          domUpdated: { value: Promise.resolve() },
+          updateCallbackDone: { value: Promise.resolve() },
           ready: { value: Promise.resolve() },
           finished: {
             value: new Promise(() => {
@@ -1657,7 +1657,7 @@ describe("Bespoke template's browser context", () => {
         callback()
 
         return Object.create(viewTransition.ViewTransition, {
-          domUpdated: { value: Promise.resolve() },
+          updateCallbackDone: { value: Promise.resolve() },
           ready: { value: Promise.resolve() },
           finished: {
             value: new Promise(() => {
@@ -1712,7 +1712,7 @@ describe("Bespoke template's browser context", () => {
         })
 
         return Object.create(viewTransition.ViewTransition, {
-          domUpdated: { value: Promise.resolve() },
+          updateCallbackDone: { value: Promise.resolve() },
           ready: { value: Promise.resolve() },
           finished: { value: finished },
         })

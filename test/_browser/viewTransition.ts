@@ -3,15 +3,15 @@ beforeEach(() => {
     writable: true,
     configurable: true,
     value: jest.fn((callback: () => void) => {
-      const domUpdated = new Promise<void>((resolve) => {
+      const updateCallbackDone = new Promise<void>((resolve) => {
         callback()
         resolve()
       })
 
       return Object.create(ViewTransition, {
-        domUpdated: {
+        updateCallbackDone: {
           enumerable: true,
-          value: domUpdated,
+          value: updateCallbackDone,
         },
         ready: {
           enumerable: true,
@@ -19,7 +19,7 @@ beforeEach(() => {
         },
         finished: {
           enumerable: true,
-          value: domUpdated,
+          value: updateCallbackDone,
         },
       })
     }),
