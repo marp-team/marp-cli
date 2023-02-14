@@ -19,6 +19,7 @@ To show transition animations, a viewer has to show HTML slide in the browser wh
 ### Supported browsers
 
 - **Chrome**: ✅ (111-)
+- **Edge**: ✅ (111-)
 - **Firefox**: :x:
 - **Safari**: :x:
 
