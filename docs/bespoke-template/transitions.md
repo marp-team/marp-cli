@@ -67,7 +67,7 @@ Disabled transition for this slide.
 Got back cover transition.
 ```
 
-`transition` directive means to set the animation to **"the next slide boundary (`---`)"**. So setting `transition` directive at the last slide would have no meaning.
+`transition` directive means to set the animation to **"the next slide boundary (`---`)"**. So setting `transition` directive on the last slide would have no meaning.
 
 ### Built-in transitions
 
@@ -125,7 +125,7 @@ The custom duration accepts a unit `s` or `ms`.
 
 You also can define the custom transitions and animations, both in theme CSS and Markdown inline style. We provide unlimited extensibillity of your own transitions with your creativity.
 
-Define animation [`@keyframes`](https://developer.mozilla.org/en-US/docs/Web/CSS/@keyframes), with a specific keyframe name ruled by Marp.
+For making custom transitions, all you have to know is only about CSS. Define animation [`@keyframes`](https://developer.mozilla.org/en-US/docs/Web/CSS/@keyframes), with a specific keyframe name ruled by Marp. There are no extra plugins and JavaScript codes.
 
 Marp prefers the custom transition if defined the transition with same name as built-in transitions.
 
@@ -368,7 +368,7 @@ If you want to swap the order of layers during animation, try to animate `z-inde
 
 ## Morphing animations
 
-View Transitions API also provides smooth moving animation during the transition, for specific two elements in before and after the transition. It's very similar to PowerPoint's Morph transition and Keynote's Magic Move.
+View Transitions API also provides smooth moving animation during the transition, for specific two elements before and after the transition. It gives a very similar effect to PowerPoint's Morph transition and Keynote's Magic Move, just by simple CSS declarations.
 
 If there were marked elements with the same name by [`view-transition-name` CSS property][view-transition-name] in a old page and new page between transition, the `bespoke` template will apply morphing animation automatically.
 
@@ -382,9 +382,9 @@ The slide author can visualize the relationship between the different elements i
 
 ### Example
 
-In this example, the icon image of "1" in every pages are marked as morphable elements named as "one" by `view-transition-name` CSS propety.
+In this example, the icon image of "1" on every page is marked as morphable elements named "one" by `view-transition-name` CSS property.
 
-Generally setting [`contain` CSS property][contain] as `layout` or `paint` is also required together with `view-transition-name`. If lacked, the browser may ignore morph transition with the error `Shared element must contain paint or layout`.
+Generally setting [`contain` CSS property][contain] as `layout` or `paint` is also required together with `view-transition-name`. If it lacked, the browser may ignore the morph transition with the error `Shared element must contain paint or layout`.
 
 [contain]: https://developer.mozilla.org/en-US/docs/Web/CSS/contain
 
@@ -439,7 +439,7 @@ It provides a writing experience of presentation slides by Markdown.
 
 ### Disable by CLI option
 
-The transition is an optional feature in bespoke template, and enabled by default. You can opt out the transition support by adding CLI option `--bespoke.transition=false`.
+The transition is an optional feature in bespoke template, and it's enabled by default. You can opt out the transition support by adding CLI option `--bespoke.transition=false`.
 
 ```sh
 marp --bespoke.transition=false markdown.md
@@ -447,7 +447,7 @@ marp --bespoke.transition=false markdown.md
 
 This option is also useful when using [a custom engine](../../README.md#functional-engine) that has supported `transition` custom local directive for another approach.
 
-### Reduce transition by viewer
+### Reduce transition by a viewer
 
 _Even if the slide author used transitions,_ every viewer do not always prefer to see dizzy animations. [Reducing motion is important especially for people with vestibular disorders.](https://www.w3.org/WAI/WCAG21/Understanding/animation-from-interactions.html)
 
