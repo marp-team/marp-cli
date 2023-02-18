@@ -131,7 +131,6 @@
     "sass": "^1.58.3",
     "strip-ansi": "^7.0.1",
     "stylelint": "^15.1.0",
-    "stylelint-config-prettier": "^9.0.5",
     "stylelint-config-standard-scss": "^7.0.1",
     "supertest": "^6.3.3",
     "tar-stream": "^3.0.0",
