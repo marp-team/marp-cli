@@ -15,6 +15,7 @@
 @keyframes marp-incoming-transition-backward-__builtin__pivot {
   @include utils.send-backward;
 }
+
 @keyframes marp-outgoing-transition-backward-__builtin__pivot {
   from {
     transform-origin: left top;

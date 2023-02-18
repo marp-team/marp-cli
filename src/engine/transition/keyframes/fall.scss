@@ -3,6 +3,7 @@
 @keyframes marp-incoming-transition-__builtin__fall {
   @include utils.send-backward;
 }
+
 @keyframes marp-outgoing-transition-__builtin__fall {
   from {
     animation-timing-function: cubic-bezier(0.4, 0, 1, 0.6);
@@ -30,5 +31,6 @@
     transform-origin: 50% 100%;
   }
 }
+
 @keyframes marp-outgoing-transition-backward-__builtin__fall {
 }

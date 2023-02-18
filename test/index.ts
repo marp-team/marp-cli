@@ -6,44 +6,54 @@ import * as puppeteerUtil from '../src/utils/puppeteer'
 
 const stdinBuffer = getStdin.buffer
 
-afterEach(() => {
-  jest.restoreAllMocks()
-  jest.clearAllMocks()
-})
+afterEach(() => jest.clearAllMocks())
 
 describe('Marp CLI API interface', () => {
   it('runs Marp CLI with specific options', async () => {
     const marpCliSpy = jest.spyOn(marpCli, 'marpCli').mockResolvedValue(0)
-    const ret = await api([], { baseUrl: 'https://example.com/' })
 
-    expect(ret).toBe(0)
-    expect(marpCliSpy).toHaveBeenCalled()
+    try {
+      const ret = await api([], { baseUrl: 'https://example.com/' })
 
-    const opts: marpCli.MarpCLIInternalOptions = marpCliSpy.mock.calls[0][1]
+      expect(ret).toBe(0)
+      expect(marpCliSpy).toHaveBeenCalled()
 
-    expect(opts.baseUrl).toBe('https://example.com/')
-    expect(opts.stdin).toBe(false)
-    expect(opts.throwErrorAlways).toBe(true)
+      const opts: marpCli.MarpCLIInternalOptions = marpCliSpy.mock.calls[0][1]
+
+      expect(opts.baseUrl).toBe('https://example.com/')
+      expect(opts.stdin).toBe(false)
+      expect(opts.throwErrorAlways).toBe(true)
+    } finally {
+      marpCliSpy.mockRestore()
+    }
   })
 
   it('does not read input from stdin if called API', async () => {
-    jest.spyOn(console, 'error').mockImplementation()
+    const cliError = jest.spyOn(console, 'error').mockImplementation()
 
-    await marpCli.cliInterface([])
-    expect(stdinBuffer).toHaveBeenCalled()
-    ;(stdinBuffer as jest.Mock).mockClear()
+    try {
+      await marpCli.cliInterface([])
+      expect(stdinBuffer).toHaveBeenCalled()
+      ;(stdinBuffer as jest.Mock).mockClear()
 
-    await api([])
-    expect(stdinBuffer).not.toHaveBeenCalled()
+      await api([])
+      expect(stdinBuffer).not.toHaveBeenCalled()
+    } finally {
+      cliError.mockRestore()
+    }
   })
 
   it('always throws error if CLI met an error to suspend', async () => {
-    jest.spyOn(console, 'error').mockImplementation()
+    const cliError = jest.spyOn(console, 'error').mockImplementation()
 
-    const fakePath = path.resolve(__dirname, '__fake')
+    try {
+      const fakePath = path.resolve(__dirname, '__fake')
 
-    expect(await marpCli.cliInterface(['-c', fakePath])).toBeGreaterThan(0)
-    await expect(api(['-c', fakePath])).rejects.toBeInstanceOf(CLIError)
+      expect(await marpCli.cliInterface(['-c', fakePath])).toBeGreaterThan(0)
+      await expect(api(['-c', fakePath])).rejects.toBeInstanceOf(CLIError)
+    } finally {
+      cliError.mockRestore()
+    }
   })
 
   it('resets cached Chrome path every time', async () => {
@@ -51,12 +61,16 @@ describe('Marp CLI API interface', () => {
       puppeteerUtil,
       'resetExecutablePath'
     )
-    jest.spyOn(marpCli, 'marpCli').mockResolvedValue(0)
+    const marpCliSpy = jest.spyOn(marpCli, 'marpCli').mockResolvedValue(0)
 
-    await api([])
-    expect(resetExecutablePathSpy).toHaveBeenCalledTimes(1)
+    try {
+      await api([])
+      expect(resetExecutablePathSpy).toHaveBeenCalledTimes(1)
 
-    await api([])
-    expect(resetExecutablePathSpy).toHaveBeenCalledTimes(2)
+      await api([])
+      expect(resetExecutablePathSpy).toHaveBeenCalledTimes(2)
+    } finally {
+      marpCliSpy.mockRestore()
+    }
   })
 })
