@@ -13,6 +13,7 @@
 @keyframes marp-incoming-transition-backward-__builtin__diamond {
   @include utils.send-backward;
 }
+
 @keyframes marp-outgoing-transition-backward-__builtin__diamond {
   0% {
     clip-path: polygon(50% -50%, 150% 50%, 50% 150%, -50% 50%);
