@@ -25,7 +25,6 @@ jest.mock('../src/watcher')
 jest.mock('../src/theme')
 
 afterEach(() => {
-  jest.restoreAllMocks()
   mockWsOn.mockReset()
 })
 
@@ -82,17 +81,22 @@ describe('Watcher', () => {
       const conv = jest.spyOn(watcher as any, 'convert').mockImplementation()
       const del = jest.spyOn(watcher as any, 'delete').mockImplementation()
 
-      onChange('change')
-      expect(conv).toHaveBeenCalledWith('change')
+      try {
+        onChange('change')
+        expect(conv).toHaveBeenCalledWith('change')
 
-      onAdd('add')
-      expect(conv).toHaveBeenCalledWith('add')
+        onAdd('add')
+        expect(conv).toHaveBeenCalledWith('add')
 
-      onUnlink('unlink')
-      expect(del).toHaveBeenCalledWith('unlink')
+        onUnlink('unlink')
+        expect(del).toHaveBeenCalledWith('unlink')
 
-      watcher.converter.options.themeSet.onThemeUpdated('theme-update')
-      expect(conv).toHaveBeenCalledWith('theme-update')
+        watcher.converter.options.themeSet.onThemeUpdated('theme-update')
+        expect(conv).toHaveBeenCalledWith('theme-update')
+      } finally {
+        conv.mockRestore()
+        del.mockRestore()
+      }
     })
   })
 
@@ -166,14 +170,19 @@ describe('WatchNotifier', () => {
   describe('#port', () => {
     it('finds available port from 37717', async () => {
       const finderSpy = jest.spyOn(portfinder, 'getPortPromise')
-      const instance = new WatchNotifier()
 
-      expect(await instance.port()).toBe(37717)
-      expect(finderSpy).toHaveBeenCalledTimes(1)
+      try {
+        const instance = new WatchNotifier()
 
-      // Return stored port number of instance when called twice
-      await instance.port()
-      expect(finderSpy).toHaveBeenCalledTimes(1)
+        expect(await instance.port()).toBe(37717)
+        expect(finderSpy).toHaveBeenCalledTimes(1)
+
+        // Return stored port number of instance when called twice
+        await instance.port()
+        expect(finderSpy).toHaveBeenCalledTimes(1)
+      } finally {
+        finderSpy.mockRestore()
+      }
     })
 
     describe('when 37717 port is using for the other purpose', () => {

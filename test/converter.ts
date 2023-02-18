@@ -28,8 +28,8 @@ beforeEach(() => {
   mkdirSpy = jest.spyOn(fs.promises, 'mkdir').mockImplementation()
 })
 
+afterEach(() => mkdirSpy.mockRestore())
 afterAll(() => Converter.closeBrowser())
-afterEach(() => jest.restoreAllMocks())
 
 describe('Converter', () => {
   const onePath = path.resolve(__dirname, '_files/1.md')
@@ -257,19 +257,24 @@ describe('Converter', () => {
       describe('when given URL is invalid', () => {
         it('outputs warning and does not override URL', async () => {
           const warn = jest.spyOn(console, 'warn').mockImplementation()
-          const { result } = await instance({
-            globalDirectives: { url: '[INVALID]' },
-          }).convert('---\nurl: https://example.com/\n---')
 
-          expect(warn).toHaveBeenCalledWith(
-            expect.stringContaining('Specified canonical URL is ignored')
-          )
-          expect(warn).toHaveBeenCalledWith(
-            expect.stringContaining('[INVALID]')
-          )
-          expect(result).toContain(
-            '<link rel="canonical" href="https://example.com/">'
-          )
+          try {
+            const { result } = await instance({
+              globalDirectives: { url: '[INVALID]' },
+            }).convert('---\nurl: https://example.com/\n---')
+
+            expect(warn).toHaveBeenCalledWith(
+              expect.stringContaining('Specified canonical URL is ignored')
+            )
+            expect(warn).toHaveBeenCalledWith(
+              expect.stringContaining('[INVALID]')
+            )
+            expect(result).toContain(
+              '<link rel="canonical" href="https://example.com/">'
+            )
+          } finally {
+            warn.mockRestore()
+          }
         })
       })
     })
@@ -497,13 +502,17 @@ describe('Converter', () => {
       const write = (fs as any).__mockWriteFile()
       const stdout = jest.spyOn(process.stdout, 'write').mockImplementation()
 
-      const output = '-'
-      const ret = await instance({ output }).convertFile(new File(threePath))
+      try {
+        const output = '-'
+        const ret = await instance({ output }).convertFile(new File(threePath))
 
-      expect(write).not.toHaveBeenCalled()
-      expect(stdout).toHaveBeenCalledTimes(1)
-      expect(ret.file.path).toBe(threePath)
-      expect(ret.newFile?.type).toBe(FileType.StandardIO)
+        expect(write).not.toHaveBeenCalled()
+        expect(stdout).toHaveBeenCalledTimes(1)
+        expect(ret.file.path).toBe(threePath)
+        expect(ret.newFile?.type).toBe(FileType.StandardIO)
+      } finally {
+        stdout.mockRestore()
+      }
     })
 
     describe('when convert type is PDF', () => {
@@ -568,23 +577,30 @@ describe('Converter', () => {
             const fileTmp = jest.spyOn(File.prototype, 'saveTmpFile')
             const warn = jest.spyOn(console, 'warn').mockImplementation()
 
-            await pdfInstance({
-              allowLocalFiles: true,
-              output: '-',
-            }).convertFile(file)
+            try {
+              await pdfInstance({
+                allowLocalFiles: true,
+                output: '-',
+              }).convertFile(file)
 
-            expect(warn).toHaveBeenCalledWith(
-              expect.stringContaining(
-                'Insecure local file accessing is enabled'
+              expect(warn).toHaveBeenCalledWith(
+                expect.stringContaining(
+                  'Insecure local file accessing is enabled'
+                )
               )
-            )
-            expect(fileTmp).toHaveBeenCalledWith(
-              expect.objectContaining({ extension: '.html' })
-            )
-            expect(fileCleanup).toHaveBeenCalledWith(
-              expect.stringContaining(os.tmpdir())
-            )
-            expect(fileSave).toHaveBeenCalled()
+              expect(fileTmp).toHaveBeenCalledWith(
+                expect.objectContaining({ extension: '.html' })
+              )
+              expect(fileCleanup).toHaveBeenCalledWith(
+                expect.stringContaining(os.tmpdir())
+              )
+              expect(fileSave).toHaveBeenCalled()
+            } finally {
+              fileCleanup.mockRestore()
+              fileSave.mockRestore()
+              fileTmp.mockRestore()
+              warn.mockRestore()
+            }
           },
           puppeteerTimeoutMs
         )
@@ -1176,24 +1192,29 @@ describe('Converter', () => {
 
       it('converts markdown file to empty text and save to specified path when output is defined but no notes exist', async () => {
         const warn = jest.spyOn(console, 'warn').mockImplementation()
-        const notesInstance = (opts: Partial<ConverterOption> = {}) =>
-          instance({ ...opts, type: ConvertType.notes })
 
-        const write = (fs as any).__mockWriteFile()
-        const output = './specified.txt'
-        const ret = await notesInstance({ output }).convertFile(
-          new File(onePath)
-        )
-        const notes: Buffer = write.mock.calls[0][1]
+        try {
+          const notesInstance = (opts: Partial<ConverterOption> = {}) =>
+            instance({ ...opts, type: ConvertType.notes })
 
-        expect(warn).toHaveBeenCalledWith(
-          expect.stringContaining('contains no notes')
-        )
-        expect(write).toHaveBeenCalled()
-        expect(write.mock.calls[0][0]).toBe('./specified.txt')
-        expect(notes.toString()).toBe('')
-        expect(ret.newFile?.path).toBe('./specified.txt')
-        expect(ret.newFile?.buffer).toBe(notes)
+          const write = (fs as any).__mockWriteFile()
+          const output = './specified.txt'
+          const ret = await notesInstance({ output }).convertFile(
+            new File(onePath)
+          )
+          const notes: Buffer = write.mock.calls[0][1]
+
+          expect(warn).toHaveBeenCalledWith(
+            expect.stringContaining('contains no notes')
+          )
+          expect(write).toHaveBeenCalled()
+          expect(write.mock.calls[0][0]).toBe('./specified.txt')
+          expect(notes.toString()).toBe('')
+          expect(ret.newFile?.path).toBe('./specified.txt')
+          expect(ret.newFile?.buffer).toBe(notes)
+        } finally {
+          warn.mockRestore()
+        }
       })
     })
   })
@@ -1220,14 +1241,19 @@ describe('Converter', () => {
       it('converts passed files when output is stdout', async () => {
         const write = (fs as any).__mockWriteFile()
         const stdout = jest.spyOn(process.stdout, 'write').mockImplementation()
-        const files = [new File(onePath), new File(twoPath)]
 
-        await instance({ output: '-' }).convertFiles(files, {
-          onConverted: (result) => expect(files).toContain(result.file),
-        })
+        try {
+          const files = [new File(onePath), new File(twoPath)]
 
-        expect(write).not.toHaveBeenCalled()
-        expect(stdout).toHaveBeenCalledTimes(2)
+          await instance({ output: '-' }).convertFiles(files, {
+            onConverted: (result) => expect(files).toContain(result.file),
+          })
+
+          expect(write).not.toHaveBeenCalled()
+          expect(stdout).toHaveBeenCalledTimes(2)
+        } finally {
+          stdout.mockRestore()
+        }
       })
     })
   })

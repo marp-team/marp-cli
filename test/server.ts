@@ -15,8 +15,6 @@ import { ThemeSet } from '../src/theme'
 
 jest.mock('express')
 
-afterEach(() => jest.restoreAllMocks())
-
 describe('Server', () => {
   let themeSet: ThemeSet
   beforeEach(async () => (themeSet = await ThemeSet.initialize([])))
@@ -144,48 +142,52 @@ describe('Server', () => {
         it('triggers conversion with corresponded type option', async () => {
           const server = await setupServer()
 
-          jest
+          const convertFileSpy = jest
             .spyOn<any, any>(server.converter, 'convertFile')
             .mockResolvedValue({ newFile: { buffer: 'converted' } })
 
-          const mdRes = await request(server.server).get('/1.md')
-          expect(server.converter.options.type).toBe(ConvertType.html)
-          expect(mdRes.type).toBe('text/html')
+          try {
+            const mdRes = await request(server.server).get('/1.md')
+            expect(server.converter.options.type).toBe(ConvertType.html)
+            expect(mdRes.type).toBe('text/html')
 
-          const pdfRes = await request(server.server).get('/1.md?pdf')
-          expect(server.converter.options.type).toBe(ConvertType.pdf)
-          expect(pdfRes.type).toBe('application/pdf')
+            const pdfRes = await request(server.server).get('/1.md?pdf')
+            expect(server.converter.options.type).toBe(ConvertType.pdf)
+            expect(pdfRes.type).toBe('application/pdf')
 
-          const pptxRes = await request(server.server).get('/1.md?pptx')
-          expect(server.converter.options.type).toBe(ConvertType.pptx)
-          expect(pptxRes.type).toBe(
-            'application/vnd.openxmlformats-officedocument.presentationml.presentation'
-          )
+            const pptxRes = await request(server.server).get('/1.md?pptx')
+            expect(server.converter.options.type).toBe(ConvertType.pptx)
+            expect(pptxRes.type).toBe(
+              'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+            )
 
-          // PPTX document is downloaded with a proper filename because it cannot show in browser window.
-          expect(pptxRes.header['content-disposition']).toBe(
-            'attachment; filename="1.pptx"'
-          )
+            // PPTX document is downloaded with a proper filename because it cannot show in browser window.
+            expect(pptxRes.header['content-disposition']).toBe(
+              'attachment; filename="1.pptx"'
+            )
 
-          const pngRes = await request(server.server).get('/1.md?png')
-          expect(server.converter.options.type).toBe(ConvertType.png)
-          expect(pngRes.type).toBe('image/png')
+            const pngRes = await request(server.server).get('/1.md?png')
+            expect(server.converter.options.type).toBe(ConvertType.png)
+            expect(pngRes.type).toBe('image/png')
 
-          const jpgRes = await request(server.server).get('/1.md?jpg')
-          expect(server.converter.options.type).toBe(ConvertType.jpeg)
-          expect(jpgRes.type).toBe('image/jpeg')
+            const jpgRes = await request(server.server).get('/1.md?jpg')
+            expect(server.converter.options.type).toBe(ConvertType.jpeg)
+            expect(jpgRes.type).toBe('image/jpeg')
 
-          const jpegRes = await request(server.server).get('/1.md?jpeg')
-          expect(server.converter.options.type).toBe(ConvertType.jpeg)
-          expect(jpegRes.type).toBe('image/jpeg')
+            const jpegRes = await request(server.server).get('/1.md?jpeg')
+            expect(server.converter.options.type).toBe(ConvertType.jpeg)
+            expect(jpegRes.type).toBe('image/jpeg')
 
-          const txtRes = await request(server.server).get('/1.md?txt')
-          expect(server.converter.options.type).toBe(ConvertType.notes)
-          expect(txtRes.type).toBe('text/plain')
+            const txtRes = await request(server.server).get('/1.md?txt')
+            expect(server.converter.options.type).toBe(ConvertType.notes)
+            expect(txtRes.type).toBe('text/plain')
 
-          const notesRes = await request(server.server).get('/1.md?notes')
-          expect(server.converter.options.type).toBe(ConvertType.notes)
-          expect(notesRes.type).toBe('text/plain')
+            const notesRes = await request(server.server).get('/1.md?notes')
+            expect(server.converter.options.type).toBe(ConvertType.notes)
+            expect(notesRes.type).toBe('text/plain')
+          } finally {
+            convertFileSpy.mockRestore()
+          }
         })
       })
 
@@ -195,12 +197,18 @@ describe('Server', () => {
           const event = jest.fn()
           const { server, converter } = (await setupServer()).on('error', event)
 
-          jest.spyOn(converter, 'convertFile').mockRejectedValue(err)
+          const convertFileSpy = jest
+            .spyOn(converter, 'convertFile')
+            .mockRejectedValue(err)
 
-          const response = await request(server).get('/1.md')
-          expect(event).toHaveBeenCalledWith(err)
-          expect(response.status).toBe(503)
-          expect(response.text).toBe('Error: test')
+          try {
+            const response = await request(server).get('/1.md')
+            expect(event).toHaveBeenCalledWith(err)
+            expect(response.status).toBe(503)
+            expect(response.text).toBe('Error: test')
+          } finally {
+            convertFileSpy.mockRestore()
+          }
         })
       })
     })
