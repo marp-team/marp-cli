@@ -19,7 +19,8 @@ const delayedEngineResolver = (
 
 export class ResolvedEngine {
   klass: Engine
-  package?: Record<string, any>
+
+  private _cachedPackage?: Record<string, any> | null
 
   private static _defaultEngine: ResolvedEngine | undefined
 
@@ -27,12 +28,7 @@ export class ResolvedEngine {
     engine: ResolvableEngine | ResolvableEngine[],
     from?: string
   ): Promise<ResolvedEngine> {
-    const resolvedEngine = new ResolvedEngine(
-      await ResolvedEngine.resolveModule(engine, from)
-    )
-
-    await resolvedEngine.resolvePackage()
-    return resolvedEngine
+    return new ResolvedEngine(await ResolvedEngine.resolveModule(engine, from))
   }
 
   static async resolveDefaultEngine(): Promise<ResolvedEngine> {
@@ -49,6 +45,13 @@ export class ResolvedEngine {
       ])
     }
     return ResolvedEngine._defaultEngine
+  }
+
+  async getPackage() {
+    if (this._cachedPackage === undefined) {
+      this._cachedPackage = await this.resolvePackage()
+    }
+    return this._cachedPackage
   }
 
   private static async resolveModule(
@@ -83,14 +86,15 @@ export class ResolvedEngine {
     this.klass = klass
   }
 
-  private async resolvePackage(): Promise<void> {
+  private async resolvePackage() {
     const classPath = this.findClassPath(this.klass)
-    if (!classPath) return
+    if (!classPath) return null
 
     const pkgPath = await pkgUp({ cwd: path.dirname(classPath) })
-    if (!pkgPath) return
+    if (!pkgPath) return null
 
-    this.package = require(pkgPath)
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    return require(pkgPath) as Record<string, any>
   }
 
   // NOTE: It cannot test because of overriding `require` in Jest context.
