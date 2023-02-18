@@ -1,4 +1,7 @@
-/** @jest-environment jsdom */
+/**
+ * @jest-environment jsdom
+ * @jest-environment-options {"customExportConditions": ["node", "node-addons"]}
+ */
 import { getPortPromise } from 'portfinder'
 import { Server } from 'ws'
 import watch from '../../src/templates/watch/watch'
@@ -8,10 +11,10 @@ beforeEach(() => {
   ;(window as any).location = { reload: jest.fn() }
 })
 
-afterEach(() => jest.restoreAllMocks())
-
 describe('Watch mode notifier on browser context', () => {
   let server: Server
+  let infoSpy: jest.SpyInstance
+  let warnSpy: jest.SpyInstance
 
   const createWSServer = async () => {
     const port = await getPortPromise({ port: 37717 })
@@ -26,13 +29,18 @@ describe('Watch mode notifier on browser context', () => {
   }
 
   beforeEach(async () => {
-    jest.spyOn(console, 'info').mockImplementation()
-    jest.spyOn(console, 'warn').mockImplementation()
+    infoSpy = jest.spyOn(console, 'info').mockImplementation()
+    warnSpy = jest.spyOn(console, 'warn').mockImplementation()
 
     server = await createWSServer()
   })
 
-  afterEach(() => server.close())
+  afterEach(() => {
+    server.close()
+
+    infoSpy.mockRestore()
+    warnSpy.mockRestore()
+  })
 
   describe('when window.__marpCliWatchWS is defined', () => {
     beforeEach(() => {

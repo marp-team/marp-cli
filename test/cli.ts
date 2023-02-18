@@ -1,13 +1,12 @@
 import chalk from 'chalk'
 import { error, info, silence, warn } from '../src/cli'
 
-afterEach(() => {
-  jest.restoreAllMocks()
-  silence(false)
-})
+afterEach(() => silence(false))
 
 describe('CLI helpers', () => {
   let spy: jest.SpyInstance
+
+  afterEach(() => spy?.mockRestore())
 
   describe('#error', () => {
     beforeEach(() => (spy = jest.spyOn(console, 'error').mockImplementation()))
