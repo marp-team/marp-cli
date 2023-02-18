@@ -7,6 +7,10 @@
 - Upgrade Marp Core to [v3.5.0](https://github.com/marp-team/marp-core/releases/v3.5.0) ([#502](https://github.com/marp-team/marp-cli/pull/502))
 - Upgrade Node.js and dependent packages ([#502](https://github.com/marp-team/marp-cli/pull/502))
 
+### Fixed
+
+- Apply lazy resolution for engine's `package.json` ([#503](https://github.com/marp-team/marp-cli/pull/503))
+
 ## v2.3.0 - 2023-01-08
 
 ### Breaking
