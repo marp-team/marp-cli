@@ -2,8 +2,6 @@ import path from 'path'
 import { Marpit } from '@marp-team/marpit'
 import { ThemeSet } from '../src/theme'
 
-afterEach(() => jest.restoreAllMocks())
-
 describe('ThemeSet', () => {
   const themeDir = path.resolve(__dirname, '_files/themes')
   const themeA = path.resolve(themeDir, './a.css')
@@ -54,9 +52,13 @@ describe('ThemeSet', () => {
           .spyOn<any, any>(themeInstance, 'load')
           .mockResolvedValue(0)
 
-        await themeSet.load(themeA)
-        expect(themeSet.themes.size).toBe(1)
-        expect(load).toHaveBeenCalledTimes(1)
+        try {
+          await themeSet.load(themeA)
+          expect(themeSet.themes.size).toBe(1)
+          expect(load).toHaveBeenCalledTimes(1)
+        } finally {
+          load.mockRestore()
+        }
       })
 
       describe('when theme has resolved name', () => {
@@ -109,15 +111,20 @@ describe('ThemeSet', () => {
 
       it('outputs warning and ignores registration', async () => {
         const warn = jest.spyOn(console, 'warn').mockImplementation()
-        const themeSet = await ThemeSet.initialize([emptyCSS])
-        const marpit = new Marpit()
 
-        themeSet.registerTo(marpit)
+        try {
+          const themeSet = await ThemeSet.initialize([emptyCSS])
+          const marpit = new Marpit()
 
-        expect(marpit.themeSet.size).toBe(0)
-        expect(warn).toHaveBeenCalledWith(
-          expect.stringContaining('Cannot register theme CSS')
-        )
+          themeSet.registerTo(marpit)
+
+          expect(marpit.themeSet.size).toBe(0)
+          expect(warn).toHaveBeenCalledWith(
+            expect.stringContaining('Cannot register theme CSS')
+          )
+        } finally {
+          warn.mockRestore()
+        }
       })
     })
   })

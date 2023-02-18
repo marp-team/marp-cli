@@ -3,6 +3,7 @@
 @keyframes marp-incoming-transition-__builtin__explode {
   @include utils.send-backward;
 }
+
 @keyframes marp-outgoing-transition-__builtin__explode {
   from {
     animation-timing-function: ease-out;
@@ -21,5 +22,6 @@
     opacity: 0;
   }
 }
+
 @keyframes marp-outgoing-transition-backward-__builtin__explode {
 }

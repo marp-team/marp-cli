@@ -30,6 +30,7 @@
     box-shadow: var(--bespoke-marp-transition-drop-shadow);
   }
 }
+
 @keyframes marp-outgoing-transition-__builtin__drop {
   35% {
     filter: none;
@@ -50,6 +51,7 @@
     filter: none;
   }
 }
+
 @keyframes marp-outgoing-transition-backward-__builtin__drop {
   0% {
     z-index: 1;

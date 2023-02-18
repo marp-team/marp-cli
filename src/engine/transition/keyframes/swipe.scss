@@ -13,6 +13,7 @@
     z-index: 1;
   }
 }
+
 @keyframes marp-incoming-transition-__builtin__swipe {
   0% {
     animation-timing-function: ease-in-out;
@@ -25,6 +26,7 @@
     transform: scale(1);
   }
 }
+
 @keyframes marp-outgoing-transition-backward-__builtin__swipe {
   0% {
     animation-timing-function: ease-in-out;
@@ -35,6 +37,7 @@
     transform: scale(0.95);
   }
 }
+
 @keyframes marp-incoming-transition-backward-__builtin__swipe {
   0% {
     animation-timing-function: ease-out;

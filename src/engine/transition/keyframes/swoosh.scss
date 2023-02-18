@@ -14,6 +14,7 @@
 @keyframes marp-incoming-transition-backward-__builtin__swoosh {
   @include utils.send-backward;
 }
+
 @keyframes marp-outgoing-transition-backward-__builtin__swoosh {
   from {
     transform: translate(0, 0) scale(1) perspective(100vw);

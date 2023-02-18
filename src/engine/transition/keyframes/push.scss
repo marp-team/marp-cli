@@ -16,6 +16,7 @@
     transform: translateX(100%);
   }
 }
+
 @keyframes marp-incoming-transition-backward-__builtin__push {
   @include utils.send-backward;
 }

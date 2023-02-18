@@ -16,6 +16,7 @@
       scale(0.45) translateX(calc(var(--marp-transition-direction, 1) * -25vw));
   }
 }
+
 @keyframes marp-incoming-transition-__builtin__in-out {
   0% {
     z-index: -1;
