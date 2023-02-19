@@ -78,218 +78,152 @@ Marp CLI has provided useful [33 built-in transitions](../../src/engine/transiti
     <tr>
       <td align="center" valign="bottom"><b>none</b></td>
       <td align="center" valign="bottom">
-        <a href="https://marp-cli-page-transitions.glitch.me/#2">
-          <img src="./images/clockwise.gif" width="128" height="72" /><br />
-          <b>clockwise</b>
-        </a>
+        <img src="./images/clockwise.gif" width="128" height="72" /><br />
+        <b>clockwise</b>
       </td>
       <td align="center" valign="bottom">
-        <a href="https://marp-cli-page-transitions.glitch.me/#3">
-          <img src="./images/counterclockwise.gif" width="128" height="72" /><br />
-          <b>counterclockwise</b>
-        </a>
+        <img src="./images/counterclockwise.gif" width="128" height="72" /><br />
+        <b>counterclockwise</b>
       </td>
       <td align="center" valign="bottom">
-        <a href="https://marp-cli-page-transitions.glitch.me/#4">
-          <img src="./images/cover.gif" width="128" height="72" /><br />
-          <b>cover</b>
-        </a>
+        <img src="./images/cover.gif" width="128" height="72" /><br />
+        <b>cover</b>
       </td>
     </tr>
     <tr>
       <td align="center" valign="bottom">
-        <a href="https://marp-cli-page-transitions.glitch.me/#5">
-          <img src="./images/coverflow.gif" width="128" height="72" /><br />
-          <b>coverflow</b>
-        </a>
+        <img src="./images/coverflow.gif" width="128" height="72" /><br />
+        <b>coverflow</b>
       </td>
       <td align="center" valign="bottom">
-        <a href="https://marp-cli-page-transitions.glitch.me/#6">
-          <img src="./images/cube.gif" width="128" height="72" /><br />
-          <b>cube</b>
-        </a>
+        <img src="./images/cube.gif" width="128" height="72" /><br />
+        <b>cube</b>
       </td>
       <td align="center" valign="bottom">
-        <a href="https://marp-cli-page-transitions.glitch.me/#7">
-          <img src="./images/cylinder.gif" width="128" height="72" /><br />
-          <b>cylinder</b>
-        </a>
+        <img src="./images/cylinder.gif" width="128" height="72" /><br />
+        <b>cylinder</b>
       </td>
       <td align="center" valign="bottom">
-        <a href="https://marp-cli-page-transitions.glitch.me/#8">
-          <img src="./images/diamond.gif" width="128" height="72" /><br />
-          <b>diamond</b>
-        </a>
+        <img src="./images/diamond.gif" width="128" height="72" /><br />
+        <b>diamond</b>
       </td>
     </tr>
     <tr>
       <td align="center" valign="bottom">
-        <a href="https://marp-cli-page-transitions.glitch.me/#9">
-          <img src="./images/drop.gif" width="128" height="72" /><br />
-          <b>drop</b>
-        </a>
+        <img src="./images/drop.gif" width="128" height="72" /><br />
+        <b>drop</b>
       </td>
       <td align="center" valign="bottom">
-        <a href="https://marp-cli-page-transitions.glitch.me/#10">
-          <img src="./images/explode.gif" width="128" height="72" /><br />
-          <b>explode</b>
-        </a>
+        <img src="./images/explode.gif" width="128" height="72" /><br />
+        <b>explode</b>
       </td>
       <td align="center" valign="bottom">
-        <a href="https://marp-cli-page-transitions.glitch.me/#11">
-          <img src="./images/fade.gif" width="128" height="72" /><br />
-          <b>fade</b>
-        </a>
+        <img src="./images/fade.gif" width="128" height="72" /><br />
+        <b>fade</b>
       </td>
       <td align="center" valign="bottom">
-        <a href="https://marp-cli-page-transitions.glitch.me/#12">
-          <img src="./images/fade-out.gif" width="128" height="72" /><br />
-          <b>fade-out</b>
-        </a>
+        <img src="./images/fade-out.gif" width="128" height="72" /><br />
+        <b>fade-out</b>
       </td>
     </tr>
     <tr>
       <td align="center" valign="bottom">
-        <a href="https://marp-cli-page-transitions.glitch.me/#13">
-          <img src="./images/fall.gif" width="128" height="72" /><br />
-          <b>fall</b>
-        </a>
+        <img src="./images/fall.gif" width="128" height="72" /><br />
+        <b>fall</b>
       </td>
       <td align="center" valign="bottom">
-        <a href="https://marp-cli-page-transitions.glitch.me/#14">
-          <img src="./images/flip.gif" width="128" height="72" /><br />
-          <b>flip</b>
-        </a>
+        <img src="./images/flip.gif" width="128" height="72" /><br />
+        <b>flip</b>
       </td>
       <td align="center" valign="bottom">
-        <a href="https://marp-cli-page-transitions.glitch.me/#15">
-          <img src="./images/glow.gif" width="128" height="72" /><br />
-          <b>glow</b>
-        </a>
+        <img src="./images/glow.gif" width="128" height="72" /><br />
+        <b>glow</b>
       </td>
       <td align="center" valign="bottom">
-        <a href="https://marp-cli-page-transitions.glitch.me/#16">
-          <img src="./images/implode.gif" width="128" height="72" /><br />
-          <b>implode</b>
-        </a>
+        <img src="./images/implode.gif" width="128" height="72" /><br />
+        <b>implode</b>
       </td>
     </tr>
     <tr>
       <td align="center" valign="bottom">
-        <a href="https://marp-cli-page-transitions.glitch.me/#17">
-          <img src="./images/in-out.gif" width="128" height="72" /><br />
-          <b>in-out</b>
-        </a>
+        <img src="./images/in-out.gif" width="128" height="72" /><br />
+        <b>in-out</b>
       </td>
       <td align="center" valign="bottom">
-        <a href="https://marp-cli-page-transitions.glitch.me/#18">
-          <img src="./images/iris-in.gif" width="128" height="72" /><br />
-          <b>iris-in</b>
-        </a>
+        <img src="./images/iris-in.gif" width="128" height="72" /><br />
+        <b>iris-in</b>
       </td>
       <td align="center" valign="bottom">
-        <a href="https://marp-cli-page-transitions.glitch.me/#19">
-          <img src="./images/iris-out.gif" width="128" height="72" /><br />
-          <b>iris-out</b>
-        </a>
+        <img src="./images/iris-out.gif" width="128" height="72" /><br />
+        <b>iris-out</b>
       </td>
       <td align="center" valign="bottom">
-        <a href="https://marp-cli-page-transitions.glitch.me/#20">
-          <img src="./images/melt.gif" width="128" height="72" /><br />
-          <b>melt</b>
-        </a>
+        <img src="./images/melt.gif" width="128" height="72" /><br />
+        <b>melt</b>
       </td>
     </tr>
     <tr>
       <td align="center" valign="bottom">
-        <a href="https://marp-cli-page-transitions.glitch.me/#21">
-          <img src="./images/overlap.gif" width="128" height="72" /><br />
-          <b>overlap</b>
-        </a>
+        <img src="./images/overlap.gif" width="128" height="72" /><br />
+        <b>overlap</b>
       </td>
       <td align="center" valign="bottom">
-        <a href="https://marp-cli-page-transitions.glitch.me/#22">
-          <img src="./images/pivot.gif" width="128" height="72" /><br />
-          <b>pivot</b>
-        </a>
+        <img src="./images/pivot.gif" width="128" height="72" /><br />
+        <b>pivot</b>
       </td>
       <td align="center" valign="bottom">
-        <a href="https://marp-cli-page-transitions.glitch.me/#23">
-          <img src="./images/pull.gif" width="128" height="72" /><br />
-          <b>pull</b>
-        </a>
+        <img src="./images/pull.gif" width="128" height="72" /><br />
+        <b>pull</b>
       </td>
       <td align="center" valign="bottom">
-        <a href="https://marp-cli-page-transitions.glitch.me/#24">
-          <img src="./images/push.gif" width="128" height="72" /><br />
-          <b>push</b>
-        </a>
+        <img src="./images/push.gif" width="128" height="72" /><br />
+        <b>push</b>
       </td>
     </tr>
     <tr>
       <td align="center" valign="bottom">
-        <a href="https://marp-cli-page-transitions.glitch.me/#25">
-          <img src="./images/reveal.gif" width="128" height="72" /><br />
-          <b>reveal</b>
-        </a>
+        <img src="./images/reveal.gif" width="128" height="72" /><br />
+        <b>reveal</b>
       </td>
       <td align="center" valign="bottom">
-        <a href="https://marp-cli-page-transitions.glitch.me/#26">
-          <img src="./images/rotate.gif" width="128" height="72" /><br />
-          <b>rotate</b>
-        </a>
+        <img src="./images/rotate.gif" width="128" height="72" /><br />
+        <b>rotate</b>
       </td>
       <td align="center" valign="bottom">
-        <a href="https://marp-cli-page-transitions.glitch.me/#27">
-          <img src="./images/slide.gif" width="128" height="72" /><br />
-          <b>slide</b>
-        </a>
+        <img src="./images/slide.gif" width="128" height="72" /><br />
+        <b>slide</b>
       </td>
       <td align="center" valign="bottom">
-        <a href="https://marp-cli-page-transitions.glitch.me/#28">
-          <img src="./images/star.gif" width="128" height="72" /><br />
-          <b>star</b>
-        </a>
+        <img src="./images/star.gif" width="128" height="72" /><br />
+        <b>star</b>
       </td>
     </tr>
     <tr>
       <td align="center" valign="bottom">
-        <a href="https://marp-cli-page-transitions.glitch.me/#29">
-          <img src="./images/swap.gif" width="128" height="72" /><br />
-          <b>swap</b>
-        </a>
+        <img src="./images/swap.gif" width="128" height="72" /><br />
+        <b>swap</b>
       </td>
       <td align="center" valign="bottom">
-        <a href="https://marp-cli-page-transitions.glitch.me/#30">
-          <img src="./images/swipe.gif" width="128" height="72" /><br />
-          <b>swipe</b>
-        </a>
+        <img src="./images/swipe.gif" width="128" height="72" /><br />
+        <b>swipe</b>
       </td>
       <td align="center" valign="bottom">
-        <a href="https://marp-cli-page-transitions.glitch.me/#31">
-          <img src="./images/swoosh.gif" width="128" height="72" /><br />
-          <b>swoosh</b>
-        </a>
+        <img src="./images/swoosh.gif" width="128" height="72" /><br />
+        <b>swoosh</b>
       </td>
       <td align="center" valign="bottom">
-        <a href="https://marp-cli-page-transitions.glitch.me/#32">
-          <img src="./images/wipe.gif" width="128" height="72" /><br />
-          <b>wipe</b>
-        </a>
+        <img src="./images/wipe.gif" width="128" height="72" /><br />
+        <b>wipe</b>
       </td>
     </tr>
     <tr>
       <td align="center" valign="bottom">
-        <a href="https://marp-cli-page-transitions.glitch.me/#33">
-          <img src="./images/wiper.gif" width="128" height="72" /><br />
-          <b>wiper</b>
-        </a>
+        <img src="./images/wiper.gif" width="128" height="72" /><br />
+        <b>wiper</b>
       </td>
       <td align="center" valign="bottom">
-        <a href="https://marp-cli-page-transitions.glitch.me/#34">
-          <img src="./images/zoom.gif" width="128" height="72" /><br />
-          <b>zoom</b>
-        </a>
+        <img src="./images/zoom.gif" width="128" height="72" /><br />
+        <b>zoom</b>
       </td>
       <td></td>
       <td></td>
