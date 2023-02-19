@@ -223,6 +223,9 @@ export const resolveAnimationStyles = (
 ): readonly string[] => {
   const rules: string[] = [
     `:root{${publicCSSVar('direction')}:${opts.backward ? -1 : 1};}`,
+
+    // For marp-bespoke-bespoke-inactive plugin
+    ':root:has(.bespoke-marp-inactive){cursor:none;}',
   ]
 
   const resolveDefaultDuration = (
