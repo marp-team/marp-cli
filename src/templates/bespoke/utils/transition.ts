@@ -37,7 +37,7 @@ export const _testElementAnimation = (
   elm: HTMLElement,
   callback: (ret: MarpTransitionResolvableKeyframeSettings | undefined) => void
 ) => {
-  /* istanbul ignore next */
+  /* c8 ignore next */
   requestAnimationFrame(() => {
     elm.style.animationPlayState = 'running'
     requestAnimationFrame(() => callback(undefined))
