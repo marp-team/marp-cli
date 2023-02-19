@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v2.4.0 - 2023-02-19
+
 ### Changed
 
 - [Slide transitions for `bespoke` template](https://github.com/marp-team/marp-cli/blob/main/docs/bespoke-transitions/README.md) powered by [View Transition API](https://www.w3.org/TR/css-view-transitions-1/) is stably available by default ([#447](https://github.com/marp-team/marp-cli/issues/447), [#501](https://github.com/marp-team/marp-cli/pull/501))
