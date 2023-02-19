@@ -377,9 +377,7 @@ If there were marked elements with the same name by [`view-transition-name` CSS 
 The slide author can visualize the relationship between the different elements in the two different pages. It's helpful for creating a more engaging presentation for the audience.
 
 <p align="center">
-
-[![Morph animation example](morphing-animation.gif)](./morphing-animation.mp4)
-
+  <a href="morphing-animation.mp4"><img src="morphing-animation.gif" alt="Morph animation example" width="480" height="270" /></a>
 </p>
 
 If there were multiple pairs defined by `view-transition-name` CSS property with different names, each elements will morph at the same time. Elements that were not marked by `view-transition-name` still follow the selected animation by `transition` local directive.
