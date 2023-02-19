@@ -374,11 +374,17 @@ If there were marked elements with the same name by [`view-transition-name` CSS 
 
 [view-transition-name]: https://www.w3.org/TR/css-view-transitions-1/#view-transition-name-prop
 
-![]()
-
 The slide author can visualize the relationship between the different elements in the two different pages. It's helpful for creating a more engaging presentation for the audience.
 
-> Not marked contents by `view-transition-name` CSS property still follow a selected animation by `transition` local directive.
+<p align="center">
+
+[![Morph animation example](morphing-animation.gif)](./morphing-animation.mp4)
+
+</p>
+
+If there were multiple pairs defined by `view-transition-name` CSS property with different names, each elements will morph at the same time. Elements that were not marked by `view-transition-name` still follow the selected animation by `transition` local directive.
+
+> **Warning** Each morphable elements marked by `view-transition-name` must have uniquely named in a slide page. If there were multiple elements named by `view-transition-name` with the same name in a single page, View Transition API does not apply _the whole of transition animation_.
 
 ### Example
 
@@ -391,10 +397,7 @@ Generally setting [`contain` CSS property][contain] as `layout` or `paint` is al
 ```markdown
 ---
 theme: gaia
-
-# Apply fade transition
 transition: fade
-
 style: |
   /* ⬇️ Mark the image of "1" in every pages as morphable image named as "one" ⬇️ */
   img[alt="1"] {
@@ -435,9 +438,61 @@ Marp is an open-sourced Markdown presentation ecosystem.
 It provides a writing experience of presentation slides by Markdown.
 ```
 
+#### Use HTML to mark morphable contents
+
+By using an inline HTML with enabling raw HTML rendering by `--html` Marp CLI option, you can mark a group of morphable contents with more flexibility.
+
+Define the style of `morph` class to mark the inner elements as morphable. In this example, the name of group can set through CSS variable.
+
+```markdown
+---
+header: Bubble sort
+transition: fade
+style: |
+  /* Define the style of "morph" class */
+  .morph {
+    display: inline-block;
+    view-transition-name: var(--morph-name);
+    contain: layout;
+  }
+---
+
+- <span class="morph" style="--morph-name:b7;">◼◼◼◼◼◼◼</span> 7
+- <span class="morph" style="--morph-name:b5;">◼◼◼◼◼</span> 5
+- <span class="morph" style="--morph-name:b3;">◼◼◼</span> 3
+- <span class="morph" style="--morph-name:b9;">◼◼◼◼◼◼◼◼◼</span> 9
+
+---
+
+- <span class="morph" style="--morph-name:b5;">◼◼◼◼◼</span> 5
+- <span class="morph" style="--morph-name:b7;">◼◼◼◼◼◼◼</span> 7
+- <span class="morph" style="--morph-name:b3;">◼◼◼</span> 3
+- <span class="morph" style="--morph-name:b9;">◼◼◼◼◼◼◼◼◼</span> 9
+
+---
+
+- <span class="morph" style="--morph-name:b5;">◼◼◼◼◼</span> 5
+- <span class="morph" style="--morph-name:b3;">◼◼◼</span> 3
+- <span class="morph" style="--morph-name:b7;">◼◼◼◼◼◼◼</span> 7
+- <span class="morph" style="--morph-name:b9;">◼◼◼◼◼◼◼◼◼</span> 9
+
+---
+
+- <span class="morph" style="--morph-name:b3;">◼◼◼</span> 3
+- <span class="morph" style="--morph-name:b5;">◼◼◼◼◼</span> 5
+- <span class="morph" style="--morph-name:b7;">◼◼◼◼◼◼◼</span> 7
+- <span class="morph" style="--morph-name:b9;">◼◼◼◼◼◼◼◼◼</span> 9
+```
+
+Due to the security reason, Marp CLI does not render raw HTML tags in Markdown by default. You have to should add `--html` option to use inline HTMLs.
+
+```bash
+marp morphable.md --html
+```
+
 ## Opt-out transitions
 
-### Disable by CLI option
+### Disable transitions by CLI option
 
 The transition is an optional feature in bespoke template, and it's enabled by default. You can opt out the transition support by adding CLI option `--bespoke.transition=false`.
 
@@ -445,9 +500,9 @@ The transition is an optional feature in bespoke template, and it's enabled by d
 marp --bespoke.transition=false markdown.md
 ```
 
-This option is also useful when using [a custom engine](../../README.md#functional-engine) that has supported `transition` custom local directive for another approach.
+This option is also useful when using [a customized engine](../../README.md#functional-engine) that has supported `transition` custom local directive for another approach.
 
-### Reduce transition by a viewer
+### Reduce transitions by a viewer
 
 _Even if the slide author used transitions,_ every viewer do not always prefer to see dizzy animations. [Reducing motion is important especially for people with vestibular disorders.](https://www.w3.org/WAI/WCAG21/Understanding/animation-from-interactions.html)
 
