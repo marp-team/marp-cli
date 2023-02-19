@@ -296,7 +296,7 @@ The `bespoke` template is using [Bespoke.js](https://github.com/bespokejs/bespok
 - **Progress bar** (optional): By setting `--bespoke.progress` option, you can add a progress bar on the top of the deck.
 - [**Slide transitions**][transitions]: Support transitions (`transition` local directive) powered by [View Transitions API].
 
-[transitions]: ./docs/bespoke-template/transitions.md
+[transitions]: ./docs/bespoke-transitions/README.md
 [view transitions api]: https://www.w3.org/TR/css-view-transitions-1/
 
 > ℹ️ Presenter view may be disabled if [the browser restricted using localStorage](https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API#Feature-detecting_localStorage) (e.g. Open HTML in the old Safari with private browsing, or open the _local_ HTML file with Chrome that has blocked 3rd party cookies in `chrome://settings/content/cookies`).

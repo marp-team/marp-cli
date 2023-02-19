@@ -79,19 +79,19 @@ Marp CLI has provided useful [33 built-in transitions](../../src/engine/transiti
       <td align="center" valign="bottom"><b>none</b></td>
       <td align="center" valign="bottom">
         <a href="https://marp-cli-page-transitions.glitch.me/#2">
-          <img src="https://raw.githubusercontent.com/marp-team/marp-cli/make-stable-transitions/docs/bespoke-template/transitions/clockwise.gif" width="128" height="72" /><br />
+          <img src="./images/clockwise.gif" width="128" height="72" /><br />
           <b>clockwise</b>
         </a>
       </td>
       <td align="center" valign="bottom">
         <a href="https://marp-cli-page-transitions.glitch.me/#3">
-          <img src="https://raw.githubusercontent.com/marp-team/marp-cli/make-stable-transitions/docs/bespoke-template/transitions/counterclockwise.gif" width="128" height="72" /><br />
+          <img src="./images/counterclockwise.gif" width="128" height="72" /><br />
           <b>counterclockwise</b>
         </a>
       </td>
       <td align="center" valign="bottom">
         <a href="https://marp-cli-page-transitions.glitch.me/#4">
-          <img src="https://raw.githubusercontent.com/marp-team/marp-cli/make-stable-transitions/docs/bespoke-template/transitions/cover.gif" width="128" height="72" /><br />
+          <img src="./images/cover.gif" width="128" height="72" /><br />
           <b>cover</b>
         </a>
       </td>
@@ -99,25 +99,25 @@ Marp CLI has provided useful [33 built-in transitions](../../src/engine/transiti
     <tr>
       <td align="center" valign="bottom">
         <a href="https://marp-cli-page-transitions.glitch.me/#5">
-          <img src="https://raw.githubusercontent.com/marp-team/marp-cli/make-stable-transitions/docs/bespoke-template/transitions/coverflow.gif" width="128" height="72" /><br />
+          <img src="./images/coverflow.gif" width="128" height="72" /><br />
           <b>coverflow</b>
         </a>
       </td>
       <td align="center" valign="bottom">
         <a href="https://marp-cli-page-transitions.glitch.me/#6">
-          <img src="https://raw.githubusercontent.com/marp-team/marp-cli/make-stable-transitions/docs/bespoke-template/transitions/cube.gif" width="128" height="72" /><br />
+          <img src="./images/cube.gif" width="128" height="72" /><br />
           <b>cube</b>
         </a>
       </td>
       <td align="center" valign="bottom">
         <a href="https://marp-cli-page-transitions.glitch.me/#7">
-          <img src="https://raw.githubusercontent.com/marp-team/marp-cli/make-stable-transitions/docs/bespoke-template/transitions/cylinder.gif" width="128" height="72" /><br />
+          <img src="./images/cylinder.gif" width="128" height="72" /><br />
           <b>cylinder</b>
         </a>
       </td>
       <td align="center" valign="bottom">
         <a href="https://marp-cli-page-transitions.glitch.me/#8">
-          <img src="https://raw.githubusercontent.com/marp-team/marp-cli/make-stable-transitions/docs/bespoke-template/transitions/diamond.gif" width="128" height="72" /><br />
+          <img src="./images/diamond.gif" width="128" height="72" /><br />
           <b>diamond</b>
         </a>
       </td>
@@ -125,25 +125,25 @@ Marp CLI has provided useful [33 built-in transitions](../../src/engine/transiti
     <tr>
       <td align="center" valign="bottom">
         <a href="https://marp-cli-page-transitions.glitch.me/#9">
-          <img src="https://raw.githubusercontent.com/marp-team/marp-cli/make-stable-transitions/docs/bespoke-template/transitions/drop.gif" width="128" height="72" /><br />
+          <img src="./images/drop.gif" width="128" height="72" /><br />
           <b>drop</b>
         </a>
       </td>
       <td align="center" valign="bottom">
         <a href="https://marp-cli-page-transitions.glitch.me/#10">
-          <img src="https://raw.githubusercontent.com/marp-team/marp-cli/make-stable-transitions/docs/bespoke-template/transitions/explode.gif" width="128" height="72" /><br />
+          <img src="./images/explode.gif" width="128" height="72" /><br />
           <b>explode</b>
         </a>
       </td>
       <td align="center" valign="bottom">
         <a href="https://marp-cli-page-transitions.glitch.me/#11">
-          <img src="https://raw.githubusercontent.com/marp-team/marp-cli/make-stable-transitions/docs/bespoke-template/transitions/fade.gif" width="128" height="72" /><br />
+          <img src="./images/fade.gif" width="128" height="72" /><br />
           <b>fade</b>
         </a>
       </td>
       <td align="center" valign="bottom">
         <a href="https://marp-cli-page-transitions.glitch.me/#12">
-          <img src="https://raw.githubusercontent.com/marp-team/marp-cli/make-stable-transitions/docs/bespoke-template/transitions/fade-out.gif" width="128" height="72" /><br />
+          <img src="./images/fade-out.gif" width="128" height="72" /><br />
           <b>fade-out</b>
         </a>
       </td>
@@ -151,25 +151,25 @@ Marp CLI has provided useful [33 built-in transitions](../../src/engine/transiti
     <tr>
       <td align="center" valign="bottom">
         <a href="https://marp-cli-page-transitions.glitch.me/#13">
-          <img src="https://raw.githubusercontent.com/marp-team/marp-cli/make-stable-transitions/docs/bespoke-template/transitions/fall.gif" width="128" height="72" /><br />
+          <img src="./images/fall.gif" width="128" height="72" /><br />
           <b>fall</b>
         </a>
       </td>
       <td align="center" valign="bottom">
         <a href="https://marp-cli-page-transitions.glitch.me/#14">
-          <img src="https://raw.githubusercontent.com/marp-team/marp-cli/make-stable-transitions/docs/bespoke-template/transitions/flip.gif" width="128" height="72" /><br />
+          <img src="./images/flip.gif" width="128" height="72" /><br />
           <b>flip</b>
         </a>
       </td>
       <td align="center" valign="bottom">
         <a href="https://marp-cli-page-transitions.glitch.me/#15">
-          <img src="https://raw.githubusercontent.com/marp-team/marp-cli/make-stable-transitions/docs/bespoke-template/transitions/glow.gif" width="128" height="72" /><br />
+          <img src="./images/glow.gif" width="128" height="72" /><br />
           <b>glow</b>
         </a>
       </td>
       <td align="center" valign="bottom">
         <a href="https://marp-cli-page-transitions.glitch.me/#16">
-          <img src="https://raw.githubusercontent.com/marp-team/marp-cli/make-stable-transitions/docs/bespoke-template/transitions/implode.gif" width="128" height="72" /><br />
+          <img src="./images/implode.gif" width="128" height="72" /><br />
           <b>implode</b>
         </a>
       </td>
@@ -177,25 +177,25 @@ Marp CLI has provided useful [33 built-in transitions](../../src/engine/transiti
     <tr>
       <td align="center" valign="bottom">
         <a href="https://marp-cli-page-transitions.glitch.me/#17">
-          <img src="https://raw.githubusercontent.com/marp-team/marp-cli/make-stable-transitions/docs/bespoke-template/transitions/in-out.gif" width="128" height="72" /><br />
+          <img src="./images/in-out.gif" width="128" height="72" /><br />
           <b>in-out</b>
         </a>
       </td>
       <td align="center" valign="bottom">
         <a href="https://marp-cli-page-transitions.glitch.me/#18">
-          <img src="https://raw.githubusercontent.com/marp-team/marp-cli/make-stable-transitions/docs/bespoke-template/transitions/iris-in.gif" width="128" height="72" /><br />
+          <img src="./images/iris-in.gif" width="128" height="72" /><br />
           <b>iris-in</b>
         </a>
       </td>
       <td align="center" valign="bottom">
         <a href="https://marp-cli-page-transitions.glitch.me/#19">
-          <img src="https://raw.githubusercontent.com/marp-team/marp-cli/make-stable-transitions/docs/bespoke-template/transitions/iris-out.gif" width="128" height="72" /><br />
+          <img src="./images/iris-out.gif" width="128" height="72" /><br />
           <b>iris-out</b>
         </a>
       </td>
       <td align="center" valign="bottom">
         <a href="https://marp-cli-page-transitions.glitch.me/#20">
-          <img src="https://raw.githubusercontent.com/marp-team/marp-cli/make-stable-transitions/docs/bespoke-template/transitions/melt.gif" width="128" height="72" /><br />
+          <img src="./images/melt.gif" width="128" height="72" /><br />
           <b>melt</b>
         </a>
       </td>
@@ -203,25 +203,25 @@ Marp CLI has provided useful [33 built-in transitions](../../src/engine/transiti
     <tr>
       <td align="center" valign="bottom">
         <a href="https://marp-cli-page-transitions.glitch.me/#21">
-          <img src="https://raw.githubusercontent.com/marp-team/marp-cli/make-stable-transitions/docs/bespoke-template/transitions/overlap.gif" width="128" height="72" /><br />
+          <img src="./images/overlap.gif" width="128" height="72" /><br />
           <b>overlap</b>
         </a>
       </td>
       <td align="center" valign="bottom">
         <a href="https://marp-cli-page-transitions.glitch.me/#22">
-          <img src="https://raw.githubusercontent.com/marp-team/marp-cli/make-stable-transitions/docs/bespoke-template/transitions/pivot.gif" width="128" height="72" /><br />
+          <img src="./images/pivot.gif" width="128" height="72" /><br />
           <b>pivot</b>
         </a>
       </td>
       <td align="center" valign="bottom">
         <a href="https://marp-cli-page-transitions.glitch.me/#23">
-          <img src="https://raw.githubusercontent.com/marp-team/marp-cli/make-stable-transitions/docs/bespoke-template/transitions/pull.gif" width="128" height="72" /><br />
+          <img src="./images/pull.gif" width="128" height="72" /><br />
           <b>pull</b>
         </a>
       </td>
       <td align="center" valign="bottom">
         <a href="https://marp-cli-page-transitions.glitch.me/#24">
-          <img src="https://raw.githubusercontent.com/marp-team/marp-cli/make-stable-transitions/docs/bespoke-template/transitions/push.gif" width="128" height="72" /><br />
+          <img src="./images/push.gif" width="128" height="72" /><br />
           <b>push</b>
         </a>
       </td>
@@ -229,25 +229,25 @@ Marp CLI has provided useful [33 built-in transitions](../../src/engine/transiti
     <tr>
       <td align="center" valign="bottom">
         <a href="https://marp-cli-page-transitions.glitch.me/#25">
-          <img src="https://raw.githubusercontent.com/marp-team/marp-cli/make-stable-transitions/docs/bespoke-template/transitions/reveal.gif" width="128" height="72" /><br />
+          <img src="./images/reveal.gif" width="128" height="72" /><br />
           <b>reveal</b>
         </a>
       </td>
       <td align="center" valign="bottom">
         <a href="https://marp-cli-page-transitions.glitch.me/#26">
-          <img src="https://raw.githubusercontent.com/marp-team/marp-cli/make-stable-transitions/docs/bespoke-template/transitions/rotate.gif" width="128" height="72" /><br />
+          <img src="./images/rotate.gif" width="128" height="72" /><br />
           <b>rotate</b>
         </a>
       </td>
       <td align="center" valign="bottom">
         <a href="https://marp-cli-page-transitions.glitch.me/#27">
-          <img src="https://raw.githubusercontent.com/marp-team/marp-cli/make-stable-transitions/docs/bespoke-template/transitions/slide.gif" width="128" height="72" /><br />
+          <img src="./images/slide.gif" width="128" height="72" /><br />
           <b>slide</b>
         </a>
       </td>
       <td align="center" valign="bottom">
         <a href="https://marp-cli-page-transitions.glitch.me/#28">
-          <img src="https://raw.githubusercontent.com/marp-team/marp-cli/make-stable-transitions/docs/bespoke-template/transitions/star.gif" width="128" height="72" /><br />
+          <img src="./images/star.gif" width="128" height="72" /><br />
           <b>star</b>
         </a>
       </td>
@@ -255,25 +255,25 @@ Marp CLI has provided useful [33 built-in transitions](../../src/engine/transiti
     <tr>
       <td align="center" valign="bottom">
         <a href="https://marp-cli-page-transitions.glitch.me/#29">
-          <img src="https://raw.githubusercontent.com/marp-team/marp-cli/make-stable-transitions/docs/bespoke-template/transitions/swap.gif" width="128" height="72" /><br />
+          <img src="./images/swap.gif" width="128" height="72" /><br />
           <b>swap</b>
         </a>
       </td>
       <td align="center" valign="bottom">
         <a href="https://marp-cli-page-transitions.glitch.me/#30">
-          <img src="https://raw.githubusercontent.com/marp-team/marp-cli/make-stable-transitions/docs/bespoke-template/transitions/swipe.gif" width="128" height="72" /><br />
+          <img src="./images/swipe.gif" width="128" height="72" /><br />
           <b>swipe</b>
         </a>
       </td>
       <td align="center" valign="bottom">
         <a href="https://marp-cli-page-transitions.glitch.me/#31">
-          <img src="https://raw.githubusercontent.com/marp-team/marp-cli/make-stable-transitions/docs/bespoke-template/transitions/swoosh.gif" width="128" height="72" /><br />
+          <img src="./images/swoosh.gif" width="128" height="72" /><br />
           <b>swoosh</b>
         </a>
       </td>
       <td align="center" valign="bottom">
         <a href="https://marp-cli-page-transitions.glitch.me/#32">
-          <img src="https://raw.githubusercontent.com/marp-team/marp-cli/make-stable-transitions/docs/bespoke-template/transitions/wipe.gif" width="128" height="72" /><br />
+          <img src="./images/wipe.gif" width="128" height="72" /><br />
           <b>wipe</b>
         </a>
       </td>
@@ -281,13 +281,13 @@ Marp CLI has provided useful [33 built-in transitions](../../src/engine/transiti
     <tr>
       <td align="center" valign="bottom">
         <a href="https://marp-cli-page-transitions.glitch.me/#33">
-          <img src="https://raw.githubusercontent.com/marp-team/marp-cli/make-stable-transitions/docs/bespoke-template/transitions/wiper.gif" width="128" height="72" /><br />
+          <img src="./images/wiper.gif" width="128" height="72" /><br />
           <b>wiper</b>
         </a>
       </td>
       <td align="center" valign="bottom">
         <a href="https://marp-cli-page-transitions.glitch.me/#34">
-          <img src="https://raw.githubusercontent.com/marp-team/marp-cli/make-stable-transitions/docs/bespoke-template/transitions/zoom.gif" width="128" height="72" /><br />
+          <img src="./images/zoom.gif" width="128" height="72" /><br />
           <b>zoom</b>
         </a>
       </td>
@@ -566,7 +566,7 @@ If there were marked elements with the same name by [`view-transition-name` CSS 
 The slide author can visualize the relationship between the different elements in the two different pages. It's helpful for creating a more engaging presentation for the audience.
 
 <p align="center">
-  <img src="morphing-animation.gif" alt="Morph animation example" width="480" height="270" />
+  <img src="./images/morphing-animation.gif" alt="Morph animation example" width="480" height="270" />
 </p>
 
 If there were multiple pairs defined by `view-transition-name` CSS property with different names, each elements will morph at the same time. Elements that were not marked by `view-transition-name` still follow the selected animation by `transition` local directive.
@@ -680,7 +680,7 @@ style: |
 The name of group can set through CSS variable in `style` attribute.
 
 <p align="center">
-  <img src="morphing-animation-2.gif" alt="Use HTML to mark morphable contents" width="480" height="270" />
+  <img src="./images/morphing-animation-2.gif" alt="Use HTML to mark morphable contents" width="480" height="270" />
 </p>
 
 Due to the security reason, Marp CLI does not render raw HTML tags in Markdown by default. You have to should add `--html` option to use inline HTMLs.
