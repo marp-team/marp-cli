@@ -4,6 +4,7 @@
 
 ### Changed
 
+- [Slide transitions for `bespoke` template](https://github.com/marp-team/marp-cli/blob/main/docs/bespoke-transitions/README.md) powered by [View Transition API](https://www.w3.org/TR/css-view-transitions-1/) is stably available by default ([#447](https://github.com/marp-team/marp-cli/issues/447), [#501](https://github.com/marp-team/marp-cli/pull/501))
 - Upgrade Marp Core to [v3.5.0](https://github.com/marp-team/marp-core/releases/v3.5.0) ([#502](https://github.com/marp-team/marp-cli/pull/502))
 - Upgrade Node.js and dependent packages ([#502](https://github.com/marp-team/marp-cli/pull/502))
 

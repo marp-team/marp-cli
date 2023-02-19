@@ -620,45 +620,6 @@ describe('Marp CLI', () => {
     })
   })
 
-  describe('with experimental --bespoke.transition option', () => {
-    let error: jest.SpyInstance
-    let warn: jest.SpyInstance
-
-    beforeEach(() => {
-      error = jest.spyOn(console, 'error').mockImplementation()
-      warn = jest.spyOn(console, 'warn').mockImplementation()
-    })
-
-    afterEach(() => {
-      error?.mockRestore()
-      warn?.mockRestore()
-    })
-
-    const matcher = expect.stringContaining(
-      'transition support for bespoke template has been enabled'
-    )
-    const previewRecommendation = expect.stringContaining('--preview')
-
-    it('outputs an information of transitions experiment with recommendation of preview option', async () => {
-      await marpCli(['--template=bespoke', '--bespoke.transition'])
-
-      expect(warn).toHaveBeenCalledWith(matcher)
-      expect(warn).toHaveBeenCalledWith(previewRecommendation)
-    })
-
-    it('hides recommendation of preview option if enabled with preview mode', async () => {
-      await marpCli(['--template=bespoke', '--bespoke.transition', '--preview'])
-
-      expect(warn).toHaveBeenCalledWith(matcher)
-      expect(warn).not.toHaveBeenCalledWith(previewRecommendation)
-    })
-
-    it('does not output an information if template is not bespoke template', async () => {
-      await marpCli(['--template=bare', '--bespoke.transition'])
-      expect(warn).not.toHaveBeenCalledWith(matcher)
-    })
-  })
-
   describe('with passing a file', () => {
     const onePath = assetFn('_files/1.md')
 

@@ -27,11 +27,12 @@ export const findChromeInstallation = async () => {
         return linux()
       case 'win32':
         return win32()
-      /* istanbul ignore next: CI cannot test against WSL environment */
+      // CI cannot test against WSL environment
+      /* c8 ignore next */
       case 'wsl':
         return wsl()
     }
-    /* istanbul ignore next */
+    /* c8 ignore next */
     return []
   })()
 

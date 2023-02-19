@@ -85,7 +85,7 @@ export class Preview extends (EventEmitter as new () => TypedEmitter<Preview.Eve
           return await page.close()
         } catch (e: any) {
           // Ignore raising error if a target page has already close
-          /* istanbul ignore next */
+          /* c8 ignore next */
           if (!e.message.includes('Target closed.')) throw e
         }
       },
@@ -183,7 +183,7 @@ export class Preview extends (EventEmitter as new () => TypedEmitter<Preview.Eve
 
     let windowObject: Preview.Window | undefined
 
-    /* istanbul ignore next */
+    /* c8 ignore next */
     if (process.platform === 'darwin') {
       // An initial app window is not using in macOS for correct handling activation from Dock
       windowObject = (await this.createWindow()) || undefined
