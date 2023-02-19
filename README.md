@@ -303,7 +303,14 @@ The `bespoke` template is using [Bespoke.js](https://github.com/bespokejs/bespok
 
 #### Docs
 
-- **[Slide transitions in `bespoke` template][transitions]**
+- **[Slide transitions in `bespoke` template][transitions]**<br />
+  Learn all about of slide transitions for `bespoke` template: Built-in transitions, custom transitions, and morphing animations.
+
+<p align="center">
+  <a href="./docs/bespoke-transitions/README.md">
+    <img src="https://raw.githubusercontent.com/marp-team/marp-cli/main/docs/bespoke-transitions/images/morphing-animation.gif" width="320" />
+  </a>
+</p>
 
 ### `bare` template
 
