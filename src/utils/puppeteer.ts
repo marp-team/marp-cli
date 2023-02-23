@@ -2,6 +2,7 @@ import fs from 'fs'
 import os from 'os'
 import path from 'path'
 import { launch } from 'puppeteer-core'
+import macDockIcon from '../assets/mac-dock-icon.png'
 import { warn } from '../cli'
 import { CLIErrorCode, error, isError } from '../error'
 import { isDocker } from '../utils/docker'
@@ -123,6 +124,7 @@ export const generatePuppeteerLaunchArgs = async () => {
     executablePath,
     args: [...args],
     pipe: !(isWSL() || isSnapBrowser(executablePath)),
+    headless: 'new' as const,
 
     // Workaround to avoid force-extensions policy for Chrome enterprise (SET CHROME_ENABLE_EXTENSIONS=1)
     // https://github.com/puppeteer/puppeteer/blob/master/docs/troubleshooting.md#chrome-headless-doesnt-launch-on-windows
@@ -138,7 +140,21 @@ export const launchPuppeteer = async (
   ...[options]: Parameters<typeof launch>
 ) => {
   try {
-    return await launch(options)
+    const browser = await launch(options)
+
+    // Set Marp icon asynchrnously (only for macOS)
+    browser
+      .target()
+      .createCDPSession()
+      .then((session) => {
+        session
+          .send('Browser.setDockTile', { image: macDockIcon.slice(22) })
+          .catch(() => {
+            // No ops
+          })
+      })
+
+    return browser
   } catch (e: unknown) {
     if (isError(e)) {
       // Retry to launch Chromium with WebSocket connection instead of pipe if failed to connect to Chromium

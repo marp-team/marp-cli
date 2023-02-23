@@ -3,7 +3,6 @@ import { EventEmitter } from 'events'
 import { nanoid } from 'nanoid'
 import type { Page, Browser, Target } from 'puppeteer-core'
 import TypedEmitter from 'typed-emitter'
-import macDockIcon from './assets/mac-dock-icon.png'
 import { ConvertType, mimeTypes } from './converter'
 import { error } from './error'
 import { File, FileType } from './file'
@@ -150,24 +149,12 @@ export class Preview extends (EventEmitter as new () => TypedEmitter<Preview.Eve
         `--window-size=${this.options.width},${this.options.height}`,
       ],
       defaultViewport: null as any,
-      headless: process.env.NODE_ENV === 'test',
+      headless: process.env.NODE_ENV === 'test' ? 'new' : false,
       ignoreDefaultArgs: ['--enable-automation'],
       userDataDir: await generatePuppeteerDataDirPath('marp-cli-preview', {
         wslHost: isChromeInWSLHost(baseArgs.executablePath),
       }),
     })
-
-    // Set Marp icon asynchrnously (only for macOS)
-    this.puppeteerInternal
-      .target()
-      .createCDPSession()
-      .then((session) => {
-        session
-          .send('Browser.setDockTile', { image: macDockIcon.slice(22) })
-          .catch(() => {
-            // No ops
-          })
-      })
 
     const handlePageOnClose = async () => {
       const pages = (await this.puppeteer?.pages()) || []
