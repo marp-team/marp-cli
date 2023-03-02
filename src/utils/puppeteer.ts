@@ -13,6 +13,11 @@ import { isWSL, resolveWindowsEnv } from './wsl'
 let executablePath: string | undefined | false = false
 let wslTmp: string | undefined
 
+export const headlessFlag =
+  process.env.NODE_ENV === 'test' && process.platform === 'darwin'
+    ? true
+    : ('new' as const)
+
 const isShebang = (path: string) => {
   let fd: number | null = null
 
@@ -124,7 +129,7 @@ export const generatePuppeteerLaunchArgs = async () => {
     executablePath,
     args: [...args],
     pipe: !(isWSL() || isSnapBrowser(executablePath)),
-    headless: 'new' as const,
+    headless: headlessFlag,
 
     // Workaround to avoid force-extensions policy for Chrome enterprise (SET CHROME_ENABLE_EXTENSIONS=1)
     // https://github.com/puppeteer/puppeteer/blob/master/docs/troubleshooting.md#chrome-headless-doesnt-launch-on-windows
@@ -144,7 +149,7 @@ export const launchPuppeteer = async (
 
     // Set Marp icon asynchrnously (only for macOS)
     browser
-      .target()
+      ?.target()
       .createCDPSession()
       .then((session) => {
         session

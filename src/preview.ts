@@ -9,6 +9,7 @@ import { File, FileType } from './file'
 import {
   generatePuppeteerDataDirPath,
   generatePuppeteerLaunchArgs,
+  headlessFlag,
   launchPuppeteer,
 } from './utils/puppeteer'
 import { isChromeInWSLHost } from './utils/wsl'
@@ -149,7 +150,7 @@ export class Preview extends (EventEmitter as new () => TypedEmitter<Preview.Eve
         `--window-size=${this.options.width},${this.options.height}`,
       ],
       defaultViewport: null as any,
-      headless: process.env.NODE_ENV === 'test' ? 'new' : false,
+      headless: process.env.NODE_ENV === 'test' ? headlessFlag : false,
       ignoreDefaultArgs: ['--enable-automation'],
       userDataDir: await generatePuppeteerDataDirPath('marp-cli-preview', {
         wslHost: isChromeInWSLHost(baseArgs.executablePath),
