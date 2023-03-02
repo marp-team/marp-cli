@@ -83,11 +83,13 @@ export class Preview extends (EventEmitter as new () => TypedEmitter<Preview.Eve
       close: async () => {
         try {
           return await page.close()
+
+          /* c8 ignore start */
         } catch (e: any) {
           // Ignore raising error if a target page has already close
-          /* c8 ignore next */
           if (!e.message.includes('Target closed.')) throw e
         }
+        /* c8 ignore stop */
       },
       load: async (uri: string) => {
         await page.goto(uri, { timeout: 0, waitUntil: 'domcontentloaded' })
@@ -171,12 +173,13 @@ export class Preview extends (EventEmitter as new () => TypedEmitter<Preview.Eve
 
     let windowObject: Preview.Window | undefined
 
-    /* c8 ignore next */
+    /* c8 ignore start */
     if (process.platform === 'darwin') {
       // An initial app window is not using in macOS for correct handling activation from Dock
       windowObject = (await this.createWindow()) || undefined
       await page.close()
     }
+    /* c8 ignore stop */
 
     page.on('close', handlePageOnClose)
     this.emit('launch')

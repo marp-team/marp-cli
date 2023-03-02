@@ -98,7 +98,7 @@ export class ResolvedEngine {
   }
 
   // NOTE: It cannot test because of overriding `require` in Jest context.
-  /* c8 ignore next */
+  /* c8 ignore start */
   private findClassPath(klass) {
     for (const moduleId in require.cache) {
       const expt = require.cache[moduleId]?.exports
@@ -113,4 +113,5 @@ export class ResolvedEngine {
     }
     return undefined
   }
+  /* c8 ignore stop */
 }
