@@ -148,6 +148,7 @@ export const launchPuppeteer = async (
     const browser = await launch(options)
 
     // Set Marp icon asynchrnously (only for macOS)
+    /* c8 ignore start */
     browser
       ?.target()
       .createCDPSession()
@@ -158,6 +159,7 @@ export const launchPuppeteer = async (
             // No ops
           })
       })
+    /* c8 ignore stop */
 
     return browser
   } catch (e: unknown) {
