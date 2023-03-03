@@ -3,13 +3,13 @@ import { EventEmitter } from 'events'
 import { nanoid } from 'nanoid'
 import type { Page, Browser, Target } from 'puppeteer-core'
 import TypedEmitter from 'typed-emitter'
-import macDockIcon from './assets/mac-dock-icon.png'
 import { ConvertType, mimeTypes } from './converter'
 import { error } from './error'
 import { File, FileType } from './file'
 import {
   generatePuppeteerDataDirPath,
   generatePuppeteerLaunchArgs,
+  enableHeadless,
   launchPuppeteer,
 } from './utils/puppeteer'
 import { isChromeInWSLHost } from './utils/wsl'
@@ -83,11 +83,13 @@ export class Preview extends (EventEmitter as new () => TypedEmitter<Preview.Eve
       close: async () => {
         try {
           return await page.close()
+
+          /* c8 ignore start */
         } catch (e: any) {
           // Ignore raising error if a target page has already close
-          /* c8 ignore next */
           if (!e.message.includes('Target closed.')) throw e
         }
+        /* c8 ignore stop */
       },
       load: async (uri: string) => {
         await page.goto(uri, { timeout: 0, waitUntil: 'domcontentloaded' })
@@ -150,24 +152,12 @@ export class Preview extends (EventEmitter as new () => TypedEmitter<Preview.Eve
         `--window-size=${this.options.width},${this.options.height}`,
       ],
       defaultViewport: null as any,
-      headless: process.env.NODE_ENV === 'test',
+      headless: process.env.NODE_ENV === 'test' ? enableHeadless() : false,
       ignoreDefaultArgs: ['--enable-automation'],
       userDataDir: await generatePuppeteerDataDirPath('marp-cli-preview', {
         wslHost: isChromeInWSLHost(baseArgs.executablePath),
       }),
     })
-
-    // Set Marp icon asynchrnously (only for macOS)
-    this.puppeteerInternal
-      .target()
-      .createCDPSession()
-      .then((session) => {
-        session
-          .send('Browser.setDockTile', { image: macDockIcon.slice(22) })
-          .catch(() => {
-            // No ops
-          })
-      })
 
     const handlePageOnClose = async () => {
       const pages = (await this.puppeteer?.pages()) || []
@@ -183,12 +173,13 @@ export class Preview extends (EventEmitter as new () => TypedEmitter<Preview.Eve
 
     let windowObject: Preview.Window | undefined
 
-    /* c8 ignore next */
+    /* c8 ignore start */
     if (process.platform === 'darwin') {
       // An initial app window is not using in macOS for correct handling activation from Dock
       windowObject = (await this.createWindow()) || undefined
       await page.close()
     }
+    /* c8 ignore stop */
 
     page.on('close', handlePageOnClose)
     this.emit('launch')

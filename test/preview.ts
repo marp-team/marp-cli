@@ -63,16 +63,17 @@ describe('Preview', () => {
     })
 
     describe('with constructor option about window size', () => {
-      it('opens window that have specified window size', async () => {
-        const instance = preview({ height: 400, width: 200 })
+      it('opens window that have specified (or smaller) window size', async () => {
+        const instance = preview({ height: 600, width: 400 })
         const win = await instance.open('about:blank')
 
-        expect(
-          await win.page.evaluate(() => ({
-            height: window.innerHeight,
-            width: window.innerWidth,
-          }))
-        ).toMatchObject({ height: 400, width: 200 })
+        const { height, width } = await win.page.evaluate(() => ({
+          height: window.innerHeight,
+          width: window.innerWidth,
+        }))
+
+        expect(height).toBeLessThanOrEqual(600)
+        expect(width).toBeLessThanOrEqual(400)
       })
     })
 

@@ -187,6 +187,60 @@ describe('#generatePuppeteerLaunchArgs', () => {
     }
   })
 
+  describe('with PUPPETEER_HEADLESS_MODE env', () => {
+    it('uses legacy headless mode if PUPPETEER_HEADLESS_MODE was empty', async () => {
+      try {
+        process.env.PUPPETEER_HEADLESS_MODE = ''
+
+        const { headless } =
+          await puppeteerUtils().generatePuppeteerLaunchArgs()
+
+        expect(headless).toBe(true)
+      } finally {
+        delete process.env.PUPPETEER_HEADLESS_MODE
+      }
+    })
+
+    it('uses new headless mode if PUPPETEER_HEADLESS_MODE was "new"', async () => {
+      try {
+        process.env.PUPPETEER_HEADLESS_MODE = 'new'
+
+        const { headless } =
+          await puppeteerUtils().generatePuppeteerLaunchArgs()
+
+        expect(headless).toBe('new')
+      } finally {
+        delete process.env.PUPPETEER_HEADLESS_MODE
+      }
+    })
+
+    it('uses legacy headless mode if PUPPETEER_HEADLESS_MODE was "legacy"', async () => {
+      try {
+        process.env.PUPPETEER_HEADLESS_MODE = 'legacy'
+
+        const { headless } =
+          await puppeteerUtils().generatePuppeteerLaunchArgs()
+
+        expect(headless).toBe(true)
+      } finally {
+        delete process.env.PUPPETEER_HEADLESS_MODE
+      }
+    })
+
+    it('uses legacy headless mode if PUPPETEER_HEADLESS_MODE was "old"', async () => {
+      try {
+        process.env.PUPPETEER_HEADLESS_MODE = 'old'
+
+        const { headless } =
+          await puppeteerUtils().generatePuppeteerLaunchArgs()
+
+        expect(headless).toBe(true)
+      } finally {
+        delete process.env.PUPPETEER_HEADLESS_MODE
+      }
+    })
+  })
+
   describe('with CHROME_PATH env in macOS', () => {
     let originalPlatform: string | undefined
 

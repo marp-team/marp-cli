@@ -37,11 +37,12 @@ export const _testElementAnimation = (
   elm: HTMLElement,
   callback: (ret: MarpTransitionResolvableKeyframeSettings | undefined) => void
 ) => {
-  /* c8 ignore next */
+  /* c8 ignore start */
   requestAnimationFrame(() => {
     elm.style.animationPlayState = 'running'
     requestAnimationFrame(() => callback(undefined))
   })
+  /* c8 ignore stop */
 }
 
 const resolvedMarpTransitionKeyframes = new Map<

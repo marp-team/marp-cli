@@ -28,12 +28,12 @@ export const findChromeInstallation = async () => {
       case 'win32':
         return win32()
       // CI cannot test against WSL environment
-      /* c8 ignore next */
+      /* c8 ignore start */
       case 'wsl':
         return wsl()
     }
-    /* c8 ignore next */
     return []
+    /* c8 ignore stop */
   })()
 
   return installations[0]
