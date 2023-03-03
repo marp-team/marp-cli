@@ -168,6 +168,7 @@ describe('#generatePuppeteerLaunchArgs', () => {
 
   it("ignores puppeteer's --disable-extensions option if defined CHROME_ENABLE_EXTENSIONS environment value", async () => {
     const replacedEnv = replaceProperty(process, 'env', {
+      ...process.env,
       CHROME_ENABLE_EXTENSIONS: 'true',
     })
 
@@ -181,6 +182,7 @@ describe('#generatePuppeteerLaunchArgs', () => {
 
   it('enables LayoutNGPrinting and LayoutNGTableFragmentation if defined CHROME_LAYOUTNG_PRINTING environment value', async () => {
     const replacedEnv = replaceProperty(process, 'env', {
+      ...process.env,
       CHROME_LAYOUTNG_PRINTING: '1',
     })
 
@@ -197,6 +199,7 @@ describe('#generatePuppeteerLaunchArgs', () => {
   describe('with PUPPETEER_HEADLESS_MODE env', () => {
     it('uses legacy headless mode if PUPPETEER_HEADLESS_MODE was empty', async () => {
       const replacedEnv = replaceProperty(process, 'env', {
+        ...process.env,
         PUPPETEER_HEADLESS_MODE: '',
       })
 
@@ -212,6 +215,7 @@ describe('#generatePuppeteerLaunchArgs', () => {
 
     it('uses new headless mode if PUPPETEER_HEADLESS_MODE was "new"', async () => {
       const replacedEnv = replaceProperty(process, 'env', {
+        ...process.env,
         PUPPETEER_HEADLESS_MODE: 'new',
       })
 
@@ -227,6 +231,7 @@ describe('#generatePuppeteerLaunchArgs', () => {
 
     it('uses legacy headless mode if PUPPETEER_HEADLESS_MODE was "legacy"', async () => {
       const replacedEnv = replaceProperty(process, 'env', {
+        ...process.env,
         PUPPETEER_HEADLESS_MODE: 'legacy',
       })
 
@@ -242,6 +247,7 @@ describe('#generatePuppeteerLaunchArgs', () => {
 
     it('uses legacy headless mode if PUPPETEER_HEADLESS_MODE was "old"', async () => {
       const replacedEnv = replaceProperty(process, 'env', {
+        ...process.env,
         PUPPETEER_HEADLESS_MODE: 'old',
       })
 
