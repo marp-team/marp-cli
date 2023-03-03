@@ -1,9 +1,12 @@
 import os from 'os'
 import path from 'path'
+import { jest as jestGlobals } from '@jest/globals'
 
 jest.mock('../../src/utils/chrome-finder')
 jest.mock('../../src/utils/edge-finder')
 jest.mock('../../src/utils/wsl')
+
+const { replaceProperty } = jestGlobals
 
 const CLIError = (): typeof import('../../src/error').CLIError =>
   require('../../src/error').CLIError // eslint-disable-line @typescript-eslint/no-var-requires
@@ -164,27 +167,93 @@ describe('#generatePuppeteerLaunchArgs', () => {
   })
 
   it("ignores puppeteer's --disable-extensions option if defined CHROME_ENABLE_EXTENSIONS environment value", async () => {
-    try {
-      process.env.CHROME_ENABLE_EXTENSIONS = 'true'
+    const replacedEnv = replaceProperty(process, 'env', {
+      CHROME_ENABLE_EXTENSIONS: 'true',
+    })
 
+    try {
       const args = await puppeteerUtils().generatePuppeteerLaunchArgs()
       expect(args.ignoreDefaultArgs).toContain('--disable-extensions')
     } finally {
-      delete process.env.CHROME_ENABLE_EXTENSIONS
+      replacedEnv.restore()
     }
   })
 
   it('enables LayoutNGPrinting and LayoutNGTableFragmentation if defined CHROME_LAYOUTNG_PRINTING environment value', async () => {
-    try {
-      process.env.CHROME_LAYOUTNG_PRINTING = '1'
+    const replacedEnv = replaceProperty(process, 'env', {
+      CHROME_LAYOUTNG_PRINTING: '1',
+    })
 
+    try {
       const args = await puppeteerUtils().generatePuppeteerLaunchArgs()
       expect(args.args).toContain(
         '--enable-blink-features=LayoutNGPrinting,LayoutNGTableFragmentation'
       )
     } finally {
-      delete process.env.CHROME_LAYOUTNG_PRINTING
+      replacedEnv.restore()
     }
+  })
+
+  describe('with PUPPETEER_HEADLESS_MODE env', () => {
+    it('uses legacy headless mode if PUPPETEER_HEADLESS_MODE was empty', async () => {
+      const replacedEnv = replaceProperty(process, 'env', {
+        PUPPETEER_HEADLESS_MODE: '',
+      })
+
+      try {
+        const { headless } =
+          await puppeteerUtils().generatePuppeteerLaunchArgs()
+
+        expect(headless).toBe(true)
+      } finally {
+        replacedEnv.restore()
+      }
+    })
+
+    it('uses new headless mode if PUPPETEER_HEADLESS_MODE was "new"', async () => {
+      const replacedEnv = replaceProperty(process, 'env', {
+        PUPPETEER_HEADLESS_MODE: 'new',
+      })
+
+      try {
+        const { headless } =
+          await puppeteerUtils().generatePuppeteerLaunchArgs()
+
+        expect(headless).toBe('new')
+      } finally {
+        replacedEnv.restore()
+      }
+    })
+
+    it('uses legacy headless mode if PUPPETEER_HEADLESS_MODE was "legacy"', async () => {
+      const replacedEnv = replaceProperty(process, 'env', {
+        PUPPETEER_HEADLESS_MODE: 'legacy',
+      })
+
+      try {
+        const { headless } =
+          await puppeteerUtils().generatePuppeteerLaunchArgs()
+
+        expect(headless).toBe(true)
+      } finally {
+        replacedEnv.restore()
+      }
+    })
+
+    it('uses legacy headless mode if PUPPETEER_HEADLESS_MODE was "old"', async () => {
+      const replacedEnv = replaceProperty(process, 'env', {
+        PUPPETEER_HEADLESS_MODE: 'old',
+      })
+
+      try {
+        const { headless } =
+          await puppeteerUtils().generatePuppeteerLaunchArgs()
+
+        expect(headless).toBe(true)
+      } finally {
+        replacedEnv.restore()
+      }
+    })
   })
 
   describe('with CHROME_PATH env in macOS', () => {
