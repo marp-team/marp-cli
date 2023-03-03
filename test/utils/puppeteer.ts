@@ -1,12 +1,9 @@
 import os from 'os'
 import path from 'path'
-import { jest as jestGlobals } from '@jest/globals'
 
 jest.mock('../../src/utils/chrome-finder')
 jest.mock('../../src/utils/edge-finder')
 jest.mock('../../src/utils/wsl')
-
-const { replaceProperty } = jestGlobals
 
 const CLIError = (): typeof import('../../src/error').CLIError =>
   require('../../src/error').CLIError // eslint-disable-line @typescript-eslint/no-var-requires
@@ -167,97 +164,79 @@ describe('#generatePuppeteerLaunchArgs', () => {
   })
 
   it("ignores puppeteer's --disable-extensions option if defined CHROME_ENABLE_EXTENSIONS environment value", async () => {
-    const replacedEnv = replaceProperty(process, 'env', {
-      ...process.env,
-      CHROME_ENABLE_EXTENSIONS: 'true',
-    })
-
     try {
+      process.env.CHROME_ENABLE_EXTENSIONS = 'true'
+
       const args = await puppeteerUtils().generatePuppeteerLaunchArgs()
       expect(args.ignoreDefaultArgs).toContain('--disable-extensions')
     } finally {
-      replacedEnv.restore()
+      delete process.env.CHROME_ENABLE_EXTENSIONS
     }
   })
 
   it('enables LayoutNGPrinting and LayoutNGTableFragmentation if defined CHROME_LAYOUTNG_PRINTING environment value', async () => {
-    const replacedEnv = replaceProperty(process, 'env', {
-      ...process.env,
-      CHROME_LAYOUTNG_PRINTING: '1',
-    })
-
     try {
+      process.env.CHROME_LAYOUTNG_PRINTING = '1'
+
       const args = await puppeteerUtils().generatePuppeteerLaunchArgs()
       expect(args.args).toContain(
         '--enable-blink-features=LayoutNGPrinting,LayoutNGTableFragmentation'
       )
     } finally {
-      replacedEnv.restore()
+      delete process.env.CHROME_LAYOUTNG_PRINTING
     }
   })
 
   describe('with PUPPETEER_HEADLESS_MODE env', () => {
     it('uses legacy headless mode if PUPPETEER_HEADLESS_MODE was empty', async () => {
-      const replacedEnv = replaceProperty(process, 'env', {
-        ...process.env,
-        PUPPETEER_HEADLESS_MODE: '',
-      })
-
       try {
+        process.env.PUPPETEER_HEADLESS_MODE = ''
+
         const { headless } =
           await puppeteerUtils().generatePuppeteerLaunchArgs()
 
         expect(headless).toBe(true)
       } finally {
-        replacedEnv.restore()
+        delete process.env.PUPPETEER_HEADLESS_MODE
       }
     })
 
     it('uses new headless mode if PUPPETEER_HEADLESS_MODE was "new"', async () => {
-      const replacedEnv = replaceProperty(process, 'env', {
-        ...process.env,
-        PUPPETEER_HEADLESS_MODE: 'new',
-      })
-
       try {
+        process.env.PUPPETEER_HEADLESS_MODE = 'new'
+
         const { headless } =
           await puppeteerUtils().generatePuppeteerLaunchArgs()
 
         expect(headless).toBe('new')
       } finally {
-        replacedEnv.restore()
+        delete process.env.PUPPETEER_HEADLESS_MODE
       }
     })
 
     it('uses legacy headless mode if PUPPETEER_HEADLESS_MODE was "legacy"', async () => {
-      const replacedEnv = replaceProperty(process, 'env', {
-        ...process.env,
-        PUPPETEER_HEADLESS_MODE: 'legacy',
-      })
-
       try {
+        process.env.PUPPETEER_HEADLESS_MODE = 'legacy'
+
         const { headless } =
           await puppeteerUtils().generatePuppeteerLaunchArgs()
 
         expect(headless).toBe(true)
       } finally {
-        replacedEnv.restore()
+        delete process.env.PUPPETEER_HEADLESS_MODE
       }
     })
 
     it('uses legacy headless mode if PUPPETEER_HEADLESS_MODE was "old"', async () => {
-      const replacedEnv = replaceProperty(process, 'env', {
-        ...process.env,
-        PUPPETEER_HEADLESS_MODE: 'old',
-      })
-
       try {
+        process.env.PUPPETEER_HEADLESS_MODE = 'old'
+
         const { headless } =
           await puppeteerUtils().generatePuppeteerLaunchArgs()
 
         expect(headless).toBe(true)
       } finally {
-        replacedEnv.restore()
+        delete process.env.PUPPETEER_HEADLESS_MODE
       }
     })
   })
