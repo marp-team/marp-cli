@@ -86,7 +86,7 @@ Object.defineProperty(bare, 'printable', { value: true })
 
 export const bespoke: Template<TemplateBespokeOption> = async (opts) => {
   const rendererOptions = {
-    container: new Element('div', { id: 'p' }),
+    container: new Element('div', { id: ':$p' }),
     inlineSVG: true,
     slideContainer: [],
   }
