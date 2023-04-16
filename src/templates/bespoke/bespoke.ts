@@ -27,7 +27,7 @@ const parse = (
 }
 
 const bespokeTemplate = (
-  target = document.getElementById('p')! // eslint-disable-line @typescript-eslint/no-non-null-assertion
+  target = document.getElementById(':$p')! // eslint-disable-line @typescript-eslint/no-non-null-assertion
 ) => {
   setViewMode()
 

@@ -35,7 +35,7 @@ afterEach(() => {
 
 describe("Bespoke template's browser context", () => {
   const marp = new Marp({
-    container: new MarpitElement('div', { id: 'p' }),
+    container: new MarpitElement('div', { id: ':$p' }),
     html: true,
   })
 
@@ -58,7 +58,7 @@ describe("Bespoke template's browser context", () => {
     })
 
     targetDocument.body.innerHTML = html
-    return targetDocument.getElementById('p')! // eslint-disable-line @typescript-eslint/no-non-null-assertion
+    return targetDocument.getElementById(':$p')! // eslint-disable-line @typescript-eslint/no-non-null-assertion
   }
 
   const replaceLocation = <T extends void | Promise<void>>(
