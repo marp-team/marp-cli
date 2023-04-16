@@ -26,6 +26,12 @@ beforeEach(() => {
   })
 })
 
+afterEach(() => {
+  if ('startViewTransition' in document) {
+    delete document.startViewTransition
+  }
+})
+
 export const skipTransition = jest.fn()
 
 export const ViewTransition = Object.seal({ skipTransition })
