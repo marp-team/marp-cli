@@ -13,6 +13,10 @@
 - Upgrade dependent packages to the latest version ([#517](https://github.com/marp-team/marp-cli/pull/517))
 - Change `id` attribute for the whole of `bespoke` template's HTML document, to avoid conflicting with slugs generated from Markdown headings ([#516](https://github.com/marp-team/marp-cli/pull/516))
 
+### Fixed
+
+- Fix an edge case about failure of global directive injection by CLI with `--html` option ([#511](https://github.com/marp-team/marp-cli/issues/511), [#519](https://github.com/marp-team/marp-cli/pull/519))
+
 ## v2.4.0 - 2023-02-19
 
 ### Changed

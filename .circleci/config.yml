@@ -41,15 +41,15 @@ commands:
 
       - restore_cache:
           keys:
-            - v2.3-dependencies-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}-{{ .Branch }}
-            - v2.3-dependencies-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}-
-            - v2.3-dependencies-{{ .Environment.CIRCLE_JOB }}-
+            - v2.4-dependencies-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}-{{ .Branch }}
+            - v2.4-dependencies-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}-
+            - v2.4-dependencies-{{ .Environment.CIRCLE_JOB }}-
 
       - run: yarn install --frozen-lockfile
       - steps: << parameters.postinstall >>
 
       - save_cache:
-          key: v2.3-dependencies-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}-{{ .Branch }}
+          key: v2.4-dependencies-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}-{{ .Branch }}
           paths:
             - ~/.cache/yarn
 

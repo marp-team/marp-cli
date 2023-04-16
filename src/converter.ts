@@ -6,6 +6,7 @@ import chalk from 'chalk'
 import type { Browser, Page, HTTPRequest } from 'puppeteer-core'
 import { silence, warn } from './cli'
 import { Engine, ResolvedEngine } from './engine'
+import { generateOverrideGlobalDirectivesPlugin } from './engine/directive-plugin'
 import infoPlugin, { engineInfo, EngineInfo } from './engine/info-plugin'
 import metaPlugin from './engine/meta-plugin'
 import {
@@ -154,16 +155,6 @@ export class Converter {
       return undefined
     }
 
-    let additionals = ''
-
-    for (const directive of Object.keys(globalDirectives)) {
-      if (globalDirectives[directive] !== undefined) {
-        additionals += `\n<!-- ${directive}: ${JSON.stringify(
-          globalDirectives[directive]
-        )} -->`
-      }
-    }
-
     let template = this.template
     if (fallbackToPrintableTemplate && !template.printable) template = bare
 
@@ -177,9 +168,11 @@ export class Converter {
           : undefined,
       renderer: async (tplOpts) => {
         const engine = await this.generateEngine(tplOpts)
+        engine.use(generateOverrideGlobalDirectivesPlugin(globalDirectives))
+
         tplOpts.modifier?.(engine)
 
-        const ret = engine.render(stripBOM(`${markdown}${additionals}`))
+        const ret = engine.render(stripBOM(markdown))
 
         const info = engine[engineInfo]
         const outline = engine[pdfOutlineInfo]
