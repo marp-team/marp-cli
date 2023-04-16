@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v2.5.0 - 2023-04-16
+
 ### Added
 
 - Stable anchor link support in `bespoke` template ([#518](https://github.com/marp-team/marp-cli/pull/518))
