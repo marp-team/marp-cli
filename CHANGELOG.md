@@ -10,6 +10,7 @@
 
 - Upgrade Marp Core to [v3.6.0](https://github.com/marp-team/marp-core/releases/v3.6.0) ([#517](https://github.com/marp-team/marp-cli/pull/517))
 - Upgrade dependent packages to the latest version ([#517](https://github.com/marp-team/marp-cli/pull/517))
+- Change `id` attribute for the whole of `bespoke` template's HTML document, to avoid conflicting with slugs generated from Markdown headings ([#516](https://github.com/marp-team/marp-cli/pull/516))
 
 ## v2.4.0 - 2023-02-19
 
