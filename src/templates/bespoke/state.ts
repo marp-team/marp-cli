@@ -66,7 +66,6 @@ const bespokeState = (opts: BespokeStateOption = {}) => {
 
                 if (pageFragments && fragmentElement) {
                   const fragmentIndex = pageFragments.indexOf(fragmentElement)
-                  console.log(fragmentIndex)
                   if (fragmentIndex >= 0) fragment = fragmentIndex
                 }
 
