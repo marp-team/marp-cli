@@ -44,20 +44,26 @@ describe("Bespoke template's browser context", () => {
   const render = (
     md = defaultMarkdown,
     targetDocument = document,
-    { resetHead = true }: { resetHead?: boolean } = {}
+    {
+      html: enableHtml = false,
+      resetHead = true,
+    }: { html?: boolean; resetHead?: boolean } = {}
   ): HTMLElement => {
     if (resetHead) targetDocument.head.innerHTML = ''
 
-    let { html, comments } = marp.render(md) // eslint-disable-line prefer-const
+    const ret = marp.render(md, { html: enableHtml })
 
-    comments.forEach((c, i) => {
-      if (c.length > 0)
-        html = `${html}<div class="bespoke-marp-note" data-index="${i}"><p>${c.join(
+    ret.comments.forEach((c, i) => {
+      if (c.length > 0) {
+        ret.html = `${
+          ret.html
+        }<div class="bespoke-marp-note" data-index="${i}"><p>${c.join(
           '\n\n'
         )}</p></div>`
+      }
     })
 
-    targetDocument.body.innerHTML = html
+    targetDocument.body.innerHTML = ret.html
     return targetDocument.getElementById(':$p')! // eslint-disable-line @typescript-eslint/no-non-null-assertion
   }
 
@@ -1097,7 +1103,7 @@ describe("Bespoke template's browser context", () => {
   })
 
   describe('State', () => {
-    it('activates specified page by hash index', () => {
+    it('activates specific page by hash with the page number', () => {
       history.replaceState(null, document.title, '#2')
 
       render()
@@ -1106,14 +1112,48 @@ describe("Bespoke template's browser context", () => {
 
       expect(deck.slide()).toBe(1)
 
-      // Navigate by anchor
+      // Navigate by anchor with the page number
       history.replaceState(null, document.title, '#3')
       window.dispatchEvent(new HashChangeEvent('hashchange'))
 
       expect(deck.slide()).toBe(2)
     })
 
-    it('activates specified fragment state by "f" query param', () => {
+    it('activates specific page by hash with the anchor ID', () => {
+      history.replaceState(null, document.title, '#2')
+      render('# Page 1\n\n---\n\n# Page 2\n\n---\n\n# Page 3')
+
+      const deck = bespoke()
+      jest.runAllTimers()
+
+      expect(deck.slide()).toBe(1)
+
+      // Navigate by anchor with the slugified anchor ID
+      history.replaceState(null, document.title, '#page-3')
+      window.dispatchEvent(new HashChangeEvent('hashchange'))
+
+      expect(deck.slide()).toBe(2)
+    })
+
+    it('activates specific page by hash with the anchor link', () => {
+      history.replaceState(null, document.title, '')
+
+      render('a\n\n---\n\nb\n\n---\n\nc <a name="anchor">named</a>', document, {
+        html: true,
+      })
+
+      const deck = bespoke()
+      jest.runAllTimers()
+      expect(deck.slide()).toBe(0)
+
+      // Navigate by anchor with the anchor link
+      history.replaceState(null, document.title, '#anchor')
+      window.dispatchEvent(new HashChangeEvent('hashchange'))
+
+      expect(deck.slide()).toBe(2)
+    })
+
+    it('activates specific fragment state by "f" query param', () => {
       history.replaceState(null, document.title, '?f=1')
 
       render('* a\n* b\n\n---\n\n* a\n* b\n* c')
@@ -1153,6 +1193,23 @@ describe("Bespoke template's browser context", () => {
           '[data-bespoke-marp-fragment="inactive"]'
         )
       ).toHaveLength(1)
+    })
+
+    it('activates specific fragment state by hash with the anchor ID when the element is included in the fragmented list', () => {
+      history.replaceState(null, document.title, '?f=0')
+
+      render('* # a\n* # b\n* # c')
+      const deck = bespoke()
+      jest.runAllTimers()
+
+      expect(deck.slide()).toBe(0)
+      expect(deck.fragmentIndex).toBe(0)
+
+      // Navigate by anchor with the slugified anchor ID that is included in the element within the fragmented list
+      history.replaceState(null, document.title, '#b')
+      window.dispatchEvent(new HashChangeEvent('hashchange'))
+
+      expect(deck.fragmentIndex).toBe(2)
     })
   })
 

@@ -4,6 +4,7 @@
 
 ### Added
 
+- Stable anchor link support in `bespoke` template ([#518](https://github.com/marp-team/marp-cli/pull/518))
 - Support [Puppeteer's new headless mode](https://developer.chrome.com/articles/new-headless/) by `PUPPETEER_HEADLESS_MODE=new` env ([#508](https://github.com/marp-team/marp-cli/pull/508))
 
 ### Changed

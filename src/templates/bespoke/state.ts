@@ -37,8 +37,45 @@ const bespokeState = (opts: BespokeStateOption = {}) => {
     }
 
     const parseState = (opts: any = { fragment: true }) => {
-      const page = (coerceInt(location.hash.slice(1)) || 1) - 1
-      const fragment = opts.fragment ? coerceInt(readQuery('f') || '') : null
+      let fragment = opts.fragment ? coerceInt(readQuery('f') || '') : null
+
+      const page = (() => {
+        if (location.hash) {
+          // Support text fragments: https://web.dev/text-fragments/
+          const [hashWithoutDelimiter] = location.hash.slice(1).split(':~:')
+
+          const numMatcher = /^\d+$/.test(hashWithoutDelimiter)
+          if (numMatcher) return (coerceInt(hashWithoutDelimiter) ?? 1) - 1
+
+          const anchorTarget =
+            document.getElementById(hashWithoutDelimiter) ||
+            document.querySelector(
+              `a[name="${CSS.escape(hashWithoutDelimiter)}"]`
+            )
+
+          if (anchorTarget) {
+            const { length } = deck.slides
+
+            for (let i = 0; i < length; i += 1) {
+              if (deck.slides[i].contains(anchorTarget)) {
+                // Detect the fragmented list in the parent element
+                const pageFragments = deck.fragments?.[i]
+                const fragmentElement = anchorTarget.closest(
+                  '[data-marpit-fragment]'
+                )
+
+                if (pageFragments && fragmentElement) {
+                  const fragmentIndex = pageFragments.indexOf(fragmentElement)
+                  if (fragmentIndex >= 0) fragment = fragmentIndex
+                }
+
+                return i
+              }
+            }
+          }
+        }
+        return 0
+      })()
 
       activateSlide(page, fragment)
     }

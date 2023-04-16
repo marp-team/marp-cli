@@ -95,6 +95,7 @@
     "chalk": "^5.2.0",
     "cheerio": "^1.0.0-rc.12",
     "chrome-launcher": "^0.15.1",
+    "css.escape": "^1.5.1",
     "cssnano": "^6.0.0",
     "eslint": "^8.38.0",
     "eslint-config-prettier": "^8.8.0",
