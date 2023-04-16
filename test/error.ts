@@ -8,8 +8,8 @@ describe('Error helper', () => {
 
     describe('when passing error code as second argument', () => {
       it('throws CLIError with specified errorCode', () => {
-        expect(() => error('with code', 128)).toThrow(
-          new CLIError('with code', 128)
+        expect(() => error('with code', 1)).toThrow(
+          new CLIError('with code', 1)
         )
       })
     })

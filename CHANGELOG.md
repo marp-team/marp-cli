@@ -6,6 +6,11 @@
 
 - Support [Puppeteer's new headless mode](https://developer.chrome.com/articles/new-headless/) by `PUPPETEER_HEADLESS_MODE=new` env ([#508](https://github.com/marp-team/marp-cli/pull/508))
 
+### Changed
+
+- Upgrade Marp Core to [v3.6.0](https://github.com/marp-team/marp-core/releases/v3.6.0) ([#517](https://github.com/marp-team/marp-cli/pull/517))
+- Upgrade dependent packages to the latest version ([#517](https://github.com/marp-team/marp-cli/pull/517))
+
 ## v2.4.0 - 2023-02-19
 
 ### Changed
