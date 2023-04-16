@@ -82,11 +82,8 @@ $progress-height: 5px;
   body[data-bespoke-view=''],
   body[data-bespoke-view='next'] {
     .bespoke-marp-parent {
-      bottom: 0;
-      left: 0;
+      inset: 0;
       position: absolute;
-      right: 0;
-      top: 0;
 
       > .bespoke-marp-osc {
         background: rgba(#000, 0.65);
@@ -314,12 +311,9 @@ $progress-height: 5px;
         }
 
         .bespoke-marp-presenter-note-wrapper {
-          bottom: 0;
+          inset: 0;
           display: block;
-          left: 0;
           position: absolute;
-          right: 0;
-          top: 0;
         }
 
         .bespoke-marp-presenter-note-buttons {
