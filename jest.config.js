@@ -6,6 +6,7 @@ const esModules = [
   'chalk',
   'find-up',
   'globby',
+  'import-meta-resolve',
   'is-docker',
   'locate-path',
   'nanoid',

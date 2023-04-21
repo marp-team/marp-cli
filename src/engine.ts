@@ -1,8 +1,27 @@
 import path from 'path'
+import url from 'url'
 import { Marpit } from '@marp-team/marpit'
-import importFrom from 'import-from'
+import { resolve as importMetaResolve } from 'import-meta-resolve'
 import { pkgUp } from 'pkg-up'
 import { error } from './error'
+
+const silentImport = async <T = any>(
+  moduleId: string,
+  from?: string
+): Promise<T | null> => {
+  try {
+    let resolved = await importMetaResolve(
+      moduleId,
+      url.pathToFileURL(path.join(from || process.cwd(), '_.js')).toString()
+    )
+
+    if (resolved.startsWith('file:')) resolved = url.fileURLToPath(resolved)
+
+    return import(resolved)
+  } catch (e) {
+    return null
+  }
+}
 
 export type Engine = typeof Marpit
 export type ResolvableEngine = Engine | DelayedEngineResolver | string
@@ -63,8 +82,9 @@ export class ResolvedEngine {
     for (const eng of ([] as ResolvableEngine[]).concat(engine)) {
       if (typeof eng === 'string') {
         resolved =
-          (from && importFrom.silent(path.dirname(path.resolve(from)), eng)) ||
-          importFrom.silent(process.cwd(), eng)
+          (from &&
+            (await silentImport(eng, path.dirname(path.resolve(from))))) ||
+          (await silentImport(eng))
 
         if (resolved && typeof resolved === 'object' && 'default' in resolved) {
           resolved = resolved.default
