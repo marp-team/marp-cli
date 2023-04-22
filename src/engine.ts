@@ -1,11 +1,13 @@
 import path from 'path'
 import url from 'url'
+import type { Marp } from '@marp-team/marp-core'
 import { Marpit } from '@marp-team/marpit'
 import { resolve as importMetaResolve } from 'import-meta-resolve'
 import { pkgUp } from 'pkg-up'
 import { error } from './error'
 
-const silentImport = async <T = any>(
+/** @internal */
+export const _silentImport = async <T = any>(
   moduleId: string,
   from?: string
 ): Promise<T | null> => {
@@ -23,46 +25,49 @@ const silentImport = async <T = any>(
   }
 }
 
-export type Engine = typeof Marpit
-export type ResolvableEngine = Engine | DelayedEngineResolver | string
+type MarpitInstanceOrClass = Marpit | typeof Marpit
 
-const delayedEngineResolverSymbol = Symbol('delayedEngineResolver')
+export type Engine = MarpitInstanceOrClass | FunctionEngine
 
-type DelayedEngineResolver = {
-  [delayedEngineResolverSymbol]: () => Promise<Engine>
-}
+type FunctionEngine = (
+  opts?: Marpit.Options
+) => MarpitInstanceOrClass | Promise<MarpitInstanceOrClass>
 
-const delayedEngineResolver = (
-  fn: () => Promise<Engine>
-): DelayedEngineResolver => ({ [delayedEngineResolverSymbol]: fn })
+export type ResolvableEngine = Engine | string
 
-export class ResolvedEngine {
-  klass: Engine
+const preResolveAsyncSymbol = Symbol('preResolveAsync')
+
+export class ResolvedEngine<T extends Engine = Engine> {
+  klass: T
 
   private _cachedPackage?: Record<string, any> | null
 
-  private static _defaultEngine: ResolvedEngine | undefined
+  private static _defaultEngine: ResolvedEngine<typeof Marp> | undefined
 
-  static async resolve(
+  static async resolve<T extends Engine = Engine>(
     engine: ResolvableEngine | ResolvableEngine[],
     from?: string
-  ): Promise<ResolvedEngine> {
+  ): Promise<ResolvedEngine<T>> {
     return new ResolvedEngine(await ResolvedEngine.resolveModule(engine, from))
   }
 
-  static async resolveDefaultEngine(): Promise<ResolvedEngine> {
+  static async resolveDefaultEngine(): Promise<ResolvedEngine<typeof Marp>> {
     if (
       ResolvedEngine._defaultEngine === undefined ||
       process.env.NODE_ENV === 'test'
     ) {
       ResolvedEngine._defaultEngine = await ResolvedEngine.resolve([
-        '@marp-team/marp-core', // Manually-installed Marp Core
+        // Manually-installed Marp Core
+        '@marp-team/marp-core',
 
         // Bundled Marp Core
-        // eslint-disable-next-line @typescript-eslint/no-var-requires -- import statement brings segmentation fault: https://github.com/marp-team/marp-cli/issues/487
-        delayedEngineResolver(async () => require('@marp-team/marp-core').Marp),
+        Object.assign(
+          () => import('@marp-team/marp-core').then(({ Marp }) => Marp),
+          { [preResolveAsyncSymbol]: true }
+        ),
       ])
     }
+
     return ResolvedEngine._defaultEngine
   }
 
@@ -83,16 +88,22 @@ export class ResolvedEngine {
       if (typeof eng === 'string') {
         resolved =
           (from &&
-            (await silentImport(eng, path.dirname(path.resolve(from))))) ||
-          (await silentImport(eng))
-
-        if (resolved && typeof resolved === 'object' && 'default' in resolved) {
-          resolved = resolved.default
-        }
-      } else if (typeof eng === 'object' && eng[delayedEngineResolverSymbol]) {
-        resolved = await eng[delayedEngineResolverSymbol]()
+            (await _silentImport(eng, path.dirname(path.resolve(from))))) ||
+          (await _silentImport(eng))
+      } else if (typeof eng === 'function' && eng[preResolveAsyncSymbol]) {
+        resolved = await (eng as any)()
       } else {
         resolved = eng
+      }
+
+      // Resolve default export
+      while (
+        resolved &&
+        typeof resolved === 'object' &&
+        'default' in resolved &&
+        resolved !== resolved.default
+      ) {
+        resolved = resolved.default
       }
 
       if (resolved) break
@@ -102,7 +113,7 @@ export class ResolvedEngine {
     return resolved
   }
 
-  private constructor(klass: Engine) {
+  private constructor(klass: T) {
     this.klass = klass
   }
 
