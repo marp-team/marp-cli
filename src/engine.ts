@@ -25,9 +25,21 @@ export const _silentImport = async <T = any>(
   }
 
   try {
-    return import(
-      await importMetaResolve(moduleId, url.pathToFileURL(basePath).toString())
+    const resolved = await importMetaResolve(
+      moduleId,
+      url.pathToFileURL(basePath).toString()
     )
+
+    // Try to import without `file:` protocol first
+    if (resolved.startsWith('file:')) {
+      try {
+        return import(resolved.slice(5))
+      } catch (e) {
+        /* fallback */
+      }
+    }
+
+    return import(resolved)
   } catch (e) {
     return null
   }
