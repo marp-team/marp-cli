@@ -29,6 +29,7 @@ module.exports = {
   setupFiles: ['./jest.setup.js'],
   transform: {
     ...jsWithBabel.transform,
+    '/test/.+\\.mjs$': 'babel-jest',
     '\\.s?css$': '<rootDir>/test/_transformers/css.js',
     '\\.png$': '<rootDir>/test/_transformers/png.js',
     '\\.pug$': '<rootDir>/test/_transformers/pug.js',

@@ -181,6 +181,17 @@ describe('Marp CLI', () => {
           )
         })
       })
+
+      describe('with functional engine that returns Promise without resolving default export', () => {
+        const cmds = [cmd, '-c', assetFn('_configs/custom-engine/import.js')]
+
+        it('outputs using the customized engine', async () => {
+          expect(await marpCli(cmds)).toBe(0)
+          expect(log).toHaveBeenCalledWith(
+            expect.stringContaining('customized engine')
+          )
+        })
+      })
     })
   }
 
@@ -248,6 +259,32 @@ describe('Marp CLI', () => {
   })
 
   describe('with --engine option', () => {
+    it('allows loading custom engine with ES modules', async () => {
+      const stdout = jest.spyOn(process.stdout, 'write').mockImplementation()
+      const warn = jest.spyOn(console, 'warn').mockImplementation()
+
+      const cmds = [
+        '--engine',
+        assetFn('_configs/custom-engine/custom-engine.mjs'),
+        '-o',
+        '-',
+        assetFn('_files/1.md'),
+      ]
+
+      const log = jest.spyOn(console, 'log').mockImplementation()
+
+      try {
+        expect(await marpCli(cmds)).toBe(0)
+
+        const html = stdout.mock.calls[0][0].toString()
+        expect(html).toContain('<b>custom</b>')
+      } finally {
+        stdout.mockRestore()
+        log.mockRestore()
+        warn.mockRestore()
+      }
+    })
+
     it('prints error and return error code when passed module is invalid', async () => {
       const error = jest.spyOn(console, 'error').mockImplementation()
 
