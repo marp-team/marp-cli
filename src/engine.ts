@@ -1,3 +1,4 @@
+import fs from 'fs'
 import path from 'path'
 import url from 'url'
 import type { Marp } from '@marp-team/marp-core'
@@ -11,19 +12,22 @@ export const _silentImport = async <T = any>(
   moduleId: string,
   from?: string
 ): Promise<T | null> => {
+  const basePath = path.join(from || process.cwd(), '_.js')
+  const dirPath = path.dirname(basePath)
+  const moduleFilePath = path.resolve(dirPath, moduleId)
+
   try {
-    if (path.isAbsolute(moduleId)) {
-      moduleId = url.pathToFileURL(moduleId).toString()
-    }
+    const stat = await fs.promises.stat(moduleFilePath)
 
-    let resolved = await importMetaResolve(
-      moduleId,
-      url.pathToFileURL(path.join(from || process.cwd(), '_.js')).toString()
+    if (stat.isFile()) moduleId = url.pathToFileURL(moduleFilePath).toString()
+  } catch (e: unknown) {
+    // No ops
+  }
+
+  try {
+    return import(
+      await importMetaResolve(moduleId, url.pathToFileURL(basePath).toString())
     )
-
-    if (resolved.startsWith('file:')) resolved = url.fileURLToPath(resolved)
-
-    return import(resolved)
   } catch (e) {
     return null
   }
