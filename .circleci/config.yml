@@ -2,7 +2,7 @@ version: 2.1
 
 orbs:
   browser-tools: circleci/browser-tools@1.2.4
-  codecov: codecov/codecov@3.2.2
+  codecov: codecov/codecov@3.2.4
 
 executors:
   node:
@@ -99,7 +99,7 @@ commands:
             JEST_JUNIT_OUTPUT_DIR: tmp/test-results
 
       - codecov/upload:
-          version: v0.1.15
+          flags: linux
 
       - store_test_results:
           path: tmp/test-results
