@@ -33,13 +33,13 @@ export const _silentImport = async <T = any>(
     // Try to import without `file:` protocol first
     if (resolved.startsWith('file:')) {
       try {
-        return import(resolved.slice(5))
+        return await import(url.fileURLToPath(resolved))
       } catch (e) {
         /* fallback */
       }
     }
 
-    return import(resolved)
+    return await import(resolved)
   } catch (e) {
     return null
   }
