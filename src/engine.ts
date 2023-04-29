@@ -12,6 +12,10 @@ export const _silentImport = async <T = any>(
   from?: string
 ): Promise<T | null> => {
   try {
+    if (path.isAbsolute(moduleId)) {
+      moduleId = url.pathToFileURL(moduleId).toString()
+    }
+
     let resolved = await importMetaResolve(
       moduleId,
       url.pathToFileURL(path.join(from || process.cwd(), '_.js')).toString()
