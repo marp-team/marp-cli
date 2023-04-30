@@ -34,12 +34,16 @@ export const _silentImport = async <T = any>(
     if (resolved.startsWith('file:')) {
       try {
         return await import(url.fileURLToPath(resolved))
+
+        // NOTE: Fallback cannot test because of overriding `import` in Jest context.
+        /* c8 ignore start */
       } catch (e) {
         /* fallback */
       }
     }
 
     return await import(resolved)
+    /* c8 ignore stop */
   } catch (e) {
     return null
   }
