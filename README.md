@@ -399,11 +399,13 @@ marp --theme-set ./themes -- deck.md
 
 ## Engine
 
-Marp CLI is calling the [Marpit framework](https://marpit.marp.app/) based converter as "Engine". Normally we use the bundled [marp-core](https://github.com/marp-team/marp-core), but you may swap the conversion engine to another Marpit based engine through `--engine` option.
+Marp CLI is calling the [Marpit framework](https://marpit.marp.app/) based converter as "Engine". Normally we use the bundled [Marp Core](https://github.com/marp-team/marp-core), but you may swap the conversion engine to another Marpit based engine through `--engine` option.
+
+You can use Marp (and compatible markdown-it) plugins while converting, or completely swap the converter to the other Marpit-based engine which published to npm.
 
 ### Use Marpit framework
 
-For example, it can convert Markdown by using the pure Marpit framework.
+For example, you can convert Markdown with using the pure Marpit framework.
 
 ```bash
 # Install Marpit framework
@@ -415,23 +417,52 @@ marp --engine @marp-team/marpit marpit-deck.md
 
 Notice that Marpit has not provided theme. It would be good to include inline style in Markdown, or pass CSS file by `--theme` option.
 
+> If you want to use the Marpit-based custom engine by the module name, the specified module must be exporting a class inherited from Marpit as the default export.
+
 ### Functional engine
 
-When you specified the path to JavaScript file in `--engine` option, you may use more customized engine by a JavaScript function.
+When you specified the path to JavaScript file (`.js`, `.cjs`, or `.mjs`) in `--engine` option, you may use more customized engine by a JavaScript function.
 
 #### Spec
 
-The functional engine should export a function with one parameter, which is a constructor option of Marpit. The function must return an instance of Marpit-based engine made by the passed parameter.
+The functional engine should export a function as the default export, which should have a single argument representing [the constructor option of Marpit](https://marpit-api.marp.app/marpit)/[Marp Core](https://github.com/marp-team/marp-core#constructor-options).
+
+The function must return a class inherited from Marpit, or an instance of Marpit-based engine made by the parameter passed by argument.
 
 ```javascript
-module.exports = function (constructorOption) {
-  return new MarpitBasedEngine(constructorOption)
+// engine.mjs (ES modules)
+import { MarpitBasedEngine } from 'marpit-based-engine'
+
+export default () => MarpitBasedEngine // Return a class inherited from Marpit
+```
+
+```javascript
+// engine.cjs (CommonJS)
+const { MarpitBasedEngine } = require('marpit-based-engine')
+
+module.exports = function (constructorOptions) {
+  // Return an instance of Marpit initialized by passed constructor options
+  return new MarpitBasedEngine(constructorOptions)
 }
 ```
+
+This function can return [`Promise`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) object so you can use [async function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function) too.
+
+```javascript
+export default async (constructorOptions) => {
+  const { MarpitBasedEngine } = await import('marpit-based-engine')
+  return new MarpitBasedEngine(constructorOptions)
+}
+```
+
+#### `marp` getter property
 
 Marp CLI also exposes `marp` getter property to the parameter. It returns a prepared instance of the built-in Marp Core engine, so you can apply several customizations to Marp engine with simple declarations.
 
 ```javascript
+const marpPlugin = require('marp-plugin-foo')
+const andMorePlugin = require('marp-plugin-bar')
+
 module.exports = ({ marp }) => marp.use(marpPlugin).use(andMorePlugin)
 ```
 
@@ -440,18 +471,18 @@ It allows converting Markdown with additional syntaxes that were provided by Mar
 #### Example: [markdown-it-mark](https://github.com/markdown-it/markdown-it-mark)
 
 ```javascript
-// engine.js
-const markdownItMark = require('markdown-it-mark')
+// engine.mjs
+import markdownItMark from 'markdown-it-mark'
 
-module.exports = ({ marp }) => marp.use(markdownItMark)
+export default ({ marp }) => marp.use(markdownItMark)
 ```
 
 ```bash
-# Install markdown-it-mark
-npm install markdown-it-mark --save
+# Install markdown-it-mark into your project
+npm i markdown-it-mark --save
 
 # Specify the path to functional engine
-marp --engine ./engine.js slide-deck.md
+marp --engine ./engine.mjs slide-deck.md
 ```
 
 The customized engine will convert `==marked==` to `<mark>marked</mark>`.

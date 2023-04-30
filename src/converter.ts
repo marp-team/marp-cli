@@ -485,17 +485,16 @@ export class Converter {
     mergeOptions: MarpitOptions
   ): Promise<Marpit & { [engineInfo]?: EngineInfo }> {
     const { html, options } = this.options
-    const { prototype } = this.options.engine
     const opts = { ...options, ...mergeOptions, html }
 
-    let engine: any
+    let engine = this.options.engine
 
-    if (
-      prototype &&
-      Object.prototype.hasOwnProperty.call(prototype, 'constructor')
-    ) {
-      engine = new this.options.engine(opts)
-    } else {
+    const isClass = (target: unknown): target is typeof Marpit =>
+      typeof target === 'function' &&
+      target.prototype &&
+      Object.prototype.hasOwnProperty.call(target.prototype, 'constructor')
+
+    if (typeof engine === 'function' && !isClass(engine)) {
       // Expose "marp" getter to allow accessing a bundled Marp Core instance
       const defaultEngine = await ResolvedEngine.resolveDefaultEngine()
 
@@ -503,10 +502,16 @@ export class Converter {
         get: () => new defaultEngine.klass(opts),
       })
 
-      engine = (this.options.engine as any)(opts)
+      // Resolve functional engine
+      engine = await Promise.resolve(engine(opts))
     }
 
-    if (typeof engine.render !== 'function')
+    if (isClass(engine)) engine = new engine(opts)
+
+    // ---
+
+    // Check engine interface
+    if (!(typeof engine === 'object' && typeof engine.render === 'function'))
       error('Specified engine has not implemented render() method.')
 
     // Enable HTML tags

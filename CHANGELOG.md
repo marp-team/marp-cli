@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Support ES Modules and async resolution for engine script ([#521](https://github.com/marp-team/marp-cli/pull/521))
+
 ## v2.5.0 - 2023-04-16
 
 ### Added
