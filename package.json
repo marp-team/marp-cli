@@ -150,7 +150,7 @@
     "@marp-team/marp-core": "^3.7.0",
     "@marp-team/marpit": "^2.5.0",
     "chokidar": "^3.5.3",
-    "cosmiconfig": "^8.2.0",
+    "cosmiconfig": "~8.1.3",
     "is-wsl": "^2.2.0",
     "puppeteer-core": "20.5.0",
     "remove": "^0.1.5",
