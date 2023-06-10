@@ -1499,13 +1499,15 @@ describe("Bespoke template's browser context", () => {
 
       request.mockReset().mockResolvedValue(wakeLockObj)
       wakeLockObj.addEventListener.mockReset()
-      navigator['wakeLock'] = { request }
+      ;(navigator as any).wakeLock = {
+        request,
+      }
 
       _clearCachedWakeLockApi()
       render()
     })
 
-    afterEach(() => delete navigator['wakeLock'])
+    afterEach(() => delete (navigator as any).wakeLock)
 
     it('calls requestWakeLock() in wake-lock plugin if Screen Wake Lock API is available', () => {
       expect(request).not.toHaveBeenCalled()

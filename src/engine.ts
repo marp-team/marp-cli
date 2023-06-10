@@ -25,7 +25,7 @@ export const _silentImport = async <T = any>(
   }
 
   try {
-    const resolved = await importMetaResolve(
+    const resolved = importMetaResolve(
       moduleId,
       url.pathToFileURL(basePath).toString()
     )
