@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v3.0.0 - 2023-06-10
+
 ### Breaking
 
 - End-of-Lifed Node.js 14 is no longer supported, and required the latest Node.js 16 and later ([#523](https://github.com/marp-team/marp-cli/pull/523))
