@@ -2,9 +2,23 @@
 
 ## [Unreleased]
 
+### Breaking
+
+- End-of-Lifed Node.js 14 is no longer supported, and required the latest Node.js 16 and later ([#523](https://github.com/marp-team/marp-cli/pull/523))
+
 ### Added
 
 - Support ES Modules and async resolution for engine script ([#521](https://github.com/marp-team/marp-cli/pull/521))
+
+### Changed
+
+- Upgrade Marp Core to [v3.7.0](https://github.com/marp-team/marp-core/releases/v3.7.0) ([#523](https://github.com/marp-team/marp-cli/pull/523))
+- Upgrade Marpit to [v2.5.0](https://github.com/marp-team/marpit/releases/tag/v2.5.0) ([#523](https://github.com/marp-team/marp-cli/pull/523))
+  - Added `paginate: skip` and `paginate: hold`
+
+### Fixed
+
+- Time out of conversion powered by Chromium in v2.5.0 Docker image ([#520](https://github.com/marp-team/marp-cli/issues/520))
 
 ## v2.5.0 - 2023-04-16
 
