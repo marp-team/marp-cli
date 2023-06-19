@@ -8,48 +8,6 @@ import { resolve as importMetaResolve } from 'import-meta-resolve'
 import { pkgUp } from 'pkg-up'
 import { error, isError } from './error'
 
-/** @internal */
-export const _silentImport = async <T = any>(
-  moduleId: string,
-  from?: string
-): Promise<T | null> => {
-  const basePath = path.join(from || process.cwd(), '_.js')
-  const dirPath = path.dirname(basePath)
-  const moduleFilePath = path.resolve(dirPath, moduleId)
-
-  try {
-    const stat = await fs.promises.stat(moduleFilePath)
-
-    if (stat.isFile()) moduleId = url.pathToFileURL(moduleFilePath).toString()
-  } catch (e: unknown) {
-    // No ops
-  }
-
-  try {
-    const resolved = importMetaResolve(
-      moduleId,
-      url.pathToFileURL(basePath).toString()
-    )
-
-    // Try to import without `file:` protocol first
-    if (resolved.startsWith('file:')) {
-      try {
-        return await import(url.fileURLToPath(resolved))
-
-        // NOTE: Fallback cannot test because of overriding `import` in Jest context.
-        /* c8 ignore start */
-      } catch (e) {
-        /* fallback */
-      }
-    }
-
-    return await import(resolved)
-    /* c8 ignore stop */
-  } catch (e) {
-    return null
-  }
-}
-
 type MarpitInstanceOrClass = Marpit | typeof Marpit
 
 type FunctionEngine = (
