@@ -222,6 +222,8 @@ export class ResolvedEngine<T extends Engine = Engine> {
         : process.cwd()
 
       return importFrom(resolvedFrom, moduleId) as T | null
+
+      /* c8 ignore start */
     } catch (e) {
       if (isError(e) && e.code === 'ERR_REQUIRE_ESM') {
         // Show reason why `require()` failed in the current context
@@ -231,8 +233,9 @@ export class ResolvedEngine<T extends Engine = Engine> {
           )
         }
       }
-      return null
+      return null // Jest allows importing ESM via `require()` so this line cannot measure coverage.
     }
+    /* c8 ignore stop */
   }
 
   // NOTE: It cannot test because of overriding `require` in Jest context.

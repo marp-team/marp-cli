@@ -1,7 +1,5 @@
 import Marp from '@marp-team/marp-core'
-import * as engine from '../src/engine'
-
-const { ResolvedEngine } = engine
+import { ResolvedEngine } from '../src/engine'
 
 afterEach(() => jest.restoreAllMocks())
 
@@ -24,7 +22,10 @@ describe('ResolvedEngine', () => {
 
   describe('#resolveDefaultEngine', () => {
     it('returns ResolvedEngine class with Marp Core which is resolved from current directory', async () => {
-      const importSpy = jest.spyOn(engine, '_silentImport')
+      const importSpy = jest.spyOn(
+        ResolvedEngine as any,
+        '_silentImportOrRequire'
+      )
       const resolvedEngine = await ResolvedEngine.resolveDefaultEngine()
 
       expect(importSpy).toHaveBeenCalledWith('@marp-team/marp-core')
@@ -37,8 +38,8 @@ describe('ResolvedEngine', () => {
 
     it('returns ResolvedEngine class with a function engine to return natively-bundled Marp Core with Promise if failed to resolve from current directory', async () => {
       jest
-        .spyOn(engine, '_silentImport')
-        .mockImplementationOnce(async () => undefined)
+        .spyOn(ResolvedEngine as any, '_silentImportOrRequire')
+        .mockImplementationOnce(async () => null)
 
       const resolvedEngine = await ResolvedEngine.resolveDefaultEngine()
       expect(resolvedEngine.klass).toBe(Marp)
