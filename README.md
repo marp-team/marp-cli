@@ -455,6 +455,8 @@ export default async (constructorOptions) => {
 }
 ```
 
+> :information_source: Currently ESM engine can resolve only when using Marp CLI via Node.js. [The standalone binary](#standalone-binary) cannot resolve ESM due to [vercel/pkg#1291](https://github.com/vercel/pkg/issues/1291).
+
 #### `marp` getter property
 
 Marp CLI also exposes `marp` getter property to the parameter. It returns a prepared instance of the built-in Marp Core engine, so you can apply several customizations to Marp engine with simple declarations.

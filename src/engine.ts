@@ -3,59 +3,18 @@ import path from 'path'
 import url from 'url'
 import type { Marp } from '@marp-team/marp-core'
 import { Marpit } from '@marp-team/marpit'
+import importFrom from 'import-from'
 import { resolve as importMetaResolve } from 'import-meta-resolve'
 import { pkgUp } from 'pkg-up'
-import { error } from './error'
-
-/** @internal */
-export const _silentImport = async <T = any>(
-  moduleId: string,
-  from?: string
-): Promise<T | null> => {
-  const basePath = path.join(from || process.cwd(), '_.js')
-  const dirPath = path.dirname(basePath)
-  const moduleFilePath = path.resolve(dirPath, moduleId)
-
-  try {
-    const stat = await fs.promises.stat(moduleFilePath)
-
-    if (stat.isFile()) moduleId = url.pathToFileURL(moduleFilePath).toString()
-  } catch (e: unknown) {
-    // No ops
-  }
-
-  try {
-    const resolved = importMetaResolve(
-      moduleId,
-      url.pathToFileURL(basePath).toString()
-    )
-
-    // Try to import without `file:` protocol first
-    if (resolved.startsWith('file:')) {
-      try {
-        return await import(url.fileURLToPath(resolved))
-
-        // NOTE: Fallback cannot test because of overriding `import` in Jest context.
-        /* c8 ignore start */
-      } catch (e) {
-        /* fallback */
-      }
-    }
-
-    return await import(resolved)
-    /* c8 ignore stop */
-  } catch (e) {
-    return null
-  }
-}
+import { error, isError } from './error'
 
 type MarpitInstanceOrClass = Marpit | typeof Marpit
-
-export type Engine = MarpitInstanceOrClass | FunctionEngine
 
 type FunctionEngine = (
   opts?: Marpit.Options
 ) => MarpitInstanceOrClass | Promise<MarpitInstanceOrClass>
+
+export type Engine = MarpitInstanceOrClass | FunctionEngine
 
 export type ResolvableEngine = Engine | string
 
@@ -112,8 +71,11 @@ export class ResolvedEngine<T extends Engine = Engine> {
       if (typeof eng === 'string') {
         resolved =
           (from &&
-            (await _silentImport(eng, path.dirname(path.resolve(from))))) ||
-          (await _silentImport(eng))
+            (await this._silentImportOrRequire(
+              eng,
+              path.dirname(path.resolve(from))
+            ))) ||
+          (await this._silentImportOrRequire(eng))
       } else if (typeof eng === 'function' && eng[preResolveAsyncSymbol]) {
         resolved = await (eng as any)()
       } else {
@@ -150,6 +112,88 @@ export class ResolvedEngine<T extends Engine = Engine> {
 
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     return require(pkgPath) as Record<string, any>
+  }
+
+  static isESMAvailable() {
+    // Standalone binary that is built by pkg cannot import ESM module.
+    // https://github.com/vercel/pkg/issues/1291
+    return !('pkg' in process)
+  }
+
+  private static async _silentImportOrRequire<T = any>(
+    moduleId: string,
+    from?: string
+  ): Promise<T | null> {
+    if (this.isESMAvailable()) return this._silentImport(moduleId, from)
+
+    return this._silentRequire(moduleId, from)
+  }
+
+  private static async _silentImport<T = any>(
+    moduleId: string,
+    from?: string
+  ): Promise<T | null> {
+    const basePath = path.join(from || process.cwd(), '_.js')
+    const dirPath = path.dirname(basePath)
+    const moduleFilePath = path.resolve(dirPath, moduleId)
+
+    try {
+      const stat = await fs.promises.stat(moduleFilePath)
+
+      if (stat.isFile()) moduleId = url.pathToFileURL(moduleFilePath).toString()
+    } catch (e: unknown) {
+      // No ops
+    }
+
+    try {
+      const resolved = importMetaResolve(
+        moduleId,
+        url.pathToFileURL(basePath).toString()
+      )
+
+      // Try to import without `file:` protocol first
+      if (resolved.startsWith('file:')) {
+        try {
+          return await import(url.fileURLToPath(resolved))
+
+          // NOTE: Fallback cannot test because of overriding `import` in Jest context.
+          /* c8 ignore start */
+        } catch (e) {
+          /* fallback */
+        }
+      }
+
+      return await import(resolved)
+      /* c8 ignore stop */
+    } catch (e) {
+      return null
+    }
+  }
+
+  private static async _silentRequire<T = any>(
+    moduleId: string,
+    from?: string
+  ): Promise<T | null> {
+    try {
+      const resolvedFrom = from
+        ? path.dirname(path.resolve(from))
+        : process.cwd()
+
+      return importFrom(resolvedFrom, moduleId) as T | null
+
+      /* c8 ignore start */
+    } catch (e) {
+      if (isError(e) && e.code === 'ERR_REQUIRE_ESM') {
+        // Show reason why `require()` failed in the current context
+        if ('pkg' in process) {
+          error(
+            'A standalone binary version of Marp CLI is currently not supported resolving ESM engine. Please consider using CommonJS engine, or trying to use Marp CLI via Node.js.'
+          )
+        }
+      }
+      return null // Jest allows importing ESM via `require()` so this line cannot measure coverage.
+    }
+    /* c8 ignore stop */
   }
 
   // NOTE: It cannot test because of overriding `require` in Jest context.

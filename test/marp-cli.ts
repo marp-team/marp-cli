@@ -297,6 +297,39 @@ describe('Marp CLI', () => {
         error.mockRestore()
       }
     })
+
+    it('uses require() instead of import() to resolve engine when ESM is not available in this context', async () => {
+      const isESMAvailable = jest
+        .spyOn(ResolvedEngine, 'isESMAvailable')
+        .mockReturnValue(false)
+
+      try {
+        const error = jest.spyOn(console, 'error').mockImplementation()
+
+        try {
+          const silentImportSpy = jest.spyOn(
+            ResolvedEngine as any,
+            '_silentImport'
+          )
+          const silentRequireSpy = jest.spyOn(
+            ResolvedEngine as any,
+            '_silentRequire'
+          )
+
+          await marpCli([
+            '--engine',
+            assetFn('_configs/custom-engine/custom-engine.mjs'),
+          ])
+
+          expect(silentImportSpy).not.toHaveBeenCalled()
+          expect(silentRequireSpy).toHaveBeenCalled()
+        } finally {
+          error.mockRestore()
+        }
+      } finally {
+        isESMAvailable.mockRestore()
+      }
+    })
   })
 
   describe('with --input-dir option', () => {
