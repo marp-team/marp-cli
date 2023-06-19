@@ -45,7 +45,8 @@ export class ResolvedEngine<T extends Engine = Engine> {
 
         // Bundled Marp Core
         Object.assign(
-          () => import('@marp-team/marp-core').then(({ Marp }) => Marp),
+          // eslint-disable-next-line @typescript-eslint/no-var-requires -- import statement brings TypeError in the standalone binary
+          () => Promise.resolve(require('@marp-team/marp-core').Marp),
           { [preResolveAsyncSymbol]: true }
         ),
       ])
