@@ -39,7 +39,10 @@
     "marp": "marp-cli.js"
   },
   "pkg": {
-    "scripts": "lib/**/*.js"
+    "scripts": "lib/**/*.js",
+    "assets": [
+      "node_modules/vm2/**/*"
+    ]
   },
   "browserslist": [
     "> 1% and last 3 versions",
