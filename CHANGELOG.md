@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v3.0.1 - 2023-06-19
+
 ### Fixed
 
 - Temporarily disable ESM engine resolution when using the standalone binary ([#524](https://github.com/marp-team/marp-cli/issues/524), [#525](https://github.com/marp-team/marp-cli/pull/525))
