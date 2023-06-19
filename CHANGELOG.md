@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix TypeError in the standalone binary by reverting how to resolve the bundled Marp Core ([#526](https://github.com/marp-team/marp-cli/issues/526), [#527](https://github.com/marp-team/marp-cli/pull/527))
+
 ## v3.0.1 - 2023-06-19
 
 ### Fixed
