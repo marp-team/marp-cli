@@ -199,27 +199,25 @@ describe('Marp CLI', () => {
     describe(`with ${cmd || 'empty'} option`, () => {
       const run = (...args) => marpCli([...(cmd ? [cmd] : []), ...args])
 
-      let error: jest.SpyInstance<ReturnType<Console['error']>, any>
+      let log: jest.SpyInstance<void, any>
 
       beforeEach(() => {
-        error = jest.spyOn(console, 'error').mockImplementation()
+        log = jest.spyOn(console, 'log').mockImplementation()
       })
 
       afterEach(() => {
-        error?.mockRestore()
+        log?.mockRestore()
       })
 
-      it('outputs help to stderr', async () => {
+      it('outputs help to stdout', async () => {
         expect(await run()).toBe(0)
-        expect(error).toHaveBeenCalledWith(expect.stringContaining('Usage'))
+        expect(log).toHaveBeenCalledWith(expect.stringContaining('Usage'))
       })
 
       describe('Preview option', () => {
         it('outputs help about --preview option', async () => {
           expect(await run()).toBe(0)
-          expect(error).toHaveBeenCalledWith(
-            expect.stringContaining('--preview')
-          )
+          expect(log).toHaveBeenCalledWith(expect.stringContaining('--preview'))
         })
 
         describe('when CLI is running in an official Docker image', () => {
@@ -230,7 +228,7 @@ describe('Marp CLI', () => {
 
             try {
               expect(await run()).toBe(0)
-              expect(error).toHaveBeenCalledWith(
+              expect(log).toHaveBeenCalledWith(
                 expect.not.stringContaining('--preview')
               )
             } finally {
@@ -304,7 +302,7 @@ describe('Marp CLI', () => {
         .mockReturnValue(false)
 
       try {
-        const error = jest.spyOn(console, 'error').mockImplementation()
+        const log = jest.spyOn(console, 'log').mockImplementation()
 
         try {
           const silentImportSpy = jest.spyOn(
@@ -324,7 +322,7 @@ describe('Marp CLI', () => {
           expect(silentImportSpy).not.toHaveBeenCalled()
           expect(silentRequireSpy).toHaveBeenCalled()
         } finally {
-          error.mockRestore()
+          log.mockRestore()
         }
       } finally {
         isESMAvailable.mockRestore()
