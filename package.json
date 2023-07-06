@@ -164,6 +164,7 @@
     "yargs": "^17.7.2"
   },
   "resolutions": {
+    "optionator": "^0.9.3",
     "pug": "^3.0.2",
     "pug-runtime": "^3.0.1",
     "semver": "^7.5.3"
