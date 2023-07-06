@@ -287,7 +287,7 @@ export const marpCli = async (
     }
 
     if (args.help) {
-      program.showHelp()
+      program.showHelp('log')
       return 0
     }
 
@@ -325,11 +325,14 @@ export const marpCli = async (
     const { length } = foundFiles
 
     if (length === 0) {
-      if (config.files.length > 0)
+      if (config.files.length > 0) {
         cli.warn('Not found processable Markdown file(s).\n')
-
-      program.showHelp()
-      return config.files.length > 0 ? 1 : 0
+        program.showHelp('error')
+        return 1
+      } else {
+        program.showHelp('log')
+        return 0
+      }
     }
 
     // Convert markdown into HTML
