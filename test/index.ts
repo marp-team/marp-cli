@@ -29,7 +29,7 @@ describe('Marp CLI API interface', () => {
   })
 
   it('does not read input from stdin if called API', async () => {
-    const cliError = jest.spyOn(console, 'error').mockImplementation()
+    const cliStdout = jest.spyOn(console, 'log').mockImplementation()
 
     try {
       await marpCli.cliInterface([])
@@ -39,7 +39,7 @@ describe('Marp CLI API interface', () => {
       await api([])
       expect(stdinBuffer).not.toHaveBeenCalled()
     } finally {
-      cliError.mockRestore()
+      cliStdout.mockRestore()
     }
   })
 
