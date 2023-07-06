@@ -663,7 +663,7 @@ describe('Converter', () => {
       describe('with pdfOutlines option', () => {
         type SerializedOutline = [
           name: string | undefined,
-          children: SerializedOutline[]
+          children: SerializedOutline[],
         ]
 
         const getOutline = (outline: PDFDict): SerializedOutline => {

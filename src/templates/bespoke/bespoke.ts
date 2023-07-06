@@ -19,7 +19,7 @@ import bespokeWakeLock from './wake-lock'
 const parse = (
   ...patterns: [
     [normalView: 1 | 0, presnterView: 1 | 0, nextView: 1 | 0],
-    (...args: unknown[]) => void
+    (...args: unknown[]) => void,
   ][]
 ) => {
   const i = viewModes.findIndex((v) => getViewMode() === v)
