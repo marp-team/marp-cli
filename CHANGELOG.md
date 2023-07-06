@@ -5,6 +5,7 @@
 ### Changed
 
 - Upgrade dependent packages to the latest versions ([#533](https://github.com/marp-team/marp-cli/pull/533))
+- Route help messages to stdout instead of stderr ([#532](https://github.com/marp-team/marp-cli/pull/532) by [@tomotargz](https://github.com/tomotargz))
 
 ## v3.0.2 - 2023-06-19
 
