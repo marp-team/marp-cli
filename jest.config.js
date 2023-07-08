@@ -32,7 +32,11 @@ module.exports = {
     '\\.s?css$': '<rootDir>/test/_transformers/css.js',
     '\\.png$': '<rootDir>/test/_transformers/png.js',
     '\\.pug$': '<rootDir>/test/_transformers/pug.js',
+
+    // TODO: Remove if Jest did not fail on ESM dynamic imports
     'custom-engine\\.mjs$': 'babel-jest',
+    'config\\.mjs$': 'babel-jest',
+    'esm-project/marp\\.config\\.js$': 'babel-jest',
   },
   transformIgnorePatterns: [`/node_modules/(?!${esModules.join('|')})`],
   testEnvironment: 'node',

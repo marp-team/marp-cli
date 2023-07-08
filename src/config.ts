@@ -2,7 +2,11 @@
 import fs from 'fs'
 import path from 'path'
 import chalk from 'chalk'
-import { cosmiconfig, cosmiconfigSync } from 'cosmiconfig'
+import {
+  cosmiconfig,
+  cosmiconfigSync,
+  Options as CosmiconfigOptions,
+} from 'cosmiconfig'
 import { osLocale } from 'os-locale'
 import { info, warn, error as cliError } from './cli'
 import { ConverterOption, ConvertType } from './converter'
@@ -108,6 +112,10 @@ export class MarpCLIConfig {
     })()
 
     return conf
+  }
+
+  static isESMAvailable() {
+    return ResolvedEngine.isESMAvailable()
   }
 
   private constructor() {} // eslint-disable-line @typescript-eslint/no-empty-function
@@ -331,11 +339,9 @@ export class MarpCLIConfig {
   }
 
   private async loadConf(confPath?: string) {
-    const generateCosmiconfigExplorer = ResolvedEngine.isESMAvailable()
-      ? cosmiconfig
-      : cosmiconfigSync // sync version is using `require()` instead of `import()` so not expect to meet a trouble with ESM
-
-    const explorer = generateCosmiconfigExplorer(MarpCLIConfig.moduleName)
+    const explorer = MarpCLIConfig.isESMAvailable()
+      ? cosmiconfig(MarpCLIConfig.moduleName)
+      : cosmiconfigSync(MarpCLIConfig.moduleName)
 
     try {
       const ret = await (confPath === undefined
