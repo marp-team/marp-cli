@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { URL } from 'url'
-import type { MarpOptions } from '@marp-team/marp-core'
+import type { Marp, MarpOptions } from '@marp-team/marp-core'
 import { Marpit, Options as MarpitOptions } from '@marp-team/marpit'
 import chalk from 'chalk'
 import type { Browser, Page, HTTPRequest } from 'puppeteer-core'
@@ -503,7 +503,9 @@ export class Converter {
       })
 
       // Resolve functional engine
-      engine = await Promise.resolve(engine(opts))
+      engine = await Promise.resolve(
+        engine(opts as typeof opts & { readonly marp: Marp })
+      )
     }
 
     if (isClass(engine)) engine = new engine(opts)

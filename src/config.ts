@@ -2,9 +2,9 @@
 import fs from 'fs'
 import path from 'path'
 import chalk from 'chalk'
-import { cosmiconfig } from 'cosmiconfig'
+import { cosmiconfig, cosmiconfigSync } from 'cosmiconfig'
 import { osLocale } from 'os-locale'
-import { info, warn } from './cli'
+import { info, warn, error as cliError } from './cli'
 import { ConverterOption, ConvertType } from './converter'
 import { ResolvableEngine, ResolvedEngine } from './engine'
 import { keywordsAsArray } from './engine/meta-plugin'
@@ -70,7 +70,7 @@ export type IMarpCLIConfig = Overwrite<
       progress?: boolean
       transition?: boolean
     }
-    engine?: ResolvableEngine | ResolvableEngine[]
+    engine?: ResolvableEngine
     html?: ConverterOption['html']
     keywords?: string | string[]
     lang?: string
@@ -211,7 +211,7 @@ export class MarpCLIConfig {
         this.conf.image
 
       if (image === 'png') return ConvertType.png
-      if (image === 'jpeg') return ConvertType.jpeg
+      if (image === 'jpg' || image === 'jpeg') return ConvertType.jpeg
 
       // Detect from filename
       const lowerOutput = (output || '').toLowerCase()
@@ -331,7 +331,11 @@ export class MarpCLIConfig {
   }
 
   private async loadConf(confPath?: string) {
-    const explorer = cosmiconfig(MarpCLIConfig.moduleName)
+    const generateCosmiconfigExplorer = ResolvedEngine.isESMAvailable()
+      ? cosmiconfig
+      : cosmiconfigSync // sync version is using `require()` instead of `import()` so not expect to meet a trouble with ESM
+
+    const explorer = generateCosmiconfigExplorer(MarpCLIConfig.moduleName)
 
     try {
       const ret = await (confPath === undefined
@@ -343,10 +347,21 @@ export class MarpCLIConfig {
         this.conf = ret.config
       }
     } catch (e: unknown) {
+      const isErr = isError(e)
+
+      if (isErr && e.code === 'ERR_REQUIRE_ESM') {
+        // Show reason why `require()` failed in the current context
+        if ('pkg' in process) {
+          cliError(
+            'A standalone binary version of Marp CLI is currently not supported resolving ESM. Please consider using CommonJS, or trying to use Marp CLI via Node.js.'
+          )
+        }
+      }
+
       error(
         [
           'Could not find or parse configuration file.',
-          isError(e) && e.name !== 'Error' && `(${e.name})`,
+          isErr && `(${e.name}: ${e.message.trimEnd()})`,
           confPath !== undefined && `[${confPath}]`,
         ]
           .filter((m) => m)

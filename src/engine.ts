@@ -8,15 +8,18 @@ import { resolve as importMetaResolve } from 'import-meta-resolve'
 import { pkgUp } from 'pkg-up'
 import { error, isError } from './error'
 
-type MarpitInstanceOrClass = Marpit | typeof Marpit
+type FunctionalEngine<T extends typeof Marpit = typeof Marpit> = (
+  constructorOptions: ConstructorParameters<T>[0] & { readonly marp: Marp }
+) => Marpit | typeof Marpit | Promise<Marpit | typeof Marpit>
 
-type FunctionEngine = (
-  opts?: Marpit.Options
-) => MarpitInstanceOrClass | Promise<MarpitInstanceOrClass>
+export type Engine<T extends typeof Marpit = typeof Marpit> =
+  | Marpit
+  | typeof Marpit
+  | FunctionalEngine<T>
 
-export type Engine = MarpitInstanceOrClass | FunctionEngine
-
-export type ResolvableEngine = Engine | string
+export type ResolvableEngine<T extends typeof Marpit = typeof Marpit> =
+  | Engine<T>
+  | string
 
 const preResolveAsyncSymbol = Symbol('preResolveAsync')
 
@@ -188,7 +191,7 @@ export class ResolvedEngine<T extends Engine = Engine> {
         // Show reason why `require()` failed in the current context
         if ('pkg' in process) {
           error(
-            'A standalone binary version of Marp CLI is currently not supported resolving ESM engine. Please consider using CommonJS engine, or trying to use Marp CLI via Node.js.'
+            'A standalone binary version of Marp CLI is currently not supported resolving ESM. Please consider using CommonJS, or trying to use Marp CLI via Node.js.'
           )
         }
       }
