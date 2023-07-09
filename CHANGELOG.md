@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v3.1.0 - 2023-07-09
+
 ### Added
 
 - ES Modules support for the configuration file ([#534](https://github.com/marp-team/marp-cli/pull/534))
