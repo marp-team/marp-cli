@@ -37,6 +37,7 @@ const runForObservation = async (argv: string[]) => {
   return ret
 }
 
+jest.mock('cosmiconfig')
 jest.mock('fs')
 jest.mock('../src/preview')
 jest.mock('../src/watcher', () => jest.createMockFromModule('../src/watcher'))
@@ -1107,6 +1108,48 @@ describe('Marp CLI', () => {
             )
           } finally {
             warn.mockRestore()
+          }
+        })
+      })
+
+      describe('with ES Module', () => {
+        it('allows loading config with mjs extension', async () => {
+          const debug = jest.spyOn(console, 'debug').mockImplementation()
+          const log = jest.spyOn(console, 'log').mockImplementation()
+
+          try {
+            expect(
+              await marpCli(['-v', '-c', assetFn('_configs/mjs/config.mjs')])
+            ).toBe(0)
+
+            expect(debug).toHaveBeenCalledWith(
+              expect.stringContaining('loaded')
+            )
+          } finally {
+            debug.mockRestore()
+            log.mockRestore()
+          }
+        })
+
+        it('allows loading config from ESM project', async () => {
+          const debug = jest.spyOn(console, 'debug').mockImplementation()
+          const log = jest.spyOn(console, 'log').mockImplementation()
+
+          try {
+            expect(
+              await marpCli([
+                '-v',
+                '-c',
+                assetFn('_configs/esm-project/marp.config.js'),
+              ])
+            ).toBe(0)
+
+            expect(debug).toHaveBeenCalledWith(
+              expect.stringContaining('loaded')
+            )
+          } finally {
+            debug.mockRestore()
+            log.mockRestore()
           }
         })
       })

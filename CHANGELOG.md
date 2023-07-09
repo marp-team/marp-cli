@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Added
+
+- ES Modules support for the configuration file ([#534](https://github.com/marp-team/marp-cli/pull/534))
+- `Config` type definition ([#534](https://github.com/marp-team/marp-cli/pull/534))
+
 ### Changed
 
 - Upgrade dependent packages to the latest versions ([#533](https://github.com/marp-team/marp-cli/pull/533))
