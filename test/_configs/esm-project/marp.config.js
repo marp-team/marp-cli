@@ -3,4 +3,4 @@ const config = {}
 
 export default config
 
-console.debug('A config file with .mjs extension was loaded.')
+console.debug('A config file within ESM project was loaded.')
