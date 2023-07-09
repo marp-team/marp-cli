@@ -455,7 +455,7 @@ export default async (constructorOptions) => {
 }
 ```
 
-> :information_source: Currently ESM engine can resolve only when using Marp CLI via Node.js. [The standalone binary](#standalone-binary) cannot resolve ESM due to [vercel/pkg#1291](https://github.com/vercel/pkg/issues/1291).
+> :information_source: Currently ES Modules can resolve only when using Marp CLI via Node.js. [The standalone binary](#standalone-binary) cannot resolve ESM due to [vercel/pkg#1291](https://github.com/vercel/pkg/issues/1291).
 
 #### `marp` getter property
 
@@ -512,7 +512,9 @@ $ npx marp --version
 
 ## Configuration file
 
-Marp CLI can be configured options with file, such as `marp.config.js`, `marp.config.cjs`, `.marprc` (JSON / YAML), and `marp` section of `package.json`. It is useful to configure settings for the whole of project.
+Marp CLI can be configured options with file, such as `marp.config.js`, `marp.config.mjs` (ES Modules), `marp.config.cjs` (CommonJS), `.marprc` (JSON / YAML), and `marp` section of `package.json`.
+
+It is useful to configure settings for the whole of project.
 
 ```javascript
 // package.json
@@ -536,10 +538,10 @@ pdf: true
 ```
 
 ```javascript
-// marp.config.js
-const markdownItContainer = require('markdown-it-container')
+// marp.config.mjs
+import markdownItContainer from 'markdown-it-container'
 
-module.exports = {
+export default {
   // Customize engine on configuration file directly
   engine: ({ marp }) => marp.use(markdownItContainer, 'custom'),
 }
@@ -548,6 +550,8 @@ module.exports = {
 By default we use configuration file that is placed on current directory, but you may also specify the path for a configuration file by `--config-file` (`--config` / `-c`) option.
 
 If you want to prevent looking up a configuration file, you can pass `--no-config-file` (`--no-config`) option.
+
+> :information_source: Currently ES Modules can resolve only when using Marp CLI via Node.js. [The standalone binary](#standalone-binary) cannot resolve ESM due to [vercel/pkg#1291](https://github.com/vercel/pkg/issues/1291).
 
 ### Options
 
@@ -578,6 +582,7 @@ If you want to prevent looking up a configuration file, you can pass `--no-confi
 | `pdfOutlines`     |      boolean \| object      |     `--pdf-outlines`      | Add outlines (bookmarks) to PDF                                                                             |
 | ┗ `pages`         |           boolean           |  `--pdf-outlines.pages`   | Make PDF outlines from slide pages (`true` by default when `pdfOutlines` is enabled)                        |
 | ┗ `headings`      |           boolean           | `--pdf-outlines.headings` | Make PDF outlines from Markdown headings (`true` by default when `pdfOutlines` is enabled)                  |
+| `pptx`            |           boolean           |         `--pptx`          | Convert slide deck into PowerPoint document                                                                 |
 | `preview`         |           boolean           |     `--preview` `-p`      | Open preview window                                                                                         |
 | `server`          |           boolean           |      `--server` `-s`      | Enable server mode                                                                                          |
 | `template`        |     `bare` \| `bespoke`     |       `--template`        | Choose template (`bespoke` by default)                                                                      |
@@ -589,20 +594,12 @@ If you want to prevent looking up a configuration file, you can pass `--no-confi
 
 [the whitelist object]: https://github.com/marp-team/marp-core#html-boolean--object
 
-### Advanced
+Some of options that cannot specify through CLI options can be configured by file.
 
-The advanced options that cannot specify through CLI options can be configured by file.
+For example, `options` field can set the base options for the constructor of the used engine. You can fine-tune constructor options for the engine, [Marp Core](https://github.com/marp-team/marp-core#constructor-options) / [Marpit](https://marpit-api.marp.app/marpit).
 
-#### Base options for engine constructor
-
-`options` can set the base options for the constructor of the used engine. You can fine-tune constructor options for [Marp Core](https://github.com/marp-team/marp-core#constructor-options) / [Marpit](https://marpit-api.marp.app/marpit).
-
-##### Example
-
-The below configuration will set constructor option for Marp Core as specified:
-
-- Disables [Marp Core's line breaks conversion](https://github.com/marp-team/marp-core#marp-markdown) (`\n` to `<br />`) to match for CommonMark, by passing [markdown-it's `breaks` option](https://markdown-it.github.io/markdown-it/#MarkdownIt.new) as `false`.
-- Disable minification for rendered theme CSS to make debug your style easily, by passing [`minifyCSS`](https://github.com/marp-team/marp-core#minifycss-boolean) as `false`.
+<details>
+<summary>Example: Customize engine's constructor option</summary>
 
 ```json
 {
@@ -615,7 +612,43 @@ The below configuration will set constructor option for Marp Core as specified:
 }
 ```
 
+This configuration will set the constructor option for Marp Core as specified:
+
+- Disables [Marp Core's line breaks conversion](https://github.com/marp-team/marp-core#marp-markdown) (`\n` to `<br />`) to match for CommonMark, by passing [markdown-it's `breaks` option](https://markdown-it.github.io/markdown-it/#MarkdownIt.new) as `false`.
+- Disable minification for rendered theme CSS to make debug your style easily, by passing [`minifyCSS`](https://github.com/marp-team/marp-core#minifycss-boolean) as `false`.
+
 > :warning: Some options may be overridden by used template.
+
+</details>
+
+### Type annotation
+
+For getting better IDE support (such as [IntelliSense](https://code.visualstudio.com/docs/editor/intellisense)) to write a config, you can annotate the config object through JSDoc, with Marp CLI's `Config` type.
+
+```javascript
+/** @type {import('@marp-team/marp-cli').Config} */
+const config = {
+  // ...
+}
+
+export default config
+```
+
+#### `Config` type with custom engine
+
+If you've swapped the engine into another Marpit based engine, you also can provide better suggestion for `options` field by passing the engine type to generics.
+
+```javascript
+/** @type {import('@marp-team/marp-cli').Config<typeof import('@marp-team/marpit').Marpit>} */
+const config = {
+  engine: '@marp-team/marpit',
+  options: {
+    // Suggest only Marpit constructor options, not Marp Core
+  },
+}
+
+export default config
+```
 
 ## API _(EXPERIMENTAL)_
 
