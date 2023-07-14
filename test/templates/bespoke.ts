@@ -64,7 +64,7 @@ describe("Bespoke template's browser context", () => {
     })
 
     targetDocument.body.innerHTML = ret.html
-    return targetDocument.getElementById(':$p')! // eslint-disable-line @typescript-eslint/no-non-null-assertion
+    return targetDocument.getElementById(':$p')!
   }
 
   const replaceLocation = <T extends void | Promise<void>>(
@@ -361,7 +361,7 @@ describe("Bespoke template's browser context", () => {
 
         keydown(
           { bubbles: true, key: Key.ArrowRight },
-          document.getElementById('element')! // eslint-disable-line @typescript-eslint/no-non-null-assertion
+          document.getElementById('element')!
         )
         expect(deck.slide()).toBe(0)
 
@@ -1296,7 +1296,6 @@ describe("Bespoke template's browser context", () => {
           try {
             window.addEventListener('storage', resolve, { once: true })
 
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             foreignFrame.contentWindow!.localStorage.setItem(
               storeKey(key),
               JSON.stringify({ ...getStore(key), ...data })
@@ -1580,12 +1579,10 @@ describe("Bespoke template's browser context", () => {
     const waitAsync = () =>
       new Promise((res) => jest.requireActual('timers').setImmediate(res))
 
-    const getCSSText = (rules: CSSRuleList) => {
-      let style = ''
-      for (let i = 0; i < rules.length; i += 1) style += rules[i].cssText
-
-      return style
-    }
+    const getCSSText = (rules: CSSRuleList) =>
+      Array.from(rules)
+        .map((rule) => rule.cssText)
+        .join('')
 
     const getTransitionStyle = (): string | null => {
       const style: HTMLStyleElement | null = document.getElementById(

@@ -81,7 +81,7 @@ export class Watcher {
 }
 
 export class WatchNotifier {
-  listeners: Map<string, Set<any>> = new Map()
+  listeners = new Map<string, Set<any>>()
 
   private wss?: WSServer
   private portNumber?: number
@@ -122,7 +122,6 @@ export class WatchNotifier {
         if (wsSet !== undefined) {
           this.listeners.set(identifier, wsSet.add(ws))
 
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           ws.on('close', () => this.listeners.get(identifier)!.delete(ws))
 
           ws.send('ready')

@@ -23,7 +23,7 @@ export class Theme {
   }
 
   get buffer() {
-    return this.readBuffer! // eslint-disable-line @typescript-eslint/no-non-null-assertion
+    return this.readBuffer!  
   }
 
   get css() {
@@ -55,13 +55,13 @@ export class ThemeSet {
   readonly fnForWatch: string[]
 
   /** The key-value pair from file path to instance */
-  readonly themes: Map<string, Theme> = new Map()
+  readonly themes = new Map<string, Theme>()
 
   onThemeUpdated: (path: string) => void = () => {
     // No ops
   }
 
-  private observedMarkdowns: Map<string, string | undefined> = new Map()
+  private observedMarkdowns = new Map<string, string | undefined>()
 
   private constructor(opts: { fn: string[]; fnForWatch: string[] }) {
     this.fn = opts.fn
@@ -121,7 +121,7 @@ export class ThemeSet {
   static async initialize(baseFn: string[], themes: Theme[] = []) {
     const fn = [...baseFn, ...themes.map((t) => t.filename)]
     const found = await ThemeSet.findPath(fn)
-    const fnForWatch: Set<string> = new Set(found.map((f) => path.resolve(f)))
+    const fnForWatch = new Set<string>(found.map((f) => path.resolve(f)))
 
     for (const f of fn) {
       // globby's hasMagic (backed by fast-glob) always recognizes "\\" (Windows path separator) as the escape character.
