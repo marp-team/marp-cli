@@ -31,7 +31,9 @@ export interface MarpCLIInternalOptions {
 
 export type MarpCLIAPIOptions = Pick<MarpCLIInternalOptions, 'baseUrl'>
 
-export interface ObservationHelper { stop: () => void }
+export interface ObservationHelper {
+  stop: () => void
+}
 
 const resolversForObservation: ((helper: ObservationHelper) => void)[] = []
 

@@ -1,4 +1,3 @@
- 
 import type { PDFDocument, PDFRef } from 'pdf-lib'
 
 // Use pre-bundled pdf-lib to avoid circular dependency warning. pdf-lib as an

@@ -89,7 +89,7 @@ export class File {
         await this.saveToFile()
         break
       case FileType.StandardIO:
-        process.stdout.write(this.buffer!)  
+        process.stdout.write(this.buffer!)
     }
   }
 
@@ -153,7 +153,7 @@ export class File {
       await fs.promises.mkdir(directory, { recursive: true })
     }
 
-    await fs.promises.writeFile(savePath, this.buffer!)  
+    await fs.promises.writeFile(savePath, this.buffer!)
   }
 
   private static stdinBuffer?: Buffer

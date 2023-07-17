@@ -43,14 +43,14 @@ export class Server extends (EventEmitter as new () => TypedEmitter<Server.Event
     this.directoryIndex = opts.directoryIndex || []
     this.inputDir = converter.options.inputDir
     this.options = opts
-    this.port = Number.parseInt(process.env.PORT!, 10) || 8080  
+    this.port = Number.parseInt(process.env.PORT!, 10) || 8080
   }
 
   async start() {
     await this.setup()
 
     return new Promise<void>((res, rej) => {
-      this.httpServer = this.server!.listen(this.port)  
+      this.httpServer = this.server!.listen(this.port)
 
       this.httpServer.on('listening', res)
       this.httpServer.on('error', (err) =>

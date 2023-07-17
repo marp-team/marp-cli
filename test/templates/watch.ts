@@ -97,7 +97,7 @@ describe('Watch mode notifier on browser context', () => {
               server.once('error', (e) => rej(e))
               server.once('connection', () => res(socket))
 
-              const socket = watch()!  
+              const socket = watch()!
             })
 
             await new Promise((res) => {

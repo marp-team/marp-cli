@@ -146,7 +146,7 @@ const fetchMarpTransitionKeyframes = async (
       return resolved
     })
   }
-   
+
   return resolvedMarpTransitionKeyframes.get(transitionName)!
 }
 

@@ -118,7 +118,7 @@ export class Preview extends (EventEmitter as new () => TypedEmitter<Preview.Eve
 
             if (url.searchParams.get('__marp_cli_id') === id) {
               pptr.off('targetcreated', idMatcher)
-              ;(async () => res((await target.page())!))()  
+              ;(async () => res((await target.page())!))()
             }
           }
 

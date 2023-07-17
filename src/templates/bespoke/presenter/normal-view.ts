@@ -1,7 +1,10 @@
 import { generateURLfromParams, storage } from '../utils'
 import { presenterPrefix } from './presenter-view'
 
-interface BespokeForPresenter { syncKey: string; [key: string]: any }
+interface BespokeForPresenter {
+  syncKey: string
+  [key: string]: any
+}
 
 const validateDeck = (deck: any): deck is BespokeForPresenter =>
   deck.syncKey && typeof deck.syncKey === 'string'

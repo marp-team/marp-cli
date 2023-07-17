@@ -23,7 +23,7 @@ export class Theme {
   }
 
   get buffer() {
-    return this.readBuffer!  
+    return this.readBuffer!
   }
 
   get css() {
