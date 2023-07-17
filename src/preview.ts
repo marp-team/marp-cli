@@ -15,7 +15,8 @@ import {
 import { isChromeInWSLHost } from './utils/wsl'
 
 export namespace Preview {
-  export interface Events {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-definitions -- TypedEmitter requires type definition instead of interface
+  export type Events = {
     close: (window: any) => void
     exit: () => void
     launch: () => void

@@ -243,7 +243,8 @@ export class Server extends (EventEmitter as new () => TypedEmitter<Server.Event
 }
 
 export namespace Server {
-  export interface Events {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-definitions -- TypedEmitter requires type definition instead of interface
+  export type Events = {
     converted: ConvertedCallback
     error: (err: Error) => void
   }
