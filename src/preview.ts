@@ -15,6 +15,7 @@ import {
 import { isChromeInWSLHost } from './utils/wsl'
 
 export namespace Preview {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-definitions -- TypedEmitter requires type definition instead of interface
   export type Events = {
     close: (window: any) => void
     exit: () => void
@@ -118,7 +119,7 @@ export class Preview extends (EventEmitter as new () => TypedEmitter<Preview.Eve
 
             if (url.searchParams.get('__marp_cli_id') === id) {
               pptr.off('targetcreated', idMatcher)
-              ;(async () => res((await target.page())!))() // eslint-disable-line @typescript-eslint/no-non-null-assertion
+              ;(async () => res((await target.page())!))()
             }
           }
 

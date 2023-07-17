@@ -43,14 +43,14 @@ export class Server extends (EventEmitter as new () => TypedEmitter<Server.Event
     this.directoryIndex = opts.directoryIndex || []
     this.inputDir = converter.options.inputDir
     this.options = opts
-    this.port = Number.parseInt(process.env.PORT!, 10) || 8080 // eslint-disable-line @typescript-eslint/no-non-null-assertion
+    this.port = Number.parseInt(process.env.PORT!, 10) || 8080
   }
 
   async start() {
     await this.setup()
 
     return new Promise<void>((res, rej) => {
-      this.httpServer = this.server!.listen(this.port) // eslint-disable-line @typescript-eslint/no-non-null-assertion
+      this.httpServer = this.server!.listen(this.port)
 
       this.httpServer.on('listening', res)
       this.httpServer.on('error', (err) =>
@@ -243,6 +243,7 @@ export class Server extends (EventEmitter as new () => TypedEmitter<Server.Event
 }
 
 export namespace Server {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-definitions -- TypedEmitter requires type definition instead of interface
   export type Events = {
     converted: ConvertedCallback
     error: (err: Error) => void

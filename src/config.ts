@@ -1,12 +1,7 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import fs from 'fs'
 import path from 'path'
 import chalk from 'chalk'
-import {
-  cosmiconfig,
-  cosmiconfigSync,
-  Options as CosmiconfigOptions,
-} from 'cosmiconfig'
+import { cosmiconfig, cosmiconfigSync } from 'cosmiconfig'
 import { osLocale } from 'os-locale'
 import { info, warn, error as cliError } from './cli'
 import { ConverterOption, ConvertType } from './converter'

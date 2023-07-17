@@ -1,16 +1,16 @@
-export type ResolveAnimationOptions = {
+export interface ResolveAnimationOptions {
   type: 'incoming' | 'outgoing'
   backward?: boolean
   duration?: string
 }
 
-export type MarpTransitionData = {
+export interface MarpTransitionData {
   name: string
   duration?: string
   builtinFallback?: boolean
 }
 
-export type MarpTransitionKeyframeSettings = {
+export interface MarpTransitionKeyframeSettings {
   name: string
   defaultDuration?: string
 }
@@ -146,7 +146,7 @@ const fetchMarpTransitionKeyframes = async (
       return resolved
     })
   }
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
   return resolvedMarpTransitionKeyframes.get(transitionName)!
 }
 

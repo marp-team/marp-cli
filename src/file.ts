@@ -89,7 +89,7 @@ export class File {
         await this.saveToFile()
         break
       case FileType.StandardIO:
-        process.stdout.write(this.buffer!) // eslint-disable-line @typescript-eslint/no-non-null-assertion
+        process.stdout.write(this.buffer!)
     }
   }
 
@@ -153,7 +153,7 @@ export class File {
       await fs.promises.mkdir(directory, { recursive: true })
     }
 
-    await fs.promises.writeFile(savePath, this.buffer!) // eslint-disable-line @typescript-eslint/no-non-null-assertion
+    await fs.promises.writeFile(savePath, this.buffer!)
   }
 
   private static stdinBuffer?: Buffer

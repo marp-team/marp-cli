@@ -26,9 +26,7 @@ const parse = (
   return patterns.map(([pat, plugin]) => pat[i] && plugin).filter((p) => p)
 }
 
-const bespokeTemplate = (
-  target = document.getElementById(':$p')! // eslint-disable-line @typescript-eslint/no-non-null-assertion
-) => {
+const bespokeTemplate = (target = document.getElementById(':$p')!) => {
   setViewMode()
 
   const key = popQuery('sync') || undefined
