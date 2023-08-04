@@ -10,7 +10,6 @@ RUN apk update && apk upgrade && \
       chromium@edge \
       freetype@edge \
       libstdc++@edge \
-      harfbuzz@edge \
       ttf-liberation@edge \
       font-noto-cjk@edge \
       font-noto-devanagari@edge \
