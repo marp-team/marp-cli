@@ -7,7 +7,7 @@
 - Upgrade Marp Core to [v3.8.0](https://github.com/marp-team/marp-core/releases/v3.8.0) ([#536](https://github.com/marp-team/marp-cli/pull/536))
   - This core is no longer depending on the global `highlight.js` instance, in favor of the instance-specific highlight.js that is accessible through `highlightjs` getter
 - Upgrade Node.js LTS ([#536](https://github.com/marp-team/marp-cli/pull/536))
-- Upgrade dependent packages to the latest versions ([#535](https://github.com/marp-team/marp-cli/pull/535), [#536](https://github.com/marp-team/marp-cli/pull/536))
+- Upgrade dependent packages to the latest versions ([#535](https://github.com/marp-team/marp-cli/pull/535), [#536](https://github.com/marp-team/marp-cli/pull/536), [#537](https://github.com/marp-team/marp-cli/pull/537))
 
 ## v3.1.0 - 2023-07-09
 
