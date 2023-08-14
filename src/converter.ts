@@ -171,7 +171,7 @@ export class Converter {
 
         tplOpts.modifier?.(engine)
 
-        const ret = engine.render(stripBOM(markdown))
+        const ret = await engine.render(stripBOM(markdown))
 
         const info = engine[engineInfo]
         const outline = engine[pdfOutlineInfo]
