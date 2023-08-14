@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Allow async `render()` in the custom engine ([#540](https://github.com/marp-team/marp-cli/pull/540) by [@GuillaumeDesforges](https://github.com/GuillaumeDesforges))
+
 ## v3.2.0 - 2023-08-04
 
 ### Changed
