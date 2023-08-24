@@ -27,7 +27,7 @@ import templates, {
   TemplateResult,
 } from './templates/'
 import { ThemeSet } from './theme'
-import { isOfficialImage } from './utils/docker'
+import { isOfficialDockerImage } from './utils/container'
 import { pdfLib, setOutline } from './utils/pdf'
 import {
   generatePuppeteerDataDirPath,
@@ -545,7 +545,7 @@ export class Converter {
       // directory so always create tmp file to home directory if in Linux.
       // (There is an exception for an official docker image)
       return baseFile.saveTmpFile({
-        home: process.platform === 'linux' && !isOfficialImage(),
+        home: process.platform === 'linux' && !isOfficialDockerImage(),
         extension: '.html',
       })
     })()

@@ -20,7 +20,7 @@ import {
 import { Preview } from '../src/preview'
 import { Server } from '../src/server'
 import { ThemeSet } from '../src/theme'
-import * as docker from '../src/utils/docker'
+import * as container from '../src/utils/container'
 import * as version from '../src/version'
 import { Watcher } from '../src/watcher'
 
@@ -224,7 +224,7 @@ describe('Marp CLI', () => {
         describe('when CLI is running in an official Docker image', () => {
           it('does not output help about --preview option', async () => {
             const isOfficialImage = jest
-              .spyOn(docker, 'isOfficialImage')
+              .spyOn(container, 'isOfficialDockerImage')
               .mockReturnValue(true)
 
             try {
@@ -482,7 +482,7 @@ describe('Marp CLI', () => {
         describe('when CLI is running in an official Docker image', () => {
           it('ignores --preview option with warning', async () => {
             const isOfficialImage = jest
-              .spyOn(docker, 'isOfficialImage')
+              .spyOn(container, 'isOfficialDockerImage')
               .mockReturnValue(true)
             const warn = jest.spyOn(cli, 'warn').mockImplementation()
 
@@ -1187,7 +1187,7 @@ describe('Marp CLI', () => {
       describe('when CLI is running in an official Docker image', () => {
         it('ignores --preview option with warning', async () => {
           const isOfficialImage = jest
-            .spyOn(docker, 'isOfficialImage')
+            .spyOn(container, 'isOfficialDockerImage')
             .mockReturnValue(true)
 
           try {

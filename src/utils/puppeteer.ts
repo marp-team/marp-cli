@@ -5,8 +5,8 @@ import { launch } from 'puppeteer-core'
 import macDockIcon from '../assets/mac-dock-icon.png'
 import { warn } from '../cli'
 import { CLIErrorCode, error, isError } from '../error'
-import { isDocker } from '../utils/docker'
 import { findChromeInstallation } from './chrome-finder'
+import { isInsideContainer } from './container'
 import { findEdgeInstallation } from './edge-finder'
 import { isWSL, resolveWindowsEnv } from './wsl'
 
@@ -76,11 +76,11 @@ export const generatePuppeteerLaunchArgs = async () => {
   const args = new Set<string>(['--export-tagged-pdf', '--test-type'])
 
   // Docker environment and WSL environment need to disable sandbox. :(
-  if (isDocker() || isWSL()) args.add('--no-sandbox')
+  if (isInsideContainer() || isWSL()) args.add('--no-sandbox')
 
   // Workaround for Chrome 73 in docker and unit testing with CircleCI
   // https://github.com/GoogleChrome/puppeteer/issues/3774
-  if (isDocker() || process.env.CI)
+  if (isInsideContainer() || process.env.CI)
     args.add('--disable-features=VizDisplayCompositor')
 
   // Enable View transitions API

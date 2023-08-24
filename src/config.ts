@@ -10,7 +10,7 @@ import { keywordsAsArray } from './engine/meta-plugin'
 import { error, isError } from './error'
 import { TemplateOption } from './templates'
 import { Theme, ThemeSet } from './theme'
-import { isOfficialImage } from './utils/docker'
+import { isOfficialDockerImage } from './utils/container'
 
 type Overwrite<T, U> = Omit<T, Extract<keyof T, keyof U>> & U
 
@@ -132,7 +132,7 @@ export class MarpCLIConfig {
     const preview = (() => {
       const p = this.args.preview ?? this.conf.preview ?? false
 
-      if (p && isOfficialImage()) {
+      if (p && isOfficialDockerImage()) {
         warn(
           `Preview window cannot show within an official docker image. Preview option was ignored.`
         )

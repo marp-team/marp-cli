@@ -8,6 +8,7 @@ const esModules = [
   'find-up',
   'globby',
   'import-meta-resolve',
+  'is-inside-container',
   'is-docker',
   'lighthouse-logger',
   'locate-path',
