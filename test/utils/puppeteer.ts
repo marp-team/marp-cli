@@ -17,8 +17,8 @@ const puppeteerUtils = (): typeof import('../../src/utils/puppeteer') =>
 const chromeFinder = (): typeof import('../../src/utils/chrome-finder') =>
   require('../../src/utils/chrome-finder')
 
-const docker = (): typeof import('../../src/utils/docker') =>
-  require('../../src/utils/docker')
+const container = (): typeof import('../../src/utils/container') =>
+  require('../../src/utils/container')
 
 const edgeFinder = (): typeof import('../../src/utils/edge-finder') =>
   require('../../src/utils/edge-finder')
@@ -152,8 +152,8 @@ describe('#generatePuppeteerLaunchArgs', () => {
     }
   })
 
-  it('uses specific settings if running within a Docker container', async () => {
-    jest.spyOn(docker(), 'isDocker').mockImplementation(() => true)
+  it('uses specific settings if running within a container image', async () => {
+    jest.spyOn(container(), 'isInsideContainer').mockImplementation(() => true)
     jest
       .spyOn(chromeFinder(), 'findChromeInstallation')
       .mockResolvedValue('/usr/bin/chromium')

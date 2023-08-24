@@ -9,7 +9,7 @@ import { File, FileType } from './file'
 import { Preview, fileToURI } from './preview'
 import { Server } from './server'
 import templates from './templates'
-import { isOfficialImage } from './utils/docker'
+import { isOfficialDockerImage } from './utils/container'
 import { resetExecutablePath } from './utils/puppeteer'
 import version from './version'
 import watcher, { Watcher, notifier } from './watcher'
@@ -109,7 +109,7 @@ export const marpCli = async (
         preview: {
           alias: 'p',
           describe: 'Open preview window',
-          hidden: isOfficialImage(),
+          hidden: isOfficialDockerImage(),
           group: OptionGroup.Basic,
           type: 'boolean',
         },

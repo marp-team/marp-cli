@@ -6,6 +6,10 @@
 
 - Allow async `render()` in the custom engine ([#540](https://github.com/marp-team/marp-cli/pull/540) by [@GuillaumeDesforges](https://github.com/GuillaumeDesforges))
 
+### Changed
+
+- Replace `is-docker` to `is-inside-container` for detecting more virtualized containers ([#543](https://github.com/marp-team/marp-cli/issues/543), [#544](https://github.com/marp-team/marp-cli/pull/544))
+
 ## v3.2.0 - 2023-08-04
 
 ### Changed
