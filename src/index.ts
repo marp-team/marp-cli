@@ -33,3 +33,7 @@ export interface Config<Engine extends typeof Marpit = typeof Marp>
       options?: ConstructorParameters<Engine>[0]
     }
   > {}
+
+export const defineConfig = <Engine extends typeof Marpit = typeof Marp>(
+  config: Config<Engine>
+) => config

@@ -17,6 +17,7 @@ cosmiconfig.cosmiconfig = jest.fn((moduleName, options) => {
       '.js': defaultLoadersSync['.js'],
       '.mjs': defaultLoadersSync['.js'],
       '.cjs': defaultLoadersSync['.js'],
+      '.ts': defaultLoadersSync['.ts'],
     },
     ...(options ?? {}),
   })
