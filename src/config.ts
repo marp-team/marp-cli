@@ -340,7 +340,7 @@ export class MarpCLIConfig {
 
     try {
       const ret = await (confPath === undefined
-        ? explorer.search()
+        ? explorer.search(process.cwd())
         : explorer.load(confPath))
 
       if (ret) {
