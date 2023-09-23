@@ -15,6 +15,10 @@
 - Upgrade development Node.js LTS to v18.18.0 ([#547](https://github.com/marp-team/marp-cli/pull/547))
 - Upgrade dependent packages to the latest versions ([#548](https://github.com/marp-team/marp-cli/pull/548))
 
+### Fixed
+
+- A huge document fails generating PDF/PPTX/images by `net::ERR_ABORTED` ([#545](https://github.com/marp-team/marp-cli/issues/545), [#551](https://github.com/marp-team/marp-cli/pull/551))
+
 ## v3.2.1 - 2023-08-24
 
 ### Added

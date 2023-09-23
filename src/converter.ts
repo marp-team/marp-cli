@@ -2,7 +2,7 @@ import { URL } from 'url'
 import type { Marp, MarpOptions } from '@marp-team/marp-core'
 import { Marpit, Options as MarpitOptions } from '@marp-team/marpit'
 import chalk from 'chalk'
-import type { Browser, Page, HTTPRequest } from 'puppeteer-core'
+import type { Browser, Page, HTTPRequest, WaitForOptions } from 'puppeteer-core'
 import { silence, warn } from './cli'
 import { Engine, ResolvedEngine } from './engine'
 import { generateOverrideGlobalDirectivesPlugin } from './engine/directive-plugin'
@@ -297,8 +297,8 @@ export class Converter {
 
     let outlineData: OutlineData | undefined
 
-    ret.buffer = await this.usePuppeteer(html, async (page, uri) => {
-      await page.goto(uri, { waitUntil: ['domcontentloaded', 'networkidle0'] })
+    ret.buffer = await this.usePuppeteer(html, async (page, { render }) => {
+      await render()
 
       if (tpl.rendered.outline) {
         outlineData = await page.evaluate(
@@ -384,20 +384,15 @@ export class Converter {
 
     const files: File[] = []
 
-    await this.usePuppeteer(html, async (page, uri) => {
+    await this.usePuppeteer(html, async (page, { render }) => {
       await page.setViewport({
         ...tpl.rendered.size,
         deviceScaleFactor: opts.scale ?? 1,
       })
-      await page.goto(uri, { waitUntil: ['domcontentloaded', 'networkidle0'] })
+      await render()
       await page.emulateMediaType('print')
 
       const screenshot = async (pageNumber = 1) => {
-        // for Chrome < 89 (TODO: Remove this script evaluation in future)
-        await page.evaluate(
-          `window.scrollTo(0,${(pageNumber - 1) * tpl.rendered.size.height})`
-        )
-
         const clip = {
           x: 0,
           y: (pageNumber - 1) * tpl.rendered.size.height,
@@ -405,13 +400,13 @@ export class Converter {
         } as const
 
         if (opts.type === ConvertType.jpeg)
-          return (await page.screenshot({
+          return await page.screenshot({
             clip,
             quality: opts.quality,
             type: 'jpeg',
-          })) as Buffer
+          })
 
-        return (await page.screenshot({ clip, type: 'png' })) as Buffer
+        return await page.screenshot({ clip, type: 'png' })
       }
 
       if (opts.pages) {
@@ -532,7 +527,10 @@ export class Converter {
 
   private async usePuppeteer<T>(
     baseFile: File,
-    processer: (page: Page, uri: string) => Promise<T>
+    processer: (
+      page: Page,
+      helpers: { render: () => Promise<void> }
+    ) => Promise<T>
   ) {
     const tmpFile: File.TmpFileInterface | undefined = await (() => {
       if (!this.options.allowLocalFiles) return undefined
@@ -563,7 +561,7 @@ export class Converter {
           }
           return `file://${tmpFile.path}`
         }
-        return `data:text/html;base64,${baseFile.buffer!.toString('base64')}`
+        return undefined
       })()
 
       const page = await browser.newPage()
@@ -572,8 +570,21 @@ export class Converter {
       const { missingFileSet, failedFileSet } =
         this.trackFailedLocalFileAccess(page)
 
+      const render = async () => {
+        const waitForOptions: WaitForOptions = {
+          waitUntil: ['domcontentloaded', 'networkidle0'],
+        }
+
+        if (uri) {
+          await page.goto(uri, waitForOptions)
+        } else {
+          await page.goto('data:text/html,')
+          await page.setContent(baseFile.buffer!.toString(), waitForOptions)
+        }
+      }
+
       try {
-        return await processer(page, uri)
+        return await processer(page, { render })
       } finally {
         if (missingFileSet.size > 0) {
           warn(
