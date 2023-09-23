@@ -40,9 +40,8 @@ describe('#generatePuppeteerDataDirPath', () => {
   })
 
   it('returns the path of created data dir for OS specific temporary directory', async () => {
-    const dataDir = await puppeteerUtils().generatePuppeteerDataDirPath(
-      'tmp-name'
-    )
+    const dataDir =
+      await puppeteerUtils().generatePuppeteerDataDirPath('tmp-name')
     const expectedDir = path.resolve(os.tmpdir(), 'tmp-name')
 
     expect(dataDir).toBe(expectedDir)
