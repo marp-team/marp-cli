@@ -53,7 +53,7 @@ export const generatePuppeteerDataDirPath = async (
   { wslHost }: { wslHost?: boolean } = {}
 ): Promise<string> => {
   const dataDir = await (async () => {
-    if (isWSL() && wslHost) {
+    if ((await isWSL()) && wslHost) {
       // In WSL environment, Marp CLI may use Chrome on Windows. If Chrome has
       // located in host OS (Windows), we have to specify Windows path.
       if (wslTmp === undefined) wslTmp = await resolveWindowsEnv('TMP')
@@ -76,7 +76,7 @@ export const generatePuppeteerLaunchArgs = async () => {
   const args = new Set<string>(['--export-tagged-pdf', '--test-type'])
 
   // Docker environment and WSL environment need to disable sandbox. :(
-  if (isInsideContainer() || isWSL()) args.add('--no-sandbox')
+  if (isInsideContainer() || (await isWSL())) args.add('--no-sandbox')
 
   // Workaround for Chrome 73 in docker and unit testing with CircleCI
   // https://github.com/GoogleChrome/puppeteer/issues/3774
@@ -104,7 +104,7 @@ export const generatePuppeteerLaunchArgs = async () => {
 
     if (!executablePath) {
       // Find Edge as fallback (Edge has pre-installed to almost Windows)
-      executablePath = findEdgeInstallation()
+      executablePath = await findEdgeInstallation()
 
       if (!executablePath) {
         if (findChromeError) warn(findChromeError.message)

@@ -30,9 +30,9 @@ export const resolveWindowsEnvSync = (key: string): string | undefined => {
   return ret.startsWith(`${key}=`) ? ret.slice(key.length + 1) : undefined
 }
 
-export const isWSL = (): number => {
+export const isWSL = async (): Promise<number> => {
   if (isWsl === undefined) {
-    if (require('is-wsl')) {
+    if ((await import('is-wsl')).default) {
       // Detect whether WSL version is 2
       // https://github.com/microsoft/WSL/issues/4555#issuecomment-700213318
       const isWSL2 = (() => {
@@ -57,5 +57,5 @@ export const isWSL = (): number => {
   return isWsl
 }
 
-export const isChromeInWSLHost = (chromePath: string | undefined) =>
-  !!(isWSL() && chromePath?.match(/^\/mnt\/[a-z]\//))
+export const isChromeInWSLHost = async (chromePath: string | undefined) =>
+  !!((await isWSL()) && chromePath?.match(/^\/mnt\/[a-z]\//))

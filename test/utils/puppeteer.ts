@@ -77,7 +77,7 @@ describe('#generatePuppeteerDataDirPath', () => {
     })
 
     it('resolves tmpdir for Windows and returns data dir path for resolved directory', async () => {
-      jest.spyOn(wsl(), 'isWSL').mockImplementation(() => 1)
+      jest.spyOn(wsl(), 'isWSL').mockResolvedValue(1)
 
       const resolveWindowsEnv = jest
         .spyOn(wsl(), 'resolveWindowsEnv')
@@ -113,7 +113,7 @@ describe('#generatePuppeteerLaunchArgs', () => {
     jest.spyOn(chromeFinder(), 'findChromeInstallation').mockImplementation()
     jest
       .spyOn(edgeFinder(), 'findEdgeInstallation')
-      .mockImplementation(() => '/usr/bin/msedge')
+      .mockResolvedValue('/usr/bin/msedge')
 
     const args = await puppeteerUtils().generatePuppeteerLaunchArgs()
     expect(args.executablePath).toBe('/usr/bin/msedge')
@@ -252,7 +252,7 @@ describe('#generatePuppeteerLaunchArgs', () => {
       // Set Edge fallback as a sentinel
       jest
         .spyOn(edgeFinder(), 'findEdgeInstallation')
-        .mockImplementation(() => '/usr/bin/msedge')
+        .mockResolvedValue('/usr/bin/msedge')
     })
 
     afterEach(() => {

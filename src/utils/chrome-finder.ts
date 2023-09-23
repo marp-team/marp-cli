@@ -17,7 +17,7 @@ export const findChromeInstallation = async () => {
   // 'wsl' platform will resolve Chrome from Windows. In WSL 2, Puppeteer cannot
   // communicate with Chrome spawned in the host OS so should follow the
   // original platform ('linux') if CLI was executed in WSL 2.
-  const platform = isWSL() === 1 ? 'wsl' : process.platform
+  const platform = (await isWSL()) === 1 ? 'wsl' : process.platform
 
   const installations = await (async () => {
     switch (platform) {

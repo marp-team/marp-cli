@@ -144,9 +144,9 @@ export class Converter {
       if (this.options.baseUrl) return this.options.baseUrl
 
       if (isFile(f) && type !== ConvertType.html) {
-        return isChromeInWSLHost(
+        return (await isChromeInWSLHost(
           (await generatePuppeteerLaunchArgs()).executablePath
-        )
+        ))
           ? `file:${await resolveWSLPathToHost(f.absolutePath)}`
           : f.absoluteFileScheme
       }
@@ -557,7 +557,7 @@ export class Converter {
 
       const uri = await (async () => {
         if (tmpFile) {
-          if (isChromeInWSLHost(browser.process()?.spawnfile)) {
+          if (await isChromeInWSLHost(browser.process()?.spawnfile)) {
             // Windows Chrome should read file from WSL environment
             return `file:${await resolveWSLPathToHost(tmpFile.path)}`
           }
@@ -641,7 +641,7 @@ export class Converter {
         ...baseArgs,
         timeout,
         userDataDir: await generatePuppeteerDataDirPath('marp-cli-conversion', {
-          wslHost: isChromeInWSLHost(baseArgs.executablePath),
+          wslHost: await isChromeInWSLHost(baseArgs.executablePath),
         }),
       })
       Converter.browser.once('disconnected', () => {
