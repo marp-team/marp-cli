@@ -621,9 +621,9 @@ This configuration will set the constructor option for Marp Core as specified:
 
 </details>
 
-### Type annotation
+### Auto completion
 
-For getting better IDE support (such as [IntelliSense](https://code.visualstudio.com/docs/editor/intellisense)) to write a config, you can annotate the config object through JSDoc, with Marp CLI's `Config` type.
+For getting the power of auto completion for the config, such as [IntelliSense](https://code.visualstudio.com/docs/editor/intellisense), you can annotate the config object through JSDoc, with Marp CLI's `Config` type.
 
 ```javascript
 /** @type {import('@marp-team/marp-cli').Config} */
@@ -634,9 +634,19 @@ const config = {
 export default config
 ```
 
+Or you can use Vite-like `defineConfig` helper from Marp CLI instead.
+
+```javascript
+import { defineConfig } from '@marp-team/marp-cli'
+
+export default defineConfig({
+  // ...
+})
+```
+
 #### `Config` type with custom engine
 
-If you've swapped the engine into another Marpit based engine, you also can provide better suggestion for `options` field by passing the engine type to generics.
+If you've swapped the engine into another Marpit based engine, you can provide better suggestion for `options` field by passing the engine type to generics.
 
 ```javascript
 /** @type {import('@marp-team/marp-cli').Config<typeof import('@marp-team/marpit').Marpit>} */
@@ -648,6 +658,25 @@ const config = {
 }
 
 export default config
+```
+
+#### TypeScript (`marp.config.ts`)
+
+If you installed `typescript` into your local project together with Marp CLI, you can write a config by TypeScript `marp.config.ts`. Marp CLI will try to transpile `.ts` with the project configuration `tsconfig.json`.
+
+In TypeScript configuration, you can specify the custom engine as the generics for `defineConfig` helper, like this:
+
+```typescript
+// marp.config.ts
+import { Marpit } from '@marp-team/marpit'
+import { defineConfig } from '@marp-team/marp-cli'
+
+export default defineConfig<typeof Marpit>({
+  engine: Marpit,
+  options: {
+    // Suggest only Marpit constructor options
+  },
+})
 ```
 
 ## API _(EXPERIMENTAL)_
