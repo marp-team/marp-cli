@@ -4,7 +4,10 @@
 
 ### Changed
 
+- Upgrade Marpit to [v2.5.3](https://github.com/marp-team/marpit/releases/tag/v2.5.3) ([#548](https://github.com/marp-team/marp-cli/pull/548))
+- Upgrade Marp Core to [v3.8.1](https://github.com/marp-team/marp-core/releases/v3.8.1) ([#548](https://github.com/marp-team/marp-cli/pull/548))
 - Upgrade development Node.js LTS to v18.18.0 ([#547](https://github.com/marp-team/marp-cli/pull/547))
+- Upgrade dependent packages to the latest versions ([#548](https://github.com/marp-team/marp-cli/pull/548))
 
 ## v3.2.1 - 2023-08-24
 
