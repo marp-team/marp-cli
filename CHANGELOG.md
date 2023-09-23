@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Upgrade development Node.js LTS to v18.18.0 ([#547](https://github.com/marp-team/marp-cli/pull/547))
+
 ## v3.2.1 - 2023-08-24
 
 ### Added
