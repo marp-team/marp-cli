@@ -75,16 +75,11 @@ export const generatePuppeteerDataDirPath = async (
 export const generatePuppeteerLaunchArgs = async () => {
   const args = new Set<string>(['--export-tagged-pdf', '--test-type'])
 
-  // Docker environment and WSL environment need to disable sandbox. :(
-  if (isInsideContainer() || (await isWSL())) args.add('--no-sandbox')
+  // Docker environment and WSL environment always need to disable sandbox
+  if (process.env.CHROME_NO_SANDBOX || isInsideContainer() || (await isWSL()))
+    args.add('--no-sandbox')
 
-  // Workaround for Chrome 73 in docker and unit testing with CircleCI
-  // https://github.com/GoogleChrome/puppeteer/issues/3774
-  if (isInsideContainer() || process.env.CI)
-    args.add('--disable-features=VizDisplayCompositor')
-
-  // Enable View transitions API
-  if (!process.env.CI) args.add('--enable-blink-features=ViewTransition')
+  args.add('--enable-blink-features=ViewTransition')
 
   // LayoutNG Printing
   if (process.env.CHROME_LAYOUTNG_PRINTING)

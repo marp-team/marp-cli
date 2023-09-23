@@ -151,7 +151,18 @@ describe('#generatePuppeteerLaunchArgs', () => {
     }
   })
 
-  it('uses specific settings if running within a container image', async () => {
+  it('disables sandbox if defined CHROME_NO_SANDBOX environment value', async () => {
+    try {
+      process.env.CHROME_NO_SANDBOX = '1'
+
+      const args = await puppeteerUtils().generatePuppeteerLaunchArgs()
+      expect(args.args).toContain('--no-sandbox')
+    } finally {
+      delete process.env.CHROME_NO_SANDBOX
+    }
+  })
+
+  it('disables sandbox if running within a container image', async () => {
     jest.spyOn(container(), 'isInsideContainer').mockImplementation(() => true)
     jest
       .spyOn(chromeFinder(), 'findChromeInstallation')
@@ -159,7 +170,6 @@ describe('#generatePuppeteerLaunchArgs', () => {
 
     const args = await puppeteerUtils().generatePuppeteerLaunchArgs()
     expect(args.args).toContain('--no-sandbox')
-    expect(args.args).toContain('--disable-features=VizDisplayCompositor')
   })
 
   it("ignores puppeteer's --disable-extensions option if defined CHROME_ENABLE_EXTENSIONS environment value", async () => {
