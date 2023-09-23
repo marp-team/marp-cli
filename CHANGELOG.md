@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Added
+
+- Support the project configuration file written in TypeScript `marp.config.ts` ([#548](https://github.com/marp-team/marp-cli/pull/548), [#549](https://github.com/marp-team/marp-cli/pull/549))
+- `defineConfig` helper for writing typed configuration ([#549](https://github.com/marp-team/marp-cli/pull/549))
+
 ### Changed
 
 - Upgrade Marpit to [v2.5.3](https://github.com/marp-team/marpit/releases/tag/v2.5.3) ([#548](https://github.com/marp-team/marp-cli/pull/548))
