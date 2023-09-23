@@ -13,9 +13,9 @@ export const findAccessiblePath = (paths: string[]): string | undefined =>
     return false
   })
 
-const linux = (): string | undefined => {
+const linux = async (): Promise<string | undefined> => {
   // WSL 1 should find Edge executable from host OS
-  if (isWSL() === 1) {
+  if ((await isWSL()) === 1) {
     const localAppData = resolveWindowsEnvSync('LOCALAPPDATA')
 
     return win32({
@@ -70,8 +70,8 @@ const win32 = ({
   )
 }
 
-export const findEdgeInstallation = (): string | undefined => {
-  if (process.platform === 'linux') return linux()
+export const findEdgeInstallation = async (): Promise<string | undefined> => {
+  if (process.platform === 'linux') return await linux()
   if (process.platform === 'darwin') return darwin()
   if (process.platform === 'win32') return win32()
 

@@ -39,7 +39,7 @@ describe('#findEdgeInstallation', () => {
       Object.defineProperty(process, 'platform', { value: 'win32' })
     })
 
-    it('finds out the first accessible Edge from 3 locations', () => {
+    it('finds out the first accessible Edge from 3 locations', async () => {
       const currentEnv = process.env
 
       const programFiles = path.join('C:', 'Mock', 'Program Files')
@@ -57,7 +57,7 @@ describe('#findEdgeInstallation', () => {
             () => 'C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe'
           )
 
-        expect(edgeFinder.findEdgeInstallation()).toBe(
+        expect(await edgeFinder.findEdgeInstallation()).toBe(
           'C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe'
         )
         expect(findAccessiblePath.mock.calls[0][0]).toStrictEqual([
@@ -90,14 +90,14 @@ describe('#findEdgeInstallation', () => {
       Object.defineProperty(process, 'platform', { value: 'darwin' })
     })
 
-    it('finds out the first accessible Edge from specific paths', () => {
+    it('finds out the first accessible Edge from specific paths', async () => {
       const findAccessiblePath = jest
         .spyOn(edgeFinder, 'findAccessiblePath')
         .mockImplementation(
           () => '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge'
         )
 
-      expect(edgeFinder.findEdgeInstallation()).toBe(
+      expect(await edgeFinder.findEdgeInstallation()).toBe(
         '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge'
       )
       expect(findAccessiblePath.mock.calls[0][0]).toMatchInlineSnapshot(`
@@ -117,12 +117,12 @@ describe('#findEdgeInstallation', () => {
       Object.defineProperty(process, 'platform', { value: 'linux' })
     })
 
-    it('finds out the first accessible Edge from specific paths', () => {
+    it('finds out the first accessible Edge from specific paths', async () => {
       const findAccessiblePath = jest
         .spyOn(edgeFinder, 'findAccessiblePath')
         .mockImplementation(() => '/opt/microsoft/msedge/msedge')
 
-      expect(edgeFinder.findEdgeInstallation()).toBe(
+      expect(await edgeFinder.findEdgeInstallation()).toBe(
         '/opt/microsoft/msedge/msedge'
       )
       expect(findAccessiblePath.mock.calls[0][0]).toMatchInlineSnapshot(`
@@ -136,9 +136,11 @@ describe('#findEdgeInstallation', () => {
     })
 
     describe('on Windows WSL', () => {
-      beforeEach(() => jest.spyOn(wsl, 'isWSL').mockImplementation(() => 1))
+      beforeEach(() =>
+        jest.spyOn(wsl, 'isWSL').mockImplementation(async () => 1)
+      )
 
-      it('finds out the first accessible Edge from mounted Windows location', () => {
+      it('finds out the first accessible Edge from mounted Windows location', async () => {
         const findAccessiblePath = jest
           .spyOn(edgeFinder, 'findAccessiblePath')
           .mockImplementation()
@@ -151,7 +153,7 @@ describe('#findEdgeInstallation', () => {
           .spyOn(wsl, 'resolveWSLPathToGuestSync')
           .mockImplementation(() => '/mnt/c/mock/Local')
 
-        edgeFinder.findEdgeInstallation()
+        await edgeFinder.findEdgeInstallation()
         expect(resolveWindowsEnvSync).toHaveBeenCalledWith('LOCALAPPDATA')
         expect(resolveWSLPathToGuestSync).toHaveBeenCalledWith(
           'C:\\Mock\\Local'
@@ -180,8 +182,8 @@ describe('#findEdgeInstallation', () => {
       Object.defineProperty(process, 'platform', { value: 'unknown' })
     })
 
-    it('returns undefined', () => {
-      expect(edgeFinder.findEdgeInstallation()).toBeUndefined()
+    it('returns undefined', async () => {
+      expect(await edgeFinder.findEdgeInstallation()).toBeUndefined()
     })
   })
 })

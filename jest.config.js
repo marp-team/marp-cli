@@ -10,6 +10,7 @@ const esModules = [
   'import-meta-resolve',
   'is-inside-container',
   'is-docker',
+  'is-wsl',
   'lighthouse-logger',
   'locate-path',
   'nanoid',

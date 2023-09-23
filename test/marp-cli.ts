@@ -3,7 +3,7 @@ import fs from 'fs'
 import path from 'path'
 import { version as coreVersion } from '@marp-team/marp-core/package.json'
 import { version as marpitVersion } from '@marp-team/marpit/package.json'
-import { Explorer } from 'cosmiconfig/dist/Explorer'
+import * as cosmiconfigExplorer from 'cosmiconfig/dist/Explorer'
 import getStdin from 'get-stdin'
 import stripAnsi from 'strip-ansi'
 import { version as cliVersion } from '../package.json'
@@ -24,6 +24,7 @@ import * as container from '../src/utils/container'
 import * as version from '../src/version'
 import { Watcher } from '../src/watcher'
 
+const { Explorer } = cosmiconfigExplorer as any
 const observationHelpers: ObservationHelper[] = []
 const previewEmitter = new EventEmitter() as Preview
 

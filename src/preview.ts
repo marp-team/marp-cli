@@ -156,7 +156,7 @@ export class Preview extends (EventEmitter as new () => TypedEmitter<Preview.Eve
       headless: process.env.NODE_ENV === 'test' ? enableHeadless() : false,
       ignoreDefaultArgs: ['--enable-automation'],
       userDataDir: await generatePuppeteerDataDirPath('marp-cli-preview', {
-        wslHost: isChromeInWSLHost(baseArgs.executablePath),
+        wslHost: await isChromeInWSLHost(baseArgs.executablePath),
       }),
     })
 
