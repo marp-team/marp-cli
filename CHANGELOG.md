@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v3.3.0 - 2023-09-23
+
 ### Added
 
 - Support the project configuration file written in TypeScript `marp.config.ts` ([#548](https://github.com/marp-team/marp-cli/pull/548), [#549](https://github.com/marp-team/marp-cli/pull/549))
