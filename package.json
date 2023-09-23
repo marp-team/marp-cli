@@ -117,7 +117,7 @@
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "jest-junit": "^16.0.0",
-    "nanoid": "^5.0.1",
+    "nanoid": "^4.0.2",
     "npm-run-all2": "^6.0.6",
     "os-locale": "^6.0.2",
     "pdf-lib": "^1.17.1",
