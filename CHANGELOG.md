@@ -6,6 +6,7 @@
 
 - Support the project configuration file written in TypeScript `marp.config.ts` ([#548](https://github.com/marp-team/marp-cli/pull/548), [#549](https://github.com/marp-team/marp-cli/pull/549))
 - `defineConfig` helper for writing typed configuration ([#549](https://github.com/marp-team/marp-cli/pull/549))
+- Recognize `CHROME_NO_SANDBOX` env to allow opt-out of the Chrome/Chromium sandbox during conversion explicitly ([#543](https://github.com/marp-team/marp-cli/issues/543), [#550](https://github.com/marp-team/marp-cli/pull/550))
 
 ### Changed
 
