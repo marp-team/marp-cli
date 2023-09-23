@@ -1154,6 +1154,30 @@ describe('Marp CLI', () => {
           }
         })
       })
+
+      describe('with TypeScript', () => {
+        it('allows loading config with TypeScript', async () => {
+          const debug = jest.spyOn(console, 'debug').mockImplementation()
+          const log = jest.spyOn(console, 'log').mockImplementation()
+
+          try {
+            expect(
+              await marpCli([
+                '-v',
+                '-c',
+                assetFn('_configs/typescript/marp.config.ts'),
+              ])
+            ).toBe(0)
+
+            expect(debug).toHaveBeenCalledWith(
+              expect.stringContaining('loaded')
+            )
+          } finally {
+            debug.mockRestore()
+            log.mockRestore()
+          }
+        })
+      })
     })
 
     describe('with --preview / -p option', () => {
