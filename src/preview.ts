@@ -4,7 +4,7 @@ import { nanoid } from 'nanoid'
 import type { Page, Browser, Target } from 'puppeteer-core'
 import TypedEmitter from 'typed-emitter'
 import { ConvertType, mimeTypes } from './converter'
-import { error } from './error'
+import { CLIError, error } from './error'
 import { File, FileType } from './file'
 import {
   generatePuppeteerDataDirPath,
@@ -93,7 +93,24 @@ export class Preview extends (EventEmitter as new () => TypedEmitter<Preview.Eve
         /* c8 ignore stop */
       },
       load: async (uri: string) => {
-        await page.goto(uri, { timeout: 0, waitUntil: 'domcontentloaded' })
+        if (uri.startsWith('data:')) {
+          // A data URI with a huge size may fail opening with a browser due to the limitation of URL length.
+          // If received a data URI, try to open it with a converted Blob URL.
+          await Promise.all([
+            page.waitForNavigation({
+              timeout: 5000,
+              waitUntil: 'domcontentloaded',
+            }),
+            page.evaluate(async (uri) => {
+              const res = await fetch(uri, { cache: 'no-cache' })
+              const blob = await res.blob()
+              location.href = URL.createObjectURL(blob)
+            }, uri),
+          ])
+        } else {
+          await page.goto(uri, { timeout: 0, waitUntil: 'domcontentloaded' })
+        }
+
         await page
           .target()
           .createCDPSession()
@@ -126,13 +143,12 @@ export class Preview extends (EventEmitter as new () => TypedEmitter<Preview.Eve
           pptr.on('targetcreated', idMatcher)
 
           // Open new window with specific identifier
-          ;(async () => {
-            for (const page of await pptr.pages()) {
-              await page.evaluate(
-                `window.open('about:blank?__marp_cli_id=${id}', '', 'width=${this.options.width},height=${this.options.height}')`
-              )
-              break
-            }
+          void (async () => {
+            const [page] = await pptr.pages()
+
+            await page.evaluate(
+              `window.open('about:blank?__marp_cli_id=${id}', '', 'width=${this.options.width},height=${this.options.height}')`
+            )
           })()
         })
       )
