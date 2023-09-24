@@ -4,7 +4,7 @@ import { nanoid } from 'nanoid'
 import type { Page, Browser, Target } from 'puppeteer-core'
 import TypedEmitter from 'typed-emitter'
 import { ConvertType, mimeTypes } from './converter'
-import { CLIError, error } from './error'
+import { error } from './error'
 import { File, FileType } from './file'
 import {
   generatePuppeteerDataDirPath,
