@@ -14,6 +14,8 @@ import {
 } from './utils/puppeteer'
 import { isChromeInWSLHost } from './utils/wsl'
 
+const emptyPageURI = `data:text/html;base64,PHRpdGxlPk1hcnAgQ0xJPC90aXRsZT4` // <title>Marp CLI</title>
+
 export namespace Preview {
   // eslint-disable-next-line @typescript-eslint/consistent-type-definitions -- TypedEmitter requires type definition instead of interface
   export type Events = {
@@ -165,10 +167,10 @@ export class Preview extends (EventEmitter as new () => TypedEmitter<Preview.Eve
       ...baseArgs,
       args: [
         ...baseArgs.args,
-        `--app=data:text/html,<title>${encodeURIComponent('Marp CLI')}</title>`,
+        `--app=${emptyPageURI}`,
         `--window-size=${this.options.width},${this.options.height}`,
       ],
-      defaultViewport: null as any,
+      defaultViewport: null,
       headless: process.env.NODE_ENV === 'test' ? enableHeadless() : false,
       ignoreDefaultArgs: ['--enable-automation'],
       userDataDir: await generatePuppeteerDataDirPath('marp-cli-preview', {
@@ -193,6 +195,7 @@ export class Preview extends (EventEmitter as new () => TypedEmitter<Preview.Eve
     /* c8 ignore start */
     if (process.platform === 'darwin') {
       // An initial app window is not using in macOS for correct handling activation from Dock
+      await page.goto(emptyPageURI, { waitUntil: 'domcontentloaded' })
       windowObject = (await this.createWindow()) || undefined
       await page.close()
     }
