@@ -4,7 +4,8 @@
 
 ### Fixed
 
-- Improve stability of in-memory preview for large content  ([#553](https://github.com/marp-team/marp-cli/pull/553))
+- Improve stability of in-memory preview for large content ([#553](https://github.com/marp-team/marp-cli/pull/553))
+- Accessibility: Render CLI's kind output in a specific color instead of ANSI color ([#552](https://github.com/marp-team/marp-cli/issues/552), [#554](https://github.com/marp-team/marp-cli/pull/554))
 
 ## v3.3.0 - 2023-09-23
 

@@ -1,7 +1,9 @@
-import chalk from 'chalk'
+import chalk, { supportsColorStderr } from 'chalk'
 import stripAnsi from 'strip-ansi'
 import wrapAnsi from 'wrap-ansi'
 import { terminalWidth } from 'yargs'
+
+const { has16m, has256 } = { ...supportsColorStderr } // Workaround for type error
 
 interface CLIOption {
   singleLine?: boolean
@@ -27,16 +29,27 @@ export function silence(value: boolean) {
 }
 
 export function info(message: string, opts: CLIOption = {}): void {
+  if (silent) return
+
+  const highlight =
+    has16m || has256 ? chalk.bgHex('#67b8e3').hex('#000') : chalk.inverse
+
   // Use console.warn to output into stderr
-  if (!silent)
-    console.warn(messageBlock(chalk.bgCyan.black('[  INFO ]'), message, opts))
+  console.warn(messageBlock(highlight`[  INFO ]`, message, opts))
 }
 
 export function warn(message: string, opts: CLIOption = {}): void {
-  if (!silent)
-    console.warn(messageBlock(chalk.bgYellow.black('[  WARN ]'), message, opts))
+  if (silent) return
+
+  const highlight =
+    has16m || has256 ? chalk.bgHex('#fc0').hex('#000') : chalk.inverse
+
+  console.warn(messageBlock(highlight`[  WARN ]`, message, opts))
 }
 
 export function error(message: string, opts: CLIOption = {}): void {
-  console.error(messageBlock(chalk.bgRed.white('[ ERROR ]'), message, opts))
+  const highlight =
+    has16m || has256 ? chalk.bgHex('#c00').hex('#fff') : chalk.inverse
+
+  console.error(messageBlock(highlight`[ ERROR ]`, message, opts))
 }
