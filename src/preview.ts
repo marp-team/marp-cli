@@ -14,6 +14,8 @@ import {
 } from './utils/puppeteer'
 import { isChromeInWSLHost } from './utils/wsl'
 
+const emptyPageURI = `data:text/html;base64,PHRpdGxlPk1hcnAgQ0xJPC90aXRsZT4` // <title>Marp CLI</title>
+
 export namespace Preview {
   // eslint-disable-next-line @typescript-eslint/consistent-type-definitions -- TypedEmitter requires type definition instead of interface
   export type Events = {
@@ -93,7 +95,24 @@ export class Preview extends (EventEmitter as new () => TypedEmitter<Preview.Eve
         /* c8 ignore stop */
       },
       load: async (uri: string) => {
-        await page.goto(uri, { timeout: 0, waitUntil: 'domcontentloaded' })
+        if (uri.startsWith('data:')) {
+          // A data URI with a huge size may fail opening with a browser due to the limitation of URL length.
+          // If received a data URI, try to open it with a converted Blob URL.
+          await Promise.all([
+            page.waitForNavigation({
+              timeout: 5000,
+              waitUntil: 'domcontentloaded',
+            }),
+            page.evaluate(async (uri) => {
+              const res = await fetch(uri, { cache: 'no-cache' })
+              const blob = await res.blob()
+              location.href = URL.createObjectURL(blob)
+            }, uri),
+          ])
+        } else {
+          await page.goto(uri, { timeout: 0, waitUntil: 'domcontentloaded' })
+        }
+
         await page
           .target()
           .createCDPSession()
@@ -126,13 +145,12 @@ export class Preview extends (EventEmitter as new () => TypedEmitter<Preview.Eve
           pptr.on('targetcreated', idMatcher)
 
           // Open new window with specific identifier
-          ;(async () => {
-            for (const page of await pptr.pages()) {
-              await page.evaluate(
-                `window.open('about:blank?__marp_cli_id=${id}', '', 'width=${this.options.width},height=${this.options.height}')`
-              )
-              break
-            }
+          void (async () => {
+            const [page] = await pptr.pages()
+
+            await page.evaluate(
+              `window.open('about:blank?__marp_cli_id=${id}', '', 'width=${this.options.width},height=${this.options.height}')`
+            )
           })()
         })
       )
@@ -149,10 +167,10 @@ export class Preview extends (EventEmitter as new () => TypedEmitter<Preview.Eve
       ...baseArgs,
       args: [
         ...baseArgs.args,
-        `--app=data:text/html,<title>${encodeURIComponent('Marp CLI')}</title>`,
+        `--app=${emptyPageURI}`,
         `--window-size=${this.options.width},${this.options.height}`,
       ],
-      defaultViewport: null as any,
+      defaultViewport: null,
       headless: process.env.NODE_ENV === 'test' ? enableHeadless() : false,
       ignoreDefaultArgs: ['--enable-automation'],
       userDataDir: await generatePuppeteerDataDirPath('marp-cli-preview', {
@@ -171,6 +189,7 @@ export class Preview extends (EventEmitter as new () => TypedEmitter<Preview.Eve
     })
 
     const [page] = await this.puppeteerInternal.pages()
+    await page.goto(emptyPageURI, { waitUntil: 'domcontentloaded' })
 
     let windowObject: Preview.Window | undefined
 

@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Improve stability of in-memory preview for large content  ([#553](https://github.com/marp-team/marp-cli/pull/553))
+
 ## v3.3.0 - 2023-09-23
 
 ### Added
