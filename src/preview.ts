@@ -189,13 +189,13 @@ export class Preview extends (EventEmitter as new () => TypedEmitter<Preview.Eve
     })
 
     const [page] = await this.puppeteerInternal.pages()
+    await page.goto(emptyPageURI, { waitUntil: 'domcontentloaded' })
 
     let windowObject: Preview.Window | undefined
 
     /* c8 ignore start */
     if (process.platform === 'darwin') {
       // An initial app window is not using in macOS for correct handling activation from Dock
-      await page.goto(emptyPageURI, { waitUntil: 'domcontentloaded' })
       windowObject = (await this.createWindow()) || undefined
       await page.close()
     }
