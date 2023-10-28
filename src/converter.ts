@@ -135,7 +135,7 @@ export class Converter {
       fallbackToPrintableTemplate = false,
     }: { fallbackToPrintableTemplate?: boolean } = {}
   ): Promise<TemplateResult> {
-    const { lang, globalDirectives, type } = this.options
+    const { globalDirectives, type } = this.options
 
     const isFile = (f: File | undefined): f is File =>
       !!f && f.type === FileType.File
@@ -159,7 +159,6 @@ export class Converter {
 
     return await template({
       ...(this.options.templateOption || {}),
-      lang,
       base: await resolveBase(file),
       notifyWS:
         isFile(file) && this.options.watch && type === ConvertType.html
@@ -478,8 +477,8 @@ export class Converter {
   private async generateEngine(
     mergeOptions: MarpitOptions
   ): Promise<Marpit & { [engineInfo]?: EngineInfo }> {
-    const { html, options } = this.options
-    const opts = { ...options, ...mergeOptions, html }
+    const { html, lang, options } = this.options
+    const opts = { ...options, lang, ...mergeOptions, html }
 
     let engine = this.options.engine
 

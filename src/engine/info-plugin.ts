@@ -3,6 +3,7 @@ export interface EngineInfo {
   description: string | undefined
   image: string | undefined
   keywords: string[] | undefined
+  lang: string | undefined
   length: number
   size: { height: number; width: number }
   theme: string | undefined
@@ -28,6 +29,7 @@ export default function infoPlugin(md: any) {
       description: globalDirectives.marpCLIDescription,
       image: globalDirectives.marpCLIImage,
       keywords: globalDirectives.marpCLIKeywords,
+      lang: globalDirectives.lang || marpit.options.lang,
       title: globalDirectives.marpCLITitle,
       url: globalDirectives.marpCLIURL,
       size: {

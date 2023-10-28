@@ -22,7 +22,6 @@ interface TemplateRendererOptions extends Options {
 
 interface TemplateCoreOption {
   base?: string
-  lang: string
   notifyWS?: string
   renderer: (
     tplOpts: TemplateRendererOptions
@@ -36,6 +35,7 @@ export interface TemplateMeta {
   keywords: string[] | undefined
   title: string | undefined
   url: string | undefined
+  lang: string | undefined
 }
 
 interface RenderedSize {
