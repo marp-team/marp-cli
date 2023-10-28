@@ -8,6 +8,10 @@
 - Upgrade Marp Core to [v3.9.0](https://github.com/marp-team/marp-core/releases/v3.9.0) ([#557](https://github.com/marp-team/marp-cli/pull/557))
 - Upgrade dependent packages to the latest versions ([#557](https://github.com/marp-team/marp-cli/pull/557))
 
+### Fixed
+
+- Enable PNG image transparency ([#555](https://github.com/marp-team/marp-cli/issues/555), [#556](https://github.com/marp-team/marp-cli/pull/556))
+
 ## v3.3.1 - 2023-10-01
 
 ### Fixed
