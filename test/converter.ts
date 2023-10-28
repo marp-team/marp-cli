@@ -132,6 +132,11 @@ describe('Converter', () => {
       expect(result).toContain('<html lang="zh">')
     })
 
+    it('prefers lang specified in Markdown than lang option', async () => {
+      const { result } = await instance().convert('<!-- lang: fr -->')
+      expect(result).toContain('<html lang="fr">')
+    })
+
     it("overrides html option by converter's html option", async () => {
       const defaultHtml = (await instance().convert('<i><br></i>')).rendered
       expect(defaultHtml.html).toContain('&lt;i&gt;<br />&lt;/i&gt;')

@@ -5,8 +5,11 @@
 ### Changed
 
 - Upgrade Marpit to [v2.6.1](https://github.com/marp-team/marpit/releases/tag/v2.6.1) ([#557](https://github.com/marp-team/marp-cli/pull/557))
+  - Added `lang` global directive
 - Upgrade Marp Core to [v3.9.0](https://github.com/marp-team/marp-core/releases/v3.9.0) ([#557](https://github.com/marp-team/marp-cli/pull/557))
+  - Enabled [CSS container query](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_container_queries) support for child elements of `section` element by default
 - Upgrade dependent packages to the latest versions ([#557](https://github.com/marp-team/marp-cli/pull/557))
+- Reflect the language defined in `lang` global directive to `<html>` element ([#542](https://github.com/marp-team/marp-cli/issues/542), [#558](https://github.com/marp-team/marp-cli/pull/558))
 
 ### Fixed
 
