@@ -110,6 +110,10 @@
 
 - Time out of conversion powered by Chromium in v2.5.0 Docker image ([#520](https://github.com/marp-team/marp-cli/issues/520))
 
+---
+
+<details><summary>History of past major versions</summary>
+
 ## v2.5.0 - 2023-04-16
 
 ### Added
@@ -1160,10 +1164,6 @@
 ### Changed
 
 - Upgrade dependent packages to latest version, included [Marpit v0.4.1](https://github.com/marp-team/marpit/releases/tag/v0.4.1) and [Marp Core v0.3.1](https://github.com/marp-team/marp-core/releases/tag/v0.3.1) ([#54](https://github.com/marp-team/marp-cli/pull/54))
-
----
-
-<details><summary>History of pre-release versions</summary>
 
 ## v0.0.15 - 2018-12-06
 
