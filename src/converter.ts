@@ -478,7 +478,7 @@ export class Converter {
     mergeOptions: MarpitOptions
   ): Promise<Marpit & { [engineInfo]?: EngineInfo }> {
     const { html, lang, options } = this.options
-    const opts = { ...options, lang, ...mergeOptions, html }
+    const opts = { lang, ...options, ...mergeOptions, html }
 
     let engine = this.options.engine
 
