@@ -11,6 +11,10 @@
 - Upgrade dependent packages to the latest versions ([#557](https://github.com/marp-team/marp-cli/pull/557))
 - Reflect the language defined in `lang` global directive to `<html>` element ([#542](https://github.com/marp-team/marp-cli/issues/542), [#558](https://github.com/marp-team/marp-cli/pull/558))
 
+### Added
+
+- CI testing against Node.js v20 ([#559](https://github.com/marp-team/marp-cli/pull/559))
+
 ### Fixed
 
 - Enable PNG image transparency ([#555](https://github.com/marp-team/marp-cli/issues/555), [#556](https://github.com/marp-team/marp-cli/pull/556))
