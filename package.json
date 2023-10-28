@@ -157,7 +157,6 @@
     "chokidar": "^3.5.3",
     "cosmiconfig": "^8.3.6",
     "puppeteer-core": "21.4.1",
-    "remove": "^0.1.5",
     "serve-index": "^1.9.1",
     "tmp": "^0.2.1",
     "ws": "^8.14.2",
