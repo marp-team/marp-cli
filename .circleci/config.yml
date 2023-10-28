@@ -203,6 +203,15 @@ jobs:
       - test:
           browser: true
 
+  test-node20:
+    executor:
+      name: node
+      browser: true
+      version: '20.9'
+    steps:
+      - test:
+          browser: true
+
   docker-build-latest:
     executor: node
     steps:
@@ -238,12 +247,16 @@ workflows:
       - test-node18:
           requires:
             - audit
+      - test-node20:
+          requires:
+            - audit
 
       # Docker (latest)
       - docker-build-latest:
           requires:
             - test-node16
             - test-node18
+            - test-node20
           filters:
             branches:
               only: main
