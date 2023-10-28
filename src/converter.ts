@@ -391,6 +391,13 @@ export class Converter {
       await render()
       await page.emulateMediaType('print')
 
+      if (opts.type === ConvertType.png) {
+        // Enable transparency
+        await page.addStyleTag({
+          content: ':root,body { background:transparent !important; }',
+        })
+      }
+
       const screenshot = async (pageNumber = 1) => {
         const clip = {
           x: 0,
@@ -405,7 +412,11 @@ export class Converter {
             type: 'jpeg',
           })
 
-        return await page.screenshot({ clip, type: 'png' })
+        return await page.screenshot({
+          clip,
+          omitBackground: true,
+          type: 'png',
+        })
       }
 
       if (opts.pages) {
