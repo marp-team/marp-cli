@@ -28,6 +28,9 @@ executors:
 commands:
   install:
     parameters:
+      force:
+        type: boolean
+        default: false
       postinstall:
         type: steps
         default: []
@@ -45,7 +48,7 @@ commands:
             - v2.4-dependencies-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}-
             - v2.4-dependencies-{{ .Environment.CIRCLE_JOB }}-
 
-      - run: yarn install --frozen-lockfile
+      - run: yarn install --frozen-lockfile <<# parameters.force >>--ignore-engines<</ parameters.force >>
       - steps: << parameters.postinstall >>
 
       - save_cache:
@@ -65,11 +68,15 @@ commands:
       browser:
         type: boolean
         default: false
+      force:
+        type: boolean
+        default: false
     steps:
       - run: node --version
 
       - checkout
-      - install
+      - install:
+          force: << parameters.force >>
 
       - when:
           condition: << parameters.browser >>
@@ -185,6 +192,7 @@ jobs:
       version: '16.18'
     steps:
       - test:
+          force: true
           browser: true
 
   test-node18:
