@@ -377,7 +377,9 @@ export class MarpCLIConfig {
         return {
           advice: { use: '--theme-set', insteadOf: '--theme' },
           name: this.args.theme,
-          path: path.resolve(this.args.theme),
+          path: this.args.theme.includes(`http`)
+            ? this.args.theme
+            : path.resolve(this.args.theme),
         }
 
       if (this.conf.theme)
