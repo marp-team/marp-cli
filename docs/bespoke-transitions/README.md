@@ -21,7 +21,7 @@ To show transition animations, a viewer has to show HTML slide in the browser wh
 - **Chrome**: ✅ (111-)
 - **Edge**: ✅ (111-)
 - **Firefox**: :x:
-- **Safari**: :x:
+- **Safari**: Testable in [Safari Technology Preview 192](https://webkit.org/blog/15260/release-notes-for-safari-technology-preview-192/) and later
 
 ## `transition` local directive
 
