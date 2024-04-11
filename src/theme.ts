@@ -3,7 +3,7 @@ import fs from 'fs'
 import path from 'path'
 import { Marpit } from '@marp-team/marpit'
 import { isDynamicPattern } from 'globby'
-import { warn } from './cli'
+import { warn, info } from './cli'
 import { isError } from './error'
 import { File } from './file'
 
@@ -33,7 +33,23 @@ export class Theme {
   }
 
   async load() {
-    this.readBuffer = await fs.promises.readFile(this.filename)
+    if (this.isUrl(this.filename)) {
+      // Fetch the content from a remote URL
+      const response = await fetch(this.filename)
+      this.readBuffer = Buffer.from(await response.text())
+    } else {
+      // Read the content from a local file
+      this.readBuffer = await fs.promises.readFile(this.filename)
+    }
+  }
+
+  private isUrl(filename: string): boolean {
+    try {
+      new URL(filename)
+      return true
+    } catch {
+      return false
+    }
   }
 
   private genUniqName() {
