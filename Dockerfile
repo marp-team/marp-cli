@@ -29,6 +29,7 @@ ENV CHROME_PATH /usr/bin/chromium-browser
 
 WORKDIR /home/marp/.cli
 COPY --chown=marp:marp . .
+RUN npm install
 RUN yarn install --production --frozen-lockfile && yarn cache clean && node marp-cli.js --version
 
 # Setup workspace for user
