@@ -8,11 +8,14 @@ env:
   #   https://github.com/orgs/community/discussions/45969
   BUILDX_NO_DEFAULT_ATTESTATIONS: 1
 
+# on:
+#   push:
+#     branches:
+#       - main
+#       - add-ghcr-containner
 on:
-  push:
-    branches:
-      - main
-      - add-ghcr-containner
+  - pull_request
+  - push
 
 jobs:
   build_container_image:
