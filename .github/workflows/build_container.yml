@@ -46,6 +46,11 @@ jobs:
           tags: |
             type=raw,value=latest
             type=raw,value=${{ env.TAGS }}
+      # https://github.com/marp-team/marp-cli/issues/515
+      - name: build MarpCLI
+        run: |
+          yarn install
+          yarn build
       # build and push the image
       - name: Build and push
         uses: docker/build-push-action@v4
