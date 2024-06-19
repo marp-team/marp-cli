@@ -30,6 +30,13 @@ jobs:
         with:
           # platforms: "linux/arm64/v8,linux/amd64"
           platforms: "linux/amd64"
+      # https://github.com/marp-team/marp-cli/issues/515
+      - name: build MarpCLI
+        run: |
+          yarn install
+          yarn build
+      - name: Verify Build Output
+        run: ls -alh lib/
       - name: Setup Docker buildX for multi-arch builds 🏗️
         uses: docker/setup-buildx-action@v3
       - name: Login to the container registry 🗝️
@@ -46,17 +53,6 @@ jobs:
           tags: |
             type=raw,value=latest
             type=raw,value=${{ env.TAGS }}
-      # https://github.com/marp-team/marp-cli/issues/515
-      # - name: build MarpCLI
-      #   run: |
-      #     yarn install
-      #     yarn build
-      - name: Install dependencies
-        run: yarn install
-      - name: Build MarpCLI
-        run: yarn build
-      - name: Verify Build Output
-        run: ls -alh lib/
       # build and push the image
       - name: Build and push
         uses: docker/build-push-action@v4
