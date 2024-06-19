@@ -58,6 +58,7 @@ jobs:
         uses: docker/build-push-action@v4
         if: github.repository_owner == 'ankudinov'
         with:
+          context: "{{defaultContext}}:/home/marp/.cli"
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
