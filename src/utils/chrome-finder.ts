@@ -8,6 +8,7 @@ import {
 } from 'chrome-launcher/dist/chrome-finder'
 import { parse as parsePlist } from 'fast-plist'
 import { isWSL } from './wsl'
+import { execFileSync } from 'child_process'
 
 const macAppDirectoryMatcher = /.app\/?$/
 
@@ -25,6 +26,8 @@ export const findChromeInstallation = async () => {
         return await withNormalizedChromePathForDarwin(() => [darwinFast()])
       case 'linux':
         return linux()
+      case 'freebsd':
+        return freebsd()
       case 'win32':
         return win32()
       // CI cannot test against WSL environment
@@ -93,4 +96,28 @@ export const withNormalizedChromePathForDarwin = async <T>(
       process.env.CHROME_PATH = originalChromePath
     }
   }
+}
+
+/**
+ * FreeBSD is not supported by chrome-launcher, so implement a simple chrome
+ * finder for FreeBSD ourselves.
+ */
+function freebsd(): string[] {
+  let paths: string[] = []
+
+  // Read CHROME_PATH from env.
+
+  if (process.env.CHROME_PATH) {
+    paths.push(process.env.CHROME_PATH)
+  }
+
+  // Look for chrome executable by using the which command.
+
+  const [path] = execFileSync('which', ['chrome']).toString().split('\n')
+
+  if (path) {
+    paths.push(path)
+  }
+
+  return paths
 }

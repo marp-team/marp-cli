@@ -106,7 +106,8 @@ export const generatePuppeteerLaunchArgs = async () => {
 
         // https://github.com/marp-team/marp-cli/issues/475
         // https://github.com/GoogleChrome/chrome-launcher/issues/278
-        const chromiumResolvable = process.platform === 'linux'
+        const chromiumResolvable =
+          process.platform === 'linux' || process.platform === 'freebsd'
 
         error(
           `You have to install Google Chrome${
