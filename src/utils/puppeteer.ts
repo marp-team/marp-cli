@@ -1,6 +1,7 @@
 import fs from 'fs'
 import os from 'os'
 import path from 'path'
+import { nanoid } from 'nanoid'
 import { launch } from 'puppeteer-core'
 import macDockIcon from '../assets/mac-dock-icon.png'
 import { warn } from '../cli'
@@ -9,7 +10,6 @@ import { findChromeInstallation } from './chrome-finder'
 import { isInsideContainer } from './container'
 import { findEdgeInstallation } from './edge-finder'
 import { isWSL, resolveWindowsEnv } from './wsl'
-import { nanoid } from 'nanoid'
 
 let executablePath: string | undefined | false = false
 let wslTmp: string | undefined
