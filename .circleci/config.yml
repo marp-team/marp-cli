@@ -63,7 +63,7 @@ commands:
           postinstall:
             - run: yarn -s check:audit
 
-  test:
+  prepare:
     parameters:
       browser:
         type: boolean
@@ -83,6 +83,8 @@ commands:
           steps:
             - browser-tools/install-chrome
 
+  lint:
+    steps:
       - run:
           name: Prettier formatting
           command: yarn check:format
@@ -99,6 +101,8 @@ commands:
           name: stylelint
           command: yarn lint:css
 
+  test:
+    steps:
       - run:
           name: Jest
           command: yarn test:coverage --ci -i --reporters=default --reporters=jest-junit
@@ -185,16 +189,16 @@ jobs:
     steps:
       - audit
 
-  # Testing
   test-node16:
     executor:
       name: node
       browser: true
       version: '16.20'
     steps:
-      - test:
+      - prepare:
           force: true
           browser: true
+      - test
 
   test-node18:
     executor:
@@ -202,17 +206,21 @@ jobs:
       browser: true
       version: '18.20'
     steps:
-      - test:
+      - prepare:
           force: true
           browser: true
+      - lint
+      - test
 
   test-node20:
     executor:
       name: node
       browser: true
     steps:
-      - test:
+      - prepare:
           browser: true
+      - lint
+      - test
 
   test-node22:
     executor:
@@ -220,8 +228,10 @@ jobs:
       browser: true
       version: '22.8'
     steps:
-      - test:
+      - prepare:
           browser: true
+      - lint
+      - test
 
   # Docker
   docker-build-latest:
