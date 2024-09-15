@@ -26,6 +26,8 @@ jobs:
         include:
           - node-version: '^16.20.2'
             force: true
+          - node-version: '^18.20.4'
+            force: true
 
     steps:
       # - name: Output concurrency group

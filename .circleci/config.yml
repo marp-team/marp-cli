@@ -203,6 +203,7 @@ jobs:
       version: '18.20'
     steps:
       - test:
+          force: true
           browser: true
 
   test-node20:
