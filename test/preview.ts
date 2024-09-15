@@ -4,7 +4,7 @@ import { CLIError } from '../src/error'
 import { File, FileType } from '../src/file'
 import { Preview, fileToURI } from '../src/preview'
 
-jest.mock('node:path')
+jest.mock('node:path', () => require('./__mocks__/node/path'))
 jest.setTimeout(40000)
 
 describe('Preview', () => {
