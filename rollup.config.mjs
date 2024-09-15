@@ -16,26 +16,23 @@ import pugPlugin from 'rollup-plugin-pug'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const require = createRequire(import.meta.url)
 
-const { default: builtinModules } = await import('builtin-modules')
 const { dependencies, name, version } = require('./package.json')
+const external = (id) =>
+  Object.keys(dependencies).some(
+    (dep) => dep === id || id.startsWith(`${dep}/`)
+  )
 
 const compact = !process.env.ROLLUP_WATCH
-
-const external = (deps) => (id) =>
-  deps.some((dep) => dep === id || id.startsWith(`${dep}/`))
 
 const plugins = (opts = {}) => [
   json({ preferConst: true }),
   alias({
-    entries: [
-      { find: /^node:(.+)$/, replacement: '$1' },
-      { find: 'jszip', replacement: 'jszip/dist/jszip.min.js' },
-    ],
+    entries: [{ find: 'jszip', replacement: 'jszip/dist/jszip.min.js' }],
   }),
   nodeResolve({
     browser: !!opts.browser,
+    preferBuiltins: !opts.browser,
     exportConditions: opts.browser ? [] : ['node'],
-    mainFields: ['module', 'jsnext:main', 'main'],
   }),
   replace({
     preventAssignment: true,
@@ -65,14 +62,11 @@ const plugins = (opts = {}) => [
 ]
 
 const browser = (opts = {}) => ({
-  external: external(Object.keys(dependencies)),
+  external,
   plugins: plugins({ ...opts, browser: true }),
 })
 
-const cli = {
-  external: external([...builtinModules, ...Object.keys(dependencies)]),
-  plugins: plugins(),
-}
+const cli = { external, plugins: plugins() }
 
 export default [
   {
