@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-namespace */
-import EventEmitter from 'events'
-import fs from 'fs'
-import { Server as HttpServer } from 'http'
-import path from 'path'
-import querystring from 'querystring'
-import url from 'url'
-import { promisify } from 'util'
+import EventEmitter from 'node:events'
+import fs from 'node:fs'
+import { Server as HttpServer } from 'node:http'
+import path from 'node:path'
+import querystring from 'node:querystring'
+import url from 'node:url'
+import { promisify } from 'node:util'
 import type { Express, Request, Response } from 'express'
 import serveIndex from 'serve-index'
 import TypedEmitter from 'typed-emitter'
@@ -224,9 +224,12 @@ export class Server extends (EventEmitter as new () => TypedEmitter<Server.Event
     const baseDir = path.resolve(this.inputDir)
     const targetPath = path.join(baseDir, decodeURIComponent(relativePath))
 
+    // This test is no longer covered by updated express, but still remaining for security
     if (!targetPath.startsWith(baseDir)) {
+      /* c8 ignore start */
       // Skip remaining process to prevent check for unexpected file and directory
       return { valid: false, path: targetPath }
+      /* c8 ignore end */
     }
 
     // Check file stat
@@ -234,7 +237,7 @@ export class Server extends (EventEmitter as new () => TypedEmitter<Server.Event
     try {
       stats = fetchedStats || (await fs.promises.stat(targetPath))
       valid = valid && !!stats?.isFile()
-    } catch (e: unknown) {
+    } catch {
       valid = false
     }
 

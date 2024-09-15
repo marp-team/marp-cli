@@ -11,13 +11,6 @@ interface TransitionCallbackOption {
   cond: (e: any) => boolean
 }
 
-interface ViewTransition {
-  finished: Promise<void>
-  ready: Promise<void>
-  skipTransition: () => void
-  updateCallbackDone: Promise<void>
-}
-
 export const transitionStyleId = '_tSId' as const
 
 const transitionApply = '_tA' as const
@@ -47,7 +40,7 @@ const reducedKeyframes: MarpTransitionKeyframes = {
 }
 
 const bespokeTransition = (deck) => {
-  if (!document['startViewTransition']) return
+  if (!document.startViewTransition) return
 
   const transitionDuringState = (
     value?: boolean | ViewTransition
@@ -189,8 +182,7 @@ const bespokeTransition = (deck) => {
         try {
           transitionDuringState(true) // to prevent unexpected navigation
 
-          const transition: ViewTransition =
-            document['startViewTransition'](navigate)
+          const transition = document.startViewTransition(navigate)
 
           transitionDuringState(transition)
           transition.finished.finally(finalize)

@@ -2,6 +2,29 @@
 
 ## [Unreleased]
 
+### Breaking
+
+- End-of-Lifed Node.js 16 is no longer supported, and required Node.js 18 and later ([#591](https://github.com/marp-team/marp-cli/pull/591))
+- Upgrade Marp Core to [v4.0.0](https://github.com/marp-team/marp-core/releases/v4.0.0) ([#591](https://github.com/marp-team/marp-cli/pull/591))
+  - The slide container of built-in themes became the block element and adopted safe centering
+  - Relax HTML allowlist: Allowed a lot of HTML elements and attributes by default
+
+### Added
+
+- CI testing against Node.js v22 ([#591](https://github.com/marp-team/marp-cli/pull/591))
+
+### Changed
+
+- Upgrade Marpit to [v3.1.1](https://github.com/marp-team/marpit/releases/tag/v3.1.1) ([#591](https://github.com/marp-team/marp-cli/pull/591))
+  - Support for CSS nesting
+- Upgrade development Node.js LTS to v20.17.0 ([#591](https://github.com/marp-team/marp-cli/pull/591))
+- Upgrade dependent packages to the latest versions ([#591](https://github.com/marp-team/marp-cli/pull/591))
+
+### Fixed
+
+- The browser sometimes cannot launch due to profile's singleton lock ([#589](https://github.com/marp-team/marp-cli/issues/589), [#591](https://github.com/marp-team/marp-cli/pull/591))
+- Make silence some deprecation warnings in Node.js v22 ([#574](https://github.com/marp-team/marp-cli/issues/574), [#576](https://github.com/marp-team/marp-cli/issues/576), [#591](https://github.com/marp-team/marp-cli/pull/591))
+
 ## v3.4.0 - 2023-10-28
 
 ### Changed

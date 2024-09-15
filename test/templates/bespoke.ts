@@ -1556,7 +1556,7 @@ describe("Bespoke template's browser context", () => {
       jest.runOnlyPendingTimers()
       deck.slide(0)
       await waitAsync()
-      document['startViewTransition'].mockClear()
+      ;(document.startViewTransition as jest.Mock).mockClear()
 
       return deck
     }
@@ -1663,19 +1663,21 @@ describe("Bespoke template's browser context", () => {
       expect(document['startViewTransition']).toHaveBeenCalledTimes(2)
 
       // Cancel transition by double navigation
-      document['startViewTransition'].mockImplementationOnce((callback) => {
-        callback()
+      ;(document.startViewTransition as jest.Mock).mockImplementationOnce(
+        (callback) => {
+          callback()
 
-        return Object.create(viewTransition.ViewTransition, {
-          updateCallbackDone: { value: Promise.resolve() },
-          ready: { value: Promise.resolve() },
-          finished: {
-            value: new Promise(() => {
-              /* never resolved to simulate transition */
-            }),
-          },
-        })
-      })
+          return Object.create(viewTransition.ViewTransition, {
+            updateCallbackDone: { value: Promise.resolve() },
+            ready: { value: Promise.resolve() },
+            finished: {
+              value: new Promise(() => {
+                /* never resolved to simulate transition */
+              }),
+            },
+          })
+        }
+      )
 
       deck.next()
       expect(deck.slide()).toBe(0)
@@ -1709,19 +1711,21 @@ describe("Bespoke template's browser context", () => {
       // Initialize
       const deck = await initializeBespoke()
 
-      document['startViewTransition'].mockImplementationOnce((callback) => {
-        callback()
+      ;(document.startViewTransition as jest.Mock).mockImplementationOnce(
+        (callback) => {
+          callback()
 
-        return Object.create(viewTransition.ViewTransition, {
-          updateCallbackDone: { value: Promise.resolve() },
-          ready: { value: Promise.resolve() },
-          finished: {
-            value: new Promise(() => {
-              /* never resolved to simulate transition */
-            }),
-          },
-        })
-      })
+          return Object.create(viewTransition.ViewTransition, {
+            updateCallbackDone: { value: Promise.resolve() },
+            ready: { value: Promise.resolve() },
+            finished: {
+              value: new Promise(() => {
+                /* never resolved to simulate transition */
+              }),
+            },
+          })
+        }
+      )
 
       deck.next()
       await waitAsync()
@@ -1759,20 +1763,21 @@ describe("Bespoke template's browser context", () => {
       const deck = await initializeBespoke()
 
       let resolveTransition: (() => void) | undefined
+      ;(document.startViewTransition as jest.Mock).mockImplementation(
+        (callback) => {
+          callback()
 
-      document['startViewTransition'].mockImplementation((callback) => {
-        callback()
+          const finished = new Promise<void>((resolve) => {
+            resolveTransition = () => resolve()
+          })
 
-        const finished = new Promise<void>((resolve) => {
-          resolveTransition = () => resolve()
-        })
-
-        return Object.create(viewTransition.ViewTransition, {
-          updateCallbackDone: { value: Promise.resolve() },
-          ready: { value: Promise.resolve() },
-          finished: { value: finished },
-        })
-      })
+          return Object.create(viewTransition.ViewTransition, {
+            updateCallbackDone: { value: Promise.resolve() },
+            ready: { value: Promise.resolve() },
+            finished: { value: finished },
+          })
+        }
+      )
 
       try {
         deck.next()
@@ -1817,9 +1822,11 @@ describe("Bespoke template's browser context", () => {
       const deck = await initializeBespoke()
 
       // Error when calling startViewTransition
-      document['startViewTransition'].mockImplementationOnce(() => {
-        throw new Error('test')
-      })
+      ;(document.startViewTransition as jest.Mock).mockImplementationOnce(
+        () => {
+          throw new Error('test')
+        }
+      )
 
       deck.next()
       expect(deck.slide()).toBe(0)
@@ -1832,10 +1839,12 @@ describe("Bespoke template's browser context", () => {
       await waitAsync()
 
       // Error in callback: Prevent double navigation
-      document['startViewTransition'].mockImplementationOnce((callback) => {
-        callback()
-        throw new Error('ex')
-      })
+      ;(document.startViewTransition as jest.Mock).mockImplementationOnce(
+        (callback) => {
+          callback()
+          throw new Error('ex')
+        }
+      )
 
       deck.next()
       expect(deck.slide()).toBe(0)

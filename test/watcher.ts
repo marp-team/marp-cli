@@ -1,10 +1,11 @@
-import http from 'http'
+import http from 'node:http'
 import chokidar from 'chokidar'
-import portfinder = require('portfinder')
+// import * as portfinder from 'portfinder'
 import { File, FileType } from '../src/file'
 import { ThemeSet } from '../src/theme'
 import { Watcher, WatchNotifier, notifier } from '../src/watcher'
 
+const portfinder = require('portfinder') // eslint-disable-line @typescript-eslint/no-require-imports
 const mockWsOn = jest.fn()
 
 jest.mock('chokidar', () => ({

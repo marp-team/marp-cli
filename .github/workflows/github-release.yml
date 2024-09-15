@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 env:
-  YARN_VERSION: '^1.22.17'
+  YARN_VERSION: '^1.22.22'
 
 jobs:
   github-release:
@@ -51,9 +51,9 @@ jobs:
         run: yarn standalone:pack
         env:
           MATRIX_OS: ${{ matrix.os }}
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
-          name: assets
+          name: assets-${{ matrix.os }}
           path: dist
       - name: Upload created asset to GitHub Release
         uses: marp-team/actions@v1

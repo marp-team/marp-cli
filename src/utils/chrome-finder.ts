@@ -1,5 +1,5 @@
-import fs from 'fs'
-import path from 'path'
+import fs from 'node:fs'
+import path from 'node:path'
 import {
   darwinFast,
   linux,
@@ -81,7 +81,7 @@ export const withNormalizedChromePathForDarwin = async <T>(
           )
         }
       }
-    } catch (e) {
+    } catch {
       // ignore
     }
   }

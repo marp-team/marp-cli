@@ -1,8 +1,8 @@
-import fs from 'fs'
-import os from 'os'
-import path from 'path'
-import { URL } from 'url'
-import { promisify } from 'util'
+import fs from 'node:fs'
+import os from 'node:os'
+import path from 'node:path'
+import { URL } from 'node:url'
+import { promisify } from 'node:util'
 import { Marp } from '@marp-team/marp-core'
 import { Options } from '@marp-team/marpit'
 import { load } from 'cheerio'
@@ -22,7 +22,7 @@ const puppeteerTimeoutMs = 60000
 
 let mkdirSpy: jest.SpiedFunction<typeof fs.promises.mkdir>
 
-jest.mock('fs')
+jest.mock('node:fs', () => require('./__mocks__/node/fs')) // eslint-disable-line @typescript-eslint/no-require-imports, jest/no-mocks-import -- Windows file system cannot use `:`
 
 beforeEach(() => {
   mkdirSpy = jest.spyOn(fs.promises, 'mkdir').mockImplementation()
@@ -138,14 +138,21 @@ describe('Converter', () => {
     })
 
     it("overrides html option by converter's html option", async () => {
-      const defaultHtml = (await instance().convert('<i><br></i>')).rendered
-      expect(defaultHtml.html).toContain('&lt;i&gt;<br />&lt;/i&gt;')
+      const htmlMd = '<i><br><button>test</button></i>'
 
-      const enabled = (await instance({ html: true }).convert(md)).rendered
-      expect(enabled.html).toContain('<i>Hello!</i>')
+      const defaultHtml = (await instance().convert(htmlMd)).rendered
+      expect(defaultHtml.html).toContain(
+        '<i><br />&lt;button&gt;test&lt;/button&gt;</i>'
+      )
 
-      const disabled = (await instance({ html: false }).convert(md)).rendered
-      expect(disabled.html).toContain('&lt;i&gt;Hello!&lt;/i&gt;')
+      const enabled = (await instance({ html: true }).convert(htmlMd)).rendered
+      expect(enabled.html).toContain('<i><br /><button>test</button></i>')
+
+      const disabled = (await instance({ html: false }).convert(htmlMd))
+        .rendered
+      expect(disabled.html).toContain(
+        '&lt;i&gt;&lt;br&gt;&lt;button&gt;test&lt;/button&gt;&lt;/i&gt;'
+      )
     })
 
     it('correctly applies overridden global directives even if enabled HTML option', async () => {

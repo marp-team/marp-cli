@@ -1,4 +1,4 @@
-import path from 'path'
+import path from 'node:path'
 import { Marpit } from '@marp-team/marpit'
 import { ThemeSet } from '../src/theme'
 

@@ -1,10 +1,10 @@
-import childProcess from 'child_process'
-import fs from 'fs'
+import childProcess from 'node:child_process'
+import fs from 'node:fs'
 
 jest.mock('is-wsl')
 
 const wsl = (): typeof import('../../src/utils/wsl') =>
-  require('../../src/utils/wsl')
+  require('../../src/utils/wsl') // eslint-disable-line @typescript-eslint/no-require-imports
 
 beforeEach(() => jest.resetModules())
 afterEach(() => jest.restoreAllMocks())

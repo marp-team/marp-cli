@@ -5,20 +5,22 @@ module.exports = {
     es6: true,
     node: true,
   },
-  extends: ['eslint:recommended', 'plugin:import/recommended', 'prettier'],
+  extends: ['eslint:recommended', 'plugin:import-x/recommended', 'prettier'],
   parserOptions: {
     ecmaVersion: 'latest',
     ecmaFeatures: { jsx: true },
   },
+  plugins: ['unicorn'],
   rules: {
-    'import/no-unresolved': ['error', { ignore: ['ts-key-enum'] }],
-    'import/order': ['error', { alphabetize: { order: 'asc' } }],
+    'import-x/no-unresolved': ['error', { ignore: ['ts-key-enum'] }],
+    'import-x/order': ['error', { alphabetize: { order: 'asc' } }],
+    'unicorn/prefer-node-protocol': 'error',
   },
   settings: {
-    'import/resolver': {
+    'import-x/resolver': {
       node: { extensions: ['.mjs', '.js', '.jsx', '.json', '.ts', '.tsx'] },
     },
-    'import/ignore': ['@rollup/plugin-node-resolve'],
+    'import-x/ignore': ['@rollup/plugin-node-resolve'],
   },
   overrides: [
     {
@@ -28,7 +30,7 @@ module.exports = {
       extends: [
         'plugin:@typescript-eslint/recommended',
         'plugin:@typescript-eslint/stylistic',
-        'plugin:import/typescript',
+        'plugin:import-x/typescript',
         'prettier',
       ],
       rules: {

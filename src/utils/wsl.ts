@@ -1,5 +1,5 @@
-import { execFile, spawnSync } from 'child_process'
-import { readFileSync } from 'fs'
+import { execFile, spawnSync } from 'node:child_process'
+import { readFileSync } from 'node:fs'
 
 let isWsl: number | undefined
 
@@ -44,7 +44,7 @@ export const isWSL = async (): Promise<number> => {
 
           const gccMatched = verStr.match(/gcc[^,]+?(\d+)\.\d+\.\d+/)
           if (gccMatched && Number.parseInt(gccMatched[1], 10) >= 8) return true
-        } catch (e: unknown) {
+        } catch {
           // no ops
         }
       })()

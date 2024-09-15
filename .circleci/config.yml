@@ -1,8 +1,8 @@
 version: 2.1
 
 orbs:
-  browser-tools: circleci/browser-tools@1.2.4
-  codecov: codecov/codecov@3.2.4
+  browser-tools: circleci/browser-tools@1.4.8
+  codecov: codecov/codecov@4.1.0
 
 executors:
   node:
@@ -12,7 +12,7 @@ executors:
         default: false
       version:
         type: string
-        default: '18.18.0' # Specify LTS major and minor for development
+        default: '20.17.0' # Specify LTS major and minor for development
     docker:
       - image: cimg/node:<< parameters.version >><<# parameters.browser >>-browsers<</ parameters.browser >>
     working_directory: ~/marp-cli
@@ -36,7 +36,7 @@ commands:
         default: []
       yarn:
         type: string
-        default: '^1.22.17'
+        default: '^1.22.22'
     steps:
       - run:
           name: Upgrade yarn for current user
@@ -48,7 +48,10 @@ commands:
             - v2.4-dependencies-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}-
             - v2.4-dependencies-{{ .Environment.CIRCLE_JOB }}-
 
-      - run: yarn install --frozen-lockfile <<# parameters.force >>--ignore-engines<</ parameters.force >>
+      - run: |
+          yarn install --frozen-lockfile <<# parameters.force >>--ignore-engines<</ parameters.force >>
+          yarn patch-package
+
       - steps: << parameters.postinstall >>
 
       - save_cache:
@@ -63,7 +66,7 @@ commands:
           postinstall:
             - run: yarn -s check:audit
 
-  test:
+  prepare:
     parameters:
       browser:
         type: boolean
@@ -83,6 +86,8 @@ commands:
           steps:
             - browser-tools/install-chrome
 
+  lint:
+    steps:
       - run:
           name: Prettier formatting
           command: yarn check:format
@@ -99,6 +104,8 @@ commands:
           name: stylelint
           command: yarn lint:css
 
+  test:
+    steps:
       - run:
           name: Jest
           command: yarn test:coverage --ci -i --reporters=default --reporters=jest-junit
@@ -185,33 +192,40 @@ jobs:
     steps:
       - audit
 
-  test-node16:
-    executor:
-      name: node
-      browser: true
-      version: '16.18'
-    steps:
-      - test:
-          force: true
-          browser: true
-
   test-node18:
     executor:
       name: node
       browser: true
+      version: '18.20'
     steps:
-      - test:
+      - prepare:
+          force: true
           browser: true
+      - lint
+      - test
 
   test-node20:
     executor:
       name: node
       browser: true
-      version: '20.9'
     steps:
-      - test:
+      - prepare:
           browser: true
+      - lint
+      - test
 
+  test-node22:
+    executor:
+      name: node
+      browser: true
+      version: '22.8'
+    steps:
+      - prepare:
+          browser: true
+      - lint
+      - test
+
+  # Docker
   docker-build-latest:
     executor: node
     steps:
@@ -241,22 +255,22 @@ workflows:
     jobs:
       # Test
       - audit
-      - test-node16:
-          requires:
-            - audit
       - test-node18:
           requires:
             - audit
       - test-node20:
           requires:
             - audit
+      - test-node22:
+          requires:
+            - audit
 
       # Docker (latest)
       - docker-build-latest:
           requires:
-            - test-node16
             - test-node18
             - test-node20
+            - test-node22
           filters:
             branches:
               only: main

@@ -1,10 +1,10 @@
-import path from 'path'
+import path from 'node:path'
 import { ConvertType } from '../src/converter'
 import { CLIError } from '../src/error'
 import { File, FileType } from '../src/file'
 import { Preview, fileToURI } from '../src/preview'
 
-jest.mock('path')
+jest.mock('node:path', () => require('./__mocks__/node/path')) // eslint-disable-line @typescript-eslint/no-require-imports, jest/no-mocks-import -- Windows file system cannot use `:`
 jest.setTimeout(40000)
 
 describe('Preview', () => {

@@ -1,6 +1,6 @@
-import { promisify } from 'util'
+import { promisify } from 'node:util'
 
-const fs = jest.requireActual('fs')
+const fs = jest.requireActual('node:fs')
 
 let writeFileMockSpy: jest.SpyInstance | undefined
 let writeFilePromiseMockSpy: jest.SpyInstance | undefined

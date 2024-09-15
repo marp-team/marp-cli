@@ -1,5 +1,5 @@
-import fs from 'fs'
-import path from 'path'
+import fs from 'node:fs'
+import path from 'node:path'
 import chalk from 'chalk'
 import { cosmiconfig, cosmiconfigSync } from 'cosmiconfig'
 import { osLocale } from 'os-locale'
@@ -181,7 +181,7 @@ export class MarpCLIConfig {
 
     const pdfNotes = !!(this.args.pdfNotes || this.conf.pdfNotes)
     const pdfOutlines =
-      this.args.pdfOutlines ?? this.conf.pdfOutlines
+      (this.args.pdfOutlines ?? this.conf.pdfOutlines)
         ? (() => {
             const defaultPdfOutlines = { pages: true, headings: true } as const
             const getConf = (key: keyof typeof defaultPdfOutlines) => {

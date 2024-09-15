@@ -1,7 +1,8 @@
-import path from 'path'
+import { ClientRequest } from 'node:http'
+import path from 'node:path'
 import Marp from '@marp-team/marp-core'
 import { load } from 'cheerio'
-import express from 'express'
+import express, { type Express } from 'express'
 import request from 'supertest'
 import {
   Converter,
@@ -105,7 +106,9 @@ describe('Server', () => {
   })
 
   describe('Routing', () => {
-    const setupServer = async (opts: Server.Options = {}): Promise<Server> => {
+    const setupServer = async (
+      opts: Server.Options = {}
+    ): Promise<Server & { server: Express }> => {
       const server: any = new Server(converter(), opts)
 
       await server.setup() // Setup server without listening
@@ -264,11 +267,22 @@ describe('Server', () => {
     })
 
     describe('when the directory traversal attack is detected', () => {
-      it('returns 403', async () => {
+      it('returns 404', async () => {
         const server = await setupServer()
         const response = await request(server.server).get('/../../README.md')
 
-        expect(response.status).toBe(403)
+        // Current express is recognized directory traversal attack, and normalize request path to `/README.md`.
+        // So prevention logic of Marp CLI (returns 403) is not passed now.
+        // expect(response.status).toBe(403)
+        expect(response.status).toBe(404)
+      })
+
+      it('normalizes the request path that is trying directory traversal attack', async () => {
+        const server = await setupServer()
+        const response = await request(server.server).get('/../../4.txt')
+
+        expect((response.request.req as ClientRequest).path).toBe('/4.txt')
+        expect(response.status).toBe(200)
       })
     })
   })

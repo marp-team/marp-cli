@@ -1,9 +1,9 @@
-import { EventEmitter } from 'events'
-import fs from 'fs'
-import path from 'path'
+import { EventEmitter } from 'node:events'
+import fs from 'node:fs'
+import path from 'node:path'
 import { version as coreVersion } from '@marp-team/marp-core/package.json'
 import { version as marpitVersion } from '@marp-team/marpit/package.json'
-import * as cosmiconfigExplorer from 'cosmiconfig/dist/Explorer'
+import * as cosmiconfigExplorer from 'cosmiconfig/dist/Explorer' // eslint-disable-line import-x/namespace
 import getStdin from 'get-stdin'
 import stripAnsi from 'strip-ansi'
 import { version as cliVersion } from '../package.json'
@@ -26,7 +26,7 @@ import { Watcher } from '../src/watcher'
 
 const { Explorer } = cosmiconfigExplorer as any
 const observationHelpers: ObservationHelper[] = []
-const previewEmitter = new EventEmitter() as Preview
+const previewEmitter = new EventEmitter() as unknown as Preview
 
 const runForObservation = async (argv: string[]) => {
   const ret = await Promise.race([marpCli(argv), waitForObservation()])
@@ -39,7 +39,7 @@ const runForObservation = async (argv: string[]) => {
 }
 
 jest.mock('cosmiconfig')
-jest.mock('fs')
+jest.mock('node:fs', () => require('./__mocks__/node/fs')) // eslint-disable-line @typescript-eslint/no-require-imports, jest/no-mocks-import -- Windows file system cannot use `:`
 jest.mock('../src/preview')
 jest.mock('../src/watcher', () => jest.createMockFromModule('../src/watcher'))
 
@@ -357,7 +357,7 @@ describe('Marp CLI', () => {
         expect(await marpCli(['--input-dir', files, '--theme', 'a'])).toBe(0)
 
         for (const [, buffer] of writeFile.mock.calls) {
-          expect(buffer.toString()).toContain('/* @theme a */')
+          expect(buffer.toString()).toContain('--theme-a')
         }
       } finally {
         info.mockRestore()
@@ -561,7 +561,7 @@ describe('Marp CLI', () => {
         expect(await marpCli(args)).toBe(0)
 
         const { css } = (await convert.mock.results[0].value).rendered
-        expect(css).toContain('/* @theme a */')
+        expect(css).toContain('--theme-a')
 
         const converter: Converter = convert.mock.instances[0]
         const { themeSet } = converter.options
@@ -630,7 +630,7 @@ describe('Marp CLI', () => {
         expect(convert).toHaveBeenCalledTimes(1)
 
         const { css } = (await convert.mock.results[0].value).rendered
-        expect(css).toContain('@theme a')
+        expect(css).toContain('--theme-a')
         expect(observeSpy).toHaveBeenCalledWith(filePath, 'a')
       })
     })
@@ -646,7 +646,7 @@ describe('Marp CLI', () => {
           expect(await marpCli([...baseArgs, '--theme', name])).toBe(0)
           expect(convert).toHaveBeenCalledTimes(1)
           expect((await convert.mock.results[0].value).rendered.css).toContain(
-            `@theme ${name}`
+            `--theme-${name}`
           )
           expect(observeSpy).toHaveBeenCalledWith(filePath, name)
         }
@@ -664,7 +664,7 @@ describe('Marp CLI', () => {
           expect(await marpCli([...baseArgs(themes), '--theme', name])).toBe(0)
           expect(convert).toHaveBeenCalledTimes(1)
           expect((await convert.mock.results[0].value).rendered.css).toContain(
-            `@theme ${name}`
+            `--theme-${name}`
           )
           expect(observeSpy).toHaveBeenCalledWith(filePath, name)
         }
@@ -980,7 +980,7 @@ describe('Marp CLI', () => {
           expect(await marpCli(['md.md'])).toBe(0)
 
           const html = stdout.mock.calls[0][0].toString()
-          expect(html).toContain('<b>html</b>')
+          expect(html).toContain('<b>html<button>button</button></b>')
         } finally {
           stdout.mockRestore()
           warn.mockRestore()
@@ -1002,9 +1002,11 @@ describe('Marp CLI', () => {
 
             expect(await marpCli(['md.md', opt, '-o', '-'])).toBe(0)
 
-            // html option in a configuration file should not work
+            // html option in a configuration file should not work, and not allowed element should be escaped
             const html = stdout.mock.calls[0][0].toString()
-            expect(html).toContain('&lt;b&gt;html&lt;/b&gt;')
+            expect(html).toContain(
+              '<b>html&lt;button&gt;button&lt;/button&gt;</b>'
+            )
           }
         } finally {
           stdout.mockRestore()
@@ -1025,7 +1027,7 @@ describe('Marp CLI', () => {
           expect(await marpCli(['md.md', '-o', '-'])).toBe(0)
 
           const html = stdout.mock.calls[0][0].toString()
-          expect(html).toContain('@theme b')
+          expect(html).toContain('--theme-b')
         } finally {
           stdout.mockRestore()
           warn.mockRestore()
@@ -1065,7 +1067,7 @@ describe('Marp CLI', () => {
             )
 
             const html = stdout.mock.calls[0][0].toString()
-            expect(html).toContain('@theme a')
+            expect(html).toContain('--theme-a')
           } finally {
             stdout.mockRestore()
             warn.mockRestore()
@@ -1101,7 +1103,7 @@ describe('Marp CLI', () => {
           try {
             const conf = assetFn('_configs/custom-engine/anonymous.js')
             const md = assetFn('_configs/custom-engine/md.md')
-            const { engine } = require(conf) // eslint-disable-line @typescript-eslint/no-var-requires
+            const { engine } = require(conf) // eslint-disable-line @typescript-eslint/no-require-imports
 
             expect(await marpCli(['-c', conf, md, '--no-output'])).toBe(0)
             expect(engine).toHaveBeenCalledWith(

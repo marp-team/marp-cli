@@ -1,12 +1,13 @@
-import os from 'os'
-import path from 'path'
+/* eslint-disable @typescript-eslint/no-require-imports */
+import os from 'node:os'
+import path from 'node:path'
 
 jest.mock('../../src/utils/chrome-finder')
 jest.mock('../../src/utils/edge-finder')
 jest.mock('../../src/utils/wsl')
 
 const CLIError = (): typeof import('../../src/error').CLIError =>
-  require('../../src/error').CLIError // eslint-disable-line @typescript-eslint/no-var-requires
+  require('../../src/error').CLIError
 
 const puppeteer = (): typeof import('puppeteer-core') =>
   require('puppeteer-core')
@@ -33,7 +34,7 @@ describe('#generatePuppeteerDataDirPath', () => {
   let mkdirSpy: jest.SpyInstance
 
   beforeEach(async () => {
-    const { promises } = await import('fs')
+    const { promises } = await import('node:fs')
 
     mkdirSpy = jest.spyOn(promises, 'mkdir')
     mkdirSpy.mockImplementation(() => Promise.resolve(undefined))
@@ -44,8 +45,11 @@ describe('#generatePuppeteerDataDirPath', () => {
       await puppeteerUtils().generatePuppeteerDataDirPath('tmp-name')
     const expectedDir = path.resolve(os.tmpdir(), 'tmp-name')
 
-    expect(dataDir).toBe(expectedDir)
-    expect(mkdirSpy).toHaveBeenCalledWith(expectedDir, { recursive: true })
+    expect(dataDir).toContain(expectedDir)
+    expect(mkdirSpy).toHaveBeenCalledWith(
+      expect.stringContaining(expectedDir),
+      { recursive: true }
+    )
   })
 
   it('ignores EEXIST error thrown by mkdir', async () => {
@@ -89,7 +93,7 @@ describe('#generatePuppeteerDataDirPath', () => {
       )
 
       expect(resolveWindowsEnv).toHaveBeenCalledWith('TMP')
-      expect(dataDir).toBe('C:\\Test\\Tmp\\tmp-name')
+      expect(dataDir).toContain('C:\\Test\\Tmp\\tmp-name')
     })
   })
 })
@@ -204,7 +208,7 @@ describe('#generatePuppeteerLaunchArgs', () => {
         const { headless } =
           await puppeteerUtils().generatePuppeteerLaunchArgs()
 
-        expect(headless).toBe(true)
+        expect(headless).toBe('shell')
       } finally {
         delete process.env.PUPPETEER_HEADLESS_MODE
       }
@@ -217,7 +221,7 @@ describe('#generatePuppeteerLaunchArgs', () => {
         const { headless } =
           await puppeteerUtils().generatePuppeteerLaunchArgs()
 
-        expect(headless).toBe('new')
+        expect(headless).toBe(true)
       } finally {
         delete process.env.PUPPETEER_HEADLESS_MODE
       }
@@ -230,7 +234,7 @@ describe('#generatePuppeteerLaunchArgs', () => {
         const { headless } =
           await puppeteerUtils().generatePuppeteerLaunchArgs()
 
-        expect(headless).toBe(true)
+        expect(headless).toBe('shell')
       } finally {
         delete process.env.PUPPETEER_HEADLESS_MODE
       }
@@ -243,7 +247,7 @@ describe('#generatePuppeteerLaunchArgs', () => {
         const { headless } =
           await puppeteerUtils().generatePuppeteerLaunchArgs()
 
-        expect(headless).toBe(true)
+        expect(headless).toBe('shell')
       } finally {
         delete process.env.PUPPETEER_HEADLESS_MODE
       }

@@ -1,6 +1,7 @@
-import fs from 'fs'
-import os from 'os'
-import path from 'path'
+import fs from 'node:fs'
+import os from 'node:os'
+import path from 'node:path'
+import { nanoid } from 'nanoid'
 import { launch } from 'puppeteer-core'
 import macDockIcon from '../assets/mac-dock-icon.png'
 import { warn } from '../cli'
@@ -13,8 +14,8 @@ import { isWSL, resolveWindowsEnv } from './wsl'
 let executablePath: string | undefined | false = false
 let wslTmp: string | undefined
 
-export const enableHeadless = (): true | 'new' =>
-  process.env.PUPPETEER_HEADLESS_MODE?.toLowerCase() === 'new' ? 'new' : true
+export const enableHeadless = (): 'shell' | true =>
+  process.env.PUPPETEER_HEADLESS_MODE?.toLowerCase() === 'new' ? true : 'shell'
 
 const isShebang = (path: string) => {
   let fd: number | null = null
@@ -26,7 +27,7 @@ const isShebang = (path: string) => {
     fs.readSync(fd, shebangBuffer, 0, 2, 0)
 
     if (shebangBuffer[0] === 0x23 && shebangBuffer[1] === 0x21) return true
-  } catch (e: unknown) {
+  } catch {
     // no ops
   } finally {
     if (fd !== null) fs.closeSync(fd)
@@ -48,18 +49,23 @@ const isSnapBrowser = (executablePath: string | undefined) => {
   return false
 }
 
+const puppeteerDataDirSuffix = nanoid(10)
+
 export const generatePuppeteerDataDirPath = async (
   name: string,
   { wslHost }: { wslHost?: boolean } = {}
 ): Promise<string> => {
+  const nameWithSuffix = `${name}-${puppeteerDataDirSuffix}`
+
   const dataDir = await (async () => {
     if ((await isWSL()) && wslHost) {
       // In WSL environment, Marp CLI may use Chrome on Windows. If Chrome has
       // located in host OS (Windows), we have to specify Windows path.
       if (wslTmp === undefined) wslTmp = await resolveWindowsEnv('TMP')
-      if (wslTmp !== undefined) return path.win32.resolve(wslTmp, name)
+      if (wslTmp !== undefined)
+        return path.win32.resolve(wslTmp, nameWithSuffix)
     }
-    return path.resolve(os.tmpdir(), name)
+    return path.resolve(os.tmpdir(), nameWithSuffix)
   })()
 
   // Ensure the data directory is created

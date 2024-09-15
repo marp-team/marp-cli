@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-namespace */
-import fs from 'fs'
-import os from 'os'
-import path from 'path'
-import * as url from 'url'
-import { promisify } from 'util'
+import fs from 'node:fs'
+import os from 'node:os'
+import path from 'node:path'
+import * as url from 'node:url'
+import { promisify } from 'node:util'
 import getStdin from 'get-stdin'
 import { globby, Options as GlobbyOptions } from 'globby'
 import { tmpName } from 'tmp'
@@ -106,7 +106,7 @@ export class File {
       cleanup: async () => {
         try {
           await this.cleanup(tmp)
-        } catch (e: unknown) {
+        } catch {
           // No ops
         }
       },
@@ -178,7 +178,7 @@ export class File {
           dirs.push(path.resolve(p))
           continue
         }
-      } catch (e: unknown) {
+      } catch {
         // No ops
       }
 

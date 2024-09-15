@@ -1,6 +1,6 @@
 let mode: string | undefined
 
-const path = jest.requireActual('path')
+const path = jest.requireActual('node:path')
 const pathMock: any = {
   posix: () => (mode = 'posix'),
   win32: () => (mode = 'win32'),

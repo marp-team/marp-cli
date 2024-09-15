@@ -1,4 +1,4 @@
-import { URL } from 'url'
+import { URL } from 'node:url'
 import type { Marp, MarpOptions } from '@marp-team/marp-core'
 import { Marpit, Options as MarpitOptions } from '@marp-team/marpit'
 import chalk from 'chalk'
@@ -296,23 +296,25 @@ export class Converter {
 
     let outlineData: OutlineData | undefined
 
-    ret.buffer = await this.usePuppeteer(html, async (page, { render }) => {
-      await render()
+    ret.buffer = Buffer.from(
+      await this.usePuppeteer(html, async (page, { render }) => {
+        await render()
 
-      if (tpl.rendered.outline) {
-        outlineData = await page.evaluate(
-          pptrOutlinePositionResolver,
-          tpl.rendered.outline.flatMap((o) => o.headings),
-          pdfOutlineAttr
-        )
-      }
+        if (tpl.rendered.outline) {
+          outlineData = await page.evaluate(
+            pptrOutlinePositionResolver,
+            tpl.rendered.outline.flatMap((o) => o.headings),
+            pdfOutlineAttr
+          )
+        }
 
-      return await page.pdf({
-        printBackground: true,
-        preferCSSPageSize: true,
-        timeout: this.puppeteerTimeout,
+        return await page.pdf({
+          printBackground: true,
+          preferCSSPageSize: true,
+          timeout: this.puppeteerTimeout,
+        })
       })
-    })
+    )
 
     // Apply PDF metadata and annotations
     const creationDate = new Date()
@@ -426,14 +428,14 @@ export class Converter {
             page,
             extension: opts.type,
           })
-          ret.buffer = await screenshot(page)
+          ret.buffer = Buffer.from(await screenshot(page))
 
           files.push(ret)
         }
       } else {
         // Title image
         const ret = file.convert(this.options.output, { extension: opts.type })
-        ret.buffer = await screenshot()
+        ret.buffer = Buffer.from(await screenshot())
 
         files.push(ret)
       }
@@ -640,7 +642,7 @@ export class Converter {
             failedFileSet.add(url.href)
           }
         }
-      } catch (e: unknown) {
+      } catch {
         // No ops
       }
     })

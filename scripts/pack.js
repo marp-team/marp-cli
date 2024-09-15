@@ -1,9 +1,8 @@
 /* Pack built standalone binaries for release. */
 
-const fs = require('fs')
-const path = require('path')
-const zlib = require('zlib')
-const rimraf = require('rimraf')
+const fs = require('node:fs')
+const path = require('node:path')
+const zlib = require('node:zlib')
 const tar = require('tar-stream')
 const ZipStream = require('zip-stream')
 const { version } = require('../package.json')
@@ -24,7 +23,7 @@ const packToTarGz = (binary) => {
 }
 
 // Clean up dist directory
-rimraf.sync(dist)
+fs.rmSync(dist, { recursive: true, force: true })
 fs.mkdirSync(dist)
 
 // Create package for Linux (.tar.gz)

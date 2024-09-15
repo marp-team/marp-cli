@@ -1,5 +1,5 @@
-import fs from 'fs'
-import path from 'path'
+import fs from 'node:fs'
+import path from 'node:path'
 import { Element, Marpit, Options, RenderResult } from '@marp-team/marpit'
 import { OutlinePage } from '../engine/pdf/outline-plugin'
 import transitionPlugin, { EngineTransition } from '../engine/transition-plugin'
@@ -45,7 +45,8 @@ interface RenderedSize {
 
 export type TemplateOption = TemplateBareOption | TemplateBespokeOption
 
-interface TemplateBareOption {} // eslint-disable-line @typescript-eslint/no-empty-interface
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+interface TemplateBareOption {}
 
 interface TemplateBespokeOption {
   osc?: boolean
