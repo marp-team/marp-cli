@@ -36,22 +36,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-
-      - name: Install yarn
-        id: yarn
-        shell: bash
-        run: |
-          cd $HOME && yarn policies set-version $YARN_VERSION
-          echo "cache_dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
-
-      - name: Cache yarn
-        uses: actions/cache@v3
-        with:
-          path: ${{ steps.yarn.outputs.cache_dir }}
-          key: yarn_cache-${{ runner.os }}-${{ matrix.node-version }}-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            yarn_cache-${{ runner.os }}-${{ matrix.node-version }}-
-            yarn_cache-${{ runner.os }}-
+          cache: yarn
 
       - name: Install dependencies with yarn
         run: yarn install --frozen-lockfile ${{ matrix.force && '--ignore-engines' || '' }}
@@ -59,19 +44,19 @@ jobs:
       # Retry tests up to 3 times due to flaky tests on Windows CI
       # https://stackoverflow.com/a/59365905
       - name: Jest
+        env:
+          CI: true
         run: >-
           yarn test:coverage --ci -i --reporters=default --reporters=jest-junit --forceExit ||
           yarn test:coverage --ci -i --reporters=default --reporters=jest-junit --forceExit --no-cache ||
           yarn test:coverage --ci -i --reporters=default --reporters=jest-junit --forceExit --no-cache
-        env:
-          CI: true
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: coverage
           path: coverage
 
-      - uses: codecov/codecov-action@v3
+      - uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: windows
