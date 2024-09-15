@@ -53,7 +53,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: coverage
+          name: coverage-${{ matrix.node-version }}
           path: coverage
 
       - uses: codecov/codecov-action@v4
