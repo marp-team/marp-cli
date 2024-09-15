@@ -12,7 +12,7 @@ executors:
         default: false
       version:
         type: string
-        default: '18.18.0' # Specify LTS major and minor for development
+        default: '20.17.0' # Specify LTS major and minor for development
     docker:
       - image: cimg/node:<< parameters.version >><<# parameters.browser >>-browsers<</ parameters.browser >>
     working_directory: ~/marp-cli
@@ -36,7 +36,7 @@ commands:
         default: []
       yarn:
         type: string
-        default: '^1.22.17'
+        default: '^1.22.22'
     steps:
       - run:
           name: Upgrade yarn for current user
@@ -185,11 +185,12 @@ jobs:
     steps:
       - audit
 
+  # Testing
   test-node16:
     executor:
       name: node
       browser: true
-      version: '16.18'
+      version: '16.20'
     steps:
       - test:
           force: true
@@ -199,6 +200,7 @@ jobs:
     executor:
       name: node
       browser: true
+      version: '18.20'
     steps:
       - test:
           browser: true
@@ -207,11 +209,20 @@ jobs:
     executor:
       name: node
       browser: true
-      version: '20.9'
     steps:
       - test:
           browser: true
 
+  test-node22:
+    executor:
+      name: node
+      browser: true
+      version: '22.8'
+    steps:
+      - test:
+          browser: true
+
+  # Docker
   docker-build-latest:
     executor: node
     steps:
@@ -250,6 +261,9 @@ workflows:
       - test-node20:
           requires:
             - audit
+      - test-node22:
+          requires:
+            - audit
 
       # Docker (latest)
       - docker-build-latest:
@@ -257,6 +271,7 @@ workflows:
             - test-node16
             - test-node18
             - test-node20
+            - test-node22
           filters:
             branches:
               only: main

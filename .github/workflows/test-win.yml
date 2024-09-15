@@ -9,7 +9,7 @@ on:
 #   cancel-in-progress: true
 
 env:
-  YARN_VERSION: '^1.22.19'
+  YARN_VERSION: '^1.22.22'
 
 jobs:
   win-test:
@@ -19,11 +19,12 @@ jobs:
       fail-fast: false
       matrix:
         node-version:
-          - '^16.18.1'
-          - '18.18.0'
-          - '^20.9.0'
+          - '^16.20.2'
+          - '^18.20.4'
+          - '20.17.0'
+          - '^22.8.0'
         include:
-          - node-version: '^16.18.1'
+          - node-version: '^16.20.2'
             force: true
 
     steps:
