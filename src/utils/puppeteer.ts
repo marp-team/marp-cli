@@ -9,6 +9,7 @@ import { findChromeInstallation } from './chrome-finder'
 import { isInsideContainer } from './container'
 import { findEdgeInstallation } from './edge-finder'
 import { isWSL, resolveWindowsEnv } from './wsl'
+import { nanoid } from 'nanoid'
 
 let executablePath: string | undefined | false = false
 let wslTmp: string | undefined
@@ -48,18 +49,23 @@ const isSnapBrowser = (executablePath: string | undefined) => {
   return false
 }
 
+const puppeteerDataDirSuffix = nanoid(10)
+
 export const generatePuppeteerDataDirPath = async (
   name: string,
   { wslHost }: { wslHost?: boolean } = {}
 ): Promise<string> => {
+  const nameWithSuffix = `${name}-${puppeteerDataDirSuffix}`
+
   const dataDir = await (async () => {
     if ((await isWSL()) && wslHost) {
       // In WSL environment, Marp CLI may use Chrome on Windows. If Chrome has
       // located in host OS (Windows), we have to specify Windows path.
       if (wslTmp === undefined) wslTmp = await resolveWindowsEnv('TMP')
-      if (wslTmp !== undefined) return path.win32.resolve(wslTmp, name)
+      if (wslTmp !== undefined)
+        return path.win32.resolve(wslTmp, nameWithSuffix)
     }
-    return path.resolve(os.tmpdir(), name)
+    return path.resolve(os.tmpdir(), nameWithSuffix)
   })()
 
   // Ensure the data directory is created

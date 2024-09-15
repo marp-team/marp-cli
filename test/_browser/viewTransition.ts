@@ -28,7 +28,7 @@ beforeEach(() => {
 
 afterEach(() => {
   if ('startViewTransition' in document) {
-    delete document.startViewTransition
+    delete (document as any).startViewTransition
   }
 })
 

@@ -81,6 +81,7 @@
     "@rollup/plugin-url": "^8.0.2",
     "@tsconfig/node14": "^14.1.2",
     "@types/cheerio": "^0.22.35",
+    "@types/dom-view-transitions": "^1.0.5",
     "@types/express": "^4.17.21",
     "@types/jest": "^29.5.13",
     "@types/markdown-it": "^14.1.2",

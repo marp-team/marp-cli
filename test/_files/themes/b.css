@@ -1,1 +1,5 @@
-/* @theme b */
+/** @theme b */
+
+section {
+  --theme-b: true;
+}

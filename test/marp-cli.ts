@@ -357,7 +357,7 @@ describe('Marp CLI', () => {
         expect(await marpCli(['--input-dir', files, '--theme', 'a'])).toBe(0)
 
         for (const [, buffer] of writeFile.mock.calls) {
-          expect(buffer.toString()).toContain('/* @theme a */')
+          expect(buffer.toString()).toContain('--theme-a')
         }
       } finally {
         info.mockRestore()
@@ -561,7 +561,7 @@ describe('Marp CLI', () => {
         expect(await marpCli(args)).toBe(0)
 
         const { css } = (await convert.mock.results[0].value).rendered
-        expect(css).toContain('/* @theme a */')
+        expect(css).toContain('--theme-a')
 
         const converter: Converter = convert.mock.instances[0]
         const { themeSet } = converter.options
@@ -630,7 +630,7 @@ describe('Marp CLI', () => {
         expect(convert).toHaveBeenCalledTimes(1)
 
         const { css } = (await convert.mock.results[0].value).rendered
-        expect(css).toContain('@theme a')
+        expect(css).toContain('--theme-a')
         expect(observeSpy).toHaveBeenCalledWith(filePath, 'a')
       })
     })
@@ -646,7 +646,7 @@ describe('Marp CLI', () => {
           expect(await marpCli([...baseArgs, '--theme', name])).toBe(0)
           expect(convert).toHaveBeenCalledTimes(1)
           expect((await convert.mock.results[0].value).rendered.css).toContain(
-            `@theme ${name}`
+            `--theme-${name}`
           )
           expect(observeSpy).toHaveBeenCalledWith(filePath, name)
         }
@@ -664,7 +664,7 @@ describe('Marp CLI', () => {
           expect(await marpCli([...baseArgs(themes), '--theme', name])).toBe(0)
           expect(convert).toHaveBeenCalledTimes(1)
           expect((await convert.mock.results[0].value).rendered.css).toContain(
-            `@theme ${name}`
+            `--theme-${name}`
           )
           expect(observeSpy).toHaveBeenCalledWith(filePath, name)
         }
@@ -980,7 +980,7 @@ describe('Marp CLI', () => {
           expect(await marpCli(['md.md'])).toBe(0)
 
           const html = stdout.mock.calls[0][0].toString()
-          expect(html).toContain('<b>html</b>')
+          expect(html).toContain('<b>html<button>button</button></b>')
         } finally {
           stdout.mockRestore()
           warn.mockRestore()
@@ -1002,9 +1002,11 @@ describe('Marp CLI', () => {
 
             expect(await marpCli(['md.md', opt, '-o', '-'])).toBe(0)
 
-            // html option in a configuration file should not work
+            // html option in a configuration file should not work, and not allowed element should be escaped
             const html = stdout.mock.calls[0][0].toString()
-            expect(html).toContain('&lt;b&gt;html&lt;/b&gt;')
+            expect(html).toContain(
+              '<b>html&lt;button&gt;button&lt;/button&gt;</b>'
+            )
           }
         } finally {
           stdout.mockRestore()
@@ -1025,7 +1027,7 @@ describe('Marp CLI', () => {
           expect(await marpCli(['md.md', '-o', '-'])).toBe(0)
 
           const html = stdout.mock.calls[0][0].toString()
-          expect(html).toContain('@theme b')
+          expect(html).toContain('--theme-b')
         } finally {
           stdout.mockRestore()
           warn.mockRestore()
@@ -1065,7 +1067,7 @@ describe('Marp CLI', () => {
             )
 
             const html = stdout.mock.calls[0][0].toString()
-            expect(html).toContain('@theme a')
+            expect(html).toContain('--theme-a')
           } finally {
             stdout.mockRestore()
             warn.mockRestore()
