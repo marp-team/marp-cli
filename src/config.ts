@@ -181,7 +181,7 @@ export class MarpCLIConfig {
 
     const pdfNotes = !!(this.args.pdfNotes || this.conf.pdfNotes)
     const pdfOutlines =
-      this.args.pdfOutlines ?? this.conf.pdfOutlines
+      (this.args.pdfOutlines ?? this.conf.pdfOutlines)
         ? (() => {
             const defaultPdfOutlines = { pages: true, headings: true } as const
             const getConf = (key: keyof typeof defaultPdfOutlines) => {
