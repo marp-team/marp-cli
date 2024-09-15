@@ -224,9 +224,12 @@ export class Server extends (EventEmitter as new () => TypedEmitter<Server.Event
     const baseDir = path.resolve(this.inputDir)
     const targetPath = path.join(baseDir, decodeURIComponent(relativePath))
 
+    // This test is no longer covered by updated express, but still remaining for security
     if (!targetPath.startsWith(baseDir)) {
+      /* c8 ignore start */
       // Skip remaining process to prevent check for unexpected file and directory
       return { valid: false, path: targetPath }
+      /* c8 ignore end */
     }
 
     // Check file stat
