@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-namespace */
-import { EventEmitter } from 'events'
+import { EventEmitter } from 'node:events'
 import { nanoid } from 'nanoid'
 import type { Page, Browser, Target } from 'puppeteer-core'
 import TypedEmitter from 'typed-emitter'

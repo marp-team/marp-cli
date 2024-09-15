@@ -1,8 +1,8 @@
-import fs from 'fs'
-import os from 'os'
-import path from 'path'
-import { URL } from 'url'
-import { promisify } from 'util'
+import fs from 'node:fs'
+import os from 'node:os'
+import path from 'node:path'
+import { URL } from 'node:url'
+import { promisify } from 'node:util'
 import { Marp } from '@marp-team/marp-core'
 import { Options } from '@marp-team/marpit'
 import { load } from 'cheerio'
@@ -22,7 +22,7 @@ const puppeteerTimeoutMs = 60000
 
 let mkdirSpy: jest.SpiedFunction<typeof fs.promises.mkdir>
 
-jest.mock('fs')
+jest.mock('node:fs')
 
 beforeEach(() => {
   mkdirSpy = jest.spyOn(fs.promises, 'mkdir').mockImplementation()

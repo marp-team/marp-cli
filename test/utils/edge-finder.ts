@@ -1,4 +1,4 @@
-import path from 'path'
+import path from 'node:path'
 import * as edgeFinder from '../../src/utils/edge-finder'
 import * as wsl from '../../src/utils/wsl'
 

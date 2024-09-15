@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-namespace */
-import crypto from 'crypto'
-import path from 'path'
+import crypto from 'node:crypto'
+import path from 'node:path'
 import chokidar, { type FSWatcher } from 'chokidar'
 import { getPortPromise } from 'portfinder'
 import { Server as WSServer, ServerOptions } from 'ws'

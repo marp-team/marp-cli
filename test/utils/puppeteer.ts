@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
-import os from 'os'
-import path from 'path'
+import os from 'node:os'
+import path from 'node:path'
 
 jest.mock('../../src/utils/chrome-finder')
 jest.mock('../../src/utils/edge-finder')
@@ -34,7 +34,7 @@ describe('#generatePuppeteerDataDirPath', () => {
   let mkdirSpy: jest.SpyInstance
 
   beforeEach(async () => {
-    const { promises } = await import('fs')
+    const { promises } = await import('node:fs')
 
     mkdirSpy = jest.spyOn(promises, 'mkdir')
     mkdirSpy.mockImplementation(() => Promise.resolve(undefined))

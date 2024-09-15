@@ -1,4 +1,4 @@
-import path from 'path'
+import path from 'node:path'
 import getStdin from 'get-stdin'
 import api, { CLIError } from '../src/index'
 import * as marpCli from '../src/marp-cli'

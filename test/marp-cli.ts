@@ -1,6 +1,6 @@
-import { EventEmitter } from 'events'
-import fs from 'fs'
-import path from 'path'
+import { EventEmitter } from 'node:events'
+import fs from 'node:fs'
+import path from 'node:path'
 import { version as coreVersion } from '@marp-team/marp-core/package.json'
 import { version as marpitVersion } from '@marp-team/marpit/package.json'
 import * as cosmiconfigExplorer from 'cosmiconfig/dist/Explorer' // eslint-disable-line import-x/namespace
@@ -39,7 +39,7 @@ const runForObservation = async (argv: string[]) => {
 }
 
 jest.mock('cosmiconfig')
-jest.mock('fs')
+jest.mock('node:fs')
 jest.mock('../src/preview')
 jest.mock('../src/watcher', () => jest.createMockFromModule('../src/watcher'))
 

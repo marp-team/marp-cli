@@ -1,4 +1,4 @@
-import { URL } from 'url'
+import { URL } from 'node:url'
 import { Marpit } from '@marp-team/marpit'
 import { warn } from '../cli'
 

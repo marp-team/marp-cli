@@ -10,9 +10,11 @@ module.exports = {
     ecmaVersion: 'latest',
     ecmaFeatures: { jsx: true },
   },
+  plugins: ['unicorn'],
   rules: {
     'import-x/no-unresolved': ['error', { ignore: ['ts-key-enum'] }],
     'import-x/order': ['error', { alphabetize: { order: 'asc' } }],
+    'unicorn/prefer-node-protocol': 'error',
   },
   settings: {
     'import-x/resolver': {

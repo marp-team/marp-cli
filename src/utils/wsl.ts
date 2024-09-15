@@ -1,5 +1,5 @@
-import { execFile, spawnSync } from 'child_process'
-import { readFileSync } from 'fs'
+import { execFile, spawnSync } from 'node:child_process'
+import { readFileSync } from 'node:fs'
 
 let isWsl: number | undefined
 
