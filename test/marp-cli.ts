@@ -39,7 +39,7 @@ const runForObservation = async (argv: string[]) => {
 }
 
 jest.mock('cosmiconfig')
-jest.mock('node:fs', () => require('./__mocks__/node/fs'))
+jest.mock('node:fs', () => require('./__mocks__/node/fs')) // eslint-disable-line @typescript-eslint/no-require-imports, jest/no-mocks-import -- Windows file system cannot use `:`
 jest.mock('../src/preview')
 jest.mock('../src/watcher', () => jest.createMockFromModule('../src/watcher'))
 

@@ -22,7 +22,7 @@ const puppeteerTimeoutMs = 60000
 
 let mkdirSpy: jest.SpiedFunction<typeof fs.promises.mkdir>
 
-jest.mock('node:fs', () => require('./__mocks__/node/fs'))
+jest.mock('node:fs', () => require('./__mocks__/node/fs')) // eslint-disable-line @typescript-eslint/no-require-imports, jest/no-mocks-import -- Windows file system cannot use `:`
 
 beforeEach(() => {
   mkdirSpy = jest.spyOn(fs.promises, 'mkdir').mockImplementation()
