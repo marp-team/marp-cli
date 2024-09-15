@@ -48,7 +48,10 @@ commands:
             - v2.4-dependencies-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}-
             - v2.4-dependencies-{{ .Environment.CIRCLE_JOB }}-
 
-      - run: yarn install --frozen-lockfile <<# parameters.force >>--ignore-engines<</ parameters.force >>
+      - run: |
+          yarn install --frozen-lockfile <<# parameters.force >>--ignore-engines<</ parameters.force >>
+          yarn patch-package
+
       - steps: << parameters.postinstall >>
 
       - save_cache:

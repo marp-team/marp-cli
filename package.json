@@ -122,6 +122,7 @@
     "nanoid": "^5.0.7",
     "npm-run-all2": "^6.2.3",
     "os-locale": "^6.0.2",
+    "patch-package": "^8.0.0",
     "pdf-lib": "^1.17.1",
     "pkg-up": "^5.0.0",
     "portfinder": "1.0.32",

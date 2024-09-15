@@ -39,7 +39,9 @@ jobs:
           cache: yarn
 
       - name: Install dependencies with yarn
-        run: yarn install --frozen-lockfile ${{ matrix.force && '--ignore-engines' || '' }}
+        run: |
+          yarn install --frozen-lockfile ${{ matrix.force && '--ignore-engines' || '' }}
+          yarn patch-package
 
       # Retry tests up to 3 times due to flaky tests on Windows CI
       # https://stackoverflow.com/a/59365905
