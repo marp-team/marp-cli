@@ -189,17 +189,6 @@ jobs:
     steps:
       - audit
 
-  test-node16:
-    executor:
-      name: node
-      browser: true
-      version: '16.20'
-    steps:
-      - prepare:
-          force: true
-          browser: true
-      - test
-
   test-node18:
     executor:
       name: node
@@ -263,9 +252,6 @@ workflows:
     jobs:
       # Test
       - audit
-      - test-node16:
-          requires:
-            - audit
       - test-node18:
           requires:
             - audit
@@ -279,7 +265,6 @@ workflows:
       # Docker (latest)
       - docker-build-latest:
           requires:
-            - test-node16
             - test-node18
             - test-node20
             - test-node22
