@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 import os from 'os'
 import path from 'path'
 
@@ -6,7 +7,7 @@ jest.mock('../../src/utils/edge-finder')
 jest.mock('../../src/utils/wsl')
 
 const CLIError = (): typeof import('../../src/error').CLIError =>
-  require('../../src/error').CLIError // eslint-disable-line @typescript-eslint/no-var-requires
+  require('../../src/error').CLIError
 
 const puppeteer = (): typeof import('puppeteer-core') =>
   require('puppeteer-core')

@@ -15,7 +15,7 @@ export default apiInterface
 
 // ---
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface -- Use interface instead of type for better IntelliSense
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface Config<Engine extends typeof Marpit = typeof Marp>
   extends Overwrite<
     Omit<

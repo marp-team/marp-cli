@@ -81,7 +81,7 @@ export const withNormalizedChromePathForDarwin = async <T>(
           )
         }
       }
-    } catch (e) {
+    } catch {
       // ignore
     }
   }

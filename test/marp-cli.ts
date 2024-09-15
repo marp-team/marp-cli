@@ -3,7 +3,7 @@ import fs from 'fs'
 import path from 'path'
 import { version as coreVersion } from '@marp-team/marp-core/package.json'
 import { version as marpitVersion } from '@marp-team/marpit/package.json'
-import * as cosmiconfigExplorer from 'cosmiconfig/dist/Explorer'
+import * as cosmiconfigExplorer from 'cosmiconfig/dist/Explorer' // eslint-disable-line import-x/namespace
 import getStdin from 'get-stdin'
 import stripAnsi from 'strip-ansi'
 import { version as cliVersion } from '../package.json'
@@ -26,7 +26,7 @@ import { Watcher } from '../src/watcher'
 
 const { Explorer } = cosmiconfigExplorer as any
 const observationHelpers: ObservationHelper[] = []
-const previewEmitter = new EventEmitter() as Preview
+const previewEmitter = new EventEmitter() as unknown as Preview
 
 const runForObservation = async (argv: string[]) => {
   const ret = await Promise.race([marpCli(argv), waitForObservation()])
@@ -1101,7 +1101,7 @@ describe('Marp CLI', () => {
           try {
             const conf = assetFn('_configs/custom-engine/anonymous.js')
             const md = assetFn('_configs/custom-engine/md.md')
-            const { engine } = require(conf) // eslint-disable-line @typescript-eslint/no-var-requires
+            const { engine } = require(conf) // eslint-disable-line @typescript-eslint/no-require-imports
 
             expect(await marpCli(['-c', conf, md, '--no-output'])).toBe(0)
             expect(engine).toHaveBeenCalledWith(

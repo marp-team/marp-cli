@@ -26,7 +26,7 @@ const isShebang = (path: string) => {
     fs.readSync(fd, shebangBuffer, 0, 2, 0)
 
     if (shebangBuffer[0] === 0x23 && shebangBuffer[1] === 0x21) return true
-  } catch (e: unknown) {
+  } catch {
     // no ops
   } finally {
     if (fd !== null) fs.closeSync(fd)

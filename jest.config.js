@@ -1,6 +1,7 @@
 const { jsWithBabel } = require('ts-jest/presets')
 
 const esModules = [
+  '@sindresorhus/merge-streams',
   'ansi-regex',
   'array-union',
   'chalk',
@@ -8,8 +9,8 @@ const esModules = [
   'find-up',
   'globby',
   'import-meta-resolve',
-  'is-inside-container',
   'is-docker',
+  'is-inside-container',
   'is-wsl',
   'lighthouse-logger',
   'locate-path',
@@ -18,9 +19,11 @@ const esModules = [
   'p-limit',
   'p-locate',
   'path-exists',
+  'path-type',
   'pkg-up',
   'slash',
   'strip-ansi',
+  'unicorn-magic',
   'yocto-queue',
 ]
 

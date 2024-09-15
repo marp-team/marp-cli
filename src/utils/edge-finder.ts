@@ -7,7 +7,7 @@ export const findAccessiblePath = (paths: string[]): string | undefined =>
     try {
       accessSync(p, constants.X_OK)
       return true
-    } catch (e: unknown) {
+    } catch {
       // no ops
     }
     return false

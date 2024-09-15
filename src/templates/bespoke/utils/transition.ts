@@ -284,7 +284,7 @@ export const parseTransitionData = (rawJSON: string | undefined) => {
     try {
       const json = JSON.parse(rawJSON)
       if (isTransitionData(json)) return json
-    } catch (_) {
+    } catch {
       /* fault tolerance */
     }
   }

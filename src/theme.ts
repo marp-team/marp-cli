@@ -131,7 +131,7 @@ export class ThemeSet {
 
           if (stat.isFile() || stat.isDirectory() || stat.isSymbolicLink())
             fnForWatch.add(path.resolve(f))
-        } catch (e: unknown) {
+        } catch {
           // No ops
         }
       }

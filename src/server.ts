@@ -234,7 +234,7 @@ export class Server extends (EventEmitter as new () => TypedEmitter<Server.Event
     try {
       stats = fetchedStats || (await fs.promises.stat(targetPath))
       valid = valid && !!stats?.isFile()
-    } catch (e: unknown) {
+    } catch {
       valid = false
     }
 

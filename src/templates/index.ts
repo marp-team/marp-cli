@@ -45,7 +45,8 @@ interface RenderedSize {
 
 export type TemplateOption = TemplateBareOption | TemplateBespokeOption
 
-interface TemplateBareOption {} // eslint-disable-line @typescript-eslint/no-empty-interface
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+interface TemplateBareOption {}
 
 interface TemplateBespokeOption {
   osc?: boolean

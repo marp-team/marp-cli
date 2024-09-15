@@ -48,7 +48,7 @@ export class ResolvedEngine<T extends Engine = Engine> {
 
         // Bundled Marp Core
         Object.assign(
-          // eslint-disable-next-line @typescript-eslint/no-var-requires -- import statement brings TypeError in the standalone binary
+          // eslint-disable-next-line @typescript-eslint/no-require-imports -- import statement brings TypeError in the standalone binary
           () => Promise.resolve(require('@marp-team/marp-core').Marp),
           { [preResolveAsyncSymbol]: true }
         ),
@@ -114,7 +114,7 @@ export class ResolvedEngine<T extends Engine = Engine> {
     const pkgPath = await pkgUp({ cwd: path.dirname(classPath) })
     if (!pkgPath) return null
 
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     return require(pkgPath) as Record<string, any>
   }
 
@@ -145,7 +145,7 @@ export class ResolvedEngine<T extends Engine = Engine> {
       const stat = await fs.promises.stat(moduleFilePath)
 
       if (stat.isFile()) moduleId = url.pathToFileURL(moduleFilePath).toString()
-    } catch (e: unknown) {
+    } catch {
       // No ops
     }
 
@@ -162,14 +162,14 @@ export class ResolvedEngine<T extends Engine = Engine> {
 
           // NOTE: Fallback cannot test because of overriding `import` in Jest context.
           /* c8 ignore start */
-        } catch (e) {
+        } catch {
           /* fallback */
         }
       }
 
       return await import(resolved)
       /* c8 ignore stop */
-    } catch (e) {
+    } catch {
       return null
     }
   }

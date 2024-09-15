@@ -9,13 +9,14 @@ import replace from '@rollup/plugin-replace'
 import terser from '@rollup/plugin-terser'
 import typescript from '@rollup/plugin-typescript'
 import url from '@rollup/plugin-url'
-import builtinModules from 'builtin-modules'
 import license from 'rollup-plugin-license'
 import postcss from 'rollup-plugin-postcss'
 import pugPlugin from 'rollup-plugin-pug'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const require = createRequire(import.meta.url)
+
+const { default: builtinModules } = await import('builtin-modules')
 const { dependencies, name, version } = require('./package.json')
 
 const compact = !process.env.ROLLUP_WATCH
