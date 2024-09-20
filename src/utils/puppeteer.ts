@@ -15,7 +15,11 @@ let executablePath: string | undefined | false = false
 let wslTmp: string | undefined
 
 export const enableHeadless = (): 'shell' | true =>
-  process.env.PUPPETEER_HEADLESS_MODE?.toLowerCase() === 'new' ? true : 'shell'
+  ['old', 'legacy', 'shell'].includes(
+    process.env.PUPPETEER_HEADLESS_MODE?.toLowerCase() ?? ''
+  )
+    ? 'shell'
+    : true
 
 const isShebang = (path: string) => {
   let fd: number | null = null
