@@ -19,7 +19,7 @@ It can convert Marp / Marpit Markdown files into static HTML / CSS, PDF, PowerPo
 
 ### npx
 
-[npx (`npm exec`)](https://docs.npmjs.com/cli/v7/commands/npx) is the best way to use the latest Marp CLI if you wanted
+[npx (`npm exec`)](https://docs.npmjs.com/cli/commands/npx) is the best way to use the latest Marp CLI if you wanted
 one-shot Markdown conversion _without install_. Just run below if you have
 installed [Node.js](https://nodejs.org/) v18 and later.
 
