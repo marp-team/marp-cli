@@ -1,20 +1,15 @@
 {
-  "extends": "@tsconfig/node14/tsconfig.json",
+  "extends": [
+    "@tsconfig/recommended/tsconfig.json",
+    "@tsconfig/node20/tsconfig.json"
+  ],
   "compilerOptions": {
     "jsx": "react",
-    "lib": [
-      "es2019",
-      "es2020.promise",
-      "es2020.bigint",
-      "es2020.string",
-      "dom"
-    ],
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "noImplicitAny": false,
     "resolveJsonModule": true,
-    "sourceMap": true,
-    "target": "es2019"
+    "sourceMap": true
   },
   "include": ["src"],
   "exclude": ["**/__mocks__"]

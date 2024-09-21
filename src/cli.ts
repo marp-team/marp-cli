@@ -1,7 +1,7 @@
 import chalk, { supportsColorStderr } from 'chalk'
 import stripAnsi from 'strip-ansi'
 import wrapAnsi from 'wrap-ansi'
-import { terminalWidth } from 'yargs'
+import { terminalWidth } from './utils/yargs'
 
 const { has16m, has256 } = { ...supportsColorStderr } // Workaround for type error
 
@@ -9,15 +9,15 @@ interface CLIOption {
   singleLine?: boolean
 }
 
-const width: number = terminalWidth() || 80
-
 const messageBlock = (
   kind: string,
   message: string,
   opts: CLIOption
 ): string => {
   const indent = stripAnsi(kind).length + 1
-  const target = opts.singleLine ? message : wrapAnsi(message, width - indent)
+  const target = opts.singleLine
+    ? message
+    : wrapAnsi(message, terminalWidth() - indent)
 
   return `${kind} ${target.split('\n').join(`\n${' '.repeat(indent)}`)}`
 }
