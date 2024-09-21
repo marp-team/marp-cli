@@ -100,7 +100,7 @@ The installed `marp` command is available in [npm-scripts](https://docs.npmjs.co
 You can install with `-g` option if you want to use `marp` command globally.
 
 ```bash
-npm install -g @marp-team/marp-cli
+sudo npm install -g @marp-team/marp-cli
 ```
 
 ### [Standalone binary][releases]
