@@ -101,6 +101,7 @@
     "chrome-launcher": "^1.1.2",
     "css.escape": "^1.5.1",
     "cssnano": "^7.0.6",
+    "debug": "^4.3.7",
     "eslint": "^9.10.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-import-resolver-exports": "^1.0.0-beta.5",

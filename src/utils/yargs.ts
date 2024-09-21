@@ -1,5 +1,5 @@
-import yargs from 'yargs/yargs'
 import type { Argv } from 'yargs'
+import yargs from 'yargs/yargs'
 
 let currentYargsRef: WeakRef<Argv> | null = null
 

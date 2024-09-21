@@ -9,9 +9,9 @@ import { Server } from './server'
 import templates from './templates'
 import { isOfficialDockerImage } from './utils/container'
 import { resetExecutablePath } from './utils/puppeteer'
+import { createYargs } from './utils/yargs'
 import version from './version'
 import watcher, { Watcher, notifier } from './watcher'
-import { createYargs } from './utils/yargs'
 
 enum OptionGroup {
   Basic = 'Basic Options:',

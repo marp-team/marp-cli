@@ -17,7 +17,7 @@ import { bare as bareTpl } from '../src/templates'
 import { ThemeSet } from '../src/theme'
 import { WatchNotifier } from '../src/watcher'
 
-const { CdpPage } = require('puppeteer-core/lib/cjs/puppeteer/cdp/Page')
+const { CdpPage } = require('puppeteer-core/lib/cjs/puppeteer/cdp/Page') // eslint-disable-line @typescript-eslint/no-require-imports -- Puppeteer's internal module
 
 const puppeteerTimeoutMs = 60000
 
