@@ -1,7 +1,7 @@
 import { execFile } from 'node:child_process'
-import { promisify } from 'node:util'
 import fs from 'node:fs'
 import path from 'node:path'
+import { promisify } from 'node:util'
 import { parse as parsePlist } from 'fast-plist'
 import { debugBrowserFinder } from '../../utils/debug'
 import { isWSL } from '../../utils/wsl'
