@@ -207,7 +207,10 @@ describe('Edge finder', () => {
   })
 
   describe('with WSL1', () => {
-    const wsl1EdgePath = path.join('/mnt/c/Program Files', ...winEdgeStable)
+    const wsl1EdgePath = path.posix.join(
+      '/mnt/c/Program Files',
+      ...winEdgeStable
+    )
 
     beforeEach(() => {
       jest.spyOn(utils, 'getPlatform').mockResolvedValue('wsl1')
@@ -231,18 +234,18 @@ describe('Edge finder', () => {
         acceptedBrowsers: [ChromeBrowser, ChromeCdpBrowser],
       })
       expect(findExecutableSpy).toHaveBeenCalledWith([
-        path.join('/mnt/c/mock/AppData/Local', ...winEdgeCanary),
-        path.join('/mnt/c/Program Files', ...winEdgeCanary),
-        path.join('/mnt/c/Program Files (x86)', ...winEdgeCanary),
-        path.join('/mnt/c/mock/AppData/Local', ...winEdgeDev),
-        path.join('/mnt/c/Program Files', ...winEdgeDev),
-        path.join('/mnt/c/Program Files (x86)', ...winEdgeDev),
-        path.join('/mnt/c/mock/AppData/Local', ...winEdgeBeta),
-        path.join('/mnt/c/Program Files', ...winEdgeBeta),
-        path.join('/mnt/c/Program Files (x86)', ...winEdgeBeta),
-        path.join('/mnt/c/mock/AppData/Local', ...winEdgeStable),
-        path.join('/mnt/c/Program Files', ...winEdgeStable),
-        path.join('/mnt/c/Program Files (x86)', ...winEdgeStable),
+        path.posix.join('/mnt/c/mock/AppData/Local', ...winEdgeCanary),
+        path.posix.join('/mnt/c/Program Files', ...winEdgeCanary),
+        path.posix.join('/mnt/c/Program Files (x86)', ...winEdgeCanary),
+        path.posix.join('/mnt/c/mock/AppData/Local', ...winEdgeDev),
+        path.posix.join('/mnt/c/Program Files', ...winEdgeDev),
+        path.posix.join('/mnt/c/Program Files (x86)', ...winEdgeDev),
+        path.posix.join('/mnt/c/mock/AppData/Local', ...winEdgeBeta),
+        path.posix.join('/mnt/c/Program Files', ...winEdgeBeta),
+        path.posix.join('/mnt/c/Program Files (x86)', ...winEdgeBeta),
+        path.posix.join('/mnt/c/mock/AppData/Local', ...winEdgeStable),
+        path.posix.join('/mnt/c/Program Files', ...winEdgeStable),
+        path.posix.join('/mnt/c/Program Files (x86)', ...winEdgeStable),
       ])
     })
 
@@ -253,14 +256,14 @@ describe('Edge finder', () => {
       await edgeFinder({})
 
       expect(findExecutableSpy).toHaveBeenCalledWith([
-        path.join('/mnt/c/Program Files', ...winEdgeCanary),
-        path.join('/mnt/c/Program Files (x86)', ...winEdgeCanary),
-        path.join('/mnt/c/Program Files', ...winEdgeDev),
-        path.join('/mnt/c/Program Files (x86)', ...winEdgeDev),
-        path.join('/mnt/c/Program Files', ...winEdgeBeta),
-        path.join('/mnt/c/Program Files (x86)', ...winEdgeBeta),
-        path.join('/mnt/c/Program Files', ...winEdgeStable),
-        path.join('/mnt/c/Program Files (x86)', ...winEdgeStable),
+        path.posix.join('/mnt/c/Program Files', ...winEdgeCanary),
+        path.posix.join('/mnt/c/Program Files (x86)', ...winEdgeCanary),
+        path.posix.join('/mnt/c/Program Files', ...winEdgeDev),
+        path.posix.join('/mnt/c/Program Files (x86)', ...winEdgeDev),
+        path.posix.join('/mnt/c/Program Files', ...winEdgeBeta),
+        path.posix.join('/mnt/c/Program Files (x86)', ...winEdgeBeta),
+        path.posix.join('/mnt/c/Program Files', ...winEdgeStable),
+        path.posix.join('/mnt/c/Program Files (x86)', ...winEdgeStable),
       ])
     })
 
