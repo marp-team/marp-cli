@@ -110,7 +110,7 @@ const firefoxFinderWSL1 = async () => {
       winFirefoxDevEdition,
       winFirefoxDefault,
     ].flatMap((suffix) =>
-      prefixes.map((prefix) => path.join(prefix, ...suffix))
+      prefixes.map((prefix) => path.posix.join(prefix, ...suffix))
     )
   )
 }

@@ -57,10 +57,12 @@ const edgeFinderWin32 = async ({
   programFiles = process.env.PROGRAMFILES,
   programFilesX86 = process.env['PROGRAMFILES(X86)'],
   localAppData = process.env.LOCALAPPDATA,
+  join = path.join,
 }: {
   programFiles?: string
   programFilesX86?: string
   localAppData?: string
+  join?: typeof path.join
 } = {}): Promise<string | undefined> => {
   const paths: string[] = []
 
@@ -73,7 +75,7 @@ const edgeFinderWin32 = async ({
 
   for (const suffix of suffixes) {
     for (const prefix of [localAppData, programFiles, programFilesX86]) {
-      if (prefix) paths.push(path.join(prefix, ...suffix))
+      if (prefix) paths.push(join(prefix, ...suffix))
     }
   }
 
@@ -87,5 +89,6 @@ const edgeFinderWSL1 = async () => {
     programFiles: '/mnt/c/Program Files',
     programFilesX86: '/mnt/c/Program Files (x86)',
     localAppData: localAppData && resolveWSLPathToGuestSync(localAppData),
+    join: path.posix.join,
   })
 }
