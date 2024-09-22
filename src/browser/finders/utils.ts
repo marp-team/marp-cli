@@ -1,12 +1,9 @@
-import { execFile } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
-import { promisify } from 'node:util'
 import { parse as parsePlist } from 'fast-plist'
+import nodeWhich from 'which'
 import { debugBrowserFinder } from '../../utils/debug'
 import { isWSL } from '../../utils/wsl'
-
-const execFilePromise = promisify(execFile)
 
 export const getPlatform = async () =>
   (await isWSL()) === 1 ? 'wsl1' : process.platform
@@ -28,6 +25,7 @@ const findFirst = async <T>(
   predicate: (path: string) => Promise<T>
 ) => {
   const pathsCount = paths.length
+  if (pathsCount === 0) return undefined
 
   return new Promise<T | undefined>((resolve) => {
     const result = Array<T | undefined>(pathsCount)
@@ -106,22 +104,8 @@ export const findExecutableBinary = async (binaries: string[]) =>
     return undefined
   })
 
-const which = async (command: string) => {
-  if (process.platform === 'win32') {
-    debugBrowserFinder(
-      '"which %s" command is not available on Windows.',
-      command
-    )
-    return undefined
-  }
-
-  try {
-    const { stdout } = await execFilePromise('which', [command])
-    return stdout.split(/\r?\n/)[0]
-  } catch {
-    return undefined
-  }
-}
+export const which = async (command: string) =>
+  (await nodeWhich(command, { nothrow: true })) ?? undefined
 
 // Darwin
 const darwinAppDirectoryMatcher = /.app\/?$/

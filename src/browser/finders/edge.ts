@@ -26,13 +26,10 @@ export const edgeFinder: BrowserFinder = async ({ preferredPath } = {}) => {
         return await edgeFinderLinux()
       case 'win32':
         return await edgeFinderWin32()
-      // CI cannot test against WSL environment
-      /* c8 ignore start */
       case 'wsl1':
         return await edgeFinderWSL1()
     }
     return undefined
-    /* c8 ignore stop */
   })()
 
   if (installation) return edge(installation)
@@ -67,15 +64,17 @@ const edgeFinderWin32 = async ({
 } = {}): Promise<string | undefined> => {
   const paths: string[] = []
 
-  for (const prefix of [programFiles, programFilesX86, localAppData]) {
-    if (!prefix) continue
+  const suffixes = [
+    ['Microsoft', 'Edge SxS', 'Application', 'msedge.exe'],
+    ['Microsoft', 'Edge Dev', 'Application', 'msedge.exe'],
+    ['Microsoft', 'Edge Beta', 'Application', 'msedge.exe'],
+    ['Microsoft', 'Edge', 'Application', 'msedge.exe'],
+  ]
 
-    paths.push(
-      path.join(prefix, 'Microsoft', 'Edge SxS', 'Application', 'msedge.exe'),
-      path.join(prefix, 'Microsoft', 'Edge Dev', 'Application', 'msedge.exe'),
-      path.join(prefix, 'Microsoft', 'Edge Beta', 'Application', 'msedge.exe'),
-      path.join(prefix, 'Microsoft', 'Edge', 'Application', 'msedge.exe')
-    )
+  for (const suffix of suffixes) {
+    for (const prefix of [localAppData, programFiles, programFilesX86]) {
+      if (prefix) paths.push(path.join(prefix, ...suffix))
+    }
   }
 
   return await findExecutable(paths)
@@ -87,6 +86,6 @@ const edgeFinderWSL1 = async () => {
   return await edgeFinderWin32({
     programFiles: '/mnt/c/Program Files',
     programFilesX86: '/mnt/c/Program Files (x86)',
-    localAppData: localAppData ? resolveWSLPathToGuestSync(localAppData) : '',
+    localAppData: localAppData && resolveWSLPathToGuestSync(localAppData),
   })
 }

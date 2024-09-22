@@ -27,13 +27,10 @@ export const chromeFinder: BrowserFinder = async ({ preferredPath } = {}) => {
         return linux()[0]
       case 'win32':
         return win32()[0]
-      // CI cannot test against WSL environment
-      /* c8 ignore start */
       case 'wsl1':
         return wsl()[0]
     }
     return await fallback()
-    /* c8 ignore stop */
   })()
 
   if (installation) return chrome(installation)

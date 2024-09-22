@@ -72,6 +72,64 @@ describe('Browser finder', () => {
       })
     })
 
+    it('resolves a secondary browser if the first finder throws an error', async () => {
+      let $findBrowser!: typeof findBrowser
+      let $ChromeBrowser!: typeof ChromeBrowser
+      let $ChromeCdpBrowser!: typeof ChromeCdpBrowser
+
+      await jest.isolateModulesAsync(async () => {
+        jest
+          .spyOn(
+            await import('../../src/browser/finders/firefox'),
+            'firefoxFinder'
+          )
+          .mockRejectedValue(new Error('Test error'))
+
+        $findBrowser = await import('../../src/browser/finder').then(
+          (m) => m.findBrowser
+        )
+
+        $ChromeBrowser = await import('../../src/browser/browsers/chrome').then(
+          (m) => m.ChromeBrowser
+        )
+
+        $ChromeCdpBrowser = await import(
+          '../../src/browser/browsers/chrome-cdp'
+        ).then((m) => m.ChromeCdpBrowser)
+      })
+
+      const browser = await $findBrowser(['firefox', 'chrome'], {
+        preferredPath: executableMock('empty'),
+      })
+
+      expect(browser).toStrictEqual<typeof browser>({
+        path: expect.stringMatching(/\bempty$/),
+        acceptedBrowsers: [$ChromeBrowser, $ChromeCdpBrowser],
+      })
+    })
+
+    it('rejects when finders are rejected', async () => {
+      let $findBrowser!: typeof findBrowser
+      let $CLIError!: typeof CLIError
+
+      await jest.isolateModulesAsync(async () => {
+        jest
+          .spyOn(
+            await import('../../src/browser/finders/chrome'),
+            'chromeFinder'
+          )
+          .mockRejectedValue(new Error('Test error'))
+
+        $findBrowser = await import('../../src/browser/finder').then(
+          (m) => m.findBrowser
+        )
+
+        $CLIError = await import('../../src/error').then((m) => m.CLIError)
+      })
+
+      await expect($findBrowser(['chrome'])).rejects.toThrow($CLIError)
+    })
+
     describe('with macOS', () => {
       let originalPlatform: string | undefined
 

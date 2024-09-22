@@ -9,6 +9,11 @@ const firefox = (path: string): BrowserFinderResult => ({
   acceptedBrowsers: [FirefoxBrowser],
 })
 
+const winFirefoxNightly = ['Nightly', 'firefox.exe']
+const winFirefoxNightlyAlt = ['Firefox Nightly', 'firefox.exe']
+const winFirefoxDevEdition = ['Firefox Developer Edition', 'firefox.exe']
+const winFirefoxDefault = ['Mozilla Firefox', 'firefox.exe'] // Firefox stable, ESR, and beta
+
 export const firefoxFinder: BrowserFinder = async ({ preferredPath } = {}) => {
   if (preferredPath) return firefox(preferredPath)
 
@@ -19,11 +24,8 @@ export const firefoxFinder: BrowserFinder = async ({ preferredPath } = {}) => {
         return await firefoxFinderDarwin()
       case 'win32':
         return await firefoxFinderWin32()
-      // CI cannot test against WSL environment
-      /* c8 ignore start */
       case 'wsl1':
         return await firefoxFinderWSL1()
-      /* c8 ignore stop */
     }
     return await firefoxFinderFallback()
   })()
@@ -45,8 +47,8 @@ const firefoxFinderWin32 = async () => {
 
   const winDriveMatcher = /^[a-z]:\\/i
   const winPossibleDrives = () => {
-    const possibleDriveSet = new Set<string>()
-    const pathEnvs = process.env.PATH?.split(';') ?? ['c:\\']
+    const possibleDriveSet = new Set<string>(['c'])
+    const pathEnvs = process.env.PATH?.split(';') ?? []
 
     for (const pathEnv of pathEnvs) {
       if (winDriveMatcher.test(pathEnv)) {
@@ -68,12 +70,14 @@ const firefoxFinderWin32 = async () => {
   }
 
   return await findExecutable(
-    prefixes.flatMap((prefix) => [
-      path.join(prefix, 'Nightly', 'firefox.exe'),
-      path.join(prefix, 'Firefox Nightly', 'firefox.exe'),
-      path.join(prefix, 'Firefox Developer Edition', 'firefox.exe'),
-      path.join(prefix, 'Mozilla Firefox', 'firefox.exe'), // Firefox stable, ESR, and beta
-    ])
+    [
+      winFirefoxNightly,
+      winFirefoxNightlyAlt,
+      winFirefoxDevEdition,
+      winFirefoxDefault,
+    ].flatMap((suffix) =>
+      prefixes.map((prefix) => path.join(prefix, ...suffix))
+    )
   )
 }
 
@@ -82,8 +86,8 @@ const firefoxFinderWSL1 = async () => {
 
   const winDriveMatcher = /^\/mnt\/[a-z]\//i
   const winPossibleDrives = () => {
-    const possibleDriveSet = new Set<string>()
-    const pathEnvs = process.env.PATH?.split(':') ?? ['/mnt/c/']
+    const possibleDriveSet = new Set<string>(['c'])
+    const pathEnvs = process.env.PATH?.split(':') ?? []
 
     for (const pathEnv of pathEnvs) {
       if (winDriveMatcher.test(pathEnv)) {
@@ -100,12 +104,14 @@ const firefoxFinderWSL1 = async () => {
   }
 
   return await findExecutable(
-    prefixes.flatMap((prefix) => [
-      path.join(prefix, 'Nightly', 'firefox.exe'),
-      path.join(prefix, 'Firefox Nightly', 'firefox.exe'),
-      path.join(prefix, 'Firefox Developer Edition', 'firefox.exe'),
-      path.join(prefix, 'Mozilla Firefox', 'firefox.exe'), // Firefox stable, ESR, and beta
-    ])
+    [
+      winFirefoxNightly,
+      winFirefoxNightlyAlt,
+      winFirefoxDevEdition,
+      winFirefoxDefault,
+    ].flatMap((suffix) =>
+      prefixes.map((prefix) => path.join(prefix, ...suffix))
+    )
   )
 }
 
