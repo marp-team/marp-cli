@@ -7,8 +7,11 @@ export interface BrowserOptions {
 }
 
 export abstract class Browser {
-  abstract kind: BrowserKind
-  abstract protocol: BrowserProtocol
+  static readonly kind: BrowserKind
+  static readonly protocol: BrowserProtocol
+
+  // ---
+
   purpose: BrowserPurpose
 
   constructor(opts: BrowserOptions) {
