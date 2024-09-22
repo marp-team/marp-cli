@@ -32,7 +32,7 @@ export const findBrowser = async (
     preferredPath: await (async () => {
       if (opts.preferredPath) {
         const normalized = await normalizeDarwinAppPath(opts.preferredPath)
-        if (isExecutable(normalized)) return normalized
+        if (await isExecutable(normalized)) return normalized
       }
       return undefined
     })(),

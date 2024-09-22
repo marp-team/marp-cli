@@ -2,33 +2,30 @@ import path from 'node:path'
 import { error, CLIErrorCode } from '../../error'
 import { FirefoxBrowser } from '../browsers/firefox'
 import type { BrowserFinder, BrowserFinderResult } from '../finder'
-import { getPlatform, isExecutable, which } from './utils'
+import { getPlatform, findExecutable, findExecutableBinary } from './utils'
 
 const firefox = (path: string): BrowserFinderResult => ({
   path,
   acceptedBrowsers: [FirefoxBrowser],
 })
 
-const findExecutable = (paths: string[]): string | undefined =>
-  paths.find((p) => isExecutable(p))
-
 export const firefoxFinder: BrowserFinder = async ({ preferredPath } = {}) => {
   if (preferredPath) return firefox(preferredPath)
 
   const platform = await getPlatform()
-  const installation = (() => {
+  const installation = await (async () => {
     switch (platform) {
       case 'darwin':
-        return firefoxFinderDarwin()
+        return await firefoxFinderDarwin()
       case 'win32':
-        return firefoxFinderWin32()
+        return await firefoxFinderWin32()
       // CI cannot test against WSL environment
       /* c8 ignore start */
       case 'wsl1':
-        return firefoxFinderWSL1()
+        return await firefoxFinderWSL1()
       /* c8 ignore stop */
     }
-    return firefoxFinderFallback()
+    return await firefoxFinderFallback()
   })()
 
   if (installation) return firefox(installation)
@@ -36,8 +33,8 @@ export const firefoxFinder: BrowserFinder = async ({ preferredPath } = {}) => {
   error('Firefox browser could not be found.', CLIErrorCode.NOT_FOUND_BROWSER)
 }
 
-const firefoxFinderDarwin = () =>
-  findExecutable([
+const firefoxFinderDarwin = async () =>
+  await findExecutable([
     '/Applications/Firefox Nightly.app/Contents/MacOS/firefox',
     '/Applications/Firefox Developer Edition.app/Contents/MacOS/firefox',
     '/Applications/Firefox.app/Contents/MacOS/firefox', // Firefox stable, ESR, and beta
@@ -57,7 +54,7 @@ const winPossibleDrives = () => {
   return Array.from(possibleDriveSet).sort()
 }
 
-const firefoxFinderWin32 = () => {
+const firefoxFinderWin32 = async () => {
   const prefixes: string[] = []
 
   for (const drive of winPossibleDrives()) {
@@ -70,7 +67,7 @@ const firefoxFinderWin32 = () => {
     }
   }
 
-  return findExecutable(
+  return await findExecutable(
     prefixes.flatMap((prefix) => [
       path.join(prefix, 'Nightly', 'firefox.exe'),
       path.join(prefix, 'Firefox Nightly', 'firefox.exe'),
@@ -80,7 +77,7 @@ const firefoxFinderWin32 = () => {
   )
 }
 
-const firefoxFinderWSL1 = () => {
+const firefoxFinderWSL1 = async () => {
   const prefixes: string[] = []
 
   for (const drive of winPossibleDrives()) {
@@ -88,7 +85,7 @@ const firefoxFinderWSL1 = () => {
     prefixes.push(`/mnt/${drive}/Program Files (x86)`)
   }
 
-  return findExecutable(
+  return await findExecutable(
     prefixes.flatMap((prefix) => [
       path.join(prefix, 'Nightly', 'firefox.exe'),
       path.join(prefix, 'Firefox Nightly', 'firefox.exe'),
@@ -98,22 +95,17 @@ const firefoxFinderWSL1 = () => {
   )
 }
 
-// In Linux, Firefox must have only an executable name `firefox` in every
-// editions, but some packages may provide different executable names.
-const fallbackExecutableNames = [
-  'firefox-nightly',
-  'firefox-developer-edition',
-  'firefox-developer',
-  'firefox-dev',
-  'firefox-beta',
-  'firefox',
-  'firefox-esr',
-] as const
-
-const firefoxFinderFallback = () => {
-  for (const executableName of fallbackExecutableNames) {
-    const executablePath = which(executableName)
-    if (executablePath && isExecutable(executablePath)) return executablePath
-  }
-  return undefined
-}
+const firefoxFinderFallback = async () =>
+  await findExecutableBinary(
+    // In Linux, Firefox must have only an executable name `firefox` in every
+    // editions, but some packages may provide different executable names.
+    [
+      'firefox-nightly',
+      'firefox-developer-edition',
+      'firefox-developer',
+      'firefox-dev',
+      'firefox-beta',
+      'firefox',
+      'firefox-esr',
+    ]
+  )

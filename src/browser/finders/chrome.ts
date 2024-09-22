@@ -8,7 +8,7 @@ import { error, CLIErrorCode } from '../../error'
 import { ChromeBrowser } from '../browsers/chrome'
 import { ChromeCdpBrowser } from '../browsers/chrome-cdp'
 import type { BrowserFinder, BrowserFinderResult } from '../finder'
-import { getPlatform, isExecutable, which } from './utils'
+import { findExecutableBinary, getPlatform } from './utils'
 
 const chrome = (path: string): BrowserFinderResult => ({
   path,
@@ -19,7 +19,7 @@ export const chromeFinder: BrowserFinder = async ({ preferredPath } = {}) => {
   if (preferredPath) return chrome(preferredPath)
 
   const platform = await getPlatform()
-  const installation = (() => {
+  const installation = await (async () => {
     switch (platform) {
       case 'darwin':
         return darwinFast()
@@ -32,7 +32,7 @@ export const chromeFinder: BrowserFinder = async ({ preferredPath } = {}) => {
       case 'wsl1':
         return wsl()[0]
     }
-    return fallback()
+    return await fallback()
     /* c8 ignore stop */
   })()
 
@@ -41,18 +41,11 @@ export const chromeFinder: BrowserFinder = async ({ preferredPath } = {}) => {
   error('Chrome browser could not be found.', CLIErrorCode.NOT_FOUND_BROWSER)
 }
 
-const fallbackExecutableNames = [
-  'google-chrome-stable',
-  'google-chrome',
-  'chrome', // FreeBSD Chromium
-  'chromium-browser',
-  'chromium',
-] as const
-
-const fallback = () => {
-  for (const executableName of fallbackExecutableNames) {
-    const executablePath = which(executableName)
-    if (executablePath && isExecutable(executablePath)) return executablePath
-  }
-  return undefined
-}
+const fallback = async () =>
+  await findExecutableBinary([
+    'google-chrome-stable',
+    'google-chrome',
+    'chrome', // FreeBSD Chromium
+    'chromium-browser',
+    'chromium',
+  ])

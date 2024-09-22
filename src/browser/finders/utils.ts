@@ -1,25 +1,69 @@
-import { execFileSync } from 'node:child_process'
+import { execFile } from 'node:child_process'
+import { promisify } from 'node:util'
 import fs from 'node:fs'
 import path from 'node:path'
 import { parse as parsePlist } from 'fast-plist'
 import { debugBrowserFinder } from '../../utils/debug'
 import { isWSL } from '../../utils/wsl'
 
-// Common
+const execFilePromise = promisify(execFile)
+
 export const getPlatform = async () =>
   (await isWSL()) === 1 ? 'wsl1' : process.platform
 
-export const isAccessible = (path: string, mode?: number) => {
+export const isAccessible = async (path: string, mode?: number) => {
   try {
-    fs.accessSync(path, mode)
+    await fs.promises.access(path, mode)
     return true
   } catch {
     return false
   }
 }
 
-export const isExecutable = (path: string) =>
-  isAccessible(path, fs.constants.X_OK)
+export const isExecutable = async (path: string) =>
+  await isAccessible(path, fs.constants.X_OK)
+
+const findFirst = async <T>(
+  paths: string[],
+  predicate: (path: string) => Promise<T>
+) => {
+  const pathsCount = paths.length
+
+  return new Promise<T | undefined>((resolve) => {
+    const result = Array<T | undefined>(pathsCount)
+    const resolved = Array<boolean | undefined>(pathsCount)
+
+    paths.forEach((p, index) => {
+      predicate(p)
+        .then((ret) => {
+          result[index] = ret
+          resolved[index] = !!ret
+        })
+        .catch((e) => {
+          debugBrowserFinder('%o', e)
+          resolved[index] = false
+        })
+        .finally(() => {
+          let target: number | undefined
+
+          for (let i = pathsCount - 1; i >= 0; i -= 1) {
+            if (resolved[i] !== false) target = i
+          }
+
+          if (target === undefined) {
+            resolve(undefined)
+          } else if (resolved[target]) {
+            resolve(result[target])
+          }
+        })
+    })
+  })
+}
+
+export const findExecutable = async (paths: string[]) =>
+  await findFirst(paths, async (path) =>
+    (await isExecutable(path)) ? path : undefined
+  )
 
 // Linux
 export const isSnapBrowser = async (executablePath: string) => {
@@ -35,26 +79,6 @@ export const isSnapBrowser = async (executablePath: string) => {
   }
 
   return false
-}
-
-export const which = (command: string) => {
-  if (process.platform === 'win32') {
-    debugBrowserFinder(
-      '"which %s" command is not available on Windows.',
-      command
-    )
-    return undefined
-  }
-
-  try {
-    const [ret] = execFileSync('which', [command], { stdio: 'pipe' })
-      .toString()
-      .split(/\r?\n/)
-
-    return ret
-  } catch {
-    return undefined
-  }
 }
 
 const isShebang = (path: string) => {
@@ -73,6 +97,30 @@ const isShebang = (path: string) => {
     if (fd !== null) fs.closeSync(fd)
   }
   return false
+}
+
+export const findExecutableBinary = async (binaries: string[]) =>
+  await findFirst(binaries, async (binary) => {
+    const binaryPath = await which(binary)
+    if (binaryPath && (await isExecutable(binaryPath))) return binaryPath
+    return undefined
+  })
+
+const which = async (command: string) => {
+  if (process.platform === 'win32') {
+    debugBrowserFinder(
+      '"which %s" command is not available on Windows.',
+      command
+    )
+    return undefined
+  }
+
+  try {
+    const { stdout } = await execFilePromise('which', [command])
+    return stdout.split(/\r?\n/)[0]
+  } catch {
+    return undefined
+  }
 }
 
 // Darwin
