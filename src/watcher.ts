@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 import crypto from 'node:crypto'
 import path from 'node:path'
-import chokidar, { type FSWatcher } from 'chokidar'
+import { watch as chokidarWatch, type FSWatcher } from 'chokidar'
 import { getPortPromise } from 'portfinder'
 import WS, { type ServerOptions } from 'ws'
 import { Converter, ConvertedCallback } from './converter'
@@ -22,8 +22,7 @@ export class Watcher {
     this.finder = opts.finder
     this.mode = opts.mode
 
-    this.chokidar = chokidar
-      .watch(watchPath, { ignoreInitial: true })
+    this.chokidar = chokidarWatch(watchPath, { ignoreInitial: true })
       .on('change', (f) => this.convert(f))
       .on('add', (f) => this.convert(f))
       .on('unlink', (f) => this.delete(f))

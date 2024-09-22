@@ -9,7 +9,7 @@ import { load } from 'cheerio'
 import { imageSize } from 'image-size'
 import { PDFDocument, PDFDict, PDFName, PDFHexString, PDFNumber } from 'pdf-lib'
 import { TimeoutError } from 'puppeteer-core'
-import yauzl from 'yauzl'
+import { fromBuffer as yauzlFromBuffer } from 'yauzl'
 import { Converter, ConvertType, ConverterOption } from '../src/converter'
 import { CLIError } from '../src/error'
 import { File, FileType } from '../src/file'
@@ -930,7 +930,7 @@ describe('Converter', () => {
       const getPptxDocProps = async (buffer: Buffer) => {
         // Require to ignore type definition by casting into any :(
         // https://github.com/DefinitelyTyped/DefinitelyTyped/issues/20497
-        const zip = await (promisify(yauzl.fromBuffer) as any)(buffer, {
+        const zip = await (promisify(yauzlFromBuffer) as any)(buffer, {
           lazyEntries: true,
         })
 

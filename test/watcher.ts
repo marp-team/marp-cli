@@ -1,6 +1,5 @@
 import http from 'node:http'
-import chokidar from 'chokidar'
-// import * as portfinder from 'portfinder'
+import { watch as chokidarWatch } from 'chokidar'
 import { File, FileType } from '../src/file'
 import { ThemeSet } from '../src/theme'
 import { Watcher, WatchNotifier, notifier } from '../src/watcher'
@@ -15,6 +14,7 @@ jest.mock('chokidar', () => ({
     }),
   })),
 }))
+
 jest.mock('ws', () => ({
   Server: jest.fn(() => ({
     clients: [],
@@ -22,6 +22,7 @@ jest.mock('ws', () => ({
     on: mockWsOn,
   })),
 }))
+
 jest.mock('../src/watcher')
 jest.mock('../src/theme')
 
@@ -61,10 +62,7 @@ describe('Watcher', () => {
       const watcher = createWatcher()
 
       expect(watcher).toBeInstanceOf(Watcher)
-      expect(chokidar.watch).toHaveBeenCalledWith(
-        ['test.md'],
-        expect.anything()
-      )
+      expect(chokidarWatch).toHaveBeenCalledWith(['test.md'], expect.anything())
       expect(notifier.start).toHaveBeenCalled()
 
       // Chokidar events
