@@ -88,7 +88,7 @@ const edgeFinderWSL1 = async () => {
   return await edgeFinderWin32({
     programFiles: '/mnt/c/Program Files',
     programFilesX86: '/mnt/c/Program Files (x86)',
-    localAppData: localAppData && resolveWSLPathToGuestSync(localAppData),
+    localAppData: localAppData ? resolveWSLPathToGuestSync(localAppData) : '',
     join: path.posix.join,
   })
 }
