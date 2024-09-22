@@ -17,4 +17,12 @@ export abstract class Browser {
   constructor(opts: BrowserOptions) {
     this.purpose = opts.purpose
   }
+
+  get kind() {
+    return (this.constructor as typeof Browser).kind
+  }
+
+  get protocol() {
+    return (this.constructor as typeof Browser).protocol
+  }
 }

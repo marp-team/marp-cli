@@ -40,22 +40,22 @@ const firefoxFinderDarwin = async () =>
     '/Applications/Firefox.app/Contents/MacOS/firefox', // Firefox stable, ESR, and beta
   ])
 
-const winDriveMatcher = /^[a-z]:\\/i
-const winPossibleDrives = () => {
-  const possibleDriveSet = new Set<string>()
-  const pathEnvs = process.env.PATH?.split(';') ?? ['c:\\']
-
-  for (const pathEnv of pathEnvs) {
-    if (winDriveMatcher.test(pathEnv)) {
-      possibleDriveSet.add(pathEnv[0].toLowerCase())
-    }
-  }
-
-  return Array.from(possibleDriveSet).sort()
-}
-
 const firefoxFinderWin32 = async () => {
   const prefixes: string[] = []
+
+  const winDriveMatcher = /^[a-z]:\\/i
+  const winPossibleDrives = () => {
+    const possibleDriveSet = new Set<string>()
+    const pathEnvs = process.env.PATH?.split(';') ?? ['c:\\']
+
+    for (const pathEnv of pathEnvs) {
+      if (winDriveMatcher.test(pathEnv)) {
+        possibleDriveSet.add(pathEnv[0].toLowerCase())
+      }
+    }
+
+    return Array.from(possibleDriveSet).sort()
+  }
 
   for (const drive of winPossibleDrives()) {
     for (const prefix of [
@@ -80,6 +80,20 @@ const firefoxFinderWin32 = async () => {
 const firefoxFinderWSL1 = async () => {
   const prefixes: string[] = []
 
+  const winDriveMatcher = /^\/mnt\/[a-z]\//i
+  const winPossibleDrives = () => {
+    const possibleDriveSet = new Set<string>()
+    const pathEnvs = process.env.PATH?.split(':') ?? ['/mnt/c/']
+
+    for (const pathEnv of pathEnvs) {
+      if (winDriveMatcher.test(pathEnv)) {
+        possibleDriveSet.add(pathEnv[5].toLowerCase())
+      }
+    }
+
+    return Array.from(possibleDriveSet).sort()
+  }
+
   for (const drive of winPossibleDrives()) {
     prefixes.push(`/mnt/${drive}/Program Files`)
     prefixes.push(`/mnt/${drive}/Program Files (x86)`)
@@ -98,7 +112,8 @@ const firefoxFinderWSL1 = async () => {
 const firefoxFinderFallback = async () =>
   await findExecutableBinary(
     // In Linux, Firefox must have only an executable name `firefox` in every
-    // editions, but some packages may provide different executable names.
+    // editions, but some distributions may have provided different executable
+    // names.
     [
       'firefox-nightly',
       'firefox-developer-edition',
