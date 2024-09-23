@@ -7,6 +7,7 @@ import { promisify } from 'node:util'
 import getStdin from 'get-stdin'
 import { globby, Options as GlobbyOptions } from 'globby'
 import { tmpName } from 'tmp'
+import { debug } from './utils/debug'
 
 const tmpNamePromise = promisify(tmpName)
 
@@ -100,6 +101,7 @@ export class File {
 
     if (opts.home) tmp = path.join(os.homedir(), path.basename(tmp))
 
+    debug('Save temporary file to %s', tmp)
     await this.saveToFile(tmp)
 
     return {
@@ -114,8 +116,9 @@ export class File {
     }
   }
 
-  private cleanup(tmpPath: string) {
-    return fs.promises.unlink(tmpPath)
+  private async cleanup(tmpPath: string) {
+    await fs.promises.unlink(tmpPath)
+    debug('Cleaned up temporary file: %s', tmpPath)
   }
 
   private convertName(
@@ -147,13 +150,17 @@ export class File {
   }
 
   private async saveToFile(savePath: string = this.path) {
+    debug('Saving file to %s ...', savePath)
+
     const directory = path.dirname(path.resolve(savePath))
 
     if (path.dirname(directory) !== directory) {
+      debug('Creating directory: %s', directory)
       await fs.promises.mkdir(directory, { recursive: true })
     }
 
     await fs.promises.writeFile(savePath, this.buffer!)
+    debug('Wrote: %s', savePath)
   }
 
   private static stdinBuffer?: Buffer

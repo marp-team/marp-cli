@@ -2,7 +2,8 @@ import { URL } from 'node:url'
 import type { Marp, MarpOptions } from '@marp-team/marp-core'
 import { Marpit, Options as MarpitOptions } from '@marp-team/marpit'
 import chalk from 'chalk'
-import type { Browser, Page, HTTPRequest, WaitForOptions } from 'puppeteer-core'
+import type { Page, HTTPRequest, WaitForOptions } from 'puppeteer-core'
+import { browserManager } from './browser/manager'
 import { silence, warn } from './cli'
 import { Engine, ResolvedEngine } from './engine'
 import { generateOverrideGlobalDirectivesPlugin } from './engine/directive-plugin'
@@ -29,12 +30,7 @@ import templates, {
 import { ThemeSet } from './theme'
 import { isOfficialDockerImage } from './utils/container'
 import { pdfLib, setOutline } from './utils/pdf'
-import {
-  generatePuppeteerDataDirPath,
-  generatePuppeteerLaunchArgs,
-  launchPuppeteer,
-} from './utils/puppeteer'
-import { isChromeInWSLHost, resolveWSLPathToHost } from './utils/wsl'
+import { resolveWSLPathToHost } from './utils/wsl'
 import { notifier } from './watcher'
 
 const CREATED_BY_MARP = 'Created by Marp'
@@ -144,9 +140,9 @@ export class Converter {
       if (this.options.baseUrl) return this.options.baseUrl
 
       if (isFile(f) && type !== ConvertType.html) {
-        return (await isChromeInWSLHost(
-          (await generatePuppeteerLaunchArgs()).executablePath
-        ))
+        const browser = await browserManager.browserForConversion()
+
+        return (await browser.browserInWSLHost())
           ? `file:${await resolveWSLPathToHost(f.absolutePath)}`
           : f.absoluteFileScheme
       }
@@ -561,65 +557,64 @@ export class Converter {
     })()
 
     try {
-      const browser = await Converter.runBrowser({
-        timeout: this.puppeteerTimeout,
-      })
+      // timeout: this.puppeteerTimeout,
+      const browser = await browserManager.browserForConversion()
 
-      const uri = await (async () => {
-        if (tmpFile) {
-          if (await isChromeInWSLHost(browser.process()?.spawnfile)) {
-            // Windows Chrome should read file from WSL environment
-            return `file:${await resolveWSLPathToHost(tmpFile.path)}`
+      return await browser.withPage(async (page) => {
+        page.setDefaultTimeout(this.puppeteerTimeout)
+
+        const { missingFileSet, failedFileSet } =
+          this.trackFailedLocalFileAccess(page)
+
+        const uri = await (async () => {
+          if (tmpFile) {
+            if (await browser.browserInWSLHost()) {
+              // Windows Chrome should read file from WSL environment
+              return `file:${await resolveWSLPathToHost(tmpFile.path)}`
+            }
+            return `file://${tmpFile.path}`
           }
-          return `file://${tmpFile.path}`
-        }
-        return undefined
-      })()
+          return undefined
+        })()
 
-      const page = await browser.newPage()
-      page.setDefaultTimeout(this.puppeteerTimeout)
+        const render = async () => {
+          const waitForOptions: WaitForOptions = {
+            waitUntil: ['domcontentloaded', 'networkidle0'],
+          }
 
-      const { missingFileSet, failedFileSet } =
-        this.trackFailedLocalFileAccess(page)
-
-      const render = async () => {
-        const waitForOptions: WaitForOptions = {
-          waitUntil: ['domcontentloaded', 'networkidle0'],
+          if (uri) {
+            await page.goto(uri, waitForOptions)
+          } else {
+            await page.goto('data:text/html,', waitForOptions)
+            await page.setContent(baseFile.buffer!.toString(), waitForOptions)
+          }
         }
 
-        if (uri) {
-          await page.goto(uri, waitForOptions)
-        } else {
-          await page.goto('data:text/html,')
-          await page.setContent(baseFile.buffer!.toString(), waitForOptions)
+        try {
+          return await processer(page, { render })
+        } finally {
+          if (missingFileSet.size > 0) {
+            warn(
+              `${missingFileSet.size > 1 ? 'Some of t' : 'T'}he local file${
+                missingFileSet.size > 1 ? 's are' : ' is'
+              } missing and will be ignored. Make sure the file path${
+                missingFileSet.size > 1 ? 's are' : ' is'
+              } correct.`
+            )
+          }
+          if (failedFileSet.size > 0) {
+            warn(
+              `Marp CLI has detected accessing to local file${
+                failedFileSet.size > 1 ? 's' : ''
+              }. ${
+                failedFileSet.size > 1 ? 'They are' : 'That is'
+              } blocked by security reason. Instead we recommend using assets uploaded to online. (Or you can use ${chalk.yellow(
+                '--allow-local-files'
+              )} option if you are understood of security risk)`
+            )
+          }
         }
-      }
-
-      try {
-        return await processer(page, { render })
-      } finally {
-        if (missingFileSet.size > 0) {
-          warn(
-            `${missingFileSet.size > 1 ? 'Some of t' : 'T'}he local file${
-              missingFileSet.size > 1 ? 's are' : ' is'
-            } missing and will be ignored. Make sure the file path${
-              missingFileSet.size > 1 ? 's are' : ' is'
-            } correct.`
-          )
-        }
-        if (failedFileSet.size > 0) {
-          warn(
-            `Marp CLI has detected accessing to local file${
-              failedFileSet.size > 1 ? 's' : ''
-            }. ${
-              failedFileSet.size > 1 ? 'They are' : 'That is'
-            } blocked by security reason. Instead we recommend using assets uploaded to online. (Or you can use ${chalk.yellow(
-              '--allow-local-files'
-            )} option if you are understood of security risk)`
-          )
-        }
-        await page.close()
-      }
+      })
     } finally {
       if (tmpFile) await tmpFile.cleanup()
     }
@@ -648,29 +643,5 @@ export class Converter {
     })
 
     return { missingFileSet, failedFileSet }
-  }
-
-  static async closeBrowser() {
-    if (Converter.browser) await Converter.browser.close()
-  }
-
-  private static browser?: Browser
-
-  private static async runBrowser({ timeout }: { timeout?: number }) {
-    if (!Converter.browser) {
-      const baseArgs = await generatePuppeteerLaunchArgs()
-
-      Converter.browser = await launchPuppeteer({
-        ...baseArgs,
-        timeout,
-        userDataDir: await generatePuppeteerDataDirPath('marp-cli-conversion', {
-          wslHost: await isChromeInWSLHost(baseArgs.executablePath),
-        }),
-      })
-      Converter.browser.once('disconnected', () => {
-        Converter.browser = undefined
-      })
-    }
-    return Converter.browser
   }
 }

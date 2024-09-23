@@ -21,10 +21,12 @@ export type BrowserFinder = (
 
 const finderMap = { chrome, edge, firefox } as const
 
-export const autoFinders = ['chrome', 'edge', 'firefox'] as const
+export type FinderName = keyof typeof finderMap
+
+export const defaultFinders = ['chrome', 'edge', 'firefox'] as const
 
 export const findBrowser = async (
-  finders: readonly (keyof typeof finderMap)[] = autoFinders,
+  finders: readonly FinderName[] = defaultFinders,
   opts: BrowserFinderOptions = {}
 ) => {
   const finderCount = finders.length

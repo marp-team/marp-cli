@@ -1,4 +1,5 @@
 import chalk from 'chalk'
+import { browserManager } from './browser/manager'
 import * as cli from './cli'
 import fromArguments from './config'
 import { Converter, ConvertedCallback, ConvertType } from './converter'
@@ -447,7 +448,8 @@ export const marpCli = async (
   } finally {
     await Promise.all([
       notifier.stop(),
-      Converter.closeBrowser(),
+      // Converter.closeBrowser(), // TODO: Remove this line after replacing browser management into the new manager
+      browserManager.dispose(),
       server?.stop(),
       watcherInstance?.chokidar.close(),
     ])
