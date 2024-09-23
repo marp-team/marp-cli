@@ -1,5 +1,5 @@
-import { browserManager, BrowserManager } from '../../src/browser/manager'
 import { ChromeBrowser } from '../../src/browser/browsers/chrome'
+import { browserManager, BrowserManager } from '../../src/browser/manager'
 
 describe('browserManager static instance', () => {
   it('is an instance of BrowserManager', () => {

@@ -50,8 +50,10 @@ export const isWSL = async (): Promise<number> => {
             const gccMatched = verStr.match(/gcc[^,]+?(\d+)\.\d+\.\d+/)
             if (gccMatched && Number.parseInt(gccMatched[1], 10) >= 8)
               return true
-          } catch {
-            // no ops
+          } catch (e) {
+            debug('Error while detecting WSL version: %o', e)
+            debug('Assuming current WSL version is the primary version 2')
+            return true
           }
         })()
 

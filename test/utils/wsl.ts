@@ -173,14 +173,14 @@ describe('#isWSL', () => {
     expect(readFile).toHaveBeenCalledTimes(1)
   })
 
-  it('returns 1 if throing an error while checking WSL 2', async () => {
+  it('returns 2 if throing an error while checking WSL 2 because 2 is the primary version of current WSL', async () => {
     jest.doMock('is-wsl', () => true)
 
     const readFile = jest
       .spyOn(fs.promises, 'readFile')
       .mockRejectedValue(new Error('Failed to read file'))
 
-    expect(await wsl().isWSL()).toBe(1)
+    expect(await wsl().isWSL()).toBe(2)
     expect(readFile).toHaveBeenCalledTimes(1)
   })
 })
