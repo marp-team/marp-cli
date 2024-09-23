@@ -1,6 +1,6 @@
 import { ClientRequest } from 'node:http'
 import path from 'node:path'
-import Marp from '@marp-team/marp-core'
+import { Marp } from '@marp-team/marp-core'
 import { load } from 'cheerio'
 import express, { type Express } from 'express'
 import request from 'supertest'

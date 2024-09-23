@@ -9,14 +9,15 @@ import { load } from 'cheerio'
 import { imageSize } from 'image-size'
 import { PDFDocument, PDFDict, PDFName, PDFHexString, PDFNumber } from 'pdf-lib'
 import { TimeoutError } from 'puppeteer-core'
-import { CdpPage as Page } from 'puppeteer-core/lib/cjs/puppeteer/cdp/Page'
-import yauzl from 'yauzl'
+import { fromBuffer as yauzlFromBuffer } from 'yauzl'
 import { Converter, ConvertType, ConverterOption } from '../src/converter'
 import { CLIError } from '../src/error'
 import { File, FileType } from '../src/file'
 import { bare as bareTpl } from '../src/templates'
 import { ThemeSet } from '../src/theme'
 import { WatchNotifier } from '../src/watcher'
+
+const { CdpPage } = require('puppeteer-core/lib/cjs/puppeteer/cdp/Page') // eslint-disable-line @typescript-eslint/no-require-imports -- Puppeteer's internal module
 
 const puppeteerTimeoutMs = 60000
 
@@ -929,7 +930,7 @@ describe('Converter', () => {
       const getPptxDocProps = async (buffer: Buffer) => {
         // Require to ignore type definition by casting into any :(
         // https://github.com/DefinitelyTyped/DefinitelyTyped/issues/20497
-        const zip = await (promisify(yauzl.fromBuffer) as any)(buffer, {
+        const zip = await (promisify(yauzlFromBuffer) as any)(buffer, {
           lazyEntries: true,
         })
 
@@ -969,7 +970,7 @@ describe('Converter', () => {
       it(
         'converts markdown file into PPTX',
         async () => {
-          const setViewport = jest.spyOn(Page.prototype, 'setViewport')
+          const setViewport = jest.spyOn(CdpPage.prototype, 'setViewport')
 
           await converter().convertFile(new File(onePath))
           expect(write).toHaveBeenCalled()
@@ -996,7 +997,7 @@ describe('Converter', () => {
         it(
           'assigns meta info thorugh PptxGenJs',
           async () => {
-            const setViewport = jest.spyOn(Page.prototype, 'setViewport')
+            const setViewport = jest.spyOn(CdpPage.prototype, 'setViewport')
 
             await converter({
               imageScale: 1,

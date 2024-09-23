@@ -1,6 +1,4 @@
 import chalk from 'chalk'
-import { Argv } from 'yargs'
-import yargs from 'yargs/yargs'
 import * as cli from './cli'
 import fromArguments from './config'
 import { Converter, ConvertedCallback, ConvertType } from './converter'
@@ -11,6 +9,7 @@ import { Server } from './server'
 import templates from './templates'
 import { isOfficialDockerImage } from './utils/container'
 import { resetExecutablePath } from './utils/puppeteer'
+import { createYargs } from './utils/yargs'
 import version from './version'
 import watcher, { Watcher, notifier } from './watcher'
 
@@ -51,8 +50,7 @@ export const marpCli = async (
   let watcherInstance: Watcher | undefined
 
   try {
-    const base: Argv = yargs(argv)
-    const program = base
+    const program = createYargs(argv)
       .parserConfiguration({ 'dot-notation': false })
       .usage(usage)
       .help(false)

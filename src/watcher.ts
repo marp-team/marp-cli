@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 import crypto from 'node:crypto'
 import path from 'node:path'
-import chokidar, { type FSWatcher } from 'chokidar'
+import { watch as chokidarWatch, type FSWatcher } from 'chokidar'
 import { getPortPromise } from 'portfinder'
-import { Server as WSServer, ServerOptions } from 'ws'
+import WS, { type ServerOptions } from 'ws'
 import { Converter, ConvertedCallback } from './converter'
 import { isError } from './error'
 import { File, FileType } from './file'
@@ -22,8 +22,7 @@ export class Watcher {
     this.finder = opts.finder
     this.mode = opts.mode
 
-    this.chokidar = chokidar
-      .watch(watchPath, { ignoreInitial: true })
+    this.chokidar = chokidarWatch(watchPath, { ignoreInitial: true })
       .on('change', (f) => this.convert(f))
       .on('add', (f) => this.convert(f))
       .on('unlink', (f) => this.delete(f))
@@ -83,7 +82,7 @@ export class Watcher {
 export class WatchNotifier {
   listeners = new Map<string, Set<any>>()
 
-  private wss?: WSServer
+  private wss?: WS.Server
   private portNumber?: number
 
   async port() {
@@ -113,7 +112,7 @@ export class WatchNotifier {
   }
 
   async start(opts: ServerOptions = {}) {
-    this.wss = new WSServer({ ...opts, port: await this.port() })
+    this.wss = new WS.Server({ ...opts, port: await this.port() })
     this.wss.on('connection', (ws, sock) => {
       if (sock.url) {
         const [, identifier] = sock.url.split('/')

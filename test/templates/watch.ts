@@ -3,7 +3,7 @@
  * @jest-environment-options {"customExportConditions": ["node", "node-addons"]}
  */
 import { getPortPromise } from 'portfinder'
-import { Server } from 'ws'
+import ws from 'ws'
 import watch from '../../src/templates/watch/watch'
 
 beforeEach(() => {
@@ -12,16 +12,16 @@ beforeEach(() => {
 })
 
 describe('Watch mode notifier on browser context', () => {
-  let server: Server
+  let server: ws.Server
   let infoSpy: jest.SpyInstance
   let warnSpy: jest.SpyInstance
 
   const createWSServer = async () => {
     const port = await getPortPromise({ port: 37717 })
 
-    return new Promise<Server>((res, rej) => {
+    return new Promise<ws.Server>((res, rej) => {
       try {
-        const createdServer = new Server({ port }, () => res(createdServer))
+        const createdServer = new ws.Server({ port }, () => res(createdServer))
       } catch (e) {
         rej(e)
       }
