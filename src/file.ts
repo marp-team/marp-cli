@@ -98,21 +98,24 @@ export class File {
     opts: { extension?: string; home?: boolean } = {}
   ): Promise<File.TmpFileInterface> {
     let tmp: string = await tmpNamePromise({ postfix: opts.extension })
-
     if (opts.home) tmp = path.join(os.homedir(), path.basename(tmp))
 
-    debug('Save temporary file to %s', tmp)
+    debug('Saving temporary file: %s', tmp)
     await this.saveToFile(tmp)
 
+    const cleanup = async () => {
+      try {
+        await this.cleanup(tmp)
+      } catch (e) {
+        debug('Failed to clean up temporary file: %o', e)
+      }
+    }
+
     return {
-      cleanup: async () => {
-        try {
-          await this.cleanup(tmp)
-        } catch {
-          // No ops
-        }
-      },
       path: tmp,
+      cleanup,
+      [Symbol.dispose]: () => void cleanup(),
+      [Symbol.asyncDispose]: cleanup,
     }
   }
 
@@ -150,17 +153,16 @@ export class File {
   }
 
   private async saveToFile(savePath: string = this.path) {
-    debug('Saving file to %s ...', savePath)
+    debug('Saving file: %s', savePath)
 
     const directory = path.dirname(path.resolve(savePath))
 
     if (path.dirname(directory) !== directory) {
-      debug('Creating directory: %s', directory)
       await fs.promises.mkdir(directory, { recursive: true })
     }
 
     await fs.promises.writeFile(savePath, this.buffer!)
-    debug('Wrote: %s', savePath)
+    debug('Saved: %s', savePath)
   }
 
   private static stdinBuffer?: Buffer
@@ -243,7 +245,7 @@ export class File {
 }
 
 export namespace File {
-  export interface TmpFileInterface {
+  export interface TmpFileInterface extends AsyncDisposable, Disposable {
     path: string
     cleanup: () => Promise<void>
   }

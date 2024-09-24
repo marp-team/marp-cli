@@ -540,84 +540,81 @@ export class Converter {
       helpers: { render: () => Promise<void> }
     ) => Promise<T>
   ) {
-    const tmpFile: File.TmpFileInterface | undefined = await (() => {
-      if (!this.options.allowLocalFiles) return undefined
+    const browser = browserManager.browserForConversion()
 
+    let uri: string | undefined
+    let tmpFile: File.TmpFileInterface | undefined
+
+    if (this.options.allowLocalFiles) {
       warn(
         `Insecure local file accessing is enabled for conversion from ${baseFile.relativePath()}.`
       )
 
-      // Snapd Chromium cannot access from sandbox container to user-land `/tmp`
-      // directory so always create tmp file to home directory if in Linux.
-      // (There is an exception for an official docker image)
-      return baseFile.saveTmpFile({
+      tmpFile = await baseFile.saveTmpFile({
+        // Snapd Chromium cannot access from sandbox container to user-land `/tmp`
+        // directory so always create tmp file to home directory if in Linux.
+        // (Except an official docker image)
         home: process.platform === 'linux' && !isOfficialDockerImage(),
         extension: '.html',
       })
-    })()
-
-    try {
-      // timeout: this.puppeteerTimeout,
-      const browser = await browserManager.browserForConversion()
-
-      return await browser.withPage(async (page) => {
-        page.setDefaultTimeout(this.puppeteerTimeout)
-
-        const { missingFileSet, failedFileSet } =
-          this.trackFailedLocalFileAccess(page)
-
-        const uri = await (async () => {
-          if (tmpFile) {
-            if (await browser.browserInWSLHost()) {
-              // Windows Chrome should read file from WSL environment
-              return `file:${await resolveWSLPathToHost(tmpFile.path)}`
-            }
-            return `file://${tmpFile.path}`
-          }
-          return undefined
-        })()
-
-        const render = async () => {
-          const waitForOptions: WaitForOptions = {
-            waitUntil: ['domcontentloaded', 'networkidle0'],
-          }
-
-          if (uri) {
-            await page.goto(uri, waitForOptions)
-          } else {
-            await page.goto('data:text/html,', waitForOptions)
-            await page.setContent(baseFile.buffer!.toString(), waitForOptions)
-          }
-        }
-
-        try {
-          return await processer(page, { render })
-        } finally {
-          if (missingFileSet.size > 0) {
-            warn(
-              `${missingFileSet.size > 1 ? 'Some of t' : 'T'}he local file${
-                missingFileSet.size > 1 ? 's are' : ' is'
-              } missing and will be ignored. Make sure the file path${
-                missingFileSet.size > 1 ? 's are' : ' is'
-              } correct.`
-            )
-          }
-          if (failedFileSet.size > 0) {
-            warn(
-              `Marp CLI has detected accessing to local file${
-                failedFileSet.size > 1 ? 's' : ''
-              }. ${
-                failedFileSet.size > 1 ? 'They are' : 'That is'
-              } blocked by security reason. Instead we recommend using assets uploaded to online. (Or you can use ${chalk.yellow(
-                '--allow-local-files'
-              )} option if you are understood of security risk)`
-            )
-          }
-        }
-      })
-    } finally {
-      if (tmpFile) await tmpFile.cleanup()
     }
+
+    using _tmpFile = tmpFile ?? { [Symbol.dispose]: () => void 0 }
+
+    if (tmpFile) {
+      if (await (await browser).browserInWSLHost()) {
+        uri = `file:${await resolveWSLPathToHost(tmpFile.path)}`
+      } else {
+        uri = `file://${tmpFile.path}`
+      }
+    }
+
+    return await (
+      await browser
+    ).withPage(async (page) => {
+      page.setDefaultTimeout(this.puppeteerTimeout) // TODO: Remove this line if timeout was set before
+
+      const { missingFileSet, failedFileSet } =
+        this.trackFailedLocalFileAccess(page)
+
+      const render = async () => {
+        const waitForOptions: WaitForOptions = {
+          waitUntil: ['domcontentloaded', 'networkidle0'],
+        }
+
+        if (uri) {
+          await page.goto(uri, waitForOptions)
+        } else {
+          await page.goto('data:text/html,', waitForOptions)
+          await page.setContent(baseFile.buffer!.toString(), waitForOptions)
+        }
+      }
+
+      try {
+        return await processer(page, { render })
+      } finally {
+        if (missingFileSet.size > 0) {
+          warn(
+            `${missingFileSet.size > 1 ? 'Some of t' : 'T'}he local file${
+              missingFileSet.size > 1 ? 's are' : ' is'
+            } missing and will be ignored. Make sure the file path${
+              missingFileSet.size > 1 ? 's are' : ' is'
+            } correct.`
+          )
+        }
+        if (failedFileSet.size > 0) {
+          warn(
+            `Marp CLI has detected accessing to local file${
+              failedFileSet.size > 1 ? 's' : ''
+            }. ${
+              failedFileSet.size > 1 ? 'They are' : 'That is'
+            } blocked by security reason. Instead we recommend using assets uploaded to online. (Or you can use ${chalk.yellow(
+              '--allow-local-files'
+            )} option if you are understood of security risk)`
+          )
+        }
+      }
+    })
   }
 
   private trackFailedLocalFileAccess(page: Page): {
