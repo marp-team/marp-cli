@@ -2,7 +2,13 @@ import { URL } from 'node:url'
 import type { Marp, MarpOptions } from '@marp-team/marp-core'
 import { Marpit, Options as MarpitOptions } from '@marp-team/marpit'
 import chalk from 'chalk'
-import type { Page, HTTPRequest, WaitForOptions } from 'puppeteer-core'
+import type {
+  Page,
+  HTTPRequest,
+  WaitForOptions,
+  Viewport,
+} from 'puppeteer-core'
+import type { Browser } from './browser/browser'
 import { browserManager } from './browser/manager'
 import { silence, warn } from './cli'
 import { Engine, ResolvedEngine } from './engine'
@@ -29,6 +35,7 @@ import templates, {
 } from './templates/'
 import { ThemeSet } from './theme'
 import { isOfficialDockerImage } from './utils/container'
+import { debug } from './utils/debug'
 import { pdfLib, setOutline } from './utils/pdf'
 import { resolveWSLPathToHost } from './utils/wsl'
 import { notifier } from './watcher'
@@ -74,7 +81,6 @@ export interface ConverterOption {
         headings: boolean
       }
   preview?: boolean
-  puppeteerTimeout?: number
   jpegQuality?: number
   server?: boolean
   template: string
@@ -104,6 +110,15 @@ export interface ConvertResult {
 
 export type ConvertedCallback = (result: ConvertResult) => void
 
+// Sharp image processing library
+let _sharp: typeof import('sharp') | undefined
+
+const sharp = () => {
+  if (!_sharp) _sharp = require('sharp') as typeof import('sharp') // eslint-disable-line @typescript-eslint/no-require-imports
+  return _sharp
+}
+
+// Markdown
 const stripBOM = (s: string) => (s.charCodeAt(0) === 0xfeff ? s.slice(1) : s)
 
 export class Converter {
@@ -118,10 +133,6 @@ export class Converter {
     if (!template) error(`Template "${this.options.template}" is not found.`)
 
     return template
-  }
-
-  get puppeteerTimeout(): number {
-    return this.options.puppeteerTimeout ?? 30000
   }
 
   async convert(
@@ -306,8 +317,9 @@ export class Converter {
 
         return await page.pdf({
           printBackground: true,
-          preferCSSPageSize: true,
-          timeout: this.puppeteerTimeout,
+          preferCSSPageSize: true, // This option is not working in WebDriver BiDi
+          width: tpl.rendered.size.width,
+          height: tpl.rendered.size.height,
         })
       })
     )
@@ -381,13 +393,39 @@ export class Converter {
 
     const files: File[] = []
 
-    await this.usePuppeteer(html, async (page, { render }) => {
-      await page.setViewport({
-        ...tpl.rendered.size,
-        deviceScaleFactor: opts.scale ?? 1,
-      })
+    await this.usePuppeteer(html, async (page, { browser, render }) => {
+      const scale = opts.scale ?? 1
+      const viewPort = (
+        browser.kind === 'firefox'
+          ? ({
+              width: Math.floor(tpl.rendered.size.width * scale),
+              height: Math.floor(tpl.rendered.size.height * scale),
+              // Firefox seems not to respect deviceScaleFactor when taking screenshot
+              // https://github.com/puppeteer/puppeteer/issues/13032
+              // https://github.com/w3c/webdriver-bidi/issues/686
+              deviceScaleFactor: 1,
+            } as const)
+          : ({
+              width: tpl.rendered.size.width,
+              height: tpl.rendered.size.height,
+              deviceScaleFactor: scale,
+            } as const)
+      ) satisfies Viewport
+
+      await page.setViewport(viewPort)
       await render()
-      await page.emulateMediaType('print')
+      await page.addStyleTag({
+        content: ':root,body { scrollbar-width:none !important; }',
+      })
+
+      try {
+        await page.emulateMediaType('print')
+      } catch (e) {
+        debug('%o', e)
+        debug(
+          'Could not emulate media type "print". Continue capturing screenshot with media type "screen".'
+        )
+      }
 
       if (opts.type === ConvertType.png) {
         // Enable transparency
@@ -397,24 +435,44 @@ export class Converter {
       }
 
       const screenshot = async (pageNumber = 1) => {
-        const clip = {
-          x: 0,
-          y: (pageNumber - 1) * tpl.rendered.size.height,
-          ...tpl.rendered.size,
-        } as const
+        const y = (pageNumber - 1) * viewPort.height
+        const clip = { x: 0, y, width: viewPort.width, height: viewPort.height }
 
-        if (opts.type === ConvertType.jpeg)
+        if (browser.protocol === 'cdp') {
+          if (opts.type === ConvertType.jpeg)
+            return await page.screenshot({
+              clip,
+              quality: opts.quality,
+              type: 'jpeg',
+            })
+
           return await page.screenshot({
             clip,
-            quality: opts.quality,
-            type: 'jpeg',
+            omitBackground: true,
+            type: 'png',
           })
+        } else if (browser.protocol === 'webDriverBiDi') {
+          if (browser.kind === 'firefox') {
+            clip.y = 0
 
-        return await page.screenshot({
-          clip,
-          omitBackground: true,
-          type: 'png',
-        })
+            await page.evaluate(
+              `document.body.scrollTo({ left: 0, top: ${y}, behavior: 'instant' })`
+            )
+          }
+
+          // WebDriver BiDi only supports PNG
+          const buf = await page.screenshot({ clip, type: 'png' })
+
+          if (opts.type === ConvertType.jpeg) {
+            // Convert png to jpeg via sharp
+            return await sharp()(buf)
+              .jpeg({ mozjpeg: true, quality: opts.quality })
+              .toBuffer()
+          }
+
+          return buf
+        }
+        error('Unsupported browser protocol for taking screenshot.')
       }
 
       if (opts.pages) {
@@ -537,11 +595,12 @@ export class Converter {
     baseFile: File,
     processer: (
       page: Page,
-      helpers: { render: () => Promise<void> }
+      helpers: {
+        browser: Browser
+        render: () => Promise<void>
+      }
     ) => Promise<T>
   ) {
-    const browser = browserManager.browserForConversion()
-
     let uri: string | undefined
     let tmpFile: File.TmpFileInterface | undefined
 
@@ -559,21 +618,20 @@ export class Converter {
       })
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     using _tmpFile = tmpFile ?? { [Symbol.dispose]: () => void 0 }
 
+    const browser = await browserManager.browserForConversion()
+
     if (tmpFile) {
-      if (await (await browser).browserInWSLHost()) {
+      if (await browser.browserInWSLHost()) {
         uri = `file:${await resolveWSLPathToHost(tmpFile.path)}`
       } else {
         uri = `file://${tmpFile.path}`
       }
     }
 
-    return await (
-      await browser
-    ).withPage(async (page) => {
-      page.setDefaultTimeout(this.puppeteerTimeout) // TODO: Remove this line if timeout was set before
-
+    return await browser.withPage(async (page) => {
       const { missingFileSet, failedFileSet } =
         this.trackFailedLocalFileAccess(page)
 
@@ -591,7 +649,7 @@ export class Converter {
       }
 
       try {
-        return await processer(page, { render })
+        return await processer(page, { browser, render })
       } finally {
         if (missingFileSet.size > 0) {
           warn(
@@ -625,8 +683,12 @@ export class Converter {
     const failedFileSet = new Set<string>()
 
     page.on('requestfailed', (req: HTTPRequest) => {
+      debug('Failed request: %s', req.url())
+      debug('%o', req.failure())
+
       try {
         const url = new URL(req.url())
+
         if (url.protocol === 'file:') {
           if (req.failure()?.errorText === 'net::ERR_FILE_NOT_FOUND') {
             missingFileSet.add(url.href)
