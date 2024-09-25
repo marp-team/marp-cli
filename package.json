@@ -40,7 +40,7 @@
   },
   "pkg": {
     "scripts": "lib/**/*.js",
-    "assets": ["tmp/icu/icudt*.dat"]
+    "assets": ["tmp/icu/icudt*.dat", "node_modules/sharp/**/*", "node_modules/@img/**/*"]
   },
   "browserslist": [
     "> 1% and last 3 versions",
@@ -59,7 +59,7 @@
     "lint:css": "stylelint \"src/**/*.{css,scss}\"",
     "prepack": "npm-run-all --parallel check:* lint:* test:coverage --parallel build types",
     "preversion": "run-p check:* lint:* test:coverage",
-    "standalone": "node -e 'fs.rmSync(`bin`,{recursive:true,force:true})' && pkg --options \"icu-data-dir=$(node ./scripts/icu.mjs)\" --out-path ./bin .",
+    "standalone": "node -e 'fs.rmSync(`bin`,{recursive:true,force:true})' && pkg --options \"icu-data-dir=$(node ./scripts/icu.mjs)\" -C Gzip --out-path ./bin .",
     "standalone:pack": "node ./scripts/pack.js",
     "test": "jest",
     "test:coverage": "jest --coverage",
