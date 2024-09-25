@@ -10,6 +10,7 @@ import { imageSize } from 'image-size'
 import { PDFDocument, PDFDict, PDFName, PDFHexString, PDFNumber } from 'pdf-lib'
 import { TimeoutError } from 'puppeteer-core'
 import { fromBuffer as yauzlFromBuffer } from 'yauzl'
+import { BrowserManager } from '../src/browser/manager'
 import { Converter, ConvertType, ConverterOption } from '../src/converter'
 import { CLIError } from '../src/error'
 import { File, FileType } from '../src/file'
@@ -19,7 +20,7 @@ import { WatchNotifier } from '../src/watcher'
 
 const { CdpPage } = require('puppeteer-core/lib/cjs/puppeteer/cdp/Page') // eslint-disable-line @typescript-eslint/no-require-imports -- Puppeteer's internal module
 
-const puppeteerTimeoutMs = 60000
+const timeout = 60000
 
 let mkdirSpy: jest.SpiedFunction<typeof fs.promises.mkdir>
 
@@ -30,18 +31,27 @@ beforeEach(() => {
 })
 
 afterEach(() => mkdirSpy.mockRestore())
-afterAll(() => Converter.closeBrowser())
 
 describe('Converter', () => {
   const onePath = path.resolve(__dirname, '_files/1.md')
   const twoPath = path.resolve(__dirname, '_files/2.mdown')
   const threePath = path.resolve(__dirname, '_files/3.markdown')
 
+  let browserManager: BrowserManager
   let themeSet: ThemeSet
-  beforeEach(async () => (themeSet = await ThemeSet.initialize([])))
+
+  beforeEach(async () => {
+    browserManager = new BrowserManager({ timeout })
+    themeSet = await ThemeSet.initialize([])
+  })
+
+  afterEach(async () => {
+    await browserManager.dispose()
+  })
 
   const instance = (opts: Partial<ConverterOption> = {}) =>
     new Converter({
+      browserManager,
       themeSet,
       allowLocalFiles: false,
       engine: Marp,
@@ -57,8 +67,11 @@ describe('Converter', () => {
     })
 
   describe('#constructor', () => {
-    it('assigns initial options to options member', () => {
+    it('assigns initial options to options member', async () => {
+      await using browserManager = new BrowserManager({ timeout: 12345 })
+
       const options = {
+        browserManager,
         themeSet,
         allowLocalFiles: true,
         engine: Marp,
@@ -85,17 +98,6 @@ describe('Converter', () => {
     it('throws CLIError when specified template is not defined', () => {
       const throwErr = () => instance({ template: 'not_defined' }).template
       expect(throwErr).toThrow(CLIError)
-    })
-  })
-
-  describe('get #puppeteerTimeout', () => {
-    it('returns specified timeout', () => {
-      expect(instance({ puppeteerTimeout: 1000 }).puppeteerTimeout).toBe(1000)
-      expect(instance({ puppeteerTimeout: 0 }).puppeteerTimeout).toBe(0)
-    })
-
-    it('returns the default timeout 30000ms if not specified', () => {
-      expect(instance().puppeteerTimeout).toBe(30000)
     })
   })
 
@@ -555,7 +557,7 @@ describe('Converter', () => {
           expect(ret.newFile?.path).toBe('test.pdf')
           expect(ret.newFile?.buffer).toBe(pdf)
         },
-        puppeteerTimeoutMs
+        timeout
       )
 
       describe('with meta global directives', () => {
@@ -581,7 +583,7 @@ describe('Converter', () => {
             expect(pdf.getAuthor()).toBe('author')
             expect(pdf.getKeywords()).toBe('a; b; c')
           },
-          puppeteerTimeoutMs
+          timeout
         )
       })
 
@@ -624,7 +626,7 @@ describe('Converter', () => {
               warn.mockRestore()
             }
           },
-          puppeteerTimeoutMs
+          timeout
         )
       })
 
@@ -651,7 +653,7 @@ describe('Converter', () => {
               PDFHexString.fromText('presenter note')
             )
           },
-          puppeteerTimeoutMs
+          timeout
         )
 
         it('sets a comment author to notes if set author global directive', async () => {
@@ -788,7 +790,7 @@ describe('Converter', () => {
                 ]
               `)
             },
-            puppeteerTimeoutMs
+            timeout
           )
         })
 
@@ -833,7 +835,7 @@ describe('Converter', () => {
                 ]
               `)
             },
-            puppeteerTimeoutMs
+            timeout
           )
         })
 
@@ -898,19 +900,21 @@ describe('Converter', () => {
                 ]
               `)
             },
-            puppeteerTimeoutMs
+            timeout
           )
         })
       })
 
-      describe('with custom puppeteer timeout', () => {
+      describe('with custom timeout set by browser manager', () => {
         it('follows setting timeout', async () => {
           ;(fs as any).__mockWriteFile()
 
+          await using browserManager = new BrowserManager({ timeout: 1 })
+
           await expect(
             pdfInstance({
+              browserManager,
               output: 'test.pdf',
-              puppeteerTimeout: 1,
             }).convertFile(new File(onePath))
           ).rejects.toThrow(TimeoutError)
         })
@@ -990,7 +994,7 @@ describe('Converter', () => {
           const meta = await getPptxDocProps(pptx)
           expect(meta['dc:creator']).toBe('Created by Marp')
         },
-        puppeteerTimeoutMs
+        timeout
       )
 
       describe('with meta global directives', () => {
@@ -1020,7 +1024,7 @@ describe('Converter', () => {
               expect.objectContaining({ deviceScaleFactor: 1 })
             )
           },
-          puppeteerTimeoutMs
+          timeout
         )
       })
     })
@@ -1050,7 +1054,7 @@ describe('Converter', () => {
           expect(width).toBe(1280)
           expect(height).toBe(720)
         },
-        puppeteerTimeoutMs
+        timeout
       )
 
       describe('with 4:3 size global directive for Marp Core', () => {
@@ -1069,7 +1073,7 @@ describe('Converter', () => {
             expect(width).toBe(960)
             expect(height).toBe(720)
           },
-          puppeteerTimeoutMs
+          timeout
         )
       })
 
@@ -1090,7 +1094,7 @@ describe('Converter', () => {
             expect(width).toBe(640)
             expect(height).toBe(360)
           },
-          puppeteerTimeoutMs
+          timeout
         )
       })
     })
@@ -1121,7 +1125,7 @@ describe('Converter', () => {
           expect(width).toBe(1280)
           expect(height).toBe(720)
         },
-        puppeteerTimeoutMs
+        timeout
       )
 
       describe('with 4:3 size global directive for Marp Core', () => {
@@ -1141,7 +1145,7 @@ describe('Converter', () => {
             expect(width).toBe(960)
             expect(height).toBe(720)
           },
-          puppeteerTimeoutMs
+          timeout
         )
       })
 
@@ -1162,7 +1166,7 @@ describe('Converter', () => {
             expect(width).toBe(640)
             expect(height).toBe(360)
           },
-          puppeteerTimeoutMs
+          timeout
         )
       })
     })
@@ -1189,7 +1193,7 @@ describe('Converter', () => {
           expect(write.mock.calls[0][0]).toBe('c.001.png')
           expect(write.mock.calls[1][0]).toBe('c.002.png')
         },
-        puppeteerTimeoutMs
+        timeout
       )
     })
 

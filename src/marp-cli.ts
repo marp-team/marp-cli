@@ -1,5 +1,5 @@
 import chalk from 'chalk'
-import type { BrowserManager } from './browser/manager'
+import { BrowserManager } from './browser/manager'
 import * as cli from './cli'
 import { fromArguments } from './config'
 import { Converter, ConvertedCallback, ConvertType } from './converter'
@@ -296,10 +296,15 @@ export const marpCli = async (
     const config = await fromArguments(args)
     if (args.version) return await version(config)
 
+    // Initialize browser manager
+    browserManager = new BrowserManager(config.browserManagerOption())
+
     // Initialize converter
-    const converter = new Converter(await config.converterOption())
+    const converter = new Converter({
+      ...(await config.converterOption()),
+      browserManager,
+    })
     const cvtOpts = converter.options
-    browserManager = cvtOpts.browserManager
 
     // Find target markdown files
     const finder = async (): Promise<File[]> => {
