@@ -20,7 +20,7 @@
 - Upgrade Marpit to [v3.1.1](https://github.com/marp-team/marpit/releases/tag/v3.1.1) ([#591](https://github.com/marp-team/marp-cli/pull/591))
   - Support for CSS nesting
 - Upgrade development Node.js LTS to v20.17.0 ([#591](https://github.com/marp-team/marp-cli/pull/591))
-- Upgrade dependent packages to the latest versions ([#591](https://github.com/marp-team/marp-cli/pull/591))
+- Upgrade dependent packages to the latest versions ([#591](https://github.com/marp-team/marp-cli/pull/591), [#598](https://github.com/marp-team/marp-cli/pull/598))
 
 ### Fixed
 
