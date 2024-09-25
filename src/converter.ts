@@ -9,7 +9,7 @@ import type {
   Viewport,
 } from 'puppeteer-core'
 import type { Browser } from './browser/browser'
-import { browserManager } from './browser/manager'
+import type { BrowserManager } from './browser/manager'
 import { silence, warn } from './cli'
 import { Engine, ResolvedEngine } from './engine'
 import { generateOverrideGlobalDirectivesPlugin } from './engine/directive-plugin'
@@ -64,6 +64,7 @@ export const mimeTypes = {
 export interface ConverterOption {
   allowLocalFiles: boolean
   baseUrl?: string
+  browserManager: BrowserManager
   engine: Engine
   globalDirectives: { theme?: string } & Partial<TemplateMeta>
   html?: MarpOptions['html']
@@ -130,6 +131,10 @@ export class Converter {
     this.options = opts
   }
 
+  get browser(): Promise<Browser> {
+    return this.options.browserManager.browserForConversion()
+  }
+
   get template(): Template {
     const template = templates[this.options.template]
     if (!template) error(`Template "${this.options.template}" is not found.`)
@@ -153,7 +158,7 @@ export class Converter {
       if (this.options.baseUrl) return this.options.baseUrl
 
       if (isFile(f) && type !== ConvertType.html) {
-        const browser = await browserManager.browserForConversion()
+        const browser = await this.browser
 
         return (await browser.browserInWSLHost())
           ? `file:${await resolveWSLPathToHost(f.absolutePath)}`
@@ -304,7 +309,7 @@ export class Converter {
     const ret = file.convert(this.options.output, { extension: 'pdf' })
 
     // Generate PDF
-    const browser = await browserManager.browserForConversion()
+    const browser = await this.browser
 
     if (browser.kind === 'firefox' && !this._firefoxPDFConversionWarning) {
       this._firefoxPDFConversionWarning = true
@@ -634,7 +639,7 @@ export class Converter {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     using _tmpFile = tmpFile ?? { [Symbol.dispose]: () => void 0 }
 
-    const browser = await browserManager.browserForConversion()
+    const browser = await this.browser
 
     if (tmpFile) {
       if (await browser.browserInWSLHost()) {

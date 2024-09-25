@@ -8,7 +8,12 @@ import { error, CLIErrorCode } from '../../error'
 import { ChromeBrowser } from '../browsers/chrome'
 import { ChromeCdpBrowser } from '../browsers/chrome-cdp'
 import type { BrowserFinder, BrowserFinderResult } from '../finder'
-import { findExecutableBinary, getPlatform, isExecutable } from './utils'
+import {
+  findExecutableBinary,
+  getPlatform,
+  isExecutable,
+  normalizeDarwinAppPath,
+} from './utils'
 
 const chrome = (path: string): BrowserFinderResult => ({
   path,
@@ -18,8 +23,10 @@ const chrome = (path: string): BrowserFinderResult => ({
 export const chromeFinder: BrowserFinder = async ({ preferredPath } = {}) => {
   if (preferredPath) return chrome(preferredPath)
 
-  if (process.env.CHROME_PATH && (await isExecutable(process.env.CHROME_PATH)))
-    return chrome(process.env.CHROME_PATH)
+  if (process.env.CHROME_PATH) {
+    const path = await normalizeDarwinAppPath(process.env.CHROME_PATH)
+    if (path && (await isExecutable(path))) return chrome(path)
+  }
 
   const platform = await getPlatform()
   const installation = await (async () => {

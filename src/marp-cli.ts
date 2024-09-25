@@ -1,7 +1,7 @@
 import chalk from 'chalk'
-import { browserManager } from './browser/manager'
+import type { BrowserManager } from './browser/manager'
 import * as cli from './cli'
-import fromArguments from './config'
+import { fromArguments } from './config'
 import { Converter, ConvertedCallback, ConvertType } from './converter'
 import { CLIError, error, isError } from './error'
 import { File, FileType } from './file'
@@ -47,6 +47,7 @@ export const marpCli = async (
   argv: string[],
   { baseUrl, stdin: defaultStdin, throwErrorAlways }: MarpCLIInternalOptions
 ): Promise<number> => {
+  let browserManager: BrowserManager | undefined
   let server: Server | undefined
   let watcherInstance: Watcher | undefined
 
@@ -298,6 +299,7 @@ export const marpCli = async (
     // Initialize converter
     const converter = new Converter(await config.converterOption())
     const cvtOpts = converter.options
+    browserManager = cvtOpts.browserManager
 
     // Find target markdown files
     const finder = async (): Promise<File[]> => {
@@ -448,8 +450,7 @@ export const marpCli = async (
   } finally {
     await Promise.all([
       notifier.stop(),
-      // Converter.closeBrowser(), // TODO: Remove this line after replacing browser management into the new manager
-      browserManager.dispose(),
+      browserManager?.dispose(),
       server?.stop(),
       watcherInstance?.chokidar.close(),
     ])

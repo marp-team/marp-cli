@@ -53,6 +53,8 @@ export class BrowserManager implements AsyncDisposable {
       this._preferredProtocol = config.protocol
     }
     if (config.timeout !== undefined) this._timeout = config.timeout
+
+    debugBrowser('Browser manager configured: %o', config)
   }
 
   async findBrowser() {
@@ -65,10 +67,23 @@ export class BrowserManager implements AsyncDisposable {
   async browserForConversion(): Promise<Browser> {
     if (!this._conversionBrowser) {
       const { acceptedBrowsers, path } = await this.findBrowser()
-      const browser = acceptedBrowsers.find(
-        (browser) => browser.protocol === this._preferredProtocol
-      )
+
+      const browser =
+        acceptedBrowsers.find(
+          ({ protocol }) => protocol === this._preferredProtocol
+        ) ||
+        (() => {
+          if (acceptedBrowsers.length > 0) {
+            debugBrowser(
+              'The available browsers do not support the preferred protocol "%s". Using the first available browser.',
+              this._preferredProtocol
+            )
+          }
+          return acceptedBrowsers[0]
+        })()
+
       if (!browser) error('No browser found for conversion')
+      debugBrowser('Use browser class for conversion: %o', browser)
 
       // @ts-expect-error ts2511: TS cannot create an instance of an abstract class
       this._conversionBrowser = new browser({ path, timeout: this._timeout })
@@ -80,9 +95,11 @@ export class BrowserManager implements AsyncDisposable {
   async browserForPreview(): Promise<ChromeCdpBrowser> {
     if (!this._previewBrowser) {
       const { acceptedBrowsers, path } = await this.findBrowser()
+
       if (!acceptedBrowsers.some((browser) => browser === ChromeCdpBrowser)) {
         error('No browser found for preview')
       }
+      debugBrowser('Use browser class for preview: %o', ChromeCdpBrowser)
 
       this._previewBrowser = new ChromeCdpBrowser({
         path,
@@ -103,6 +120,3 @@ export class BrowserManager implements AsyncDisposable {
     await this.dispose()
   }
 }
-
-export const browserManager = new BrowserManager()
-export default browserManager

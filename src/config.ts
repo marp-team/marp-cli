@@ -3,6 +3,7 @@ import path from 'node:path'
 import chalk from 'chalk'
 import { cosmiconfig, cosmiconfigSync } from 'cosmiconfig'
 import { osLocale } from 'os-locale'
+import { BrowserManager } from './browser/manager'
 import { info, warn, error as cliError } from './cli'
 import { ConverterOption, ConvertType } from './converter'
 import { ResolvableEngine, ResolvedEngine } from './engine'
@@ -254,22 +255,25 @@ export class MarpCLIConfig {
       return scale
     })()
 
-    const puppeteerTimeout = (() => {
-      if (process.env['PUPPETEER_TIMEOUT']) {
-        const envTimeout = Number.parseInt(process.env['PUPPETEER_TIMEOUT'], 10)
-        if (!Number.isNaN(envTimeout)) return envTimeout
-      }
-      return undefined
-    })()
+    const browserManager = new BrowserManager({
+      protocol: 'cdp',
+      timeout: (() => {
+        if (process.env.PUPPETEER_TIMEOUT) {
+          const envTimeout = Number.parseInt(process.env.PUPPETEER_TIMEOUT, 10)
+          if (!Number.isNaN(envTimeout)) return envTimeout
+        }
+        return undefined
+      })(),
+    })
 
     return {
+      browserManager,
       imageScale,
       inputDir,
       output,
       pdfNotes,
       pdfOutlines,
       preview,
-      puppeteerTimeout,
       server,
       template,
       templateOption,
@@ -411,4 +415,4 @@ export class MarpCLIConfig {
   }
 }
 
-export default MarpCLIConfig.fromArguments
+export const { fromArguments } = MarpCLIConfig
