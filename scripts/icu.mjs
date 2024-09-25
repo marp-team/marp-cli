@@ -45,7 +45,7 @@ const icuDat = await new Promise((res, rej) => {
       zip.readEntry()
     }
   })
-  zip.on('end', () => rej(meta))
+  zip.on('end', () => rej(new Error('Failed to find ICU data in the archive')))
   zip.readEntry()
 })
 
