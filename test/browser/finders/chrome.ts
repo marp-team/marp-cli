@@ -13,6 +13,8 @@ afterEach(() => {
   jest.restoreAllMocks()
 })
 
+const itExceptWin = process.platform === 'win32' ? it.skip : it
+
 const executableMock = (name: string) =>
   path.join(__dirname, `../../utils/_executable_mocks`, name)
 
@@ -52,11 +54,14 @@ describe('Chrome finder', () => {
       })
     })
 
-    it('processes regular resolution if CHROME_PATH is not executable', async () => {
-      process.env.CHROME_PATH = executableMock('non-executable')
+    itExceptWin(
+      'processes regular resolution if CHROME_PATH is not executable',
+      async () => {
+        process.env.CHROME_PATH = executableMock('non-executable')
 
-      await expect(chromeFinder({})).rejects.toThrow(regularResolution)
-    })
+        await expect(chromeFinder({})).rejects.toThrow(regularResolution)
+      }
+    )
 
     it('processes regular resolution if CHROME_PATH is not found', async () => {
       process.env.CHROME_PATH = executableMock('not-found')

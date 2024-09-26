@@ -21,6 +21,8 @@ const winFxNightlyAlt = ['Firefox Nightly', 'firefox.exe']
 const winFxDev = ['Firefox Developer Edition', 'firefox.exe']
 const winFx = ['Mozilla Firefox', 'firefox.exe']
 
+const itExceptWin = process.platform === 'win32' ? it.skip : it
+
 const executableMock = (name: string) =>
   path.join(__dirname, `../../utils/_executable_mocks`, name)
 
@@ -60,11 +62,14 @@ describe('Firefox finder', () => {
       })
     })
 
-    it('processes regular resolution if FIREFOX_PATH is not executable', async () => {
-      process.env.FIREFOX_PATH = executableMock('non-executable')
+    itExceptWin(
+      'processes regular resolution if FIREFOX_PATH is not executable',
+      async () => {
+        process.env.FIREFOX_PATH = executableMock('non-executable')
 
-      await expect(firefoxFinder({})).rejects.toThrow(regularResolution)
-    })
+        await expect(firefoxFinder({})).rejects.toThrow(regularResolution)
+      }
+    )
 
     it('processes regular resolution if FIREFOX_PATH is not found', async () => {
       process.env.FIREFOX_PATH = executableMock('not-found')
