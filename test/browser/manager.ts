@@ -1,8 +1,8 @@
-import { BrowserManager } from '../../src/browser/manager'
-import * as browserFinder from '../../src/browser/finder'
 import { ChromeBrowser } from '../../src/browser/browsers/chrome'
 import { ChromeCdpBrowser } from '../../src/browser/browsers/chrome-cdp'
 import { FirefoxBrowser } from '../../src/browser/browsers/firefox'
+import * as browserFinder from '../../src/browser/finder'
+import { BrowserManager } from '../../src/browser/manager'
 
 afterEach(() => {
   jest.resetAllMocks()
