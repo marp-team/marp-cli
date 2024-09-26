@@ -3,10 +3,10 @@ import { EventEmitter } from 'node:events'
 import { nanoid } from 'nanoid'
 import type { Page, Browser, Target } from 'puppeteer-core'
 import TypedEmitter from 'typed-emitter'
+import { BrowserManager } from './browser/manager'
 import { ConvertType, mimeTypes } from './converter'
 import { error } from './error'
 import { File, FileType } from './file'
-import { BrowserManager } from './browser/manager'
 import { debugPreview } from './utils/debug'
 
 const emptyPageURI = `data:text/html;base64,PHRpdGxlPk1hcnAgQ0xJPC90aXRsZT4` // <title>Marp CLI</title>

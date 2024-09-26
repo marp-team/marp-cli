@@ -9,7 +9,11 @@ import type {
 } from 'puppeteer-core'
 import { CLIErrorCode, error, isError } from '../../error'
 import { isInsideContainer } from '../../utils/container'
-import { isWSL, resolveWindowsEnv } from '../../utils/wsl'
+import {
+  isWSL,
+  resolveWindowsEnv,
+  resolveWSLPathToGuestSync,
+} from '../../utils/wsl'
 import { Browser } from '../browser'
 import type { BrowserKind, BrowserProtocol, BrowserOptions } from '../browser'
 import { isSnapBrowser } from '../finders/utils'
@@ -48,10 +52,9 @@ export class ChromeBrowser extends Browser {
       userDataDir: await this.createPuppeteerDataDir(),
       ...opts,
       args: await this.puppeteerArgs(opts.args ?? []),
-      ignoreDefaultArgs:
-        typeof opts.ignoreDefaultArgs === 'boolean'
-          ? opts.ignoreDefaultArgs
-          : [...ignoreDefaultArgsSet],
+      ignoreDefaultArgs: opts.ignoreDefaultArgs === true || [
+        ...ignoreDefaultArgsSet,
+      ],
     })
 
     const tryLaunch = async (
@@ -116,19 +119,27 @@ export class ChromeBrowser extends Browser {
   }
 
   private async createPuppeteerDataDir() {
+    let requiredResolveWSLPath = false
+
     const dataDir = await (async () => {
       // In WSL environment, Marp CLI may use Chrome on Windows. If Chrome has
       // located in host OS (Windows), we have to specify Windows path.
       if (await this.browserInWSLHost()) {
         if (wslTmp === undefined) wslTmp = await resolveWindowsEnv('TMP')
-        if (wslTmp !== undefined)
+        if (wslTmp !== undefined) {
+          requiredResolveWSLPath = true
           return path.win32.resolve(wslTmp, this._dataDirName)
+        }
       }
       return path.resolve(os.tmpdir(), this._dataDirName)
     })()
 
     // Ensure the data directory is created
-    await fs.promises.mkdir(dataDir, { recursive: true })
+    await fs.promises.mkdir(
+      requiredResolveWSLPath ? resolveWSLPathToGuestSync(dataDir) : dataDir,
+      { recursive: true }
+    )
+
     return dataDir
   }
 }
