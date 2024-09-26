@@ -31,19 +31,27 @@ export class ChromeBrowser extends Browser {
   protected async launchPuppeteer(
     opts: PuppeteerLaunchOptions
   ): Promise<PuppeteerBrowser> {
+    const ignoreDefaultArgsSet = new Set(
+      typeof opts.ignoreDefaultArgs === 'object' ? opts.ignoreDefaultArgs : []
+    )
+
+    // Escape hatch for force-extensions policy for Chrome enterprise
+    // https://github.com/puppeteer/puppeteer/blob/master/docs/troubleshooting.md#chrome-headless-doesnt-launch-on-windows
+    // https://github.com/marp-team/marp-cli/issues/231
+    if (process.env.CHROME_ENABLE_EXTENSIONS) {
+      ignoreDefaultArgsSet.add('--disable-extensions')
+    }
+
     const baseOpts = this.generateLaunchOptions({
-      args: await this.puppeteerArgs(),
       headless: this.puppeteerHeadless(),
       pipe: await this.puppeteerPipe(),
       userDataDir: await this.createPuppeteerDataDir(),
-
-      // Escape hatch for force-extensions policy for Chrome enterprise
-      // https://github.com/puppeteer/puppeteer/blob/master/docs/troubleshooting.md#chrome-headless-doesnt-launch-on-windows
-      // https://github.com/marp-team/marp-cli/issues/231
-      ignoreDefaultArgs: process.env.CHROME_ENABLE_EXTENSIONS
-        ? ['--disable-extensions']
-        : undefined,
       ...opts,
+      args: await this.puppeteerArgs(opts.args ?? []),
+      ignoreDefaultArgs:
+        typeof opts.ignoreDefaultArgs === 'boolean'
+          ? opts.ignoreDefaultArgs
+          : [...ignoreDefaultArgsSet],
     })
 
     const tryLaunch = async (
@@ -79,8 +87,8 @@ export class ChromeBrowser extends Browser {
     return await tryLaunch()
   }
 
-  private async puppeteerArgs() {
-    const args = new Set(['--test-type'])
+  private async puppeteerArgs(extraArgs: string[] = []) {
+    const args = new Set(['--test-type', ...extraArgs])
 
     if (!(await this.puppeteerArgsEnableSandbox())) args.add('--no-sandbox')
 

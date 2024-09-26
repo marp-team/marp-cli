@@ -9,7 +9,6 @@ import { Preview, fileToURI } from './preview'
 import { Server } from './server'
 import templates from './templates'
 import { isOfficialDockerImage } from './utils/container'
-import { resetExecutablePath } from './utils/puppeteer'
 import { createYargs } from './utils/yargs'
 import version from './version'
 import watcher, { Watcher, notifier } from './watcher'
@@ -401,10 +400,10 @@ export const marpCli = async (
           )
 
           // Preview window
-          const preview = new Preview()
+          const preview = new Preview({ browserManager: browserManager! })
           preview.on('exit', () => res(0))
           preview.on('opening', (location: string) => {
-            const loc = location.substr(0, 50)
+            const loc = location.substring(0, 50)
             const msg = `[Preview] Opening ${loc}...`
             cli.info(chalk.cyan(msg))
           })
@@ -467,20 +466,10 @@ export const waitForObservation = () =>
     resolversForObservation.push(res)
   })
 
-export const apiInterface = (argv: string[], opts: MarpCLIAPIOptions = {}) => {
-  resetExecutablePath()
-
-  return marpCli(argv, {
-    ...opts,
-    stdin: false,
-    throwErrorAlways: true,
-  })
-}
+export const apiInterface = (argv: string[], opts: MarpCLIAPIOptions = {}) =>
+  marpCli(argv, { ...opts, stdin: false, throwErrorAlways: true })
 
 export const cliInterface = (argv: string[] = []) =>
-  marpCli(argv, {
-    stdin: true,
-    throwErrorAlways: false,
-  })
+  marpCli(argv, { stdin: true, throwErrorAlways: false })
 
 export default cliInterface

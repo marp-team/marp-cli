@@ -6,17 +6,15 @@ import TypedEmitter from 'typed-emitter'
 import { ConvertType, mimeTypes } from './converter'
 import { error } from './error'
 import { File, FileType } from './file'
-import {
-  generatePuppeteerDataDirPath,
-  generatePuppeteerLaunchArgs,
-  enableHeadless,
-  launchPuppeteer,
-} from './utils/puppeteer'
-import { isChromeInWSLHost } from './utils/wsl'
+import { BrowserManager } from './browser/manager'
+import { debugPreview } from './utils/debug'
 
 const emptyPageURI = `data:text/html;base64,PHRpdGxlPk1hcnAgQ0xJPC90aXRsZT4` // <title>Marp CLI</title>
 
 export namespace Preview {
+  type PartialByKeys<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>> &
+    Partial<Pick<T, K>>
+
   // eslint-disable-next-line @typescript-eslint/consistent-type-definitions -- TypedEmitter requires type definition instead of interface
   export type Events = {
     close: (window: any) => void
@@ -27,9 +25,12 @@ export namespace Preview {
   }
 
   export interface Options {
+    browserManager: BrowserManager
     height: number
     width: number
   }
+
+  export type ConstructorOptions = PartialByKeys<Options, 'height' | 'width'>
 
   export interface Window extends EventEmitter {
     page: Page
@@ -43,12 +44,16 @@ export class Preview extends (EventEmitter as new () => TypedEmitter<Preview.Eve
 
   private puppeteerInternal: Browser | undefined
 
-  constructor(opts: Partial<Preview.Options> = {}) {
+  constructor(opts: Preview.ConstructorOptions) {
     super()
+
     this.options = {
+      browserManager: opts.browserManager,
       height: opts.height || 360,
       width: opts.width || 640,
     }
+
+    debugPreview('Initialized preview instance: %o', this.options)
   }
 
   get puppeteer(): Browser | undefined {
@@ -68,27 +73,40 @@ export class Preview extends (EventEmitter as new () => TypedEmitter<Preview.Eve
   }
 
   async exit() {
+    debugPreview('Requested to exit preview')
+
     if (this.puppeteer) {
+      debugPreview('Closing puppeteer instance for preview...')
+
       await this.puppeteer.close()
 
       this.emit('exit')
       this.puppeteerInternal = undefined
+
+      debugPreview('Closed puppeteer instance')
     }
+  }
+
+  private get browserManager() {
+    return this.options.browserManager
   }
 
   private createWindowObject(page: Page): Preview.Window {
     const window = new EventEmitter()
 
-    page.on('close', async () => window.emit('close'))
+    page.on('close', () => window.emit('close'))
 
     return Object.assign(window, {
       page,
       close: async () => {
         try {
+          debugPreview('Request to close a page: %o', page)
           return await page.close()
 
           /* c8 ignore start */
         } catch (e: any) {
+          debugPreview('%O', e)
+
           // Ignore raising error if a target page has already close
           if (!e.message.includes('Target closed.')) throw e
         }
@@ -98,7 +116,11 @@ export class Preview extends (EventEmitter as new () => TypedEmitter<Preview.Eve
         if (uri.startsWith('data:')) {
           // A data URI with a huge size may fail opening with a browser due to the limitation of URL length.
           // If received a data URI, try to open it with a converted Blob URL.
-          await Promise.all([
+          debugPreview(
+            'Loading page: Detected to load data URI. Try to convert to Blob URL and open it in the browser.'
+          )
+
+          const [response] = await Promise.all([
             page.waitForNavigation({
               timeout: 5000,
               waitUntil: 'domcontentloaded',
@@ -109,34 +131,45 @@ export class Preview extends (EventEmitter as new () => TypedEmitter<Preview.Eve
               location.href = URL.createObjectURL(blob)
             }, uri),
           ])
+
+          debugPreview('Loaded: %s', response?.url())
         } else {
+          debugPreview('Loading page: %s', uri)
           await page.goto(uri, { timeout: 0, waitUntil: 'domcontentloaded' })
+          debugPreview('Loaded: %s', uri)
         }
 
-        await page
-          .target()
-          .createCDPSession()
-          .then((session) => {
-            session.send('Page.resetNavigationHistory').catch(() => {
-              // No ops
-            })
+        await page.createCDPSession().then((session) => {
+          session.send('Page.resetNavigationHistory').catch(() => {
+            // No ops
           })
+        })
       },
     })
   }
 
   private async createWindow() {
+    debugPreview('Trying to create new window')
+
     try {
       return this.createWindowObject(
         await new Promise<Page>((res, rej) => {
           const pptr = this.puppeteer
-          if (!pptr) return rej(false)
+
+          if (!pptr) {
+            debugPreview('Ignored: Puppeteer instance is not available')
+            return rej(false)
+          }
 
           const id = nanoid()
           const idMatcher = (target: Target) => {
+            debugPreview('Activated the window finder for %s.', id)
+
             const url = new URL(target.url())
 
             if (url.searchParams.get('__marp_cli_id') === id) {
+              debugPreview('Found a target window with id: %s', id)
+
               pptr.off('targetcreated', idMatcher)
               ;(async () => res((await target.page())!))()
             }
@@ -148,10 +181,15 @@ export class Preview extends (EventEmitter as new () => TypedEmitter<Preview.Eve
           void (async () => {
             const [page] = await pptr.pages()
 
+            debugPreview('Opening a new window... (id: %s)', id)
+
             await page.evaluate(
               `window.open('about:blank?__marp_cli_id=${id}', '', 'width=${this.options.width},height=${this.options.height}')`
             )
           })()
+        }).then((page) => {
+          debugPreview('Created new window!: %s', page.url())
+          return page
         })
       )
     } catch (e: unknown) {
@@ -161,29 +199,30 @@ export class Preview extends (EventEmitter as new () => TypedEmitter<Preview.Eve
   }
 
   private async launch(): Promise<Preview.Window> {
-    const baseArgs = await generatePuppeteerLaunchArgs()
+    const browser = await this.browserManager.browserForPreview()
 
-    this.puppeteerInternal = await launchPuppeteer({
-      ...baseArgs,
+    this.puppeteerInternal = await browser.launch({
       args: [
-        ...baseArgs.args,
         `--app=${emptyPageURI}`,
         `--window-size=${this.options.width},${this.options.height}`,
       ],
       defaultViewport: null,
-      headless: process.env.NODE_ENV === 'test' ? enableHeadless() : false,
+      headless: process.env.NODE_ENV === 'test',
       ignoreDefaultArgs: ['--enable-automation'],
-      userDataDir: await generatePuppeteerDataDirPath('marp-cli-preview', {
-        wslHost: await isChromeInWSLHost(baseArgs.executablePath),
-      }),
     })
 
     const handlePageOnClose = async () => {
-      const pages = (await this.puppeteer?.pages()) || []
-      if (pages.length === 0) await this.exit()
+      debugPreview('Page closed')
+
+      const pagesCount = (await this.puppeteer?.pages())?.length ?? 0
+      debugPreview('Remaining pages count: %d', pagesCount)
+
+      if (pagesCount === 0) await this.exit()
     }
 
     this.puppeteerInternal.on('targetcreated', (target) => {
+      debugPreview('Target created: %o', target.url())
+
       // NOTE: PDF viewer on headfull Chrome may return `null`.
       target.page().then((page) => page?.on('close', handlePageOnClose))
     })
