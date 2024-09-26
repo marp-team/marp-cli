@@ -40,7 +40,7 @@ describe('#findEdgeInstallation', () => {
     })
 
     it('finds out the first accessible Edge from 3 locations', async () => {
-      const currentEnv = process.env
+      const currentEnv = { ...process.env }
 
       const programFiles = path.join('C:', 'Mock', 'Program Files')
       const programFilesX86 = path.join('C:', 'Mock', 'Program Files (x86)')
@@ -79,7 +79,7 @@ describe('#findEdgeInstallation', () => {
         delete process.env['PROGRAMFILES(X86)']
         delete process.env.LOCALAPPDATA
 
-        process.env = currentEnv
+        process.env = { ...currentEnv }
       }
     })
   })
