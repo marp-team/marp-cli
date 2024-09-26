@@ -18,8 +18,6 @@ import { bare as bareTpl } from '../src/templates'
 import { ThemeSet } from '../src/theme'
 import { WatchNotifier } from '../src/watcher'
 
-const { CdpPage } = require('puppeteer-core/lib/cjs/puppeteer/cdp/Page') // eslint-disable-line @typescript-eslint/no-require-imports -- Puppeteer's internal module
-
 const timeout = 60000
 
 let mkdirSpy: jest.SpiedFunction<typeof fs.promises.mkdir>
@@ -974,15 +972,18 @@ describe('Converter', () => {
       it(
         'converts markdown file into PPTX',
         async () => {
-          const setViewport = jest.spyOn(CdpPage.prototype, 'setViewport')
+          const cvt = converter()
+          const imageSpy = jest.spyOn(cvt as any, 'convertFileToImage')
 
-          await converter().convertFile(new File(onePath))
+          await cvt.convertFile(new File(onePath))
           expect(write).toHaveBeenCalled()
           expect(write.mock.calls[0][0]).toBe('test.pptx')
 
           // It has a different default scale x2
-          expect(setViewport).toHaveBeenCalledWith(
-            expect.objectContaining({ deviceScaleFactor: 2 })
+          expect(imageSpy).toHaveBeenLastCalledWith(
+            expect.anything(), // Template
+            expect.anything(), // File
+            expect.objectContaining({ scale: 2 })
           )
 
           // ZIP PK header for Office Open XML
@@ -1001,16 +1002,17 @@ describe('Converter', () => {
         it(
           'assigns meta info thorugh PptxGenJs',
           async () => {
-            const setViewport = jest.spyOn(CdpPage.prototype, 'setViewport')
-
-            await converter({
+            const cvt = converter({
               imageScale: 1,
               globalDirectives: {
                 title: 'Test meta',
                 description: 'Test description',
                 author: 'author',
               },
-            }).convertFile(new File(onePath))
+            })
+            const imageSpy = jest.spyOn(cvt as any, 'convertFileToImage')
+
+            await cvt.convertFile(new File(onePath))
 
             const pptx: Buffer = write.mock.calls[0][1]
             const meta = await getPptxDocProps(pptx)
@@ -1020,8 +1022,10 @@ describe('Converter', () => {
             expect(meta['dc:creator']).toBe('author')
 
             // Custom scale
-            expect(setViewport).toHaveBeenCalledWith(
-              expect.objectContaining({ deviceScaleFactor: 1 })
+            expect(imageSpy).toHaveBeenLastCalledWith(
+              expect.anything(), // Template
+              expect.anything(), // File
+              expect.objectContaining({ scale: 1 })
             )
           },
           timeout

@@ -4,6 +4,7 @@ import { Marp } from '@marp-team/marp-core'
 import { load } from 'cheerio'
 import express, { type Express } from 'express'
 import request from 'supertest'
+import { BrowserManager } from '../src/browser/manager'
 import {
   Converter,
   ConvertType,
@@ -17,11 +18,16 @@ import { ThemeSet } from '../src/theme'
 jest.mock('express')
 
 describe('Server', () => {
+  let browserManager: BrowserManager
   let themeSet: ThemeSet
+
+  beforeAll(() => (browserManager = new BrowserManager()))
   beforeEach(async () => (themeSet = await ThemeSet.initialize([])))
+  afterAll(async () => browserManager?.dispose())
 
   const converter = (opts: Partial<ConverterOption> = {}) =>
     new Converter({
+      browserManager,
       themeSet,
       allowLocalFiles: false,
       engine: Marp,

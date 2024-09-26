@@ -76,6 +76,9 @@ export abstract class Browser
     const puppeteer = await this.launch()
     const page = await puppeteer.newPage()
 
+    page.setDefaultTimeout(this.timeout)
+    page.setDefaultNavigationTimeout(this.timeout)
+
     try {
       return await fn(page)
     } finally {

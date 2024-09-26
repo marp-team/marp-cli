@@ -38,8 +38,8 @@ const runForObservation = async (argv: string[]) => {
   return ret
 }
 
-jest.mock('cosmiconfig')
 jest.mock('node:fs', () => require('./__mocks__/node/fs')) // eslint-disable-line @typescript-eslint/no-require-imports, jest/no-mocks-import -- Windows file system cannot use `:`
+jest.mock('cosmiconfig')
 jest.mock('../src/preview')
 jest.mock('../src/watcher', () => jest.createMockFromModule('../src/watcher'))
 
@@ -1344,7 +1344,7 @@ describe('Marp CLI', () => {
 
       it('follows specified timeout in conversion that is using Puppeteer', async () => {
         expect(
-          (await conversion(onePath, '--pdf')).options.puppeteerTimeout
+          (await conversion(onePath, '--pdf')).options.browserManager.timeout
         ).toBe(12345)
       })
 
@@ -1352,7 +1352,7 @@ describe('Marp CLI', () => {
         process.env.PUPPETEER_TIMEOUT = 'invalid'
 
         expect(
-          (await conversion(onePath, '--pdf')).options.puppeteerTimeout
+          (await conversion(onePath, '--pdf')).options.browserManager.timeout
         ).toBeUndefined()
       })
     })

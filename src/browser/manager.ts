@@ -35,6 +35,10 @@ export class BrowserManager implements AsyncDisposable {
     this.configure(config)
   }
 
+  get timeout() {
+    return this._timeout
+  }
+
   configure(config: BrowserManagerConfig) {
     if (config.finders) {
       this._finders = ([] as FinderName[]).concat(config.finders)
@@ -86,7 +90,7 @@ export class BrowserManager implements AsyncDisposable {
       debugBrowser('Use browser class for conversion: %o', browser)
 
       // @ts-expect-error ts2511: TS cannot create an instance of an abstract class
-      this._conversionBrowser = new browser({ path, timeout: this._timeout })
+      this._conversionBrowser = new browser({ path, timeout: this.timeout })
     }
     return this._conversionBrowser!
   }
@@ -103,7 +107,7 @@ export class BrowserManager implements AsyncDisposable {
 
       this._previewBrowser = new ChromeCdpBrowser({
         path,
-        timeout: this._timeout,
+        timeout: this.timeout,
       })
     }
     return this._previewBrowser
