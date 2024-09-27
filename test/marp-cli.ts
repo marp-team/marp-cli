@@ -242,6 +242,35 @@ describe('Marp CLI', () => {
     })
   }
 
+  describe('with DEBUG env', () => {
+    let originalEnv: Record<string, string | undefined>
+
+    beforeEach(() => (originalEnv = { ...process.env }))
+    afterEach(() => (process.env = { ...originalEnv }))
+
+    it('shows enabling debug logging and set pattern', async () => {
+      process.env.DEBUG = 'debug-pattern,debug-pattern:*'
+
+      const warn = jest.spyOn(console, 'warn').mockImplementation()
+      const log = jest.spyOn(console, 'log').mockImplementation()
+
+      try {
+        expect(await marpCli(['-v'])).toBe(0)
+        expect(warn).toHaveBeenCalledWith(
+          expect.stringContaining('Debug logging is enabled')
+        )
+        expect(warn).toHaveBeenCalledWith(
+          expect.stringContaining(
+            'Filter pattern: debug-pattern,debug-pattern:*'
+          )
+        )
+      } finally {
+        warn.mockRestore()
+        log.mockRestore()
+      }
+    })
+  })
+
   describe('when passed file is not found', () => {
     it('outputs warning and help with exit code 1', async () => {
       const warn = jest.spyOn(console, 'warn').mockImplementation()
@@ -1334,15 +1363,13 @@ describe('Marp CLI', () => {
     })
 
     describe('with PUPPETEER_TIMEOUT env', () => {
-      beforeEach(() => {
-        process.env.PUPPETEER_TIMEOUT = '12345'
-      })
+      let originalEnv: Record<string, string | undefined>
 
-      afterEach(() => {
-        delete process.env.PUPPETEER_TIMEOUT
-      })
+      beforeEach(() => (originalEnv = { ...process.env }))
+      afterEach(() => (process.env = { ...originalEnv }))
 
       it('follows specified timeout in conversion that is using Puppeteer', async () => {
+        process.env.PUPPETEER_TIMEOUT = '12345'
         expect(
           (await conversion(onePath, '--pdf')).options.browserManager.timeout
         ).toBe(12345)
@@ -1350,7 +1377,6 @@ describe('Marp CLI', () => {
 
       it('does not follows specified timeout if the env value is not valid number', async () => {
         process.env.PUPPETEER_TIMEOUT = 'invalid'
-
         expect(
           (await conversion(onePath, '--pdf')).options.browserManager.timeout
         ).toBeUndefined()
