@@ -481,7 +481,7 @@ export const waitForObservation = () =>
 export const apiInterface = (argv: string[], opts: MarpCLIAPIOptions = {}) =>
   marpCli(argv, { ...opts, stdin: false, throwErrorAlways: true })
 
-export const cliInterface = (argv: string[], opts: MarpCLICLIOptions = {}) => {
+export const cliInterface = (argv: string[]) => {
   if (process.env.DEBUG) {
     cli.info(
       `Debug logging is enabled. (Filter pattern: ${chalk.yellow(process.env.DEBUG)})`
@@ -489,5 +489,3 @@ export const cliInterface = (argv: string[], opts: MarpCLICLIOptions = {}) => {
   }
   return marpCli(argv, { stdin: true, throwErrorAlways: false })
 }
-
-export default cliInterface
