@@ -54,5 +54,5 @@ export const fetchIcu = async () => {
   })
 
   // Return the relative path to the ICU data from the project root
-  return path.relative(path.join(__dirname, '../'), icuDat).replace(/\\/g, '/')
+  return `./${path.relative(path.join(__dirname, '../'), icuDat).replace(/\\/g, '/')}`
 }
