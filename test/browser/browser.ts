@@ -1,5 +1,9 @@
+import * as puppeteer from 'puppeteer-core'
+import { Browser } from '../../src/browser/browser'
 import { FirefoxBrowser } from '../../src/browser/browsers/firefox'
 import * as wsl from '../../src/utils/wsl'
+
+jest.mock('puppeteer-core')
 
 afterEach(() => {
   jest.resetAllMocks()
@@ -7,6 +11,33 @@ afterEach(() => {
 })
 
 describe('Browser class', () => {
+  describe('#launch', () => {
+    const mockedBrowser = { once: jest.fn() }
+
+    beforeEach(() => {
+      jest.spyOn(puppeteer as any, 'launch').mockResolvedValue(mockedBrowser)
+    })
+
+    it('calls #launch in puppeteer-core with caching', async () => {
+      const browser = new FirefoxBrowser({ path: '/path/to/firefox' })
+
+      expect(await browser.launch()).toBe(mockedBrowser)
+      expect(await browser.launch()).toBe(mockedBrowser)
+      expect(puppeteer.launch).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe('[Symbol.asyncDisposable()]', () => {
+    it('calls #close when disposed', async () => {
+      const closeSpy = jest.spyOn(Browser.prototype, 'close')
+      {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        await using _browser = new FirefoxBrowser({ path: '/path/to/firefox' })
+      }
+      expect(closeSpy).toHaveBeenCalled()
+    })
+  })
+
   describe('#browserInWSLHost', () => {
     it('always returns false if the current environment is not WSL', async () => {
       jest.spyOn(wsl, 'isWSL').mockResolvedValue(0)

@@ -92,10 +92,13 @@ describe('Browser manager', () => {
         finders: ['chrome', 'firefox'],
         path: '/dummy/path',
         protocol: 'webDriverBiDi',
+        timeout: 0,
       })
 
       // Preview window is depending on CDP protocol, so it should return ChromeCdpBrowser
-      expect(await manager.browserForPreview()).toBeInstanceOf(ChromeCdpBrowser)
+      const cdpBrowser = await manager.browserForPreview()
+      expect(cdpBrowser).toBeInstanceOf(ChromeCdpBrowser)
+      expect(cdpBrowser.timeout).toBe(0)
       expect(browserFinder.findBrowser).toHaveBeenCalledWith(
         ['chrome', 'firefox'],
         { preferredPath: '/dummy/path' }

@@ -11,18 +11,14 @@ export class ChromeCdpBrowser extends ChromeBrowser {
 
     // macOS specific: Set Marp icon asynchrnously
     if (process.platform === 'darwin') {
-      /* c8 ignore start */
       puppeteer
         .target()
         .createCDPSession()
         .then((session) => {
           session
             .send('Browser.setDockTile', { image: macDockIcon.slice(22) })
-            .catch(() => {
-              // no ops
-            })
+            .catch(() => void 0)
         })
-      /* c8 ignore stop */
     }
 
     return puppeteer

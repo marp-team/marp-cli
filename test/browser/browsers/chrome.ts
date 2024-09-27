@@ -1,7 +1,7 @@
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
-import puppeteer from 'puppeteer-core'
+import * as puppeteer from 'puppeteer-core'
 import { ChromeBrowser } from '../../../src/browser/browsers/chrome'
 import * as container from '../../../src/utils/container'
 import * as wsl from '../../../src/utils/wsl'
@@ -27,7 +27,11 @@ describe('ChromeBrowser', () => {
       await new ChromeBrowser({ path: '/path/to/chrome' }).launch()
 
       expect(puppeteer.launch).toHaveBeenCalledWith(
-        expect.objectContaining({ executablePath: '/path/to/chrome' })
+        expect.objectContaining({
+          browser: 'chrome',
+          protocol: 'webDriverBiDi',
+          executablePath: '/path/to/chrome',
+        } as const satisfies puppeteer.PuppeteerLaunchOptions)
       )
     })
 
