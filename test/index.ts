@@ -17,7 +17,7 @@ describe('Marp CLI API interface', () => {
       expect(ret).toBe(0)
       expect(marpCliSpy).toHaveBeenCalled()
 
-      const opts: marpCli.MarpCLIInternalOptions = marpCliSpy.mock.calls[0][1]
+      const opts: marpCli.MarpCLIOptions = marpCliSpy.mock.calls[0][1]
 
       expect(opts.baseUrl).toBe('https://example.com/')
       expect(opts.stdin).toBe(false)

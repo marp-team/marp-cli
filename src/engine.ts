@@ -100,7 +100,11 @@ export class ResolvedEngine<T extends Engine = Engine> {
       if (resolved) break
     }
 
-    if (!resolved) error(`The specified engine has not resolved.`)
+    if (!resolved)
+      error(
+        `The specified engine has not resolved. (Try "--debug=true" to see more details)`
+      )
+
     return resolved
   }
 

@@ -15,6 +15,7 @@
 
 <!-- Allow using Firefox / WebDriver BiDi protocol during conversion ([#597](https://github.com/marp-team/marp-cli/pull/597)) -->
 
+- `--debug` (`-d`) option to CLI interface ([#599](https://github.com/marp-team/marp-cli/pull/599))
 - CI testing against Node.js v22 ([#591](https://github.com/marp-team/marp-cli/pull/591))
 
 ### Changed

@@ -1,7 +1,14 @@
 #!/usr/bin/env node
 
 'use strict'
+{
+  const prepare = require('./lib/prepare.js')
+  const cli = prepare.cliPrepare()
 
-require('./lib/marp-cli.js')
-  .cliInterface(process.argv.slice(2))
-  .then((exitCode) => process.on('exit', () => process.exit(exitCode)))
+  if (cli.debug)
+    process.env.DEBUG = `${process.env.DEBUG ? `${process.env.DEBUG},` : ''}${cli.debug}`
+
+  require('./lib/marp-cli.js')
+    .cliInterface(cli.args)
+    .then((exitCode) => process.on('exit', () => process.exit(exitCode)))
+}

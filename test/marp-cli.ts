@@ -242,6 +242,34 @@ describe('Marp CLI', () => {
     })
   }
 
+  describe('with DEBUG env', () => {
+    it('shows enabling debug logging and set pattern', async () => {
+      process.env.DEBUG = 'debug-pattern,debug-pattern:*'
+
+      try {
+        const warn = jest.spyOn(console, 'warn').mockImplementation()
+        const log = jest.spyOn(console, 'log').mockImplementation()
+
+        try {
+          expect(await marpCli(['-v'])).toBe(0)
+          expect(warn).toHaveBeenCalledWith(
+            expect.stringContaining('Debug logging is enabled')
+          )
+          expect(warn).toHaveBeenCalledWith(
+            expect.stringContaining(
+              'Filter pattern: debug-pattern,debug-pattern:*'
+            )
+          )
+        } finally {
+          warn.mockRestore()
+          log.mockRestore()
+        }
+      } finally {
+        delete process.env.DEBUG
+      }
+    })
+  })
+
   describe('when passed file is not found', () => {
     it('outputs warning and help with exit code 1', async () => {
       const warn = jest.spyOn(console, 'warn').mockImplementation()
@@ -1523,7 +1551,7 @@ describe('Marp CLI', () => {
     })
 
     it('converts markdown came from stdin and outputs to stdout', async () => {
-      expect(await marpCli()).toBe(0)
+      expect(await marpCli([])).toBe(0)
       expect(cliInfo.mock.calls.map(([m]) => m)).toContainEqual(
         expect.stringContaining('<stdin> => <stdout>')
       )
