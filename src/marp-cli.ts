@@ -22,13 +22,17 @@ enum OptionGroup {
   Marp = 'Marp / Marpit Options:',
 }
 
-export interface MarpCLIInternalOptions {
+export interface MarpCLIOptions {
   baseUrl?: string
   stdin: boolean
   throwErrorAlways: boolean
 }
 
-export type MarpCLIAPIOptions = Pick<MarpCLIInternalOptions, 'baseUrl'>
+export type MarpCLIAPIOptions = Pick<MarpCLIOptions, 'baseUrl'>
+
+export interface MarpCLICLIOptions {
+  debug?: string | boolean
+}
 
 export interface ObservationHelper {
   stop: () => void
@@ -44,7 +48,7 @@ Usage:
 
 export const marpCli = async (
   argv: string[],
-  { baseUrl, stdin: defaultStdin, throwErrorAlways }: MarpCLIInternalOptions
+  { baseUrl, stdin: defaultStdin, throwErrorAlways }: MarpCLIOptions
 ): Promise<number> => {
   let browserManager: BrowserManager | undefined
   let server: Server | undefined
@@ -68,6 +72,14 @@ export const marpCli = async (
           describe: 'Show help',
           group: OptionGroup.Basic,
           type: 'boolean',
+        },
+        debug: {
+          // NOTE: This option will not be parsed by yargs because it has been pre-parsed by prepare.ts
+          alias: 'd',
+          describe: 'Show debug logs (bool or filter pattern)',
+          defaultDescription: 'false',
+          group: OptionGroup.Basic,
+          type: 'string',
         },
         output: {
           alias: 'o',
@@ -181,7 +193,7 @@ export const marpCli = async (
         },
         template: {
           describe: 'Choose template',
-          defaultDescription: 'bespoke',
+          defaultDescription: '"bespoke"',
           group: OptionGroup.Template,
           choices: Object.keys(templates),
           type: 'string',
@@ -469,7 +481,13 @@ export const waitForObservation = () =>
 export const apiInterface = (argv: string[], opts: MarpCLIAPIOptions = {}) =>
   marpCli(argv, { ...opts, stdin: false, throwErrorAlways: true })
 
-export const cliInterface = (argv: string[] = []) =>
-  marpCli(argv, { stdin: true, throwErrorAlways: false })
+export const cliInterface = (argv: string[], opts: MarpCLICLIOptions = {}) => {
+  if (process.env.DEBUG) {
+    cli.info(
+      `Debug logging is enabled. (Filter pattern: ${chalk.yellow(process.env.DEBUG)})`
+    )
+  }
+  return marpCli(argv, { stdin: true, throwErrorAlways: false })
+}
 
 export default cliInterface
