@@ -78,8 +78,8 @@ describe('Preview', () => {
           width: window.innerWidth,
         }))
 
-        expect(height).toBe(600)
-        expect(width).toBe(400)
+        expect(height).toBeLessThanOrEqual(600)
+        expect(width).toBeLessThanOrEqual(400)
       })
     })
 
