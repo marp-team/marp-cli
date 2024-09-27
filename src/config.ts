@@ -3,8 +3,9 @@ import path from 'node:path'
 import chalk from 'chalk'
 import { cosmiconfig, cosmiconfigSync } from 'cosmiconfig'
 import { osLocale } from 'os-locale'
+import type { BrowserManagerConfig } from './browser/manager'
 import { info, warn, error as cliError } from './cli'
-import { ConverterOption, ConvertType } from './converter'
+import { ConvertType, type ConverterOption } from './converter'
 import { ResolvableEngine, ResolvedEngine } from './engine'
 import { keywordsAsArray } from './engine/meta-plugin'
 import { error, isError } from './error'
@@ -115,7 +116,23 @@ export class MarpCLIConfig {
 
   private constructor() {} // eslint-disable-line @typescript-eslint/no-empty-function
 
-  async converterOption(): Promise<ConverterOption> {
+  browserManagerOption() {
+    const timeout = (() => {
+      // TODO: Resolve timeout from args and configuration file
+      if (process.env.PUPPETEER_TIMEOUT) {
+        const envTimeout = Number.parseInt(process.env.PUPPETEER_TIMEOUT, 10)
+        if (!Number.isNaN(envTimeout)) return envTimeout
+      }
+      return undefined
+    })()
+
+    return {
+      protocol: 'cdp',
+      timeout,
+    } as const satisfies BrowserManagerConfig
+  }
+
+  async converterOption() {
     const inputDir = await this.inputDir()
     const server = this.args.server ?? this.conf.server ?? false
     const output = (() => {
@@ -254,14 +271,6 @@ export class MarpCLIConfig {
       return scale
     })()
 
-    const puppeteerTimeout = (() => {
-      if (process.env['PUPPETEER_TIMEOUT']) {
-        const envTimeout = Number.parseInt(process.env['PUPPETEER_TIMEOUT'], 10)
-        if (!Number.isNaN(envTimeout)) return envTimeout
-      }
-      return undefined
-    })()
-
     return {
       imageScale,
       inputDir,
@@ -269,7 +278,6 @@ export class MarpCLIConfig {
       pdfNotes,
       pdfOutlines,
       preview,
-      puppeteerTimeout,
       server,
       template,
       templateOption,
@@ -294,7 +302,7 @@ export class MarpCLIConfig {
       options: this.conf.options || {},
       pages: !!(this.args.images || this.conf.images),
       watch: (this.args.watch ?? this.conf.watch) || preview || server || false,
-    }
+    } as const satisfies Partial<ConverterOption>
   }
 
   get files() {
@@ -411,4 +419,4 @@ export class MarpCLIConfig {
   }
 }
 
-export default MarpCLIConfig.fromArguments
+export const { fromArguments } = MarpCLIConfig

@@ -1,4 +1,5 @@
 import path from 'node:path'
+import { BrowserManager } from '../src/browser/manager'
 import { ConvertType } from '../src/converter'
 import { CLIError } from '../src/error'
 import { File, FileType } from '../src/file'
@@ -8,9 +9,14 @@ jest.mock('node:path', () => require('./__mocks__/node/path')) // eslint-disable
 jest.setTimeout(40000)
 
 describe('Preview', () => {
+  let browserManager: BrowserManager
+
+  beforeAll(() => (browserManager = new BrowserManager()))
+  afterAll(async () => browserManager?.dispose())
+
   const previews = new Set<Preview>()
-  const preview = (...args): Preview => {
-    const instance = new Preview(...args)
+  const preview = (opts: Partial<Preview.ConstructorOptions> = {}): Preview => {
+    const instance = new Preview({ browserManager, ...opts })
     previews.add(instance)
 
     return instance
@@ -126,6 +132,16 @@ describe('Preview', () => {
               await win2.close()
             })()
           ))
+      })
+    })
+
+    describe('when opening data URI', () => {
+      it('opens data URI converted Blob URL to avoid URL length limit', async () => {
+        const instance = preview()
+        const win = await instance.open('data:text/html,<html></html>')
+
+        expect(await instance.puppeteer?.pages()).toHaveLength(1)
+        expect(win.page.url()).toStrictEqual(expect.stringMatching(/^blob:/))
       })
     })
   })

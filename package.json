@@ -40,9 +40,7 @@
   },
   "pkg": {
     "scripts": "lib/**/*.js",
-    "assets": [
-      "node_modules/vm2/**/*"
-    ]
+    "assets": ["tmp/icu/icudt*.dat", "node_modules/sharp/**/*", "node_modules/@img/**/*"]
   },
   "browserslist": [
     "> 1% and last 3 versions",
@@ -61,7 +59,7 @@
     "lint:css": "stylelint \"src/**/*.{css,scss}\"",
     "prepack": "npm-run-all --parallel check:* lint:* test:coverage --parallel build types",
     "preversion": "run-p check:* lint:* test:coverage",
-    "standalone": "node -e 'fs.rmSync(`bin`,{recursive:true,force:true})' && pkg --out-path ./bin .",
+    "standalone": "node -e 'fs.rmSync(`bin`,{recursive:true,force:true})' && pkg --options \"icu-data-dir=$(node ./scripts/icu.mjs)\" -C gzip --out-path ./bin .",
     "standalone:pack": "node ./scripts/pack.js",
     "test": "jest",
     "test:coverage": "jest --coverage",
@@ -82,11 +80,12 @@
     "@tsconfig/node20": "^20.1.4",
     "@tsconfig/recommended": "^1.0.7",
     "@types/cheerio": "^0.22.35",
+    "@types/debug": "^4.1.12",
     "@types/dom-view-transitions": "^1.0.5",
     "@types/express": "^4.17.21",
     "@types/jest": "^29.5.13",
     "@types/markdown-it": "^14.1.2",
-    "@types/node": "~16.18.108",
+    "@types/node": "~18.19.50",
     "@types/pug": "^2.0.10",
     "@types/supertest": "^6.0.2",
     "@types/which": "^3.0.4",
@@ -162,6 +161,7 @@
     "cosmiconfig": "^9.0.0",
     "puppeteer-core": "23.3.0",
     "serve-index": "^1.9.1",
+    "sharp": "^0.33.5",
     "tmp": "^0.2.3",
     "ws": "^8.18.0",
     "yargs": "^17.7.2"

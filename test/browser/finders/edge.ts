@@ -136,7 +136,7 @@ describe('Edge finder', () => {
     const winLocalAppData = ['C:', 'Mock', 'AppData', 'Local']
 
     const edgePath = path.join(...winProgramFiles, ...winEdgeStable)
-    const originalEnv = process.env
+    const originalEnv = { ...process.env }
 
     beforeEach(() => {
       jest.resetModules()
@@ -155,7 +155,7 @@ describe('Edge finder', () => {
     })
 
     afterEach(() => {
-      process.env = originalEnv
+      process.env = { ...originalEnv }
     })
 
     it('finds possible executable path and returns the matched path', async () => {

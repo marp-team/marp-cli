@@ -1,3 +1,5 @@
+import { debug } from './utils/debug'
+
 export class CLIError extends Error {
   readonly errorCode: number
   readonly message: string
@@ -28,7 +30,10 @@ export function error(
   msg: string,
   errorCode: number = CLIErrorCode.GENERAL_ERROR
 ): never {
-  throw new CLIError(msg, errorCode)
+  const cliError = new CLIError(msg, errorCode)
+  debug('%O', cliError)
+
+  throw cliError
 }
 
 export const isError = (e: unknown): e is NodeJS.ErrnoException =>

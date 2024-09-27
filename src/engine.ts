@@ -7,6 +7,7 @@ import importFrom from 'import-from'
 import { resolve as importMetaResolve } from 'import-meta-resolve'
 import { pkgUp } from 'pkg-up'
 import { error, isError } from './error'
+import { debugEngine } from './utils/debug'
 
 type FunctionalEngine<T extends typeof Marpit = typeof Marpit> = (
   constructorOptions: ConstructorParameters<T>[0] & { readonly marp: Marp }
@@ -137,21 +138,25 @@ export class ResolvedEngine<T extends Engine = Engine> {
     moduleId: string,
     from?: string
   ): Promise<T | null> {
+    let normalizedModuleId = moduleId
+
     const basePath = path.join(from || process.cwd(), '_.js')
     const dirPath = path.dirname(basePath)
-    const moduleFilePath = path.resolve(dirPath, moduleId)
+    const moduleFilePath = path.resolve(dirPath, normalizedModuleId)
 
     try {
       const stat = await fs.promises.stat(moduleFilePath)
 
-      if (stat.isFile()) moduleId = url.pathToFileURL(moduleFilePath).toString()
+      if (stat.isFile()) {
+        normalizedModuleId = url.pathToFileURL(moduleFilePath).toString()
+      }
     } catch {
       // No ops
     }
 
     try {
       const resolved = importMetaResolve(
-        moduleId,
+        normalizedModuleId,
         url.pathToFileURL(basePath).toString()
       )
 
@@ -169,7 +174,14 @@ export class ResolvedEngine<T extends Engine = Engine> {
 
       return await import(resolved)
       /* c8 ignore stop */
-    } catch {
+    } catch (e) {
+      debugEngine(
+        'Failed to import %s. (Normalized module id: %s)',
+        moduleId + (from ? ` from ${from}` : ''),
+        normalizedModuleId
+      )
+      debugEngine('%O', e)
+
       return null
     }
   }
@@ -187,6 +199,12 @@ export class ResolvedEngine<T extends Engine = Engine> {
 
       /* c8 ignore start */
     } catch (e) {
+      debugEngine(
+        'Failed to require %s.',
+        moduleId + (from ? ` from ${from}` : '')
+      )
+      debugEngine('%O', e)
+
       if (isError(e) && e.code === 'ERR_REQUIRE_ESM') {
         // Show reason why `require()` failed in the current context
         if ('pkg' in process) {

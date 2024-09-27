@@ -13,6 +13,8 @@ afterEach(() => {
   jest.restoreAllMocks()
 })
 
+const itExceptWin = process.platform === 'win32' ? it.skip : it
+
 const executableMock = (name: string) =>
   path.join(__dirname, `../../utils/_executable_mocks`, name)
 
@@ -24,6 +26,55 @@ describe('Chrome finder', () => {
       })
 
       expect(chrome).toStrictEqual({
+        path: '/test/preferred/chrome',
+        acceptedBrowsers: [ChromeBrowser, ChromeCdpBrowser],
+      })
+    })
+  })
+
+  describe('with CHROME_PATH environment variable', () => {
+    const originalEnv = { ...process.env }
+    const regularResolution = new Error('Starting regular resolution')
+
+    beforeEach(() => {
+      jest.resetModules()
+      jest.spyOn(utils, 'getPlatform').mockRejectedValue(regularResolution)
+    })
+
+    afterEach(() => {
+      process.env = { ...originalEnv }
+    })
+
+    it('return the path for executable specified in CHROME_PATH', async () => {
+      process.env.CHROME_PATH = executableMock('empty')
+
+      expect(await chromeFinder({})).toStrictEqual({
+        path: process.env.CHROME_PATH,
+        acceptedBrowsers: [ChromeBrowser, ChromeCdpBrowser],
+      })
+    })
+
+    itExceptWin(
+      'processes regular resolution if CHROME_PATH is not executable',
+      async () => {
+        process.env.CHROME_PATH = executableMock('non-executable')
+
+        await expect(chromeFinder({})).rejects.toThrow(regularResolution)
+      }
+    )
+
+    it('processes regular resolution if CHROME_PATH is not found', async () => {
+      process.env.CHROME_PATH = executableMock('not-found')
+
+      await expect(chromeFinder({})).rejects.toThrow(regularResolution)
+    })
+
+    it('prefers the preferred path over CHROME_PATH', async () => {
+      process.env.CHROME_PATH = executableMock('empty')
+
+      expect(
+        await chromeFinder({ preferredPath: '/test/preferred/chrome' })
+      ).toStrictEqual({
         path: '/test/preferred/chrome',
         acceptedBrowsers: [ChromeBrowser, ChromeCdpBrowser],
       })

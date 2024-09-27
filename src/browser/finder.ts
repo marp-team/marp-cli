@@ -21,12 +21,20 @@ export type BrowserFinder = (
 
 const finderMap = { chrome, edge, firefox } as const
 
-export const autoFinders = ['chrome', 'edge', 'firefox'] as const
+export type FinderName = keyof typeof finderMap
+
+export const defaultFinders = ['chrome', 'edge', 'firefox'] as const
 
 export const findBrowser = async (
-  finders: readonly (keyof typeof finderMap)[] = autoFinders,
+  finders: readonly FinderName[] = defaultFinders,
   opts: BrowserFinderOptions = {}
 ) => {
+  let found = false
+
+  const debug = (...args: Parameters<typeof debugBrowserFinder>) => {
+    if (!found) return debugBrowserFinder(...args)
+  }
+
   const finderCount = finders.length
   const normalizedOpts = {
     preferredPath: await (async () => {
@@ -39,13 +47,10 @@ export const findBrowser = async (
   }
 
   if (finderCount === 0) {
-    debugBrowserFinder('No browser finder specified.')
+    debug('No browser finder specified.')
 
     if (normalizedOpts.preferredPath) {
-      debugBrowserFinder(
-        'Use preferred path as Chrome: %s',
-        normalizedOpts.preferredPath
-      )
+      debug('Use preferred path as Chrome: %s', normalizedOpts.preferredPath)
 
       return await chrome(normalizedOpts)
     }
@@ -56,10 +61,7 @@ export const findBrowser = async (
     )
   }
 
-  debugBrowserFinder(
-    `Start finding browser from ${finders.join(', ')} (%o)`,
-    normalizedOpts
-  )
+  debug(`Start finding browser from ${finders.join(', ')} (%o)`, normalizedOpts)
 
   return new Promise<BrowserFinderResult>((res, rej) => {
     const results = Array<BrowserFinderResult>(finderCount)
@@ -70,12 +72,12 @@ export const findBrowser = async (
 
       finder(normalizedOpts)
         .then((ret) => {
-          debugBrowserFinder(`Found ${finderName}: %o`, ret)
+          debug(`Found ${finderName}: %o`, ret)
           results[index] = ret
           resolved[index] = true
         })
         .catch((e) => {
-          debugBrowserFinder(`Finder ${finderName} was failed: %o`, e)
+          debug(`Finder ${finderName} was failed: %o`, e)
           resolved[index] = false
         })
         .finally(() => {
@@ -98,7 +100,9 @@ export const findBrowser = async (
         })
     })
   }).then((result) => {
-    debugBrowserFinder('Use browser: %o', result)
+    debug('Use browser: %o', result)
+    found = true
+
     return result
   })
 }

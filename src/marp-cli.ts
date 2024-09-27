@@ -1,6 +1,7 @@
 import chalk from 'chalk'
+import { BrowserManager } from './browser/manager'
 import * as cli from './cli'
-import fromArguments from './config'
+import { fromArguments } from './config'
 import { Converter, ConvertedCallback, ConvertType } from './converter'
 import { CLIError, error, isError } from './error'
 import { File, FileType } from './file'
@@ -8,7 +9,6 @@ import { Preview, fileToURI } from './preview'
 import { Server } from './server'
 import templates from './templates'
 import { isOfficialDockerImage } from './utils/container'
-import { resetExecutablePath } from './utils/puppeteer'
 import { createYargs } from './utils/yargs'
 import version from './version'
 import watcher, { Watcher, notifier } from './watcher'
@@ -46,6 +46,7 @@ export const marpCli = async (
   argv: string[],
   { baseUrl, stdin: defaultStdin, throwErrorAlways }: MarpCLIInternalOptions
 ): Promise<number> => {
+  let browserManager: BrowserManager | undefined
   let server: Server | undefined
   let watcherInstance: Watcher | undefined
 
@@ -294,8 +295,14 @@ export const marpCli = async (
     const config = await fromArguments(args)
     if (args.version) return await version(config)
 
+    // Initialize browser manager
+    browserManager = new BrowserManager(config.browserManagerOption())
+
     // Initialize converter
-    const converter = new Converter(await config.converterOption())
+    const converter = new Converter({
+      ...(await config.converterOption()),
+      browserManager,
+    })
     const cvtOpts = converter.options
 
     // Find target markdown files
@@ -393,10 +400,10 @@ export const marpCli = async (
           )
 
           // Preview window
-          const preview = new Preview()
+          const preview = new Preview({ browserManager: browserManager! })
           preview.on('exit', () => res(0))
           preview.on('opening', (location: string) => {
-            const loc = location.substr(0, 50)
+            const loc = location.substring(0, 50)
             const msg = `[Preview] Opening ${loc}...`
             cli.info(chalk.cyan(msg))
           })
@@ -447,7 +454,7 @@ export const marpCli = async (
   } finally {
     await Promise.all([
       notifier.stop(),
-      Converter.closeBrowser(),
+      browserManager?.dispose(),
       server?.stop(),
       watcherInstance?.chokidar.close(),
     ])
@@ -459,20 +466,10 @@ export const waitForObservation = () =>
     resolversForObservation.push(res)
   })
 
-export const apiInterface = (argv: string[], opts: MarpCLIAPIOptions = {}) => {
-  resetExecutablePath()
-
-  return marpCli(argv, {
-    ...opts,
-    stdin: false,
-    throwErrorAlways: true,
-  })
-}
+export const apiInterface = (argv: string[], opts: MarpCLIAPIOptions = {}) =>
+  marpCli(argv, { ...opts, stdin: false, throwErrorAlways: true })
 
 export const cliInterface = (argv: string[] = []) =>
-  marpCli(argv, {
-    stdin: true,
-    throwErrorAlways: false,
-  })
+  marpCli(argv, { stdin: true, throwErrorAlways: false })
 
 export default cliInterface

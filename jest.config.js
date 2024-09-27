@@ -35,6 +35,7 @@ module.exports = {
   coverageProvider: 'v8',
   coverageThreshold: { global: { lines: 95 } },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
+  prettierPath: null,
   setupFiles: ['./jest.setup.js'],
   transform: {
     ...jsWithBabel.transform,

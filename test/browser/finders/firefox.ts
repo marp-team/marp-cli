@@ -21,6 +21,8 @@ const winFxNightlyAlt = ['Firefox Nightly', 'firefox.exe']
 const winFxDev = ['Firefox Developer Edition', 'firefox.exe']
 const winFx = ['Mozilla Firefox', 'firefox.exe']
 
+const itExceptWin = process.platform === 'win32' ? it.skip : it
+
 const executableMock = (name: string) =>
   path.join(__dirname, `../../utils/_executable_mocks`, name)
 
@@ -32,6 +34,55 @@ describe('Firefox finder', () => {
       })
 
       expect(firefox).toStrictEqual({
+        path: '/test/preferred/firefox',
+        acceptedBrowsers: [FirefoxBrowser],
+      })
+    })
+  })
+
+  describe('with FIREFOX_PATH environment variable', () => {
+    const originalEnv = { ...process.env }
+    const regularResolution = new Error('Starting regular resolution')
+
+    beforeEach(() => {
+      jest.resetModules()
+      jest.spyOn(utils, 'getPlatform').mockRejectedValue(regularResolution)
+    })
+
+    afterEach(() => {
+      process.env = { ...originalEnv }
+    })
+
+    it('return the path for executable specified in FIREFOX_PATH', async () => {
+      process.env.FIREFOX_PATH = executableMock('empty')
+
+      expect(await firefoxFinder({})).toStrictEqual({
+        path: process.env.FIREFOX_PATH,
+        acceptedBrowsers: [FirefoxBrowser],
+      })
+    })
+
+    itExceptWin(
+      'processes regular resolution if FIREFOX_PATH is not executable',
+      async () => {
+        process.env.FIREFOX_PATH = executableMock('non-executable')
+
+        await expect(firefoxFinder({})).rejects.toThrow(regularResolution)
+      }
+    )
+
+    it('processes regular resolution if FIREFOX_PATH is not found', async () => {
+      process.env.FIREFOX_PATH = executableMock('not-found')
+
+      await expect(firefoxFinder({})).rejects.toThrow(regularResolution)
+    })
+
+    it('prefers the preferred path over FIREFOX_PATH', async () => {
+      process.env.FIREFOX_PATH = executableMock('empty')
+
+      expect(
+        await firefoxFinder({ preferredPath: '/test/preferred/firefox' })
+      ).toStrictEqual({
         path: '/test/preferred/firefox',
         acceptedBrowsers: [FirefoxBrowser],
       })
@@ -147,7 +198,7 @@ describe('Firefox finder', () => {
       'Mozilla Firefox',
       'firefox.exe'
     )
-    const originalEnv = process.env
+    const originalEnv = { ...process.env }
 
     beforeEach(() => {
       jest.resetModules()
@@ -166,7 +217,7 @@ describe('Firefox finder', () => {
     })
 
     afterEach(() => {
-      process.env = originalEnv
+      process.env = { ...originalEnv }
     })
 
     it('finds possible executable path and returns the matched path', async () => {
@@ -249,7 +300,7 @@ describe('Firefox finder', () => {
   })
 
   describe('with WSL1', () => {
-    const originalEnv = process.env
+    const originalEnv = { ...process.env }
 
     beforeEach(() => {
       jest.resetModules()
@@ -265,7 +316,7 @@ describe('Firefox finder', () => {
     })
 
     afterEach(() => {
-      process.env = originalEnv
+      process.env = { ...originalEnv }
     })
 
     it('finds possible executable path and returns the matched path', async () => {

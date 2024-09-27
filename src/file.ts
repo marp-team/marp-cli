@@ -7,6 +7,7 @@ import { promisify } from 'node:util'
 import getStdin from 'get-stdin'
 import { globby, Options as GlobbyOptions } from 'globby'
 import { tmpName } from 'tmp'
+import { debug } from './utils/debug'
 
 const tmpNamePromise = promisify(tmpName)
 
@@ -97,25 +98,30 @@ export class File {
     opts: { extension?: string; home?: boolean } = {}
   ): Promise<File.TmpFileInterface> {
     let tmp: string = await tmpNamePromise({ postfix: opts.extension })
-
     if (opts.home) tmp = path.join(os.homedir(), path.basename(tmp))
 
+    debug('Saving temporary file: %s', tmp)
     await this.saveToFile(tmp)
 
+    const cleanup = async () => {
+      try {
+        await this.cleanup(tmp)
+      } catch (e) {
+        debug('Failed to clean up temporary file: %o', e)
+      }
+    }
+
     return {
-      cleanup: async () => {
-        try {
-          await this.cleanup(tmp)
-        } catch {
-          // No ops
-        }
-      },
       path: tmp,
+      cleanup,
+      [Symbol.dispose]: () => void cleanup(),
+      [Symbol.asyncDispose]: cleanup,
     }
   }
 
-  private cleanup(tmpPath: string) {
-    return fs.promises.unlink(tmpPath)
+  private async cleanup(tmpPath: string) {
+    await fs.promises.unlink(tmpPath)
+    debug('Cleaned up temporary file: %s', tmpPath)
   }
 
   private convertName(
@@ -147,6 +153,8 @@ export class File {
   }
 
   private async saveToFile(savePath: string = this.path) {
+    debug('Saving file: %s', savePath)
+
     const directory = path.dirname(path.resolve(savePath))
 
     if (path.dirname(directory) !== directory) {
@@ -154,6 +162,7 @@ export class File {
     }
 
     await fs.promises.writeFile(savePath, this.buffer!)
+    debug('Saved: %s', savePath)
   }
 
   private static stdinBuffer?: Buffer
@@ -236,7 +245,7 @@ export class File {
 }
 
 export namespace File {
-  export interface TmpFileInterface {
+  export interface TmpFileInterface extends AsyncDisposable, Disposable {
     path: string
     cleanup: () => Promise<void>
   }

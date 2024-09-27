@@ -2,7 +2,6 @@ import path from 'node:path'
 import getStdin from 'get-stdin'
 import api, { CLIError } from '../src/index'
 import * as marpCli from '../src/marp-cli'
-import * as puppeteerUtil from '../src/utils/puppeteer'
 
 const stdinBuffer = getStdin.buffer
 
@@ -53,24 +52,6 @@ describe('Marp CLI API interface', () => {
       await expect(api(['-c', fakePath])).rejects.toBeInstanceOf(CLIError)
     } finally {
       cliError.mockRestore()
-    }
-  })
-
-  it('resets cached Chrome path every time', async () => {
-    const resetExecutablePathSpy = jest.spyOn(
-      puppeteerUtil,
-      'resetExecutablePath'
-    )
-    const marpCliSpy = jest.spyOn(marpCli, 'marpCli').mockResolvedValue(0)
-
-    try {
-      await api([])
-      expect(resetExecutablePathSpy).toHaveBeenCalledTimes(1)
-
-      await api([])
-      expect(resetExecutablePathSpy).toHaveBeenCalledTimes(2)
-    } finally {
-      marpCliSpy.mockRestore()
     }
   })
 })

@@ -1,56 +1,123 @@
 import { ChromeBrowser } from '../../src/browser/browsers/chrome'
-import { browserManager, BrowserManager } from '../../src/browser/manager'
+import { ChromeCdpBrowser } from '../../src/browser/browsers/chrome-cdp'
+import { FirefoxBrowser } from '../../src/browser/browsers/firefox'
+import * as browserFinder from '../../src/browser/finder'
+import { BrowserManager } from '../../src/browser/manager'
 
-describe('browserManager static instance', () => {
-  it('is an instance of BrowserManager', () => {
-    expect(browserManager).toBeInstanceOf(BrowserManager)
-  })
+afterEach(() => {
+  jest.resetAllMocks()
+  jest.restoreAllMocks()
 })
 
-describe('BrowserManager class', () => {
-  describe('#register', () => {
-    it('registers a browser', () => {
-      const previewBrowser = new ChromeBrowser({ purpose: 'preview' })
-      const convertBrowser = new ChromeBrowser({ purpose: 'convert' })
-      const manager = new BrowserManager()
+describe('Browser manager', () => {
+  describe('constructor', () => {
+    it('creates a new instance with specified options', () => {
+      const manager: any = new BrowserManager({
+        finders: ['chrome', 'firefox'],
+        path: '/dummy/path',
+        protocol: 'webDriverBiDi',
+        timeout: 12345,
+      })
 
-      expect(manager.findBy({ browser: previewBrowser })).toBeUndefined()
-      expect(manager.findBy({ browser: convertBrowser })).toBeUndefined()
-
-      manager.register(convertBrowser)
-      expect(manager.findBy({ browser: previewBrowser })).toBeUndefined()
-      expect(manager.findBy({ browser: convertBrowser })).toBe(convertBrowser)
-
-      manager.register(previewBrowser)
-      expect(manager.findBy({ browser: previewBrowser })).toBe(previewBrowser)
-      expect(manager.findBy({ browser: convertBrowser })).toBe(convertBrowser)
+      expect(manager).toBeInstanceOf(BrowserManager)
+      expect(manager._finders).toStrictEqual(['chrome', 'firefox'])
+      expect(manager._finderPreferredPath).toBe('/dummy/path')
+      expect(manager._preferredProtocol).toBe('webDriverBiDi')
+      expect(manager.timeout).toBe(12345)
     })
   })
 
-  describe('#findBy', () => {
-    it('finds a browser by query', () => {
-      const browser = new ChromeBrowser({ purpose: 'convert' })
-      const manager = new BrowserManager()
+  describe('#browserForConversion', () => {
+    it('returns suited browser class for conversion', async () => {
+      jest.spyOn(browserFinder, 'findBrowser').mockResolvedValue({
+        path: '/dummy/path/resolved',
+        acceptedBrowsers: [ChromeCdpBrowser, ChromeBrowser],
+      })
 
-      manager.register(browser)
+      const manager = new BrowserManager({
+        finders: ['chrome', 'firefox'],
+        path: '/dummy/path',
+        protocol: 'webDriverBiDi',
+      })
 
-      // Find by instance
-      expect(manager.findBy({ browser })).toBe(browser)
-      expect(
-        manager.findBy({ browser: new ChromeBrowser({ purpose: 'preview' }) })
-      ).toBeUndefined()
+      expect(await manager.browserForConversion()).toBeInstanceOf(ChromeBrowser)
+      expect(browserFinder.findBrowser).toHaveBeenCalledWith(
+        ['chrome', 'firefox'],
+        { preferredPath: '/dummy/path' }
+      )
 
-      // Find by kind
-      expect(manager.findBy({ kind: 'chrome' })).toBe(browser)
-      expect(manager.findBy({ kind: 'firefox' })).toBeUndefined()
+      // Check whether the found result will be cached
+      await manager.browserForConversion()
+      expect(browserFinder.findBrowser).toHaveBeenCalledTimes(1)
+    })
 
-      // Find by protocol
-      expect(manager.findBy({ protocol: 'webdriver-bidi' })).toBe(browser)
-      expect(manager.findBy({ protocol: 'cdp' })).toBeUndefined()
+    it('throws an error if no suited browser is found', async () => {
+      jest
+        .spyOn(browserFinder, 'findBrowser')
+        .mockResolvedValue({ path: '/dev/null', acceptedBrowsers: [] })
 
-      // Find by purpose
-      expect(manager.findBy({ purpose: 'convert' })).toBe(browser)
-      expect(manager.findBy({ purpose: 'preview' })).toBeUndefined()
+      await expect(new BrowserManager().browserForConversion()).rejects.toThrow(
+        'No browser found for conversion'
+      )
+    })
+
+    it('uses first browser if the preferred protocol did not match', async () => {
+      jest.spyOn(browserFinder, 'findBrowser').mockResolvedValue({
+        path: '/dummy/path/resolved',
+        acceptedBrowsers: [FirefoxBrowser],
+      })
+
+      const manager = new BrowserManager({
+        finders: ['firefox'],
+        protocol: 'cdp',
+      })
+
+      expect(await manager.browserForConversion()).toBeInstanceOf(
+        FirefoxBrowser
+      )
+      expect(browserFinder.findBrowser).toHaveBeenCalledWith(['firefox'], {
+        preferredPath: undefined,
+      })
+    })
+  })
+
+  describe('#browserForPreview', () => {
+    it('returns suited browser class for preview', async () => {
+      jest.spyOn(browserFinder, 'findBrowser').mockResolvedValue({
+        path: '/dummy/path/resolved',
+        acceptedBrowsers: [ChromeCdpBrowser, ChromeBrowser],
+      })
+
+      const manager = new BrowserManager({
+        finders: ['chrome', 'firefox'],
+        path: '/dummy/path',
+        protocol: 'webDriverBiDi',
+        timeout: 0,
+      })
+
+      // Preview window is depending on CDP protocol, so it should return ChromeCdpBrowser
+      const cdpBrowser = await manager.browserForPreview()
+      expect(cdpBrowser).toBeInstanceOf(ChromeCdpBrowser)
+      expect(cdpBrowser.timeout).toBe(0)
+      expect(browserFinder.findBrowser).toHaveBeenCalledWith(
+        ['chrome', 'firefox'],
+        { preferredPath: '/dummy/path' }
+      )
+
+      // Check whether the found result will be cached
+      await manager.browserForPreview()
+      expect(browserFinder.findBrowser).toHaveBeenCalledTimes(1)
+    })
+
+    it('throws an error if no suited browser is found', async () => {
+      jest.spyOn(browserFinder, 'findBrowser').mockResolvedValue({
+        path: '/dummy/path/resolved',
+        acceptedBrowsers: [FirefoxBrowser],
+      })
+
+      await expect(new BrowserManager().browserForPreview()).rejects.toThrow(
+        'No browser found for preview'
+      )
     })
   })
 })

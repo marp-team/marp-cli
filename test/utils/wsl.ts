@@ -184,27 +184,3 @@ describe('#isWSL', () => {
     expect(readFile).toHaveBeenCalledTimes(1)
   })
 })
-
-describe('#isChromeInWSLHost', () => {
-  it('returns true if executed in WSL environment and the passed path is in WSL host', async () => {
-    const isWSL = jest.spyOn(wsl(), 'isWSL')
-    const { isChromeInWSLHost } = wsl()
-
-    isWSL.mockResolvedValue(1)
-    expect(await isChromeInWSLHost('/mnt/c/Programs/Chrome/chrome.exe')).toBe(
-      true
-    )
-    expect(await isChromeInWSLHost('/mnt/d/foo/bar/chrome')).toBe(true)
-    expect(await isChromeInWSLHost('/usr/bin/chrome')).toBe(false)
-    expect(await isChromeInWSLHost('/home/test/.chromium/chrome.exe')).toBe(
-      false
-    )
-    expect(await isChromeInWSLHost(undefined)).toBe(false)
-
-    isWSL.mockResolvedValue(0)
-    expect(await isChromeInWSLHost('/mnt/c/Programs/Chrome/chrome.exe')).toBe(
-      false
-    )
-    expect(await isChromeInWSLHost('/mnt/d/foo/bar/chrome')).toBe(false)
-  })
-})

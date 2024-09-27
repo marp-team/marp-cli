@@ -2,7 +2,7 @@ import path from 'node:path'
 import { ChromeBrowser } from '../../src/browser/browsers/chrome'
 import { ChromeCdpBrowser } from '../../src/browser/browsers/chrome-cdp'
 import { FirefoxBrowser } from '../../src/browser/browsers/firefox'
-import { autoFinders, findBrowser } from '../../src/browser/finder'
+import { defaultFinders, findBrowser } from '../../src/browser/finder'
 import { CLIError } from '../../src/error'
 
 afterEach(() => {
@@ -148,7 +148,7 @@ describe('Browser finder', () => {
       })
 
       it('normalizes executable path if preferred path was pointed to valid app bundle', async () => {
-        const browser = await findBrowser(autoFinders, {
+        const browser = await findBrowser(defaultFinders, {
           preferredPath: macBundle('Valid.app'),
         })
 
@@ -159,7 +159,7 @@ describe('Browser finder', () => {
       })
 
       it('does not normalize executable path if preferred path was pointed to invalid app bundle', async () => {
-        const browser = await findBrowser(autoFinders, {
+        const browser = await findBrowser(defaultFinders, {
           preferredPath: macBundle('Invalid.app'),
         })
 

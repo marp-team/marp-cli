@@ -2,7 +2,13 @@ import path from 'node:path'
 import { error, CLIErrorCode } from '../../error'
 import { FirefoxBrowser } from '../browsers/firefox'
 import type { BrowserFinder, BrowserFinderResult } from '../finder'
-import { getPlatform, findExecutable, findExecutableBinary } from './utils'
+import {
+  getPlatform,
+  findExecutable,
+  findExecutableBinary,
+  isExecutable,
+  normalizeDarwinAppPath,
+} from './utils'
 
 const firefox = (path: string): BrowserFinderResult => ({
   path,
@@ -16,6 +22,11 @@ const winFirefoxDefault = ['Mozilla Firefox', 'firefox.exe'] // Firefox stable, 
 
 export const firefoxFinder: BrowserFinder = async ({ preferredPath } = {}) => {
   if (preferredPath) return firefox(preferredPath)
+
+  if (process.env.FIREFOX_PATH) {
+    const nPath = await normalizeDarwinAppPath(process.env.FIREFOX_PATH)
+    if (nPath && (await isExecutable(nPath))) return firefox(nPath)
+  }
 
   const platform = await getPlatform()
   const installation = await (async () => {

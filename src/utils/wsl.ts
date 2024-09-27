@@ -69,6 +69,3 @@ export const isWSL = async (): Promise<number> => {
 
   return await isWsl
 }
-
-export const isChromeInWSLHost = async (chromePath: string | undefined) =>
-  !!((await isWSL()) && chromePath?.match(/^\/mnt\/[a-z]\//))
