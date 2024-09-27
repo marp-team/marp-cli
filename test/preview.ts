@@ -78,8 +78,8 @@ describe('Preview', () => {
           width: window.innerWidth,
         }))
 
-        expect(height).toBeLessThanOrEqual(600)
-        expect(width).toBeLessThanOrEqual(400)
+        expect(height).toBe(600)
+        expect(width).toBe(400)
       })
     })
 
@@ -132,6 +132,16 @@ describe('Preview', () => {
               await win2.close()
             })()
           ))
+      })
+    })
+
+    describe('when opening data URI', () => {
+      it('opens data URI converted Blob URL to avoid URL length limit', async () => {
+        const instance = preview()
+        const win = await instance.open('data:text/html,<html></html>')
+
+        expect(await instance.puppeteer?.pages()).toHaveLength(1)
+        expect(win.page.url()).toStrictEqual(expect.stringMatching(/^blob:/))
       })
     })
   })

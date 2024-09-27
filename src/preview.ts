@@ -169,9 +169,11 @@ export class Preview extends (EventEmitter as new () => TypedEmitter<Preview.Eve
 
             if (url.searchParams.get('__marp_cli_id') === id) {
               debugPreview('Found a target window with id: %s', id)
-
               pptr.off('targetcreated', idMatcher)
-              ;(async () => res((await target.page())!))()
+
+              void (async () => {
+                res((await target.page()) ?? (await target.asPage()))
+              })()
             }
           }
 
@@ -187,8 +189,21 @@ export class Preview extends (EventEmitter as new () => TypedEmitter<Preview.Eve
               `window.open('about:blank?__marp_cli_id=${id}', '', 'width=${this.options.width},height=${this.options.height}')`
             )
           })()
-        }).then((page) => {
-          debugPreview('Created new window!: %s', page.url())
+        }).then(async (page) => {
+          const sizeCorrection = await page.evaluate(
+            ([w, h]) => {
+              const nw = w - window.innerWidth + w
+              const nh = h - window.innerHeight + h
+
+              window.resizeTo(nw, nh)
+              return [nw, nh]
+            },
+            [this.options.width, this.options.height]
+          )
+
+          debugPreview('Apply window size correction: %o', sizeCorrection)
+          debugPreview('Created new window: %s', page.url())
+
           return page
         })
       )
