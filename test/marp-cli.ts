@@ -1523,7 +1523,7 @@ describe('Marp CLI', () => {
     })
 
     it('converts markdown came from stdin and outputs to stdout', async () => {
-      expect(await marpCli()).toBe(0)
+      expect(await marpCli([])).toBe(0)
       expect(cliInfo.mock.calls.map(([m]) => m)).toContainEqual(
         expect.stringContaining('<stdin> => <stdout>')
       )
