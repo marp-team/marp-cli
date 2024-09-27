@@ -9,6 +9,7 @@ import type {
 } from 'puppeteer-core'
 import { CLIErrorCode, error, isError } from '../../error'
 import { isInsideContainer } from '../../utils/container'
+import { debugBrowser } from '../../utils/debug'
 import {
   isWSL,
   resolveWindowsEnv,
@@ -49,7 +50,7 @@ export class ChromeBrowser extends Browser {
     const baseOpts = this.generateLaunchOptions({
       headless: this.puppeteerHeadless(),
       pipe: await this.puppeteerPipe(),
-      userDataDir: await this.createPuppeteerDataDir(),
+      // userDataDir: await this.createPuppeteerDataDir(), // user data dir will set in args option due to wrong path normalization in WSL
       ...opts,
       args: await this.puppeteerArgs(opts.args ?? []),
       ignoreDefaultArgs: opts.ignoreDefaultArgs === true || [
@@ -91,7 +92,11 @@ export class ChromeBrowser extends Browser {
   }
 
   private async puppeteerArgs(extraArgs: string[] = []) {
-    const args = new Set(['--test-type', ...extraArgs])
+    const args = new Set([
+      `--user-data-dir=${await this.createPuppeteerDataDir()}`,
+      '--test-type',
+      ...extraArgs,
+    ])
 
     if (!(await this.puppeteerArgsEnableSandbox())) args.add('--no-sandbox')
 
@@ -134,11 +139,15 @@ export class ChromeBrowser extends Browser {
       return path.resolve(os.tmpdir(), this._dataDirName)
     })()
 
+    debugBrowser(`Chrome data directory: %s`, dataDir)
+
     // Ensure the data directory is created
-    await fs.promises.mkdir(
-      requiredResolveWSLPath ? resolveWSLPathToGuestSync(dataDir) : dataDir,
-      { recursive: true }
-    )
+    const mkdirPath = requiredResolveWSLPath
+      ? resolveWSLPathToGuestSync(dataDir)
+      : dataDir
+
+    await fs.promises.mkdir(mkdirPath, { recursive: true })
+    debugBrowser(`Created data directory: %s`, mkdirPath)
 
     return dataDir
   }
