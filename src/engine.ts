@@ -7,8 +7,8 @@ import importFrom from 'import-from'
 import { resolve as importMetaResolve } from 'import-meta-resolve'
 import { pkgUp } from 'pkg-up'
 import { error, isError } from './error'
-import { debugEngine } from './utils/debug'
 import { isStandaloneBinary } from './utils/binary'
+import { debugEngine } from './utils/debug'
 
 type FunctionalEngine<T extends typeof Marpit = typeof Marpit> = (
   constructorOptions: ConstructorParameters<T>[0] & { readonly marp: Marp }

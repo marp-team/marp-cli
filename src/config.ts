@@ -11,8 +11,8 @@ import { keywordsAsArray } from './engine/meta-plugin'
 import { error, isError } from './error'
 import { TemplateOption } from './templates'
 import { Theme, ThemeSet } from './theme'
-import { isOfficialDockerImage } from './utils/container'
 import { isStandaloneBinary } from './utils/binary'
+import { isOfficialDockerImage } from './utils/container'
 
 type Overwrite<T, U> = Omit<T, Extract<keyof T, keyof U>> & U
 
