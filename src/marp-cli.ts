@@ -12,15 +12,17 @@ import { isOfficialDockerImage } from './utils/container'
 import { createYargs } from './utils/yargs'
 import version from './version'
 import watcher, { Watcher, notifier } from './watcher'
+import { availableFinders } from './browser/finder'
 
-enum OptionGroup {
-  Basic = 'Basic Options:',
-  Converter = 'Converter Options:',
-  Template = 'Template Options:',
-  PDF = 'PDF Options:',
-  Meta = 'Metadata Options:',
-  Marp = 'Marp / Marpit Options:',
-}
+const OptionGroup = {
+  Basic: 'Basic Options:',
+  Converter: 'Converter Options:',
+  Template: 'Template Options:',
+  Browser: 'Browser Options:',
+  PDF: 'PDF Options:',
+  Meta: 'Metadata Options:',
+  Marp: 'Marp / Marpit Options:',
+} as const
 
 export interface MarpCLIOptions {
   baseUrl?: string
@@ -44,7 +46,70 @@ const usage = `
 Usage:
   marp [options] <files...>
   marp [options] -I <dir>
-`.trim()
+`
+  .trim()
+  .replaceAll(' ', '\u2009') // https://github.com/yargs/yargs/issues/2120#issuecomment-1065802242
+
+const coerceImage = (image: string) => {
+  if (image === '') return 'png'
+
+  const normalized = image.toLowerCase().trim()
+  if (normalized === 'jpg' || normalized === 'jpeg') return 'jpeg'
+  if (normalized === 'png') return 'png'
+
+  return image // Expect to be handled error by yargs
+}
+
+const coerceBrowser = (browser: string | false) => {
+  if (browser === false) return []
+
+  const normalize = (str: string) => str.toLowerCase().trim()
+  const isAvailable = (finder: string) =>
+    (availableFinders as string[]).includes(normalize(finder))
+
+  const normalized = normalize(browser)
+  if (normalized === '' || normalized === 'auto') return 'auto'
+  if (isAvailable(normalized)) return normalized
+
+  // Try parsing as comma-separated list
+  const browsers = normalized
+    .split(',')
+    .flatMap((b) => (isAvailable(normalize(b)) ? normalize(b) : []))
+
+  if (browsers.length > 1) return browsers
+  if (browsers.length === 1) return browsers[0]
+
+  return browser // Expect to be handled error by yargs
+}
+
+const coerceBrowserProtocol = (protocol: string | false) => {
+  if (protocol === false) return undefined
+
+  const normalized = protocol.toLowerCase().trim()
+
+  if (normalized === 'cdp' || normalized === 'webdriver-bidi') return normalized
+  if (normalized === 'webdriver') return 'webdriver-bidi'
+  if (normalized === 'bidi') return 'webdriver-bidi'
+
+  return protocol // Expect to be handled error by yargs
+}
+
+const coerceBrowserTimeout = (timeout: string | number | boolean) => {
+  const t = timeout.toString()
+  if (timeout === false || t.toLowerCase() === 'false') return 0
+  if (timeout === true || t.toLowerCase() === 'true') return undefined
+
+  const [num, base] = (() => {
+    if (t.endsWith('ms')) return [t.slice(0, -2), 0.001]
+    if (t.endsWith('s')) return [t.slice(0, -1), 1]
+    return [t, 1]
+  })()
+
+  const parsed = Number.parseFloat(num)
+  if (Number.isNaN(parsed)) throw new Error(`Invalid number for timeout: ${t}`)
+
+  return parsed * base
+}
 
 export const marpCli = async (
   argv: string[],
@@ -154,11 +219,7 @@ export const marpCli = async (
           describe: 'Convert the first slide page into an image file',
           group: OptionGroup.Converter,
           choices: ['png', 'jpeg'],
-          coerce: (type: string) => {
-            if (type === '') return 'png'
-            if (type === 'jpg') return 'jpeg'
-            return type
-          },
+          coerce: coerceImage,
           type: 'string',
         },
         images: {
@@ -166,15 +227,11 @@ export const marpCli = async (
           describe: 'Convert slide deck into multiple image files',
           group: OptionGroup.Converter,
           choices: ['png', 'jpeg'],
-          coerce: (type: string) => {
-            if (type === '') return 'png'
-            if (type === 'jpg') return 'jpeg'
-            return type
-          },
+          coerce: coerceImage,
           type: 'string',
         },
         'image-scale': {
-          defaultDescription: '1 (or 2 for PPTX conversion)',
+          defaultDescription: '1 (or 2 for PPTX)',
           describe: 'The scale factor for rendered images',
           group: OptionGroup.Converter,
           type: 'number',
@@ -216,6 +273,36 @@ export const marpCli = async (
           defaultDescription: 'true',
           group: OptionGroup.Template,
           type: 'boolean',
+        },
+        browser: {
+          describe:
+            'The kind of browser to use for PDF, PPTX, and image conversion',
+          choices: ['auto', ...availableFinders],
+          defaultDescription: '"auto"',
+          group: OptionGroup.Browser,
+          coerce: coerceBrowser,
+          type: 'string',
+        },
+        'browser-path': {
+          describe:
+            'Path to the browser executable (Find automatically if not set)',
+          group: OptionGroup.Browser,
+          type: 'string',
+        },
+        'browser-protocol': {
+          describe: 'Preferred protocol to use for browser connection',
+          choices: ['cdp', 'webdriver-bidi'],
+          defaultDescription: '"cdp"',
+          group: OptionGroup.Browser,
+          coerce: coerceBrowserProtocol,
+          type: 'string',
+        },
+        'browser-timeout': {
+          describe:
+            'Timeout for each browser operation in seconds (0 to disable)',
+          defaultDescription: '30',
+          group: OptionGroup.Browser,
+          coerce: coerceBrowserTimeout,
         },
         'pdf-notes': {
           describe: 'Add presenter notes to PDF as annotations',
