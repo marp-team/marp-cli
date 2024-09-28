@@ -1092,6 +1092,30 @@
   dependencies:
     levn "^0.4.1"
 
+"@formatjs/ecma402-abstract@2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@formatjs/ecma402-abstract/-/ecma402-abstract-2.0.0.tgz#39197ab90b1c78b7342b129a56a7acdb8f512e17"
+  integrity sha512-rRqXOqdFmk7RYvj4khklyqzcfQl9vEL/usogncBHRZfZBDOwMGuSRNFl02fu5KGHXdbinju+YXyuR+Nk8xlr/g==
+  dependencies:
+    "@formatjs/intl-localematcher" "0.5.4"
+    tslib "^2.4.0"
+
+"@formatjs/intl-localematcher@0.5.4":
+  version "0.5.4"
+  resolved "https://registry.yarnpkg.com/@formatjs/intl-localematcher/-/intl-localematcher-0.5.4.tgz#caa71f2e40d93e37d58be35cfffe57865f2b366f"
+  integrity sha512-zTwEpWOzZ2CiKcB93BLngUX59hQkuZjT2+SAQEscSm52peDW/getsawMcWF1rGRpMCX6D7nSJA3CzJ8gn13N/g==
+  dependencies:
+    tslib "^2.4.0"
+
+"@formatjs/intl-segmenter@^11.5.7":
+  version "11.5.7"
+  resolved "https://registry.yarnpkg.com/@formatjs/intl-segmenter/-/intl-segmenter-11.5.7.tgz#c9fcb94d4690372d3ccd609ce1490910b582af78"
+  integrity sha512-MPvUKOURPY1aHc/d3YtLKp4hamrJtdBRc/AZVt9zRitrNeRszSwpIIYDHka9chQJTRIJlIfS4S9FGMdA1PE3Xw==
+  dependencies:
+    "@formatjs/ecma402-abstract" "2.0.0"
+    "@formatjs/intl-localematcher" "0.5.4"
+    tslib "^2.4.0"
+
 "@humanwhocodes/module-importer@^1.0.1":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@humanwhocodes/module-importer/-/module-importer-1.0.1.tgz#af5b2691a22b44be847b0ca81641c5fb6ad0172c"

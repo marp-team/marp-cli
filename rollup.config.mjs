@@ -94,6 +94,7 @@ export default [
     input: [
       'src/index.ts', // Node.js entrypoint
       'src/marp-cli.ts', // CLI entrypoint
+      'src/patch.ts', // CLI patch
       'src/prepare.ts', // CLI preparation
     ],
     output: { compact, dir: 'lib', exports: 'named', format: 'cjs' },

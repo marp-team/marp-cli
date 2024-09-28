@@ -7,6 +7,7 @@ import importFrom from 'import-from'
 import { resolve as importMetaResolve } from 'import-meta-resolve'
 import { pkgUp } from 'pkg-up'
 import { error, isError } from './error'
+import { isStandaloneBinary } from './utils/binary'
 import { debugEngine } from './utils/debug'
 
 type FunctionalEngine<T extends typeof Marpit = typeof Marpit> = (
@@ -126,7 +127,7 @@ export class ResolvedEngine<T extends Engine = Engine> {
   static isESMAvailable() {
     // Standalone binary that is built by pkg cannot import ESM module.
     // https://github.com/vercel/pkg/issues/1291
-    return !('pkg' in process)
+    return !isStandaloneBinary()
   }
 
   private static async _silentImportOrRequire<T = any>(
@@ -211,7 +212,7 @@ export class ResolvedEngine<T extends Engine = Engine> {
 
       if (isError(e) && e.code === 'ERR_REQUIRE_ESM') {
         // Show reason why `require()` failed in the current context
-        if ('pkg' in process) {
+        if (isStandaloneBinary()) {
           error(
             'A standalone binary version of Marp CLI is currently not supported resolving ESM. Please consider using CommonJS, or trying to use Marp CLI via Node.js.'
           )
