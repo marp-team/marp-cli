@@ -67,7 +67,7 @@ describe('ChromeBrowser', () => {
 
         expect(puppeteer.launch).toHaveBeenCalledWith(
           expect.objectContaining({
-            args: ['--test-type'],
+            args: [expect.stringMatching(/^--user-data-dir=/), '--test-type'],
             ignoreDefaultArgs: [],
           })
         )
@@ -82,7 +82,12 @@ describe('ChromeBrowser', () => {
         // Duplicate arguments should be removed
         expect(puppeteer.launch).toHaveBeenCalledWith(
           expect.objectContaining({
-            args: ['--test-type', '--foo', '--bar'],
+            args: [
+              expect.stringMatching(/^--user-data-dir=/),
+              '--test-type',
+              '--foo',
+              '--bar',
+            ],
             ignoreDefaultArgs: ['--ignore'],
           })
         )
@@ -369,7 +374,9 @@ describe('ChromeBrowser', () => {
 
         const userDataDir = mockedMkdir.mock.calls[0][0]
         expect(puppeteer.launch).toHaveBeenCalledWith(
-          expect.objectContaining({ userDataDir })
+          expect.objectContaining({
+            args: expect.arrayContaining([`--user-data-dir=${userDataDir}`]),
+          })
         )
 
         // Check uniqueness
@@ -407,10 +414,12 @@ describe('ChromeBrowser', () => {
 
         expect(puppeteer.launch).toHaveBeenCalledWith(
           expect.objectContaining({
-            userDataDir: expect.stringContaining(
-              // Chrome is a Windows application, so the path should be Windows style
-              String.raw`C:\Users\user\AppData\Local\Temp\marp-cli-`
-            ),
+            args: expect.arrayContaining([
+              expect.stringContaining(
+                // Chrome is a Windows application, so the path should be Windows style
+                String.raw`--user-data-dir=C:\Users\user\AppData\Local\Temp\marp-cli-`
+              ),
+            ]),
           })
         )
       })
