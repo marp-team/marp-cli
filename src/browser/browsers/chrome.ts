@@ -9,6 +9,7 @@ import type {
 } from 'puppeteer-core'
 import { CLIErrorCode, error, isError } from '../../error'
 import { isInsideContainer } from '../../utils/container'
+import { debugBrowser } from '../../utils/debug'
 import {
   isWSL,
   resolveWindowsEnv,
@@ -24,16 +25,18 @@ export class ChromeBrowser extends Browser {
   static readonly kind: BrowserKind = 'chrome'
   static readonly protocol: BrowserProtocol = 'webDriverBiDi'
 
-  private _dataDirName: string
+  private _puppeteerDataDir?: string
+
+  #dataDirName: string
 
   constructor(opts: BrowserOptions) {
     super(opts)
 
-    this._dataDirName = `marp-cli-${nanoid(10)}`
+    this.#dataDirName = `marp-cli-${nanoid(10)}`
   }
 
   protected async launchPuppeteer(
-    opts: PuppeteerLaunchOptions
+    opts: Omit<PuppeteerLaunchOptions, 'userDataDir'> // userDataDir cannot overload in current implementation
   ): Promise<PuppeteerBrowser> {
     const ignoreDefaultArgsSet = new Set(
       typeof opts.ignoreDefaultArgs === 'object' ? opts.ignoreDefaultArgs : []
@@ -49,8 +52,9 @@ export class ChromeBrowser extends Browser {
     const baseOpts = this.generateLaunchOptions({
       headless: this.puppeteerHeadless(),
       pipe: await this.puppeteerPipe(),
-      userDataDir: await this.createPuppeteerDataDir(),
+      // userDataDir: await this.puppeteerDataDir(), // userDataDir will set in args option due to wrong path normalization in WSL
       ...opts,
+      userDataDir: undefined,
       args: await this.puppeteerArgs(opts.args ?? []),
       ignoreDefaultArgs: opts.ignoreDefaultArgs === true || [
         ...ignoreDefaultArgsSet,
@@ -91,7 +95,11 @@ export class ChromeBrowser extends Browser {
   }
 
   private async puppeteerArgs(extraArgs: string[] = []) {
-    const args = new Set(['--test-type', ...extraArgs])
+    const args = new Set([
+      `--user-data-dir=${await this.puppeteerDataDir()}`,
+      '--test-type',
+      ...extraArgs,
+    ])
 
     if (!(await this.puppeteerArgsEnableSandbox())) args.add('--no-sandbox')
 
@@ -118,28 +126,33 @@ export class ChromeBrowser extends Browser {
     return ['old', 'legacy', 'shell'].includes(modeEnv) ? 'shell' : true
   }
 
-  private async createPuppeteerDataDir() {
-    let requiredResolveWSLPath = false
+  private async puppeteerDataDir() {
+    if (this._puppeteerDataDir === undefined) {
+      let requiredResolveWSLPath = false
 
-    const dataDir = await (async () => {
-      // In WSL environment, Marp CLI may use Chrome on Windows. If Chrome has
-      // located in host OS (Windows), we have to specify Windows path.
-      if (await this.browserInWSLHost()) {
-        if (wslTmp === undefined) wslTmp = await resolveWindowsEnv('TMP')
-        if (wslTmp !== undefined) {
-          requiredResolveWSLPath = true
-          return path.win32.resolve(wslTmp, this._dataDirName)
+      this._puppeteerDataDir = await (async () => {
+        // In WSL environment, Marp CLI may use Chrome on Windows. If Chrome has
+        // located in host OS (Windows), we have to specify Windows path.
+        if (await this.browserInWSLHost()) {
+          if (wslTmp === undefined) wslTmp = await resolveWindowsEnv('TMP')
+          if (wslTmp !== undefined) {
+            requiredResolveWSLPath = true
+            return path.win32.resolve(wslTmp, this.#dataDirName)
+          }
         }
-      }
-      return path.resolve(os.tmpdir(), this._dataDirName)
-    })()
+        return path.resolve(os.tmpdir(), this.#dataDirName)
+      })()
 
-    // Ensure the data directory is created
-    await fs.promises.mkdir(
-      requiredResolveWSLPath ? resolveWSLPathToGuestSync(dataDir) : dataDir,
-      { recursive: true }
-    )
+      debugBrowser(`Chrome data directory: %s`, this._puppeteerDataDir)
 
-    return dataDir
+      // Ensure the data directory is created
+      const mkdirPath = requiredResolveWSLPath
+        ? resolveWSLPathToGuestSync(this._puppeteerDataDir)
+        : this._puppeteerDataDir
+
+      await fs.promises.mkdir(mkdirPath, { recursive: true })
+      debugBrowser(`Created data directory: %s`, mkdirPath)
+    }
+    return this._puppeteerDataDir
   }
 }
