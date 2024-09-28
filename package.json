@@ -40,7 +40,10 @@
   },
   "pkg": {
     "scripts": "lib/**/*.js",
-    "assets": ["tmp/icu/icudt*.dat", "node_modules/sharp/**/*", "node_modules/@img/**/*"]
+    "assets": [
+      "node_modules/sharp/**/*",
+      "node_modules/@img/**/*"
+    ]
   },
   "browserslist": [
     "> 1% and last 3 versions",
@@ -59,7 +62,7 @@
     "lint:css": "stylelint \"src/**/*.{css,scss}\"",
     "prepack": "npm-run-all --parallel check:* lint:* test:coverage --parallel build types",
     "preversion": "run-p check:* lint:* test:coverage",
-    "standalone": "node ./scripts/standalone.mjs",
+    "standalone": "node -e \"fs.rmSync('bin',{recursive:true,force:true})\" && pkg -C gzip --out-path ./bin .",
     "standalone:pack": "node ./scripts/pack.js",
     "test": "jest",
     "test:coverage": "jest --coverage",
@@ -69,6 +72,7 @@
   },
   "devDependencies": {
     "@babel/preset-env": "^7.25.4",
+    "@formatjs/intl-segmenter": "^11.5.7",
     "@rollup/plugin-alias": "^5.1.1",
     "@rollup/plugin-commonjs": "^28.0.0",
     "@rollup/plugin-json": "^6.1.0",

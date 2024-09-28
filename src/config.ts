@@ -12,6 +12,7 @@ import { error, isError } from './error'
 import { TemplateOption } from './templates'
 import { Theme, ThemeSet } from './theme'
 import { isOfficialDockerImage } from './utils/container'
+import { isStandaloneBinary } from './utils/binary'
 
 type Overwrite<T, U> = Omit<T, Extract<keyof T, keyof U>> & U
 
@@ -360,7 +361,7 @@ export class MarpCLIConfig {
 
       if (isErr && e.code === 'ERR_REQUIRE_ESM') {
         // Show reason why `require()` failed in the current context
-        if ('pkg' in process) {
+        if (isStandaloneBinary()) {
           cliError(
             'A standalone binary version of Marp CLI is currently not supported resolving ESM. Please consider using CommonJS, or trying to use Marp CLI via Node.js.'
           )
