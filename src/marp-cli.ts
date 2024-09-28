@@ -1,4 +1,5 @@
 import chalk from 'chalk'
+import { availableFinders } from './browser/finder'
 import { BrowserManager } from './browser/manager'
 import * as cli from './cli'
 import { fromArguments } from './config'
@@ -12,7 +13,6 @@ import { isOfficialDockerImage } from './utils/container'
 import { createYargs } from './utils/yargs'
 import version from './version'
 import watcher, { Watcher, notifier } from './watcher'
-import { availableFinders } from './browser/finder'
 
 const OptionGroup = {
   Basic: 'Basic Options:',

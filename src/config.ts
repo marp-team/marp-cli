@@ -3,6 +3,8 @@ import path from 'node:path'
 import chalk from 'chalk'
 import { cosmiconfig, cosmiconfigSync } from 'cosmiconfig'
 import { osLocale } from 'os-locale'
+import { availableFinders } from './browser/finder'
+import type { FinderName } from './browser/finder'
 import type { BrowserManagerConfig } from './browser/manager'
 import { info, warn, error as cliError } from './cli'
 import { ConvertType, type ConverterOption } from './converter'
@@ -13,8 +15,6 @@ import { TemplateOption } from './templates'
 import { Theme, ThemeSet } from './theme'
 import { isStandaloneBinary } from './utils/binary'
 import { isOfficialDockerImage } from './utils/container'
-import { availableFinders } from './browser/finder'
-import type { FinderName } from './browser/finder'
 
 type Overwrite<T, U> = Omit<T, Extract<keyof T, keyof U>> & U
 
