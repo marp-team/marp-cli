@@ -12,8 +12,8 @@ import { isInsideContainer } from '../../utils/container'
 import { debugBrowser } from '../../utils/debug'
 import {
   isWSL,
-  resolveWindowsEnv,
-  resolveWSLPathToGuestSync,
+  getWindowsEnv,
+  translateWindowsPathToWSL,
 } from '../../utils/wsl'
 import { Browser } from '../browser'
 import type { BrowserKind, BrowserProtocol, BrowserOptions } from '../browser'
@@ -128,15 +128,15 @@ export class ChromeBrowser extends Browser {
 
   private async puppeteerDataDir() {
     if (this._puppeteerDataDir === undefined) {
-      let requiredResolveWSLPath = false
+      let needToTranslateWindowsPathToWSL = false
 
       this._puppeteerDataDir = await (async () => {
         // In WSL environment, Marp CLI may use Chrome on Windows. If Chrome has
         // located in host OS (Windows), we have to specify Windows path.
         if (await this.browserInWSLHost()) {
-          if (wslTmp === undefined) wslTmp = await resolveWindowsEnv('TMP')
+          if (wslTmp === undefined) wslTmp = await getWindowsEnv('TMP')
           if (wslTmp !== undefined) {
-            requiredResolveWSLPath = true
+            needToTranslateWindowsPathToWSL = true
             return path.win32.resolve(wslTmp, this.#dataDirName)
           }
         }
@@ -146,8 +146,8 @@ export class ChromeBrowser extends Browser {
       debugBrowser(`Chrome data directory: %s`, this._puppeteerDataDir)
 
       // Ensure the data directory is created
-      const mkdirPath = requiredResolveWSLPath
-        ? resolveWSLPathToGuestSync(this._puppeteerDataDir)
+      const mkdirPath = needToTranslateWindowsPathToWSL
+        ? await translateWindowsPathToWSL(this._puppeteerDataDir)
         : this._puppeteerDataDir
 
       await fs.promises.mkdir(mkdirPath, { recursive: true })

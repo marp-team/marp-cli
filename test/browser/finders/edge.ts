@@ -218,11 +218,11 @@ describe('Edge finder', () => {
         .spyOn(utils, 'isExecutable')
         .mockImplementation(async (p) => p === wsl1EdgePath)
       jest
-        .spyOn(wsl, 'resolveWindowsEnvSync')
-        .mockReturnValue('C:\\Mock\\AppData\\Local')
+        .spyOn(wsl, 'getWindowsEnv')
+        .mockResolvedValue('C:\\Mock\\AppData\\Local')
       jest
-        .spyOn(wsl, 'resolveWSLPathToGuestSync')
-        .mockReturnValue('/mnt/c/mock/AppData/Local')
+        .spyOn(wsl, 'translateWindowsPathToWSL')
+        .mockResolvedValue('/mnt/c/mock/AppData/Local')
     })
 
     it('finds possible executable path and returns the matched path', async () => {
@@ -250,7 +250,7 @@ describe('Edge finder', () => {
     })
 
     it('skips inaccessible directories to find', async () => {
-      jest.spyOn(wsl, 'resolveWindowsEnvSync').mockReturnValue(undefined)
+      jest.spyOn(wsl, 'getWindowsEnv').mockResolvedValue(undefined)
 
       const findExecutableSpy = jest.spyOn(utils, 'findExecutable')
       await edgeFinder({})

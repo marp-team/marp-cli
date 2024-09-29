@@ -20,6 +20,7 @@ describe('ChromeBrowser', () => {
         .spyOn(puppeteer as any, 'launch')
         .mockResolvedValue({ once: jest.fn() })
 
+      jest.spyOn(wsl, 'isWSL').mockResolvedValue(0)
       jest.spyOn(fs.promises, 'mkdir').mockImplementation()
     })
 
@@ -388,11 +389,11 @@ describe('ChromeBrowser', () => {
       it('makes data directory to Windows if trying to spawn Chrome in the host Windows from WSL', async () => {
         jest.spyOn(wsl, 'isWSL').mockResolvedValue(1)
         jest
-          .spyOn(wsl, 'resolveWindowsEnv')
+          .spyOn(wsl, 'getWindowsEnv')
           .mockResolvedValue(String.raw`C:\Users\user\AppData\Local\Temp`)
         jest
-          .spyOn(wsl, 'resolveWSLPathToGuestSync')
-          .mockImplementation((path) =>
+          .spyOn(wsl, 'translateWindowsPathToWSL')
+          .mockImplementation(async (path) =>
             path
               .replace(/\\/g, '/')
               .replace(
