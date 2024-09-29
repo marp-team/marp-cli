@@ -96,12 +96,8 @@ describe('Marp CLI', () => {
         const pkgJson = { name: '@marp-team/marp-core', version: '0.0.0' }
         const pkgPath = '../node_modules/@marp-team/marp-core/package.json'
 
-        let isMarpCoreSpy: jest.SpyInstance
-
         beforeEach(() => {
-          isMarpCoreSpy = jest
-            .spyOn(version, 'isMarpCore')
-            .mockResolvedValue(true)
+          jest.spyOn(version, 'isMarpCore').mockResolvedValue(true)
 
           mockEnginePath(
             assetFn('../node_modules/@marp-team/marp-core/lib/marp.js')
@@ -399,14 +395,9 @@ describe('Marp CLI', () => {
         const run = () =>
           runForObservation(['--input-dir', files, '--server', '--preview'])
 
-        let infoSpy: jest.SpyInstance
-        let serverStartSpy: jest.SpyInstance
-
         beforeEach(() => {
-          infoSpy = jest.spyOn(cli, 'info').mockImplementation()
-          serverStartSpy = jest
-            .spyOn<any, any>(Server.prototype, 'start')
-            .mockResolvedValue(0)
+          jest.spyOn(cli, 'info').mockImplementation()
+          jest.spyOn<any, any>(Server.prototype, 'start').mockResolvedValue(0)
         })
 
         it('opens preview window through Preview.open()', async () => {
@@ -449,12 +440,12 @@ describe('Marp CLI', () => {
   describe('with --theme option', () => {
     let convert: jest.SpyInstance
     let info: jest.SpyInstance
-    let writeFile: jest.SpyInstance
 
     beforeEach(() => {
       convert = jest.spyOn(Converter.prototype, 'convert')
       info = jest.spyOn(cli, 'info').mockImplementation()
-      writeFile = jest.spyOn(fs.promises, 'writeFile').mockImplementation()
+
+      jest.spyOn(fs.promises, 'writeFile').mockImplementation()
     })
 
     describe('when passed value is theme name', () => {
@@ -518,14 +509,13 @@ describe('Marp CLI', () => {
 
     let convert: jest.MockInstance<ReturnType<Converter['convert']>, any>
     let observeSpy: jest.MockInstance<ReturnType<ThemeSet['observe']>, any>
-    let infoSpy: jest.SpyInstance
-    let writeFile: jest.SpyInstance
 
     beforeEach(() => {
       convert = jest.spyOn(Converter.prototype, 'convert')
       observeSpy = jest.spyOn(ThemeSet.prototype, 'observe')
-      infoSpy = jest.spyOn(cli, 'info').mockImplementation()
-      writeFile = jest.spyOn(fs.promises, 'writeFile').mockImplementation()
+
+      jest.spyOn(fs.promises, 'writeFile').mockImplementation()
+      jest.spyOn(cli, 'info').mockImplementation()
     })
 
     describe('with specified single file', () => {
@@ -622,8 +612,9 @@ describe('Marp CLI', () => {
 
     it('prints error and return error code when CLIError is raised', async () => {
       const cliError = jest.spyOn(cli, 'error').mockImplementation()
-      const cliInfo = jest.spyOn(cli, 'info').mockImplementation()
-      const cvtFiles = jest
+
+      jest.spyOn(cli, 'info').mockImplementation()
+      jest
         .spyOn(Converter.prototype, 'convertFiles')
         .mockImplementation(() => Promise.reject(new CLIError('FAIL', 123)))
 
@@ -1246,12 +1237,12 @@ describe('Marp CLI', () => {
   describe('with passing from stdin', () => {
     let cliInfo: jest.SpyInstance
     let stdout: jest.SpyInstance
-    let stdinBuffer: jest.SpyInstance
 
     beforeEach(() => {
       cliInfo = jest.spyOn(cli, 'info').mockImplementation()
       stdout = jest.spyOn(process.stdout, 'write').mockImplementation()
-      stdinBuffer = jest
+
+      jest
         .spyOn(getStdin, 'buffer')
         .mockResolvedValue(Buffer.from('# markdown'))
 
