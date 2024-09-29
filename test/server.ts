@@ -104,10 +104,13 @@ describe('Server', () => {
 
   describe('#start', () => {
     it('triggers setup of express server and starts listening', async () => {
+      const listen = jest.spyOn(express.application, 'listen')
+
       const server = new Server(converter())
       await server.start()
 
-      expect(server.server?.listen).toHaveBeenCalledWith(8080)
+      expect(listen).toHaveBeenCalledWith(8080)
+      expect(listen.mock.instances[0]).toBe(server.server)
     })
   })
 
