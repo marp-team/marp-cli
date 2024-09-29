@@ -1,3 +1,5 @@
-module.exports = {
-  buffer: jest.fn().mockResolvedValue(''),
-}
+const getStdin = Object.assign(async () => '', {
+  buffer: async () => Buffer.from(''),
+})
+
+export default getStdin
