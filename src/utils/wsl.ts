@@ -1,6 +1,6 @@
 import { execFile as cpExecFile } from 'node:child_process'
-import { promisify } from 'node:util'
 import fs from 'node:fs'
+import { promisify } from 'node:util'
 import { debug } from './debug'
 
 const execFile = promisify(cpExecFile)
