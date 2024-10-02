@@ -7,7 +7,8 @@ import type {
   Page,
 } from 'puppeteer-core'
 import type TypedEventEmitter from 'typed-emitter'
-import { isWSL } from '../utils/wsl'
+import { isWSL, translateWSLPathToWindows } from '../utils/wsl'
+import { debugBrowser } from '../utils/debug'
 
 export type BrowserKind = 'chrome' | 'firefox'
 export type BrowserProtocol = ProtocolType
@@ -62,6 +63,8 @@ export abstract class Browser
       puppeteer.once('disconnected', () => {
         this.emit('disconnect', puppeteer)
         this.puppeteer = undefined
+
+        debugBrowser('Browser disconnected (Cleaned up puppeteer instance)')
       })
 
       this.puppeteer = puppeteer
@@ -114,13 +117,13 @@ export abstract class Browser
   protected async launchPuppeteer(
     opts: PuppeteerLaunchOptions
   ): Promise<PuppeteerBrowser> {
-    return await launch(this.generateLaunchOptions(opts))
+    return await launch(await this.generateLaunchOptions(opts))
   }
 
   /** @internal */
-  protected generateLaunchOptions(
+  protected async generateLaunchOptions(
     mergeOptions: PuppeteerLaunchOptions = {}
-  ): PuppeteerLaunchOptions {
+  ): Promise<PuppeteerLaunchOptions> {
     return {
       browser: this.kind,
       executablePath: this.path,

@@ -1,10 +1,15 @@
 import path from 'node:path'
 import { error, CLIErrorCode } from '../../error'
-import { translateWindowsPathToWSL, getWindowsEnv } from '../../utils/wsl'
+import {
+  translateWindowsPathToWSL,
+  getWindowsEnv,
+  getWSL2NetworkingMode,
+} from '../../utils/wsl'
 import { ChromeBrowser } from '../browsers/chrome'
 import { ChromeCdpBrowser } from '../browsers/chrome-cdp'
 import type { BrowserFinder, BrowserFinderResult } from '../finder'
 import { findExecutable, getPlatform } from './utils'
+import { debugBrowserFinder } from '../../utils/debug'
 
 const edge = (path: string): BrowserFinderResult => ({
   path,
@@ -20,11 +25,21 @@ export const edgeFinder: BrowserFinder = async ({ preferredPath } = {}) => {
       case 'darwin':
         return await edgeFinderDarwin()
       case 'linux':
-        return await edgeFinderLinux()
+        return (
+          (await edgeFinderLinux()) ||
+          (await (async () => {
+            if ((await getWSL2NetworkingMode()) === 'mirrored') {
+              debugBrowserFinder(
+                'WSL2: Detected "mirrored" networking mode. Try to find Chrome in Windows.'
+              )
+              return await edgeFinderWSL()
+            }
+          })())
+        )
       case 'win32':
         return await edgeFinderWin32()
       case 'wsl1':
-        return await edgeFinderWSL1()
+        return await edgeFinderWSL()
     }
     return undefined
   })()
@@ -79,7 +94,7 @@ const edgeFinderWin32 = async ({
   return await findExecutable(paths)
 }
 
-const edgeFinderWSL1 = async () => {
+const edgeFinderWSL = async () => {
   const localAppData = await getWindowsEnv('LOCALAPPDATA')
 
   return await edgeFinderWin32({

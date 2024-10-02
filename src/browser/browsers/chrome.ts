@@ -49,7 +49,7 @@ export class ChromeBrowser extends Browser {
       ignoreDefaultArgsSet.add('--disable-extensions')
     }
 
-    const baseOpts = this.generateLaunchOptions({
+    const baseOpts = await this.generateLaunchOptions({
       headless: this.puppeteerHeadless(),
       pipe: await this.puppeteerPipe(),
       // userDataDir: await this.puppeteerDataDir(), // userDataDir will set in args option due to wrong path normalization in WSL

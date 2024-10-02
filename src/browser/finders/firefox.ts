@@ -9,6 +9,8 @@ import {
   isExecutable,
   normalizeDarwinAppPath,
 } from './utils'
+import { debugBrowserFinder } from '../../utils/debug'
+import { getWSL2NetworkingMode } from '../../utils/wsl'
 
 const firefox = (path: string): BrowserFinderResult => ({
   path,
@@ -36,9 +38,19 @@ export const firefoxFinder: BrowserFinder = async ({ preferredPath } = {}) => {
       case 'win32':
         return await firefoxFinderWin32()
       case 'wsl1':
-        return await firefoxFinderWSL1()
+        return await firefoxFinderWSL()
     }
-    return await firefoxFinderFallback()
+    return (
+      (await firefoxFinderLinuxOrFallback()) ||
+      (await (async () => {
+        if ((await getWSL2NetworkingMode()) === 'mirrored') {
+          debugBrowserFinder(
+            'WSL2: Detected "mirrored" networking mode. Try to find Chrome in Windows.'
+          )
+          return await firefoxFinderWSL()
+        }
+      })())
+    )
   })()
 
   if (installation) return firefox(installation)
@@ -92,7 +104,7 @@ const firefoxFinderWin32 = async () => {
   )
 }
 
-const firefoxFinderWSL1 = async () => {
+const firefoxFinderWSL = async () => {
   const prefixes: string[] = []
 
   const winDriveMatcher = /^\/mnt\/[a-z]\//i
@@ -126,7 +138,7 @@ const firefoxFinderWSL1 = async () => {
   )
 }
 
-const firefoxFinderFallback = async () =>
+const firefoxFinderLinuxOrFallback = async () =>
   await findExecutableBinary(
     // In Linux, Firefox must have only an executable name `firefox` in every
     // editions, but some distributions may have provided different executable
