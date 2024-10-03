@@ -9,7 +9,6 @@ import { ChromeBrowser } from '../browsers/chrome'
 import { ChromeCdpBrowser } from '../browsers/chrome-cdp'
 import type { BrowserFinder, BrowserFinderResult } from '../finder'
 import { findExecutable, getPlatform } from './utils'
-import { debugBrowserFinder } from '../../utils/debug'
 
 const edge = (path: string): BrowserFinderResult => ({
   path,
@@ -27,14 +26,9 @@ export const edgeFinder: BrowserFinder = async ({ preferredPath } = {}) => {
       case 'linux':
         return (
           (await edgeFinderLinux()) ||
-          (await (async () => {
-            if ((await getWSL2NetworkingMode()) === 'mirrored') {
-              debugBrowserFinder(
-                'WSL2: Detected "mirrored" networking mode. Try to find Chrome in Windows.'
-              )
-              return await edgeFinderWSL()
-            }
-          })())
+          ((await getWSL2NetworkingMode()) === 'mirrored'
+            ? await edgeFinderWSL() // WSL2 Fallback
+            : undefined)
         )
       case 'win32':
         return await edgeFinderWin32()

@@ -9,8 +9,6 @@ import {
   isExecutable,
   normalizeDarwinAppPath,
 } from './utils'
-import { debugBrowserFinder } from '../../utils/debug'
-import { getWSL2NetworkingMode } from '../../utils/wsl'
 
 const firefox = (path: string): BrowserFinderResult => ({
   path,
@@ -40,17 +38,7 @@ export const firefoxFinder: BrowserFinder = async ({ preferredPath } = {}) => {
       case 'wsl1':
         return await firefoxFinderWSL()
     }
-    return (
-      (await firefoxFinderLinuxOrFallback()) ||
-      (await (async () => {
-        if ((await getWSL2NetworkingMode()) === 'mirrored') {
-          debugBrowserFinder(
-            'WSL2: Detected "mirrored" networking mode. Try to find Chrome in Windows.'
-          )
-          return await firefoxFinderWSL()
-        }
-      })())
-    )
+    return await firefoxFinderLinuxOrFallback()
   })()
 
   if (installation) return firefox(installation)

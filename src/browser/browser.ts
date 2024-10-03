@@ -7,7 +7,7 @@ import type {
   Page,
 } from 'puppeteer-core'
 import type TypedEventEmitter from 'typed-emitter'
-import { isWSL, translateWSLPathToWindows } from '../utils/wsl'
+import { isWSL } from '../utils/wsl'
 import { debugBrowser } from '../utils/debug'
 
 export type BrowserKind = 'chrome' | 'firefox'

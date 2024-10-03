@@ -14,7 +14,6 @@ import {
   isExecutable,
   normalizeDarwinAppPath,
 } from './utils'
-import { debugBrowserFinder } from '../../utils/debug'
 import { getWSL2NetworkingMode } from '../../utils/wsl'
 
 const chrome = (path: string): BrowserFinderResult => ({
@@ -36,17 +35,7 @@ export const chromeFinder: BrowserFinder = async ({ preferredPath } = {}) => {
       case 'darwin':
         return darwinFast()
       case 'linux':
-        return (
-          linux()[0] ||
-          (await (async () => {
-            if ((await getWSL2NetworkingMode()) === 'mirrored') {
-              debugBrowserFinder(
-                'WSL2: Detected "mirrored" networking mode. Try to find Chrome in Windows.'
-              )
-              return wsl()[0]
-            }
-          })())
-        )
+        return await chromeFinderLinux()
       case 'win32':
         return win32()[0]
       case 'wsl1':
@@ -58,6 +47,16 @@ export const chromeFinder: BrowserFinder = async ({ preferredPath } = {}) => {
   if (installation) return chrome(installation)
 
   error('Chrome browser could not be found.', CLIErrorCode.NOT_FOUND_BROWSER)
+}
+
+const chromeFinderLinux = async () => {
+  try {
+    const linuxPath = linux()[0]
+    if (linuxPath) return linuxPath
+  } catch (error) {
+    // no ops
+  }
+  if ((await getWSL2NetworkingMode()) === 'mirrored') return wsl()[0] // WSL2 Fallback
 }
 
 const fallback = async () =>
