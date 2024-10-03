@@ -9,7 +9,7 @@ const wsl = (): typeof import('../../src/utils/wsl') =>
 beforeEach(() => jest.resetModules())
 afterEach(() => jest.restoreAllMocks())
 
-describe('#resolveWSLPathToHost', () => {
+describe('#translateWSLPathToWindows', () => {
   it('resolves WSL path to Windows path by running wslpath', async () => {
     expect.assertions(3)
 
@@ -18,35 +18,34 @@ describe('#resolveWSLPathToHost', () => {
       .mockImplementation((fn, args, cb: any): any => {
         expect(fn).toBe('wslpath')
         expect(args).toStrictEqual(['-m', '/mnt/c/Users/foo/bar'])
-        cb(null, '\nC:/Users/foo/bar\n', '')
+        cb(null, { stdout: '\nC:\\Users\\foo\\bar\n', stderr: '' })
       })
 
-    expect(await wsl().resolveWSLPathToHost('/mnt/c/Users/foo/bar')).toBe(
-      'C:/Users/foo/bar'
+    expect(await wsl().translateWSLPathToWindows('/mnt/c/Users/foo/bar')).toBe(
+      'C:\\Users\\foo\\bar'
     )
   })
 })
 
-describe('#resolveWSLPathToGuestSync', () => {
-  it('resolves Windows path to WSL path by running wslpath', () => {
+describe('#translateWindowsPathToWSL', () => {
+  it('resolves Windows path to WSL path by running wslpath', async () => {
     expect.assertions(3)
 
     jest
-      .spyOn(childProcess, 'spawnSync')
-      .mockImplementation((fn, args): any => {
+      .spyOn(childProcess, 'execFile')
+      .mockImplementation((fn, args, cb: any): any => {
         expect(fn).toBe('wslpath')
         expect(args).toStrictEqual(['-u', 'C:\\Users\\foo\\bar'])
-
-        return { stdout: '\n/mnt/c/Users/foo/bar\n' }
+        cb(null, { stdout: '\n/mnt/c/Users/foo/bar\n', stderr: '' })
       })
 
-    expect(wsl().resolveWSLPathToGuestSync('C:\\Users\\foo\\bar')).toBe(
+    expect(await wsl().translateWindowsPathToWSL('C:\\Users\\foo\\bar')).toBe(
       '/mnt/c/Users/foo/bar'
     )
   })
 })
 
-describe('#resolveWindowsEnv', () => {
+describe('#getWindowsEnv', () => {
   it('resolves Windows environment value by running cmd.exe', async () => {
     expect.assertions(6)
 
@@ -55,29 +54,11 @@ describe('#resolveWindowsEnv', () => {
       .mockImplementation((fn, args, cb: any): any => {
         expect(fn).toBe('cmd.exe')
         expect(args).toStrictEqual(['/c', 'SET', expect.any(String)])
-        cb(null, '\nTMP=123\n', '')
+        cb(null, { stdout: '\nTMP=123\n', stderr: '' })
       })
 
-    expect(await wsl().resolveWindowsEnv('TMP')).toBe('123')
-    expect(await wsl().resolveWindowsEnv('XXX')).toBeUndefined()
-  })
-})
-
-describe('#resolveWindowsEnvSync', () => {
-  it('resolves Windows environment value by running cmd.exe', () => {
-    expect.assertions(6)
-
-    jest
-      .spyOn(childProcess, 'spawnSync')
-      .mockImplementation((fn, args): any => {
-        expect(fn).toBe('cmd.exe')
-        expect(args).toStrictEqual(['/c', 'SET', expect.any(String)])
-
-        return { stdout: '\nTMP=123\n' }
-      })
-
-    expect(wsl().resolveWindowsEnvSync('TMP')).toBe('123')
-    expect(wsl().resolveWindowsEnvSync('XXX')).toBeUndefined()
+    expect(await wsl().getWindowsEnv('TMP')).toBe('123')
+    expect(await wsl().getWindowsEnv('XXX')).toBeUndefined()
   })
 })
 

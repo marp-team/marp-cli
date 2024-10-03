@@ -37,7 +37,7 @@ import { ThemeSet } from './theme'
 import { isOfficialDockerImage } from './utils/container'
 import { debug } from './utils/debug'
 import { pdfLib, setOutline } from './utils/pdf'
-import { resolveWSLPathToHost } from './utils/wsl'
+import { translateWSLPathToWindows } from './utils/wsl'
 import { notifier } from './watcher'
 
 const CREATED_BY_MARP = 'Created by Marp'
@@ -161,7 +161,7 @@ export class Converter {
         const browser = await this.browser
 
         return (await browser.browserInWSLHost())
-          ? `file:${await resolveWSLPathToHost(f.absolutePath)}`
+          ? `file:${await translateWSLPathToWindows(f.absolutePath)}`
           : f.absoluteFileScheme
       }
 
@@ -643,7 +643,7 @@ export class Converter {
 
     if (tmpFile) {
       if (await browser.browserInWSLHost()) {
-        uri = `file:${await resolveWSLPathToHost(tmpFile.path)}`
+        uri = `file:${await translateWSLPathToWindows(tmpFile.path)}`
       } else {
         uri = `file://${tmpFile.path}`
       }

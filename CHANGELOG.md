@@ -8,18 +8,18 @@
 - Upgrade Marp Core to [v4.0.0](https://github.com/marp-team/marp-core/releases/v4.0.0) ([#591](https://github.com/marp-team/marp-cli/pull/591))
   - The slide container of built-in themes became the block element and adopted safe centering
   - Relax HTML allowlist: Allowed a lot of HTML elements and attributes by default
-- Use [the new headless mode of Chrome](https://developer.chrome.com/docs/chromium/headless) while converting by default ([#593](https://github.com/marp-team/marp-cli/pull/593))
-  - You can get back to the old headless mode by setting `PUPPETEER_HEADLESS_MODE=old` env.
 
 ### Added
 
-<!-- Allow using Firefox / WebDriver BiDi protocol during conversion ([#597](https://github.com/marp-team/marp-cli/pull/597)) -->
-
+- Initial support for Firefox / WebDriver BiDi protocol during conversion ([#565](https://github.com/marp-team/marp-cli/issues/565), [#597](https://github.com/marp-team/marp-cli/pull/597))
+- `--browser` and some related options to control the browser for conversion ([#603](https://github.com/marp-team/marp-cli/pull/603))
 - `--debug` (`-d`) option to CLI interface ([#599](https://github.com/marp-team/marp-cli/pull/599))
 - CI testing against Node.js v22 ([#591](https://github.com/marp-team/marp-cli/pull/591))
 
 ### Changed
 
+- Use [the new headless mode of Chrome](https://developer.chrome.com/docs/chromium/headless) while converting by default ([#593](https://github.com/marp-team/marp-cli/pull/593))
+  - You can get back to the old headless mode by setting `PUPPETEER_HEADLESS_MODE=old` env.
 - Upgrade Marpit to [v3.1.1](https://github.com/marp-team/marpit/releases/tag/v3.1.1) ([#591](https://github.com/marp-team/marp-cli/pull/591))
   - Support for CSS nesting
 - Upgrade development Node.js LTS to v20.17.0 ([#591](https://github.com/marp-team/marp-cli/pull/591))

@@ -1,9 +1,6 @@
 import path from 'node:path'
 import { error, CLIErrorCode } from '../../error'
-import {
-  resolveWSLPathToGuestSync,
-  resolveWindowsEnvSync,
-} from '../../utils/wsl'
+import { translateWindowsPathToWSL, getWindowsEnv } from '../../utils/wsl'
 import { ChromeBrowser } from '../browsers/chrome'
 import { ChromeCdpBrowser } from '../browsers/chrome-cdp'
 import type { BrowserFinder, BrowserFinderResult } from '../finder'
@@ -83,12 +80,14 @@ const edgeFinderWin32 = async ({
 }
 
 const edgeFinderWSL1 = async () => {
-  const localAppData = resolveWindowsEnvSync('LOCALAPPDATA')
+  const localAppData = await getWindowsEnv('LOCALAPPDATA')
 
   return await edgeFinderWin32({
     programFiles: '/mnt/c/Program Files',
     programFilesX86: '/mnt/c/Program Files (x86)',
-    localAppData: localAppData ? resolveWSLPathToGuestSync(localAppData) : '',
+    localAppData: localAppData
+      ? await translateWindowsPathToWSL(localAppData)
+      : '',
     join: path.posix.join,
   })
 }

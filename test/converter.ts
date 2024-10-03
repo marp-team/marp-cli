@@ -21,14 +21,17 @@ import { WatchNotifier } from '../src/watcher'
 const timeout = 60000
 
 let mkdirSpy: jest.SpiedFunction<typeof fs.promises.mkdir>
-
-jest.mock('node:fs', () => require('./__mocks__/node/fs')) // eslint-disable-line @typescript-eslint/no-require-imports, jest/no-mocks-import -- Windows file system cannot use `:`
+let writeFileSpy: jest.SpiedFunction<typeof fs.promises.writeFile>
 
 beforeEach(() => {
   mkdirSpy = jest.spyOn(fs.promises, 'mkdir').mockImplementation()
+  writeFileSpy = jest.spyOn(fs.promises, 'writeFile').mockImplementation()
 })
 
-afterEach(() => mkdirSpy.mockRestore())
+afterEach(() => {
+  jest.resetAllMocks()
+  jest.restoreAllMocks()
+})
 
 describe('Converter', () => {
   const onePath = path.resolve(__dirname, '_files/1.md')
@@ -45,7 +48,7 @@ describe('Converter', () => {
 
   afterEach(async () => {
     await browserManager.dispose()
-  })
+  }, timeout)
 
   const instance = (opts: Partial<ConverterOption> = {}) =>
     new Converter({
@@ -104,7 +107,7 @@ describe('Converter', () => {
     const dummyFile = new File(process.cwd())
 
     it('returns the result of template', async () => {
-      const options: any = { html: true }
+      const options = { html: true } as any
       const { result, rendered } = await instance({ options }).convert(md)
 
       expect(result).toMatch(/^<!DOCTYPE html>[\s\S]+<\/html>$/)
@@ -280,23 +283,19 @@ describe('Converter', () => {
         it('outputs warning and does not override URL', async () => {
           const warn = jest.spyOn(console, 'warn').mockImplementation()
 
-          try {
-            const { result } = await instance({
-              globalDirectives: { url: '[INVALID]' },
-            }).convert('---\nurl: https://example.com/\n---')
+          const { result } = await instance({
+            globalDirectives: { url: '[INVALID]' },
+          }).convert('---\nurl: https://example.com/\n---')
 
-            expect(warn).toHaveBeenCalledWith(
-              expect.stringContaining('Specified canonical URL is ignored')
-            )
-            expect(warn).toHaveBeenCalledWith(
-              expect.stringContaining('[INVALID]')
-            )
-            expect(result).toContain(
-              '<link rel="canonical" href="https://example.com/">'
-            )
-          } finally {
-            warn.mockRestore()
-          }
+          expect(warn).toHaveBeenCalledWith(
+            expect.stringContaining('Specified canonical URL is ignored')
+          )
+          expect(warn).toHaveBeenCalledWith(
+            expect.stringContaining('[INVALID]')
+          )
+          expect(result).toContain(
+            '<link rel="canonical" href="https://example.com/">'
+          )
         })
       })
     })
@@ -475,35 +474,29 @@ describe('Converter', () => {
       ).rejects.toBeTruthy())
 
     it('converts markdown file and save as html file by default', async () => {
-      const write = (fs as any).__mockWriteFile()
       await instance().convertFile(new File(onePath))
 
-      expect(write).toHaveBeenCalledWith(
+      expect(fs.promises.writeFile).toHaveBeenCalledWith(
         `${onePath.slice(0, -3)}.html`,
-        expect.any(Buffer),
-        expect.anything()
+        expect.any(Buffer)
       )
     })
 
     it('converts markdown file and save to specified path when output is defined', async () => {
-      const write = (fs as any).__mockWriteFile()
       const output = './specified.html'
       await instance({ output }).convertFile(new File(twoPath))
 
-      expect(write).toHaveBeenCalledWith(
+      expect(fs.promises.writeFile).toHaveBeenCalledWith(
         output,
-        expect.any(Buffer),
-        expect.anything()
+        expect.any(Buffer)
       )
     })
 
     it('tries to create the directory of output file when saving', async () => {
-      const write = (fs as any).__mockWriteFile()
       const output = path.resolve(__dirname, '__test_dir__/out.html')
-
       await instance({ output }).convertFile(new File(twoPath))
 
-      expect(write).toHaveBeenCalled()
+      expect(fs.promises.writeFile).toHaveBeenCalled()
       expect(mkdirSpy).toHaveBeenCalledWith(
         path.resolve(__dirname, '__test_dir__'),
         { recursive: true }
@@ -511,30 +504,23 @@ describe('Converter', () => {
     })
 
     it('does not try to create the directory of output file when saving to the root', async () => {
-      const write = (fs as any).__mockWriteFile()
       const output = '/out.html'
-
       await instance({ output }).convertFile(new File(twoPath))
 
-      expect(write).toHaveBeenCalled()
+      expect(fs.promises.writeFile).toHaveBeenCalled()
       expect(mkdirSpy).not.toHaveBeenCalled()
     })
 
     it('converts markdown file but not save when output is stdout', async () => {
-      const write = (fs as any).__mockWriteFile()
       const stdout = jest.spyOn(process.stdout, 'write').mockImplementation()
 
-      try {
-        const output = '-'
-        const ret = await instance({ output }).convertFile(new File(threePath))
+      const output = '-'
+      const ret = await instance({ output }).convertFile(new File(threePath))
 
-        expect(write).not.toHaveBeenCalled()
-        expect(stdout).toHaveBeenCalledTimes(1)
-        expect(ret.file.path).toBe(threePath)
-        expect(ret.newFile?.type).toBe(FileType.StandardIO)
-      } finally {
-        stdout.mockRestore()
-      }
+      expect(fs.promises.writeFile).not.toHaveBeenCalled()
+      expect(stdout).toHaveBeenCalledTimes(1)
+      expect(ret.file.path).toBe(threePath)
+      expect(ret.newFile?.type).toBe(FileType.StandardIO)
     })
 
     describe('when convert type is PDF', () => {
@@ -544,13 +530,14 @@ describe('Converter', () => {
       it(
         'converts markdown file into PDF',
         async () => {
-          const write = (fs as any).__mockWriteFile()
           const opts = { output: 'test.pdf' }
           const ret = await pdfInstance(opts).convertFile(new File(onePath))
-          const pdf: Buffer = write.mock.calls[0][1]
 
-          expect(write).toHaveBeenCalled()
-          expect(write.mock.calls[0][0]).toBe('test.pdf')
+          expect(fs.promises.writeFile).toHaveBeenCalled()
+          expect(writeFileSpy.mock.calls[0][0]).toBe('test.pdf')
+          expect(writeFileSpy.mock.calls[0][1]).toBeInstanceOf(Buffer)
+
+          const pdf = writeFileSpy.mock.calls[0][1] as Buffer
           expect(pdf.toString('ascii', 0, 5)).toBe('%PDF-')
           expect(ret.newFile?.path).toBe('test.pdf')
           expect(ret.newFile?.buffer).toBe(pdf)
@@ -562,8 +549,6 @@ describe('Converter', () => {
         it(
           'assigns meta info thorugh pdf-lib',
           async () => {
-            const write = (fs as any).__mockWriteFile()
-
             await pdfInstance({
               output: 'test.pdf',
               globalDirectives: {
@@ -574,8 +559,11 @@ describe('Converter', () => {
               },
             }).convertFile(new File(onePath))
 
-            const pdf = await PDFDocument.load(write.mock.calls[0][1])
+            expect(writeFileSpy.mock.calls[0][1]).toBeInstanceOf(Buffer)
 
+            const pdf = await PDFDocument.load(
+              writeFileSpy.mock.calls[0][1] as Buffer
+            )
             expect(pdf.getTitle()).toBe('title')
             expect(pdf.getSubject()).toBe('description')
             expect(pdf.getAuthor()).toBe('author')
@@ -586,8 +574,13 @@ describe('Converter', () => {
       })
 
       describe('with allowLocalFiles option as true', () => {
+        beforeEach(() => {
+          // Don't mock writeFile to use actually saved tmp file for conversion
+          writeFileSpy.mockRestore()
+        })
+
         it(
-          'converts with using temporally file',
+          'converts with using temporary file for local file access',
           async () => {
             const file = new File(onePath)
 
@@ -595,34 +588,26 @@ describe('Converter', () => {
             const fileSave = jest
               .spyOn(File.prototype, 'save')
               .mockImplementation()
-
             const fileTmp = jest.spyOn(File.prototype, 'saveTmpFile')
             const warn = jest.spyOn(console, 'warn').mockImplementation()
 
-            try {
-              await pdfInstance({
-                allowLocalFiles: true,
-                output: '-',
-              }).convertFile(file)
+            await pdfInstance({
+              allowLocalFiles: true,
+              output: '-',
+            }).convertFile(file)
 
-              expect(warn).toHaveBeenCalledWith(
-                expect.stringContaining(
-                  'Insecure local file accessing is enabled'
-                )
+            expect(warn).toHaveBeenCalledWith(
+              expect.stringContaining(
+                'Insecure local file accessing is enabled'
               )
-              expect(fileTmp).toHaveBeenCalledWith(
-                expect.objectContaining({ extension: '.html' })
-              )
-              expect(fileCleanup).toHaveBeenCalledWith(
-                expect.stringContaining(os.tmpdir())
-              )
-              expect(fileSave).toHaveBeenCalled()
-            } finally {
-              fileCleanup.mockRestore()
-              fileSave.mockRestore()
-              fileTmp.mockRestore()
-              warn.mockRestore()
-            }
+            )
+            expect(fileTmp).toHaveBeenCalledWith(
+              expect.objectContaining({ extension: '.html' })
+            )
+            expect(fileCleanup).toHaveBeenCalledWith(
+              expect.stringContaining(os.tmpdir())
+            )
+            expect(fileSave).toHaveBeenCalled()
           },
           timeout
         )
@@ -632,14 +617,16 @@ describe('Converter', () => {
         it(
           'assigns presenter notes as annotation of PDF',
           async () => {
-            const write = (fs as any).__mockWriteFile()
-
             await pdfInstance({
               output: 'test.pdf',
               pdfNotes: true,
             }).convertFile(new File(threePath))
 
-            const pdf = await PDFDocument.load(write.mock.calls[0][1])
+            expect(writeFileSpy.mock.calls[0][1]).toBeInstanceOf(Buffer)
+
+            const pdf = await PDFDocument.load(
+              writeFileSpy.mock.calls[0][1] as Buffer
+            )
             const annotaionRef = pdf.getPage(0).node.Annots()?.get(0)
             const annotation = pdf.context.lookup(annotaionRef, PDFDict)
 
@@ -655,15 +642,17 @@ describe('Converter', () => {
         )
 
         it('sets a comment author to notes if set author global directive', async () => {
-          const write = (fs as any).__mockWriteFile()
-
           await pdfInstance({
             output: 'test.pdf',
             pdfNotes: true,
             globalDirectives: { author: 'author' },
           }).convertFile(new File(threePath))
 
-          const pdf = await PDFDocument.load(write.mock.calls[0][1])
+          expect(writeFileSpy.mock.calls[0][1]).toBeInstanceOf(Buffer)
+
+          const pdf = await PDFDocument.load(
+            writeFileSpy.mock.calls[0][1] as Buffer
+          )
           const annotaionRef = pdf.getPage(0).node.Annots()?.get(0)
           const annotation = pdf.context.lookup(annotaionRef, PDFDict)
 
@@ -718,14 +707,16 @@ describe('Converter', () => {
           it(
             'assigns outlines for pages and headings to PDF',
             async () => {
-              const write = (fs as any).__mockWriteFile()
-
               await pdfInstance({
                 output: 'test.pdf',
                 pdfOutlines: { pages: true, headings: true },
               }).convertFile(baseFile())
 
-              const pdf = await PDFDocument.load(write.mock.calls[0][1])
+              expect(writeFileSpy.mock.calls[0][1]).toBeInstanceOf(Buffer)
+
+              const pdf = await PDFDocument.load(
+                writeFileSpy.mock.calls[0][1] as Buffer
+              )
               const outlines = pdf.catalog.lookup(
                 PDFName.of('Outlines'),
                 PDFDict
@@ -796,14 +787,16 @@ describe('Converter', () => {
           it(
             'assigns page outlines to PDF',
             async () => {
-              const write = (fs as any).__mockWriteFile()
-
               await pdfInstance({
                 output: 'test.pdf',
                 pdfOutlines: { pages: true, headings: false },
               }).convertFile(baseFile())
 
-              const pdf = await PDFDocument.load(write.mock.calls[0][1])
+              expect(writeFileSpy.mock.calls[0][1]).toBeInstanceOf(Buffer)
+
+              const pdf = await PDFDocument.load(
+                writeFileSpy.mock.calls[0][1] as Buffer
+              )
               const outlines = pdf.catalog.lookup(
                 PDFName.of('Outlines'),
                 PDFDict
@@ -841,14 +834,16 @@ describe('Converter', () => {
           it(
             'assigns heading outlines to PDF',
             async () => {
-              const write = (fs as any).__mockWriteFile()
-
               await pdfInstance({
                 output: 'test.pdf',
                 pdfOutlines: { pages: false, headings: true },
               }).convertFile(baseFile())
 
-              const pdf = await PDFDocument.load(write.mock.calls[0][1])
+              expect(writeFileSpy.mock.calls[0][1]).toBeInstanceOf(Buffer)
+
+              const pdf = await PDFDocument.load(
+                writeFileSpy.mock.calls[0][1] as Buffer
+              )
               const outlines = pdf.catalog.lookup(
                 PDFName.of('Outlines'),
                 PDFDict
@@ -905,8 +900,6 @@ describe('Converter', () => {
 
       describe('with custom timeout set by browser manager', () => {
         it('follows setting timeout', async () => {
-          ;(fs as any).__mockWriteFile()
-
           await using browserManager = new BrowserManager({ timeout: 1 })
 
           await expect(
@@ -920,12 +913,6 @@ describe('Converter', () => {
     })
 
     describe('when convert type is PPTX', () => {
-      let write: jest.Mock
-
-      beforeEach(() => {
-        write = (fs as any).__mockWriteFile()
-      })
-
       const converter = (opts: Partial<ConverterOption> = {}) =>
         instance({ output: 'test.pptx', type: ConvertType.pptx, ...opts })
 
@@ -976,8 +963,9 @@ describe('Converter', () => {
           const imageSpy = jest.spyOn(cvt as any, 'convertFileToImage')
 
           await cvt.convertFile(new File(onePath))
-          expect(write).toHaveBeenCalled()
-          expect(write.mock.calls[0][0]).toBe('test.pptx')
+          expect(writeFileSpy).toHaveBeenCalled()
+          expect(writeFileSpy.mock.calls[0][0]).toBe('test.pptx')
+          expect(writeFileSpy.mock.calls[0][1]).toBeInstanceOf(Buffer)
 
           // It has a different default scale x2
           expect(imageSpy).toHaveBeenLastCalledWith(
@@ -987,7 +975,7 @@ describe('Converter', () => {
           )
 
           // ZIP PK header for Office Open XML
-          const pptx: Buffer = write.mock.calls[0][1]
+          const pptx = writeFileSpy.mock.calls[0][1] as Buffer
           expect(pptx.toString('ascii', 0, 2)).toBe('PK')
           expect(pptx.toString('hex', 2, 4)).toBe('0304')
 
@@ -1013,8 +1001,9 @@ describe('Converter', () => {
             const imageSpy = jest.spyOn(cvt as any, 'convertFileToImage')
 
             await cvt.convertFile(new File(onePath))
+            expect(writeFileSpy.mock.calls[0][1]).toBeInstanceOf(Buffer)
 
-            const pptx: Buffer = write.mock.calls[0][1]
+            const pptx = writeFileSpy.mock.calls[0][1] as Buffer
             const meta = await getPptxDocProps(pptx)
 
             expect(meta['dc:title']).toBe('Test meta')
@@ -1034,12 +1023,6 @@ describe('Converter', () => {
     })
 
     describe('when convert type is PNG', () => {
-      let write: jest.Mock
-
-      beforeEach(() => {
-        write = (fs as any).__mockWriteFile()
-      })
-
       it(
         'converts markdown file into PNG',
         async () => {
@@ -1048,10 +1031,11 @@ describe('Converter', () => {
             type: ConvertType.png,
           }).convertFile(new File(onePath))
 
-          const png: Buffer = write.mock.calls[0][1]
+          expect(fs.promises.writeFile).toHaveBeenCalled()
+          expect(writeFileSpy.mock.calls[0][0]).toBe('a.png')
+          expect(writeFileSpy.mock.calls[0][1]).toBeInstanceOf(Buffer)
 
-          expect(write).toHaveBeenCalled()
-          expect(write.mock.calls[0][0]).toBe('a.png')
+          const png = writeFileSpy.mock.calls[0][1] as Buffer
           expect(png.toString('ascii', 1, 4)).toBe('PNG')
 
           const { width, height } = imageSize(png)
@@ -1071,9 +1055,12 @@ describe('Converter', () => {
               output: 'a.png',
               type: ConvertType.png,
             }).convertFile(new File(slide43Path))
-            const png: Buffer = write.mock.calls[0][1]
 
+            expect(writeFileSpy.mock.calls[0][1]).toBeInstanceOf(Buffer)
+
+            const png = writeFileSpy.mock.calls[0][1] as Buffer
             const { width, height } = imageSize(png)
+
             expect(width).toBe(960)
             expect(height).toBe(720)
           },
@@ -1091,10 +1078,11 @@ describe('Converter', () => {
               imageScale: 0.5,
             }).convertFile(new File(onePath))
 
-            const png: Buffer = write.mock.calls[0][1]
-            expect(png).toBeTruthy()
+            expect(writeFileSpy.mock.calls[0][1]).toBeInstanceOf(Buffer)
 
+            const png = writeFileSpy.mock.calls[0][1] as Buffer
             const { width, height } = imageSize(png)
+
             expect(width).toBe(640)
             expect(height).toBe(360)
           },
@@ -1104,12 +1092,6 @@ describe('Converter', () => {
     })
 
     describe('when convert type is JPEG', () => {
-      let write: jest.Mock
-
-      beforeEach(() => {
-        write = (fs as any).__mockWriteFile()
-      })
-
       it(
         'converts markdown file into JPEG',
         async () => {
@@ -1118,10 +1100,11 @@ describe('Converter', () => {
             type: ConvertType.jpeg,
           }).convertFile(new File(onePath))
 
-          const jpeg: Buffer = write.mock.calls[0][1]
+          expect(fs.promises.writeFile).toHaveBeenCalled()
+          expect(writeFileSpy.mock.calls[0][0]).toBe('b.jpg')
+          expect(writeFileSpy.mock.calls[0][1]).toBeInstanceOf(Buffer)
 
-          expect(write).toHaveBeenCalled()
-          expect(write.mock.calls[0][0]).toBe('b.jpg')
+          const jpeg = writeFileSpy.mock.calls[0][1] as Buffer
           expect(jpeg[0]).toBe(0xff)
           expect(jpeg[1]).toBe(0xd8)
 
@@ -1143,9 +1126,11 @@ describe('Converter', () => {
               type: ConvertType.jpeg,
             }).convertFile(new File(slide43Path))
 
-            const jpeg: Buffer = write.mock.calls[0][1]
+            expect(writeFileSpy.mock.calls[0][1]).toBeInstanceOf(Buffer)
 
+            const jpeg = writeFileSpy.mock.calls[0][1] as Buffer
             const { width, height } = imageSize(jpeg)
+
             expect(width).toBe(960)
             expect(height).toBe(720)
           },
@@ -1163,10 +1148,11 @@ describe('Converter', () => {
               imageScale: 0.5,
             }).convertFile(new File(onePath))
 
-            const jpeg: Buffer = write.mock.calls[0][1]
-            expect(jpeg).toBeTruthy()
+            expect(writeFileSpy.mock.calls[0][1]).toBeInstanceOf(Buffer)
 
+            const jpeg = writeFileSpy.mock.calls[0][1] as Buffer
             const { width, height } = imageSize(jpeg)
+
             expect(width).toBe(640)
             expect(height).toBe(360)
           },
@@ -1176,26 +1162,19 @@ describe('Converter', () => {
     })
 
     describe('when pages option is true', () => {
-      let converter: Converter
-      let write: jest.Mock
-
-      beforeEach(() => {
-        converter = instance({
-          output: 'c.png',
-          pages: true,
-          type: ConvertType.png,
-        })
-        write = (fs as any).__mockWriteFile()
-      })
-
       it(
         'converts markdown file into multiple PNG files',
         async () => {
+          const converter = instance({
+            output: 'c.png',
+            pages: true,
+            type: ConvertType.png,
+          })
           await converter.convertFile(new File(onePath)) // 2 pages
 
-          expect(write).toHaveBeenCalledTimes(2)
-          expect(write.mock.calls[0][0]).toBe('c.001.png')
-          expect(write.mock.calls[1][0]).toBe('c.002.png')
+          expect(fs.promises.writeFile).toHaveBeenCalledTimes(2)
+          expect(writeFileSpy.mock.calls[0][0]).toBe('c.001.png')
+          expect(writeFileSpy.mock.calls[1][0]).toBe('c.002.png')
         },
         timeout
       )
@@ -1206,16 +1185,18 @@ describe('Converter', () => {
         const notesInstance = (opts: Partial<ConverterOption> = {}) =>
           instance({ ...opts, type: ConvertType.notes })
 
-        const write = (fs as any).__mockWriteFile()
         const output = './specified.txt'
         const ret = await notesInstance({ output }).convertFile(
           new File(threePath)
         )
-        const notes: Buffer = write.mock.calls[0][1]
 
-        expect(write).toHaveBeenCalled()
-        expect(write.mock.calls[0][0]).toBe('./specified.txt')
+        expect(fs.promises.writeFile).toHaveBeenCalled()
+        expect(writeFileSpy.mock.calls[0][0]).toBe('./specified.txt')
+        expect(writeFileSpy.mock.calls[0][1]).toBeInstanceOf(Buffer)
+
+        const notes = writeFileSpy.mock.calls[0][1] as Buffer
         expect(notes.toString()).toBe('presenter note')
+
         expect(ret.newFile?.path).toBe('./specified.txt')
         expect(ret.newFile?.buffer).toBe(notes)
       })
@@ -1223,28 +1204,25 @@ describe('Converter', () => {
       it('converts markdown file to empty text and save to specified path when output is defined but no notes exist', async () => {
         const warn = jest.spyOn(console, 'warn').mockImplementation()
 
-        try {
-          const notesInstance = (opts: Partial<ConverterOption> = {}) =>
-            instance({ ...opts, type: ConvertType.notes })
+        const notesInstance = (opts: Partial<ConverterOption> = {}) =>
+          instance({ ...opts, type: ConvertType.notes })
 
-          const write = (fs as any).__mockWriteFile()
-          const output = './specified.txt'
-          const ret = await notesInstance({ output }).convertFile(
-            new File(onePath)
-          )
-          const notes: Buffer = write.mock.calls[0][1]
+        const output = './specified.txt'
+        const ret = await notesInstance({ output }).convertFile(
+          new File(onePath)
+        )
 
-          expect(warn).toHaveBeenCalledWith(
-            expect.stringContaining('contains no notes')
-          )
-          expect(write).toHaveBeenCalled()
-          expect(write.mock.calls[0][0]).toBe('./specified.txt')
-          expect(notes.toString()).toBe('')
-          expect(ret.newFile?.path).toBe('./specified.txt')
-          expect(ret.newFile?.buffer).toBe(notes)
-        } finally {
-          warn.mockRestore()
-        }
+        expect(warn).toHaveBeenCalledWith(
+          expect.stringContaining('contains no notes')
+        )
+        expect(fs.promises.writeFile).toHaveBeenCalled()
+        expect(writeFileSpy.mock.calls[0][0]).toBe('./specified.txt')
+        expect(writeFileSpy.mock.calls[0][1]).toBeInstanceOf(Buffer)
+
+        const notes = writeFileSpy.mock.calls[0][1] as Buffer
+        expect(notes.toString()).toBe('')
+        expect(ret.newFile?.path).toBe('./specified.txt')
+        expect(ret.newFile?.buffer).toBe(notes)
       })
     })
   })
@@ -1252,12 +1230,14 @@ describe('Converter', () => {
   describe('#convertFiles', () => {
     describe('with multiple files', () => {
       it('converts passed files', async () => {
-        const write = (fs as any).__mockWriteFile()
-
         await instance().convertFiles([new File(onePath), new File(twoPath)])
-        expect(write).toHaveBeenCalledTimes(2)
-        expect(write.mock.calls[0][0]).toBe(`${onePath.slice(0, -3)}.html`)
-        expect(write.mock.calls[1][0]).toBe(`${twoPath.slice(0, -6)}.html`)
+        expect(fs.promises.writeFile).toHaveBeenCalledTimes(2)
+        expect(writeFileSpy.mock.calls[0][0]).toBe(
+          `${onePath.slice(0, -3)}.html`
+        )
+        expect(writeFileSpy.mock.calls[1][0]).toBe(
+          `${twoPath.slice(0, -6)}.html`
+        )
       })
 
       it('throws CLIError when output is defined', () =>
@@ -1269,21 +1249,15 @@ describe('Converter', () => {
         ).rejects.toBeInstanceOf(CLIError))
 
       it('converts passed files when output is stdout', async () => {
-        const write = (fs as any).__mockWriteFile()
         const stdout = jest.spyOn(process.stdout, 'write').mockImplementation()
+        const files = [new File(onePath), new File(twoPath)]
 
-        try {
-          const files = [new File(onePath), new File(twoPath)]
+        await instance({ output: '-' }).convertFiles(files, {
+          onConverted: (result) => expect(files).toContain(result.file),
+        })
 
-          await instance({ output: '-' }).convertFiles(files, {
-            onConverted: (result) => expect(files).toContain(result.file),
-          })
-
-          expect(write).not.toHaveBeenCalled()
-          expect(stdout).toHaveBeenCalledTimes(2)
-        } finally {
-          stdout.mockRestore()
-        }
+        expect(fs.promises.writeFile).not.toHaveBeenCalled()
+        expect(stdout).toHaveBeenCalledTimes(2)
       })
     })
   })

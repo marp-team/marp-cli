@@ -2,7 +2,8 @@ import { ClientRequest } from 'node:http'
 import path from 'node:path'
 import { Marp } from '@marp-team/marp-core'
 import { load } from 'cheerio'
-import express, { type Express } from 'express'
+import express, { application } from 'express'
+import type { Express } from 'express'
 import request from 'supertest'
 import { BrowserManager } from '../src/browser/manager'
 import {
@@ -104,10 +105,13 @@ describe('Server', () => {
 
   describe('#start', () => {
     it('triggers setup of express server and starts listening', async () => {
+      const listen = jest.spyOn(application, 'listen')
+
       const server = new Server(converter())
       await server.start()
 
-      expect(server.server?.listen).toHaveBeenCalledWith(8080)
+      expect(listen).toHaveBeenCalledWith(8080)
+      expect(listen.mock.instances[0]).toBe(server.server)
     })
   })
 

@@ -3,6 +3,8 @@ import path from 'node:path'
 import chalk from 'chalk'
 import { cosmiconfig, cosmiconfigSync } from 'cosmiconfig'
 import { osLocale } from 'os-locale'
+import { availableFinders } from './browser/finder'
+import type { FinderName } from './browser/finder'
 import type { BrowserManagerConfig } from './browser/manager'
 import { info, warn, error as cliError } from './cli'
 import { ConvertType, type ConverterOption } from './converter'
@@ -24,6 +26,10 @@ interface IMarpCLIArguments {
   'bespoke.osc'?: boolean
   'bespoke.progress'?: boolean
   'bespoke.transition'?: boolean
+  browser?: string | string[]
+  browserPath?: string
+  browserProtocol?: string
+  browserTimeout?: number
   configFile?: string | false
   description?: string
   engine?: string
@@ -71,6 +77,8 @@ export type IMarpCLIConfig = Overwrite<
       progress?: boolean
       transition?: boolean
     }
+    browser?: 'auto' | FinderName | FinderName[]
+    browserProtocol?: 'cdp' | 'webdriver-bidi'
     engine?: ResolvableEngine
     html?: ConverterOption['html']
     keywords?: string | string[]
@@ -118,8 +126,58 @@ export class MarpCLIConfig {
   private constructor() {} // eslint-disable-line @typescript-eslint/no-empty-function
 
   browserManagerOption() {
+    const finders = (() => {
+      const isAvailableFinder = (f: string): f is FinderName =>
+        (availableFinders as string[]).includes(f)
+
+      const browser = this.args.browser ?? this.conf.browser ?? 'auto'
+
+      if (typeof browser === 'string') {
+        const normalized = browser.toLowerCase()
+
+        if (normalized === 'auto') return undefined
+        if (isAvailableFinder(normalized)) return normalized
+
+        error(`Unknown browser: ${browser}`)
+      }
+
+      const filtered = browser.filter(isAvailableFinder)
+
+      if (filtered.length === 0 && browser.length > 0)
+        error(`No available browsers: ${browser.join(', ')}`)
+
+      return filtered
+    })()
+
+    const browserPath = (() => {
+      if (this.args.browserPath) return path.resolve(this.args.browserPath)
+      if (this.conf.browserPath)
+        return path.resolve(path.dirname(this.confPath!), this.conf.browserPath)
+
+      // Replacement for CHROME_PATH environment variable
+      if (process.env.BROWSER_PATH) return process.env.BROWSER_PATH
+
+      return undefined
+    })()
+
+    const protocol = (() => {
+      const target =
+        this.args.browserProtocol ?? this.conf.browserProtocol ?? 'cdp'
+
+      if (target === 'cdp') return 'cdp'
+      if (target === 'webdriver-bidi') return 'webDriverBiDi'
+
+      error(`Unknown browser protocol: ${target}`)
+    })()
+
     const timeout = (() => {
-      // TODO: Resolve timeout from args and configuration file
+      if (this.args.browserTimeout !== undefined)
+        return Math.floor(this.args.browserTimeout * 1000)
+
+      if (this.conf.browserTimeout !== undefined)
+        return Math.floor(this.conf.browserTimeout * 1000)
+
+      // Fallback to classic way until v3 (PUPPETEER_TIMEOUT environment variable)
       if (process.env.PUPPETEER_TIMEOUT) {
         const envTimeout = Number.parseInt(process.env.PUPPETEER_TIMEOUT, 10)
         if (!Number.isNaN(envTimeout)) return envTimeout
@@ -128,7 +186,9 @@ export class MarpCLIConfig {
     })()
 
     return {
-      protocol: 'cdp',
+      finders,
+      path: browserPath,
+      protocol,
       timeout,
     } as const satisfies BrowserManagerConfig
   }

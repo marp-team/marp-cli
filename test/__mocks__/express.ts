@@ -3,7 +3,7 @@ import { EventEmitter } from 'node:events'
 const express = jest.requireActual('express')
 
 express.__errorOnListening = undefined
-express.application.listen = jest.fn(() => {
+express.application.listen = () => {
   const serverMock = Object.assign(new EventEmitter(), {
     close: (callback) => callback(),
   })
@@ -17,6 +17,6 @@ express.application.listen = jest.fn(() => {
   }, 0)
 
   return serverMock
-})
+}
 
 module.exports = express

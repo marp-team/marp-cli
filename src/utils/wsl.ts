@@ -1,36 +1,26 @@
-import { execFile, spawnSync } from 'node:child_process'
+import { execFile as cpExecFile } from 'node:child_process'
 import fs from 'node:fs'
+import { promisify } from 'node:util'
 import { debug } from './debug'
 
+const execFile = promisify(cpExecFile)
+const resolveStdout = ({ stdout }: { stdout: string }) => stdout.trim()
+
+export const translateWSLPathToWindows = async (wslPath: string) =>
+  await execFile('wslpath', ['-m', wslPath]).then(resolveStdout)
+
+export const translateWindowsPathToWSL = async (winPath: string) =>
+  await execFile('wslpath', ['-u', winPath]).then(resolveStdout)
+
+export const getWindowsEnv = async (envName: string) => {
+  const ret = await execFile('cmd.exe', ['/c', 'SET', envName]).then(
+    resolveStdout
+  )
+  if (ret.startsWith(`${envName}=`)) return ret.slice(envName.length + 1)
+  return undefined
+}
+
 let isWsl: number | Promise<number> | undefined
-
-export const resolveWSLPathToHost = async (path: string): Promise<string> =>
-  await new Promise<string>((res, rej) => {
-    execFile('wslpath', ['-m', path], (err, stdout) =>
-      err ? rej(err) : res(stdout.trim())
-    )
-  })
-
-export const resolveWSLPathToGuestSync = (path: string): string =>
-  spawnSync('wslpath', ['-u', path]).stdout.toString().trim()
-
-export const resolveWindowsEnv = async (
-  key: string
-): Promise<string | undefined> => {
-  const ret = await new Promise<string>((res, rej) => {
-    execFile('cmd.exe', ['/c', 'SET', key], (err, stdout) =>
-      err ? rej(err) : res(stdout.trim())
-    )
-  })
-
-  return ret.startsWith(`${key}=`) ? ret.slice(key.length + 1) : undefined
-}
-
-export const resolveWindowsEnvSync = (key: string): string | undefined => {
-  const ret = spawnSync('cmd.exe', ['/c', 'SET', key]).stdout.toString().trim()
-  return ret.startsWith(`${key}=`) ? ret.slice(key.length + 1) : undefined
-}
-
 const wsl2VerMatcher = /microsoft-standard-wsl2/i
 
 export const isWSL = async (): Promise<number> => {
@@ -66,6 +56,5 @@ export const isWSL = async (): Promise<number> => {
       }
     })().then((correctedIsWsl) => (isWsl = correctedIsWsl))
   }
-
   return await isWsl
 }

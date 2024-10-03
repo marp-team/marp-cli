@@ -19,11 +19,19 @@ export type BrowserFinder = (
   opts: BrowserFinderOptions
 ) => Promise<BrowserFinderResult>
 
-const finderMap = { chrome, edge, firefox } as const
+export type FinderName = keyof typeof availableFindersMap
 
-export type FinderName = keyof typeof finderMap
+const availableFindersMap = { chrome, edge, firefox } as const
 
-export const defaultFinders = ['chrome', 'edge', 'firefox'] as const
+export const availableFinders = Object.keys(
+  availableFindersMap
+) as readonly FinderName[]
+
+export const defaultFinders = [
+  'chrome',
+  'edge',
+  'firefox',
+] as const satisfies readonly FinderName[]
 
 export const findBrowser = async (
   finders: readonly FinderName[] = defaultFinders,
@@ -68,7 +76,7 @@ export const findBrowser = async (
     const resolved = Array<boolean | undefined>(finderCount)
 
     finders.forEach((finderName, index) => {
-      const finder = finderMap[finderName]
+      const finder = availableFindersMap[finderName]
 
       finder(normalizedOpts)
         .then((ret) => {

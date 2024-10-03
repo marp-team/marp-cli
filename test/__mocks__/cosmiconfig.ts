@@ -9,7 +9,7 @@ const {
 
 // Because of v8's bug, Jest fails with SIGSEGV if used dynamic import.
 // When using ESM in tests, you have to set up Jest to transpile config files into CommonJS with Babel.
-cosmiconfig.cosmiconfig = jest.fn((moduleName, options) => {
+cosmiconfig.cosmiconfig = (moduleName, options) => {
   return originalCosmiconfig(moduleName, {
     loaders: {
       // cosmiconfig sync loader is using `require()` to load JS
@@ -21,6 +21,6 @@ cosmiconfig.cosmiconfig = jest.fn((moduleName, options) => {
     },
     ...(options ?? {}),
   })
-})
+}
 
 module.exports = cosmiconfig
