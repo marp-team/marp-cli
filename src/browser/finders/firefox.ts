@@ -1,5 +1,6 @@
 import path from 'node:path'
 import { error, CLIErrorCode } from '../../error'
+// import { getWSL2NetworkingMode } from '../../utils/wsl'
 import { FirefoxBrowser } from '../browsers/firefox'
 import type { BrowserFinder, BrowserFinderResult } from '../finder'
 import {
@@ -38,7 +39,13 @@ export const firefoxFinder: BrowserFinder = async ({ preferredPath } = {}) => {
       case 'wsl1':
         return await firefoxFinderWSL()
     }
+
     return await firefoxFinderLinuxOrFallback()
+    /*
+    || ((await getWSL2NetworkingMode()) === 'mirrored'
+      ? await firefoxFinderWSL() // WSL2 Fallback
+      : undefined)
+    */
   })()
 
   if (installation) return firefox(installation)

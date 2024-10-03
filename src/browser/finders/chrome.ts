@@ -5,6 +5,7 @@ import {
   wsl,
 } from 'chrome-launcher/dist/chrome-finder'
 import { error, CLIErrorCode } from '../../error'
+import { getWSL2NetworkingMode } from '../../utils/wsl'
 import { ChromeBrowser } from '../browsers/chrome'
 import { ChromeCdpBrowser } from '../browsers/chrome-cdp'
 import type { BrowserFinder, BrowserFinderResult } from '../finder'
@@ -14,7 +15,6 @@ import {
   isExecutable,
   normalizeDarwinAppPath,
 } from './utils'
-import { getWSL2NetworkingMode } from '../../utils/wsl'
 
 const chrome = (path: string): BrowserFinderResult => ({
   path,
@@ -33,15 +33,15 @@ export const chromeFinder: BrowserFinder = async ({ preferredPath } = {}) => {
   const installation = await (async () => {
     switch (platform) {
       case 'darwin':
-        return darwinFast()
+        return chromeFinderDarwin()
       case 'linux':
         return await chromeFinderLinux()
       case 'win32':
-        return win32()[0]
+        return chromeFinderWin32()
       case 'wsl1':
-        return wsl()[0]
+        return chromeFinderWSL()
     }
-    return await fallback()
+    return await chromeFinderFallack()
   })()
 
   if (installation) return chrome(installation)
@@ -49,17 +49,24 @@ export const chromeFinder: BrowserFinder = async ({ preferredPath } = {}) => {
   error('Chrome browser could not be found.', CLIErrorCode.NOT_FOUND_BROWSER)
 }
 
+const chromeFinderDarwin = () => darwinFast()
 const chromeFinderLinux = async () => {
   try {
     const linuxPath = linux()[0]
     if (linuxPath) return linuxPath
-  } catch (error) {
+  } catch {
     // no ops
   }
-  if ((await getWSL2NetworkingMode()) === 'mirrored') return wsl()[0] // WSL2 Fallback
-}
 
-const fallback = async () =>
+  // WSL2 Fallback
+  if ((await getWSL2NetworkingMode()) === 'mirrored') return chromeFinderWSL()
+
+  return undefined
+}
+const chromeFinderWin32 = (): string | undefined => win32()[0]
+const chromeFinderWSL = (): string | undefined => wsl()[0]
+
+const chromeFinderFallack = async () =>
   await findExecutableBinary([
     'google-chrome-stable',
     'google-chrome',
