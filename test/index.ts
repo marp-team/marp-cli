@@ -45,4 +45,13 @@ describe('Marp CLI API interface', () => {
     expect(await marpCli.cliInterface(['-c', fakePath])).toBeGreaterThan(0)
     await expect(api(['-c', fakePath])).rejects.toBeInstanceOf(CLIError)
   })
+
+  it('always throws error if CLI has failed to parse options', async () => {
+    jest.spyOn(console, 'error').mockImplementation()
+
+    expect(await marpCli.cliInterface(['--image', 'unknown'])).toBeGreaterThan(
+      0
+    )
+    await expect(api(['--image', 'unknown'])).rejects.toBeInstanceOf(CLIError)
+  })
 })

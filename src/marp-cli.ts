@@ -4,7 +4,7 @@ import { BrowserManager } from './browser/manager'
 import * as cli from './cli'
 import { fromArguments } from './config'
 import { Converter, ConvertedCallback, ConvertType } from './converter'
-import { CLIError, error, isError } from './error'
+import { CLIError, CLIErrorCode, error, isError } from './error'
 import { File, FileType } from './file'
 import { Preview, fileToURI } from './preview'
 import { Server } from './server'
@@ -106,7 +106,9 @@ const coerceBrowserTimeout = (timeout: string | number | boolean) => {
   })()
 
   const parsed = Number.parseFloat(num)
-  if (Number.isNaN(parsed)) throw new Error(`Invalid number for timeout: ${t}`)
+
+  if (Number.isNaN(parsed) || parsed < 0)
+    error(`Invalid number for timeout: ${t}`)
 
   return parsed * base
 }
@@ -378,6 +380,13 @@ export const marpCli = async (
           type: 'string',
         },
       })
+      .fail((msg, _err, yargs) => {
+        console.error(yargs.help())
+        console.error('')
+        console.error(msg)
+
+        error(msg, CLIErrorCode.INVALID_OPTIONS)
+      })
 
     const argvRet = await program.argv
     const args = {
@@ -546,6 +555,10 @@ export const marpCli = async (
     return 0
   } catch (e: unknown) {
     if (throwErrorAlways || !(e instanceof CLIError)) throw e
+
+    // yargs error (already handled by yargs.fail())
+    if (e instanceof CLIError && e.errorCode === CLIErrorCode.INVALID_OPTIONS)
+      return 1
 
     cli.error(e.message)
 
