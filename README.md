@@ -44,7 +44,7 @@ npx @marp-team/marp-cli@latest -s ./slides
 ```
 
 > [!IMPORTANT]
-> You have to install any one of [Google Chrome], [Microsoft Edge], or [Mozilla Firefox] to convert slide deck into PDF, PPTX, and image(s). Check out [browser options](#browser-options) for more details.
+> You have to install any one of [Google Chrome], [Microsoft Edge], or [Mozilla Firefox] to convert slide deck into PDF, PPTX, and image(s).
 
 [google chrome]: https://www.google.com/chrome/
 [microsoft edge]: https://www.microsoft.com/edge
@@ -116,7 +116,7 @@ We also provide standalone binaries for Linux, macOS, and Windows. These have bu
 ## Basic usage
 
 > [!IMPORTANT]
-> Several kind of conversions with 🌐 icon require to install any of compatible browsers, [Google Chrome], [Microsoft Edge], or [Mozilla Firefox]. When an unexpected problem has occurred while converting, please update your browser to the latest version. Check out [browser options](#browser-options) for more details.
+> Several kind of conversions with 🌐 icon require to install any of compatible browsers, [Google Chrome], [Microsoft Edge], or [Mozilla Firefox]. When an unexpected problem has occurred while converting, please update your browser to the latest version. Check out [browser options](#browser-options) too.
 
 ### Convert to HTML
 
@@ -173,7 +173,9 @@ A created PPTX includes rendered Marp slide pages and the support of [Marpit pre
   <img src="https://raw.githubusercontent.com/marp-team/marp-cli/main/docs/images/pptx.png" height="300" />
 </p>
 
-> :information_source: A converted PPTX consists of pre-rendered images. Please note that contents would not be able to modify or re-use in PowerPoint.
+> [!WARNING]
+>
+> A converted PPTX consists of pre-rendered images. Please note that **contents would not be able to modify** or re-use in PowerPoint.
 
 ### Convert to PNG/JPEG image(s) 🌐
 
