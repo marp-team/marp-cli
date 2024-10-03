@@ -736,9 +736,14 @@ describe('Marp CLI', () => {
       describe('with --browser-path option', () => {
         it('uses the path as the preferred path of finder', async () => {
           expect(
-            (await conversion(onePath, '--browser-path', '/path/to/browser'))
-              .options.browserManager['_finderPreferredPath']
-          ).toBe('/path/to/browser')
+            (
+              await conversion(
+                onePath,
+                '--browser-path',
+                path.join('path', 'to', 'browser')
+              )
+            ).options.browserManager['_finderPreferredPath']
+          ).toBe(path.join('path', 'to', 'browser'))
 
           // Relative path
           const resolved = (
