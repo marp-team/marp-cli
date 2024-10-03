@@ -7,6 +7,7 @@ import * as cosmiconfigExplorer from 'cosmiconfig/dist/Explorer' // eslint-disab
 import getStdin from 'get-stdin'
 import stripAnsi from 'strip-ansi'
 import { version as cliVersion } from '../package.json'
+import { defaultFinders } from '../src/browser/finder'
 import * as cli from '../src/cli'
 import { Converter, ConvertType } from '../src/converter'
 import { ResolvedEngine } from '../src/engine'
@@ -23,7 +24,6 @@ import { ThemeSet } from '../src/theme'
 import * as container from '../src/utils/container'
 import * as version from '../src/version'
 import { Watcher } from '../src/watcher'
-import { defaultFinders } from '../src/browser/finder'
 
 jest.mock('cosmiconfig')
 jest.mock('../src/preview')
