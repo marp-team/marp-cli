@@ -23,9 +23,11 @@ import { ThemeSet } from '../src/theme'
 import * as container from '../src/utils/container'
 import * as version from '../src/version'
 import { Watcher } from '../src/watcher'
+import { defaultFinders } from '../src/browser/finder'
 
 jest.mock('cosmiconfig')
 jest.mock('../src/preview')
+jest.mock('../src/utils/yargs')
 jest.mock('../src/watcher', () => jest.createMockFromModule('../src/watcher'))
 
 const { Explorer } = cosmiconfigExplorer as any
@@ -624,6 +626,288 @@ describe('Marp CLI', () => {
       )
     })
 
+    describe('with browser options', () => {
+      describe('with --browser option', () => {
+        it('uses default browser finders when --browser is auto', async () => {
+          expect(
+            (await conversion(onePath, '--browser', 'auto')).options
+              .browserManager['_finders']
+          ).toStrictEqual(defaultFinders)
+
+          // Case insensitive
+          expect(
+            (await conversion(onePath, '--browser', 'AUTo')).options
+              .browserManager['_finders']
+          ).toStrictEqual(defaultFinders)
+        })
+
+        it('uses default browser finders when --browser has no value', async () => {
+          expect(
+            (await conversion(onePath, '--browser')).options.browserManager[
+              '_finders'
+            ]
+          ).toStrictEqual(defaultFinders)
+        })
+
+        it('uses only specific browser finder when --browser is a kind of browser', async () => {
+          // chrome
+          expect(
+            (await conversion(onePath, '--browser', 'chrome')).options
+              .browserManager['_finders']
+          ).toStrictEqual(['chrome'])
+
+          // edge
+          expect(
+            (await conversion(onePath, '--browser', 'edge')).options
+              .browserManager['_finders']
+          ).toStrictEqual(['edge'])
+
+          // firefox
+          expect(
+            (await conversion(onePath, '--browser', 'firefox')).options
+              .browserManager['_finders']
+          ).toStrictEqual(['firefox'])
+
+          // Case insensitive
+          expect(
+            (await conversion(onePath, '--browser', 'CHROME')).options
+              .browserManager['_finders']
+          ).toStrictEqual(['chrome'])
+          expect(
+            (await conversion(onePath, '--browser', 'edGE')).options
+              .browserManager['_finders']
+          ).toStrictEqual(['edge'])
+          expect(
+            (await conversion(onePath, '--browser', 'FireFox')).options
+              .browserManager['_finders']
+          ).toStrictEqual(['firefox'])
+        })
+
+        it('prints error when --browser is unknown browser', async () => {
+          const error = jest.spyOn(console, 'error').mockImplementation()
+
+          expect(await marpCli([onePath, '--browser', 'unknown'])).toBe(1)
+
+          expect(error).toHaveBeenCalledWith(
+            expect.stringContaining('Invalid values')
+          )
+        })
+
+        it('uses the specific order of browser finders when --browser has comma-separated browsers', async () => {
+          expect(
+            (await conversion(onePath, '--browser', 'firefox,edge,chrome'))
+              .options.browserManager['_finders']
+          ).toStrictEqual(['firefox', 'edge', 'chrome'])
+
+          // Trimming spaces
+          expect(
+            (await conversion(onePath, '--browser', ' edge , chrome ')).options
+              .browserManager['_finders']
+          ).toStrictEqual(['edge', 'chrome'])
+
+          // Just ignore unknown browsers
+          expect(
+            (await conversion(onePath, '--browser', 'auto,firefox,unknown'))
+              .options.browserManager['_finders']
+          ).toStrictEqual(['firefox'])
+        })
+
+        it('prints error when --browser has comma-separated unknown browsers', async () => {
+          const error = jest.spyOn(console, 'error').mockImplementation()
+
+          expect(
+            await marpCli([onePath, '--browser', 'unknown,browsers'])
+          ).toBe(1)
+
+          expect(error).toHaveBeenCalledWith(
+            expect.stringContaining('Invalid values')
+          )
+        })
+
+        it('uses no browser finders when --no-browser has specified', async () => {
+          expect(
+            (await conversion(onePath, '--no-browser')).options.browserManager[
+              '_finders'
+            ]
+          ).toStrictEqual([])
+        })
+      })
+
+      describe('with --browser-path option', () => {
+        it('uses the path as the preferred path of finder', async () => {
+          expect(
+            (await conversion(onePath, '--browser-path', '/path/to/browser'))
+              .options.browserManager['_finderPreferredPath']
+          ).toBe('/path/to/browser')
+
+          // Relative path
+          const resolved = (
+            await conversion(onePath, '--browser-path', './browser-executable')
+          ).options.browserManager['_finderPreferredPath']
+
+          expect(resolved).toBe(path.join(process.cwd(), 'browser-executable'))
+        })
+      })
+
+      describe('with --browser-protocol option', () => {
+        it('uses the default protocol "cdp" when --browser-protocol is not defined', async () => {
+          expect(
+            (await conversion(onePath)).options.browserManager[
+              '_preferredProtocol'
+            ]
+          ).toBe('cdp')
+
+          // Negated option
+          expect(
+            (await conversion(onePath, '--no-browser-protocol')).options
+              .browserManager['_preferredProtocol']
+          ).toBe('cdp')
+        })
+
+        it('uses "cdp" when --browser-protocol is "cdp"', async () => {
+          expect(
+            (await conversion(onePath, '--browser-protocol', 'cdp')).options
+              .browserManager['_preferredProtocol']
+          ).toBe('cdp')
+
+          // Case insensitive
+          expect(
+            (await conversion(onePath, '--browser-protocol', 'CDP')).options
+              .browserManager['_preferredProtocol']
+          ).toBe('cdp')
+        })
+
+        it('uses "webDriverBiDi" when --browser-protocol is "webdriver-bidi"', async () => {
+          expect(
+            (await conversion(onePath, '--browser-protocol', 'webdriver-bidi'))
+              .options.browserManager['_preferredProtocol']
+          ).toBe('webDriverBiDi')
+
+          // Case insensitive
+          expect(
+            (await conversion(onePath, '--browser-protocol', 'WebDriver-BiDi'))
+              .options.browserManager['_preferredProtocol']
+          ).toBe('webDriverBiDi')
+        })
+
+        it('allows aliases for webdriver-bidi option in --browser-protocol', async () => {
+          // "webdriver"
+          expect(
+            (await conversion(onePath, '--browser-protocol', 'webdriver'))
+              .options.browserManager['_preferredProtocol']
+          ).toBe('webDriverBiDi')
+
+          // "bidi"
+          expect(
+            (await conversion(onePath, '--browser-protocol', 'bidi')).options
+              .browserManager['_preferredProtocol']
+          ).toBe('webDriverBiDi')
+        })
+
+        it('prints error when --browser-protocol is unknown protocol', async () => {
+          const error = jest.spyOn(console, 'error').mockImplementation()
+
+          expect(
+            await marpCli([onePath, '--browser-protocol', 'unknown'])
+          ).toBe(1)
+
+          expect(error).toHaveBeenCalledWith(
+            expect.stringContaining('Invalid values')
+          )
+        })
+      })
+
+      describe('with --browser-timeout option', () => {
+        it('uses the default timeout when --browser-timeout has defined no value', async () => {
+          expect(
+            (await conversion(onePath, '--browser-timeout')).options
+              .browserManager.timeout
+          ).toBeUndefined()
+
+          // "true" also use the default timeout
+          expect(
+            (await conversion(onePath, '--browser-timeout', 'true')).options
+              .browserManager.timeout
+          ).toBeUndefined()
+          expect(
+            (await conversion(onePath, '--browser-timeout', 'TRUE')).options
+              .browserManager.timeout
+          ).toBeUndefined()
+        })
+
+        it('sets timeout as 0 when --browser-timeout is 0 or falsy value', async () => {
+          expect(
+            (await conversion(onePath, '--browser-timeout', '0')).options
+              .browserManager.timeout
+          ).toBe(0)
+
+          // Negated option
+          expect(
+            (await conversion(onePath, '--no-browser-timeout')).options
+              .browserManager.timeout
+          ).toBe(0)
+
+          // "false" also sets timeout as 0
+          expect(
+            (await conversion(onePath, '--no-browser-timeout', 'false')).options
+              .browserManager.timeout
+          ).toBe(0)
+          expect(
+            (await conversion(onePath, '--no-browser-timeout', 'FALSE')).options
+              .browserManager.timeout
+          ).toBe(0)
+        })
+
+        it('sets timeout as second when --browser-timeout is number', async () => {
+          expect(
+            (await conversion(onePath, '--browser-timeout', '42')).options
+              .browserManager.timeout
+          ).toBe(42000)
+
+          // With "s" unit
+          expect(
+            (await conversion(onePath, '--browser-timeout', '60s')).options
+              .browserManager.timeout
+          ).toBe(60000)
+
+          // Point number
+          expect(
+            (await conversion(onePath, '--browser-timeout', '1.234')).options
+              .browserManager.timeout
+          ).toBe(1234)
+          expect(
+            (await conversion(onePath, '--browser-timeout', '3.456789s'))
+              .options.browserManager.timeout
+          ).toBe(3456)
+        })
+
+        it('sets timeout as millisecond when --browser-timeout is number with ms unit', async () => {
+          expect(
+            (await conversion(onePath, '--browser-timeout', '5678ms')).options
+              .browserManager.timeout
+          ).toBe(5678)
+        })
+
+        it('prints error when --browser-timeout is unknown string', async () => {
+          const error = jest.spyOn(console, 'error').mockImplementation()
+
+          expect(await marpCli([onePath, '--browser-timeout', '???'])).toBe(1)
+          expect(error).toHaveBeenCalledWith(
+            expect.stringContaining('Invalid number for timeout: ???')
+          )
+        })
+
+        it('prints error when --browser-timeout is negative value', async () => {
+          const error = jest.spyOn(console, 'error').mockImplementation()
+
+          expect(await marpCli([onePath, '--browser-timeout', '-5'])).toBe(1)
+          expect(error).toHaveBeenCalledWith(
+            expect.stringContaining('Invalid number for timeout: -5')
+          )
+        })
+      })
+    })
+
     describe('with --pdf option', () => {
       it('converts file with PDF type', async () => {
         const cmd = [onePath, '--pdf']
@@ -647,6 +931,15 @@ describe('Marp CLI', () => {
       it('converts file with PNG type if the type was not specified', async () => {
         const cmd = [onePath, '--image']
         expect((await conversion(...cmd)).options.type).toBe(ConvertType.png)
+      })
+
+      it('prints error if the specified type is not supported', async () => {
+        const error = jest.spyOn(console, 'error').mockImplementation()
+
+        expect(await marpCli([onePath, '--image', 'unsupported'])).toBe(1)
+        expect(error).toHaveBeenCalledWith(
+          expect.stringContaining('Invalid values')
+        )
       })
 
       it('converts file with JPEG type by specified jpeg', async () => {
@@ -1128,6 +1421,44 @@ describe('Marp CLI', () => {
         expect(
           (await conversion(onePath, '--pdf')).options.browserManager.timeout
         ).toBeUndefined()
+      })
+
+      it('ignores if --browser-timeout option is specified', async () => {
+        expect(
+          (await conversion(onePath, '--pdf', '--browser-timeout', '56789ms'))
+            .options.browserManager.timeout
+        ).toBe(56789)
+      })
+    })
+
+    describe('with BROWSER_PATH env', () => {
+      beforeEach(() => {
+        process.env.BROWSER_PATH = '/path/to/browser'
+      })
+
+      afterEach(() => {
+        delete process.env.BROWSER_PATH
+      })
+
+      it('uses specified path as the preferred path of finder', async () => {
+        expect(
+          (await conversion(onePath, '--pdf')).options.browserManager[
+            '_finderPreferredPath'
+          ]
+        ).toBe('/path/to/browser')
+      })
+
+      it('ignores if --browser-path option is specified', async () => {
+        expect(
+          (
+            await conversion(
+              onePath,
+              '--pdf',
+              '--browser-path',
+              '/preferred/path/to/browser'
+            )
+          ).options.browserManager['_finderPreferredPath']
+        ).toBe('/preferred/path/to/browser')
       })
     })
   })

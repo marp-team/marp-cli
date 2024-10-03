@@ -17,6 +17,7 @@ export class CLIError extends Error {
 }
 
 export const CLIErrorCode = {
+  INVALID_OPTIONS: -1,
   GENERAL_ERROR: 1,
   NOT_FOUND_BROWSER: 2,
   LISTEN_PORT_IS_ALREADY_USED: 3,
