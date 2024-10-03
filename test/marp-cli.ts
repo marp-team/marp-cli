@@ -683,13 +683,42 @@ describe('Marp CLI', () => {
           ).toStrictEqual(['firefox'])
         })
 
-        it('prints error when --browser is unknown browser', async () => {
+        it('prints yargs error when --browser is unknown browser', async () => {
           const error = jest.spyOn(console, 'error').mockImplementation()
 
           expect(await marpCli([onePath, '--browser', 'unknown'])).toBe(1)
 
           expect(error).toHaveBeenCalledWith(
             expect.stringContaining('Invalid values')
+          )
+        })
+
+        it('uses a specific browser finder when browser option in configuration file is a kind of browser', async () => {
+          const conf = assetFn('_configs/marpit/config.js')
+
+          jest.spyOn(Explorer.prototype, 'load').mockResolvedValue({
+            filepath: conf,
+            config: { browser: 'firefox' },
+          })
+
+          expect(
+            (await conversion(onePath, '--config', conf)).options
+              .browserManager['_finders']
+          ).toStrictEqual(['firefox'])
+        })
+
+        it('prints error when browser option in configuration file is unknown browser', async () => {
+          const conf = assetFn('_configs/marpit/config.js')
+          const error = jest.spyOn(console, 'error').mockImplementation()
+
+          jest.spyOn(Explorer.prototype, 'load').mockResolvedValue({
+            filepath: conf,
+            config: { browser: 'UNKNOWN' },
+          })
+
+          expect(await marpCli([onePath, '--config', 'conf'])).toBe(1)
+          expect(error).toHaveBeenCalledWith(
+            expect.stringContaining('Unknown browser: UNKNOWN')
           )
         })
 
@@ -712,6 +741,20 @@ describe('Marp CLI', () => {
           ).toStrictEqual(['firefox'])
         })
 
+        it('uses a specific order of browser finders when browser option in configuration file is an array of browsers', async () => {
+          const conf = assetFn('_configs/marpit/config.js')
+
+          jest.spyOn(Explorer.prototype, 'load').mockResolvedValue({
+            filepath: conf,
+            config: { browser: ['edge', 'firefox', 'chrome'] },
+          })
+
+          expect(
+            (await conversion(onePath, '--config', conf)).options
+              .browserManager['_finders']
+          ).toStrictEqual(['edge', 'firefox', 'chrome'])
+        })
+
         it('prints error when --browser has comma-separated unknown browsers', async () => {
           const error = jest.spyOn(console, 'error').mockImplementation()
 
@@ -721,6 +764,21 @@ describe('Marp CLI', () => {
 
           expect(error).toHaveBeenCalledWith(
             expect.stringContaining('Invalid values')
+          )
+        })
+
+        it('prints error when browser option in configuration file is an array of unknown browsers', async () => {
+          const conf = assetFn('_configs/marpit/config.js')
+          const error = jest.spyOn(console, 'error').mockImplementation()
+
+          jest.spyOn(Explorer.prototype, 'load').mockResolvedValue({
+            filepath: conf,
+            config: { browser: ['unknown', 'browsers'] },
+          })
+
+          expect(await marpCli([onePath, '--config', 'conf'])).toBe(1)
+          expect(error).toHaveBeenCalledWith(
+            expect.stringContaining('No available browsers: unknown, browsers')
           )
         })
 
@@ -746,6 +804,20 @@ describe('Marp CLI', () => {
           ).options.browserManager['_finderPreferredPath']
 
           expect(resolved).toBe(path.join(process.cwd(), 'browser-executable'))
+        })
+
+        it('uses a path from the configuration file as the preferred path of finder when browserPath option in configuration file is specified', async () => {
+          const conf = assetFn('_configs/marpit/config.js')
+
+          jest.spyOn(Explorer.prototype, 'load').mockResolvedValue({
+            filepath: conf,
+            config: { browserPath: '../test/browser/path' },
+          })
+
+          expect(
+            (await conversion(onePath, '--config', conf)).options
+              .browserManager['_finderPreferredPath']
+          ).toBe(assetFn('_configs/test/browser/path'))
         })
       })
 
@@ -804,7 +876,7 @@ describe('Marp CLI', () => {
           ).toBe('webDriverBiDi')
         })
 
-        it('prints error when --browser-protocol is unknown protocol', async () => {
+        it('prints yargs error when --browser-protocol is unknown protocol', async () => {
           const error = jest.spyOn(console, 'error').mockImplementation()
 
           expect(
@@ -813,6 +885,21 @@ describe('Marp CLI', () => {
 
           expect(error).toHaveBeenCalledWith(
             expect.stringContaining('Invalid values')
+          )
+        })
+
+        it('prints error when browserProtocol option in configuration file is unknown protocol', async () => {
+          const conf = assetFn('_configs/marpit/config.js')
+          const error = jest.spyOn(console, 'error').mockImplementation()
+
+          jest.spyOn(Explorer.prototype, 'load').mockResolvedValue({
+            filepath: conf,
+            config: { browserProtocol: 'UNKNOWN' },
+          })
+
+          expect(await marpCli([onePath, '--config', 'conf'])).toBe(1)
+          expect(error).toHaveBeenCalledWith(
+            expect.stringContaining('Unknown browser protocol: UNKNOWN')
           )
         })
       })
@@ -904,6 +991,20 @@ describe('Marp CLI', () => {
           expect(error).toHaveBeenCalledWith(
             expect.stringContaining('Invalid number for timeout: -5')
           )
+        })
+
+        it('sets timeout as second when browserTimeout option in configuration file is specified', async () => {
+          const conf = assetFn('_configs/marpit/config.js')
+
+          jest.spyOn(Explorer.prototype, 'load').mockResolvedValue({
+            filepath: conf,
+            config: { browserTimeout: 42 },
+          })
+
+          expect(
+            (await conversion(onePath, '--config', conf)).options.browserManager
+              .timeout
+          ).toBe(42000)
         })
       })
     })
