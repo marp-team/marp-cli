@@ -43,11 +43,12 @@ npx @marp-team/marp-cli@latest -w slide-deck.md
 npx @marp-team/marp-cli@latest -s ./slides
 ```
 
-> :information_source: You have to install [Google Chrome]<!--, [Chromium], --> or [Microsoft Edge] to convert slide deck into PDF, PPTX, and image(s).
+> [!IMPORTANT]
+> You have to install any one of [Google Chrome], [Microsoft Edge], or [Mozilla Firefox] to convert slide deck into PDF, PPTX, and image(s). Check out [browser options](#browser-options) for more details.
 
 [google chrome]: https://www.google.com/chrome/
-[chromium]: https://www.chromium.org/
 [microsoft edge]: https://www.microsoft.com/edge
+[mozilla firefox]: https://www.mozilla.org/firefox/new/
 
 ### Docker
 
@@ -65,7 +66,7 @@ You can use the package manager to install and update Marp CLI easily.
 
 _Disclaimer: Package manifests are maintained by the community, not Marp team._
 
-<!-- For contributors: For contributors: This section describes only package managers that Marp manifest has been actively maintained. Each tools are following update within a few days of the latest CLI update. -->
+<!-- For contributors: This section describes only package managers that Marp manifest has been actively maintained. Each tools are following update within a few days of the latest CLI update. -->
 
 #### macOS: **[Homebrew](https://brew.sh/)**
 
@@ -73,7 +74,7 @@ _Disclaimer: Package manifests are maintained by the community, not Marp team._
 brew install marp-cli
 ```
 
-<!-- https://github.com/Homebrew/homebrew-core/blob/master/Formula/marp-cli.rb -->
+<!-- https://github.com/Homebrew/homebrew-core/blob/master/Formula/m/marp-cli.rb -->
 
 #### Windows: **[Scoop](https://scoop.sh/)**
 
@@ -87,13 +88,14 @@ scoop install marp
 
 We recommend to install Marp CLI into your Node.js project. You may control the CLI version (and engine if you want) exactly.
 
-> :information_source: Marp CLI is working only with [actively supported Node.js versions](https://endoflife.date/nodejs), so Node.js v18 and later is required when installing into your Node.js project.
-
 ```bash
 npm install --save-dev @marp-team/marp-cli
 ```
 
 The installed `marp` command is available in [npm-scripts](https://docs.npmjs.com/misc/scripts) or `npx marp`.
+
+> [!NOTE]
+> Marp CLI is working only with [actively supported Node.js versions](https://endoflife.date/nodejs), so Node.js v18 and later is required when installing into your Node.js project.
 
 #### Global installation
 
@@ -113,6 +115,9 @@ We also provide standalone binaries for Linux, macOS, and Windows. These have bu
 
 ## Basic usage
 
+> [!IMPORTANT]
+> Several kind of conversions with 🌐 icon require to install any of compatible browsers, [Google Chrome], [Microsoft Edge], or [Mozilla Firefox]. When an unexpected problem has occurred while converting, please update your browser to the latest version. Check out [browser options](#browser-options) for more details.
+
 ### Convert to HTML
 
 The passed markdown will be converted to HTML file by default. In the below example, a converted `slide-deck.html` will output to the same directory.
@@ -131,7 +136,7 @@ Marp CLI supports converting multiple files by passing multiple paths, directori
 
 When you want to output the converted result to another directory with keeping the origin directory structure, you can use `--input-dir` (`-I`) option. `--output` option would be available for specify the output directory.
 
-### Convert to PDF (`--pdf`)
+### Convert to PDF (`--pdf`) 🌐
 
 If you passed `--pdf` option or the output filename specified by `--output` (`-o`) option ends with `.pdf`, Marp CLI will try to convert Markdown into PDF file through the browser.
 
@@ -139,12 +144,6 @@ If you passed `--pdf` option or the output filename specified by `--output` (`-o
 marp --pdf slide-deck.md
 marp slide-deck.md -o converted.pdf
 ```
-
-All kind of conversions except HTML _require to install [Google Chrome]<!--, [Chromium]-->, [Microsoft Edge], or [Chromium] (flavored) browser._ When an unexpected problem has occurred while converting, please update your browser to the latest version or try installing [Google Chrome Canary].
-
-[google chrome canary]: https://www.google.com/chrome/canary/
-
-> :information_source: If you want to use Chromium or flavored browsers to convert, you have to specify the path to the browser binary through `CHROME_PATH` environment variable. For example: `CHROME_PATH=$(which brave) marp --pdf slide-deck.md`
 
 #### PDF output options
 
@@ -159,7 +158,7 @@ All kind of conversions except HTML _require to install [Google Chrome]<!--, [Ch
 
 [marpit presenter notes]: https://marpit.marp.app/usage?id=presenter-notes
 
-### Convert to PowerPoint document (`--pptx`)
+### Convert to PowerPoint document (`--pptx`) 🌐
 
 Do you want more familiar way to present and share your deck? PPTX conversion to create PowerPoint document is available by passing `--pptx` option or specify the output path with PPTX extension.
 
@@ -176,7 +175,7 @@ A created PPTX includes rendered Marp slide pages and the support of [Marpit pre
 
 > :information_source: A converted PPTX consists of pre-rendered images. Please note that contents would not be able to modify or re-use in PowerPoint.
 
-### Convert to PNG/JPEG image(s)
+### Convert to PNG/JPEG image(s) 🌐
 
 #### Multiple images (`--images`)
 
@@ -213,9 +212,11 @@ You can set the scale factor for rendered image(s) through `--image-scale` optio
 marp slide-deck.md -o title-slide@2x.png --image-scale 2
 ```
 
-> :information_source: `--image-scale` is not affect to the actual size of presentation.
+> [!TIP]
 >
-> It is also available for PPTX conversion. By default, Marp CLI will use `2` as the default scale factor in PPTX to suppress deterioration of slide rendering in full-screen presentation.
+> `--image-scale` is not affect to the actual size of presentation.
+>
+> The scale factor is also available for PPTX conversion. By default, Marp CLI will use `2` as the default scale factor in PPTX, to suppress deterioration of slide rendering in full-screen presentation.
 
 ### Export presenter notes (`--notes`)
 
@@ -229,9 +230,9 @@ marp slide-deck.md -o output.txt
 
 ### Security about local files
 
-Because of [the security reason](https://github.com/marp-team/marp-cli/pull/10#user-content-security), **PDF, PPTX and image(s) conversion cannot use local files by default.**
+Because of [the security reason](https://github.com/marp-team/marp-cli/pull/10#user-content-security), **conversion that is using the browser cannot use local files by default.**
 
-Marp CLI would output incompleted result with warning if the blocked local file accessing is detected. We recommend uploading your assets to online.
+Marp CLI would output incomplete result with warning if the blocked local file accessing is detected. We recommend uploading your assets to online.
 
 If you really need to use local files in these conversion, `--allow-local-files` option helps to find your local files. _Please use only to the trusted Markdown because there is a potential security risk._
 
@@ -255,9 +256,13 @@ Server mode supports on-demand conversion by HTTP request. We require to pass `-
   <img src="https://raw.githubusercontent.com/marp-team/marp-cli/main/docs/images/server-mode.gif" />
 </p>
 
-In this mode, the converted file outputs as the result of accessing to server, and not to disk. You can set the server port by setting the environment variable `PORT`, for example `PORT=5000 marp -s ./slides` would listen on port number 5000.
+In this mode, the converted file outputs as the result of accessing to server, and not to disk.
 
-You would get the converted PDF, PPTX, PNG, and JPEG by adding corresponded query string when requesting. e.g. `http://localhost:8080/deck-a.md?pdf` returns converted PDF.
+You would get the converted PDF, PPTX, PNG, JPEG, and TXT by adding corresponded query string when requesting. e.g. `http://localhost:8080/deck-a.md?pdf` returns converted PDF.
+
+> [!TIP]
+>
+> You can set the server port by setting the environment variable `PORT`. For example, `PORT=5000 marp -s ./slides` would listen on port number 5000.
 
 #### `index.md` / `PITCHME.md`
 
@@ -272,7 +277,51 @@ When conversions were executed together with `--preview` (`-p`) option, Marp CLI
 Unlike opening with browser, you may present deck with the immersive window.
 [Watch mode](#watch-mode) is automatically enabled while using preview window.
 
-> :information_source: `--preview` option cannot use when you are using Marp CLI through official docker image.
+> [!NOTE]
+>
+> `--preview` option cannot use when you are using Marp CLI through official Docker image.
+
+## Browser options
+
+### Choose browser (`--browser`)
+
+You can specify the kind of browser for conversion by `--browser` option. Available browsers are `chrome`, `edge`, and `firefox`. If set comma-separated browsers, Marp CLI will try to use the first available browser among them.
+
+```bash
+# Use Firefox for image conversion
+marp --browser firefox ./slide.md -o slide.png
+
+# Prefer to use Firefox first, then Chrome
+marp --browser firefox,chrome ./slide.md -o slide.png
+```
+
+The default is a special value `auto`, which means to use the first available browser from `chrome,edge,firefox`.
+
+> [!WARNING]
+>
+> _Firefox support is still early stage._ The PDF output generated by Firefox may include some incompatible renderings compared to the PDF generated by Chrome.
+
+### Browser path (`--browser-path`)
+
+If you have a browser binary that cannot find out by Marp CLI automatically, you can explicitly set the path to the browser executable through `--browser-path` option.
+
+```bash
+# Use Chromium-flavored browser (Chromium, Brave, Vivaldi, etc...)
+marp --browser-path /path/to/chromium-flavored-browser ./slide.md -o slide.pdf
+
+# Use Firefox with explicitly set path
+marp --browser firefox --browser-path /path/to/firefox ./slide.md -o slide.png
+```
+
+### Other browser options
+
+- **`--browser-protocol`**: Set the preferred protocol for connecting to the browser.
+  - `cdp`: [Chrome DevTools Protocol][cdp] (default)
+  - `webdriver-bidi`: [WebDriver BiDi]
+- **`--browser-timeout`**: Set the timeout for each browser operation in seconds. (default: `30` seconds)
+
+[cdp]: https://chromedevtools.github.io/devtools-protocol/
+[webdriver bidi]: https://w3c.github.io/webdriver-bidi/
 
 ## Template
 
@@ -292,14 +341,12 @@ The `bespoke` template is using [Bespoke.js](https://github.com/bespokejs/bespok
 - **Fullscreen**: Toggle fullscreen by hitting <kbd>f</kbd> / <kbd>F11</kbd> key.
 - **On-screen controller**: There is a touch-friendly OSC. You may also disable by `--bespoke.osc=false` if unneccesary.
 - **Fragmented list**: Recognize [Marpit's fragmented list](https://github.com/marp-team/marpit/issues/145) and appear list one-by-one if used `*` and `1)` as the bullet marker.
-- **Presenter view**: Open presenter view in external window by hitting <kbd>p</kbd> key.
+- **Presenter view**: Open presenter view in external window by hitting <kbd>p</kbd> key. (It may become disabled when not fulfilled requirements for working)
 - **Progress bar** (optional): By setting `--bespoke.progress` option, you can add a progress bar on the top of the deck.
 - [**Slide transitions**][transitions]: Support transitions (`transition` local directive) powered by [View Transitions API].
 
 [transitions]: ./docs/bespoke-transitions/README.md
 [view transitions api]: https://www.w3.org/TR/css-view-transitions-1/
-
-> ℹ️ Presenter view may be disabled if [the browser restricted using localStorage](https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API#Feature-detecting_localStorage) (e.g. Open HTML in the old Safari with private browsing, or open the _local_ HTML file with Chrome that has blocked 3rd party cookies in `chrome://settings/content/cookies`).
 
 #### Docs
 
@@ -334,10 +381,8 @@ Through [global directives] or CLI options, you can set metadata for a converted
 |    `description`    | `--description` | Define description of the slide | HTML, PDF, PPTX |
 |      `author`       |   `--author`    | Define author of the slide deck | HTML, PDF, PPTX |
 |     `keywords`      |  `--keywords`   | Define comma-separated keywords | HTML, PDF       |
-|        `url`        |     `--url`     | Define [canonical URL] \*       | HTML            |
+|        `url`        |     `--url`     | Define [canonical URL]          | HTML            |
 |       `image`       |  `--og-image`   | Define [Open Graph] image URL   | HTML            |
-
-> \*: If could not parse a specified value as valid, the URL will be ignored.
 
 [canonical url]: https://en.wikipedia.org/wiki/Canonical_link_element
 [open graph]: http://ogp.me/
@@ -383,7 +428,9 @@ A custom theme created by user also can use easily by passing the path of CSS fi
 marp --theme custom-theme.css
 ```
 
-> :information_source: Normally [Marpit theme CSS requires `@theme` meta comment](https://marpit.marp.app/theme-css?id=metadata), but it's not required in this usage.
+> [!TIP]
+>
+> [Marpit theme CSS requires `@theme` meta comment](https://marpit.marp.app/theme-css?id=metadata) in regular use, but it's not required in this usage.
 
 ### Theme set
 
@@ -417,6 +464,8 @@ marp --engine @marp-team/marpit marpit-deck.md
 
 Notice that Marpit has not provided theme. It would be good to include inline style in Markdown, or pass CSS file by `--theme` option.
 
+> [!TIP]
+>
 > If you want to use the Marpit-based custom engine by the module name, the specified module must be exporting a class inherited from Marpit as the default export.
 
 ### Functional engine
@@ -455,7 +504,9 @@ export default async (constructorOptions) => {
 }
 ```
 
-> :information_source: Currently ES Modules can resolve only when using Marp CLI via Node.js. [The standalone binary](#standalone-binary) cannot resolve ESM due to [vercel/pkg#1291](https://github.com/vercel/pkg/issues/1291).
+> [!WARNING]
+>
+> Currently ES Modules can resolve only when using Marp CLI via Node.js. [The standalone binary](#standalone-binary) cannot resolve ESM. ([vercel/pkg#1291](https://github.com/vercel/pkg/issues/1291))
 
 #### `marp` getter property
 
@@ -551,7 +602,9 @@ By default we use configuration file that is placed on current directory, but yo
 
 If you want to prevent looking up a configuration file, you can pass `--no-config-file` (`--no-config`) option.
 
-> :information_source: Currently ES Modules can resolve only when using Marp CLI via Node.js. [The standalone binary](#standalone-binary) cannot resolve ESM due to [vercel/pkg#1291](https://github.com/vercel/pkg/issues/1291).
+> [!WARNING]
+>
+> Currently ES Modules can resolve only when using Marp CLI via Node.js. [The standalone binary](#standalone-binary) cannot resolve ESM. ([vercel/pkg#1291](https://github.com/vercel/pkg/issues/1291))
 
 ### Options
 
@@ -563,6 +616,10 @@ If you want to prevent looking up a configuration file, you can pass `--no-confi
 | ┗ `osc`           |           boolean           |      `--bespoke.osc`      | \[Bespoke\] Use on-screen controller (`true` by default)                                                    |
 | ┗ `progress`      |           boolean           |   `--bespoke.progress`    | \[Bespoke\] Use progress bar (`false` by default)                                                           |
 | ┗ `transition`    |           boolean           |  `--bespoke.transition`   | \[Bespoke\] Use [transitions] (Only in browsers supported [View Transitions API]: `true` by default)        |
+| `browser`         |     string \| string[]      |        `--browser`        | The kind of browser for conversion (`auto` by default)                                                      |
+| `browserPath`     |           string            |     `--browser-path`      | Path to the browser executable                                                                              |
+| `browserProtocol` |  `cdp` \| `webdriver-bidi`  |   `--browser-protocol`    | Set the preferred protocol for connecting to the browser (`cdp` by default)                                 |
+| `browserTimeout`  |           number            |    `--browser-timeout`    | Set the timeout for each browser operation in seconds (`30` by default)                                     |
 | `description`     |           string            |      `--description`      | Define description of the slide deck                                                                        |
 | `engine`          | string \| Class \| Function |        `--engine`         | Specify Marpit based engine                                                                                 |
 | `html`            |      boolean \| object      |         `--html`          | Enable or disable HTML tags (Configuration file can pass [the whitelist object] if you are using Marp Core) |
@@ -594,12 +651,12 @@ If you want to prevent looking up a configuration file, you can pass `--no-confi
 
 [the whitelist object]: https://github.com/marp-team/marp-core#html-boolean--object
 
-Some of options that cannot specify through CLI options can be configured by file.
-
-For example, `options` field can set the base options for the constructor of the used engine. You can fine-tune constructor options for the engine, [Marp Core](https://github.com/marp-team/marp-core#constructor-options) / [Marpit](https://marpit-api.marp.app/marpit).
+Some of options that cannot specify through CLI options can be configured by file. (e.g. `options` field for the constructor option of used engine)
 
 <details>
 <summary>Example: Customize engine's constructor option</summary>
+
+You can fine-tune constructor options for the engine, [Marp Core](https://github.com/marp-team/marp-core#constructor-options) / [Marpit](https://marpit-api.marp.app/marpit).
 
 ```json
 {
@@ -617,7 +674,9 @@ This configuration will set the constructor option for Marp Core as specified:
 - Disables [Marp Core's line breaks conversion](https://github.com/marp-team/marp-core#marp-markdown) (`\n` to `<br />`) to match for CommonMark, by passing [markdown-it's `breaks` option](https://markdown-it.github.io/markdown-it/#MarkdownIt.new) as `false`.
 - Disable minification for rendered theme CSS to make debug your style easily, by passing [`minifyCSS`](https://github.com/marp-team/marp-core#minifycss-boolean) as `false`.
 
-> :warning: Some options may be overridden by used template.
+> [!WARNING]
+>
+> Some options may be overridden by used template.
 
 </details>
 
