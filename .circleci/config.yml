@@ -17,14 +17,6 @@ executors:
       - image: cimg/node:<< parameters.version >><<# parameters.browser >>-browsers<</ parameters.browser >>
     working_directory: ~/marp-cli
 
-  # docker:
-  #   machine:
-  #     image: ubuntu-2204:2023.04.2
-  #     docker_layer_caching: true
-  #   working_directory: ~/marp-cli
-  #   environment:
-  #     DOCKER_BUILDKIT: 1
-
 commands:
   install:
     parameters:
@@ -120,58 +112,6 @@ commands:
           paths:
             - lib
 
-  # docker:
-  #   parameters:
-  #     tag:
-  #       type: string
-  #       default: latest
-  #     user:
-  #       type: env_var_name
-  #       default: DOCKER_USER
-  #     pass:
-  #       type: env_var_name
-  #       default: DOCKER_PASS
-  #     machine:
-  #       type: boolean
-  #       default: false
-  #   steps:
-  #     - checkout
-
-  #     - attach_workspace:
-  #         at: ~/marp-cli
-
-  #     - unless:
-  #         condition: << parameters.machine >>
-  #         steps:
-  #           - setup_remote_docker:
-  #               version: '20.10.2'
-
-  #     - run:
-  #         name: Login to Docker Hub
-  #         command: docker login -u ${<< parameters.user >>} -p ${<< parameters.pass >>}
-
-  #     - run:
-  #         name: Install Docker buildx
-  #         command: |
-  #           docker build --platform=local --quiet -o ~ "https://github.com/docker/buildx.git#v0.8.1"
-  #           mkdir -p ~/.docker/cli-plugins
-  #           mv ~/buildx ~/.docker/cli-plugins/docker-buildx
-  #         environment:
-  #           DOCKER_BUILDKIT: 1
-
-  #     - run:
-  #         name: Setup QEMU
-  #         command: docker run --privileged --rm tonistiigi/binfmt --install all
-
-  #     - run:
-  #         name: Build Docker image and push to Docker Hub
-  #         command: |
-  #           docker context create builder
-  #           docker buildx create --use builder
-  #           docker buildx build --no-cache --platform linux/amd64,linux/arm64 --progress plain --push -t marpteam/marp-cli:<< parameters.tag >> .
-  #         environment:
-  #           DOCKER_CLI_EXPERIMENTAL: enabled
-
 jobs:
   audit:
     executor: node
@@ -210,35 +150,9 @@ jobs:
       - lint
       - test
 
-  # Docker
-  # docker-build-latest:
-  #   executor: node
-  #   steps:
-  #     - build
-
-  # docker-image-latest:
-  #   executor: docker
-  #   steps:
-  #     - docker:
-  #         tag: latest
-  #         machine: true
-
-  # docker-build-tag:
-  #   executor: node
-  #   steps:
-  #     - build
-
-  # docker-image-tag:
-  #   executor: docker
-  #   steps:
-  #     - docker:
-  #         tag: $CIRCLE_TAG
-  #         machine: true
-
 workflows:
   test:
     jobs:
-      # Test
       - audit
       - test-node18:
           requires:
