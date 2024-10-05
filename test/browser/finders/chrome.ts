@@ -5,6 +5,7 @@ import { ChromeCdpBrowser } from '../../../src/browser/browsers/chrome-cdp'
 import { chromeFinder } from '../../../src/browser/finders/chrome'
 import * as utils from '../../../src/browser/finders/utils'
 import { CLIError } from '../../../src/error'
+import * as wsl from '../../../src/utils/wsl'
 
 jest.mock('chrome-launcher/dist/chrome-finder')
 
@@ -84,9 +85,15 @@ describe('Chrome finder', () => {
   describe('with Linux', () => {
     beforeEach(() => {
       jest.spyOn(utils, 'getPlatform').mockResolvedValue('linux')
+      jest.spyOn(wsl, 'isWSL').mockResolvedValue(0)
+
       jest
         .spyOn(chromeFinderModule, 'linux')
         .mockReturnValue(['/test/chrome', '/test/chromium'])
+
+      jest
+        .spyOn(chromeFinderModule, 'wsl')
+        .mockReturnValue(['/mnt/c/test/chrome.exe', '/mnt/c/test/chromium.exe'])
     })
 
     it('calls linux() in chrome-finder module and returns the first installation path', async () => {
@@ -104,6 +111,33 @@ describe('Chrome finder', () => {
 
       await expect(chromeFinder({})).rejects.toThrow(CLIError)
       expect(chromeFinderModule.linux).toHaveBeenCalled()
+    })
+
+    it('fallbacks to WSL resolution if in WSL 2 with mirrored network mode', async () => {
+      jest.spyOn(wsl, 'getWSL2NetworkingMode').mockResolvedValue('mirrored')
+      jest.spyOn(chromeFinderModule, 'linux').mockImplementation(() => {
+        throw new Error('Test error')
+      })
+
+      const chrome = await chromeFinder({})
+
+      expect(chrome).toStrictEqual({
+        path: '/mnt/c/test/chrome.exe',
+        acceptedBrowsers: [ChromeBrowser, ChromeCdpBrowser],
+      })
+      expect(chromeFinderModule.linux).toHaveBeenCalled()
+      expect(chromeFinderModule.wsl).toHaveBeenCalled()
+    })
+
+    it('throws error if in WSL 2 with NAT mode', async () => {
+      jest.spyOn(wsl, 'getWSL2NetworkingMode').mockResolvedValue('nat')
+      jest.spyOn(chromeFinderModule, 'linux').mockImplementation(() => {
+        throw new Error('Test error')
+      })
+
+      await expect(chromeFinder({})).rejects.toThrow(CLIError)
+      expect(chromeFinderModule.linux).toHaveBeenCalled()
+      expect(chromeFinderModule.wsl).not.toHaveBeenCalled()
     })
   })
 

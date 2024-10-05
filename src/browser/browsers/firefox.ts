@@ -13,14 +13,14 @@ export class FirefoxBrowser extends Browser {
   protected async launchPuppeteer(
     opts: PuppeteerLaunchOptions
   ): Promise<PuppeteerBrowser> {
-    const userDataDir = await this.puppeteerDataDir()
-
     return await launch(
       await this.generateLaunchOptions({
         ...opts,
 
         // NOTE: Currently Windows path is incompatible with Puppeteer's preparing
-        userDataDir: (await this.browserInWSLHost()) ? undefined : userDataDir,
+        userDataDir: (await this.browserInWSLHost())
+          ? undefined
+          : await this.puppeteerDataDir(),
       })
     )
   }

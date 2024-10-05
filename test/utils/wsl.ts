@@ -17,13 +17,29 @@ describe('#translateWSLPathToWindows', () => {
       .spyOn(childProcess, 'execFile')
       .mockImplementation((fn, args, cb: any): any => {
         expect(fn).toBe('wslpath')
-        expect(args).toStrictEqual(['-m', '/mnt/c/Users/foo/bar'])
+        expect(args).toStrictEqual(['-w', '/mnt/c/Users/foo/bar'])
         cb(null, { stdout: '\nC:\\Users\\foo\\bar\n', stderr: '' })
       })
 
     expect(await wsl().translateWSLPathToWindows('/mnt/c/Users/foo/bar')).toBe(
       'C:\\Users\\foo\\bar'
     )
+  })
+
+  it('resolves WSL path to Windows path with slash if the second argument is true', async () => {
+    expect.assertions(3)
+
+    jest
+      .spyOn(childProcess, 'execFile')
+      .mockImplementation((fn, args, cb: any): any => {
+        expect(fn).toBe('wslpath')
+        expect(args).toStrictEqual(['-m', '/mnt/c/Users/foo/bar'])
+        cb(null, { stdout: '\nC:/Users/foo/bar\n', stderr: '' })
+      })
+
+    expect(
+      await wsl().translateWSLPathToWindows('/mnt/c/Users/foo/bar', true)
+    ).toBe('C:/Users/foo/bar')
   })
 })
 
@@ -59,6 +75,76 @@ describe('#getWindowsEnv', () => {
 
     expect(await wsl().getWindowsEnv('TMP')).toBe('123')
     expect(await wsl().getWindowsEnv('XXX')).toBeUndefined()
+  })
+})
+
+describe('#getWSL2NetworkingMode', () => {
+  let originalWSLDistroName: string | undefined
+  let originalWSLInterop: string | undefined
+
+  beforeEach(() => {
+    originalWSLDistroName = process.env.WSL_DISTRO_NAME
+    originalWSLInterop = process.env.WSL_INTEROP
+
+    process.env.WSL_DISTRO_NAME = ''
+    process.env.WSL_INTEROP = ''
+  })
+
+  afterEach(() => {
+    process.env.WSL_DISTRO_NAME = originalWSLDistroName
+    process.env.WSL_INTEROP = originalWSLInterop
+
+    jest.dontMock('is-wsl')
+  })
+
+  it('returns null if not running on WSL', async () => {
+    jest.doMock('is-wsl', () => false)
+    expect(await wsl().getWSL2NetworkingMode()).toBeNull()
+  })
+
+  it('returns null if running on WSL 1', async () => {
+    jest.doMock('is-wsl', () => true)
+    jest
+      .spyOn(fs.promises, 'readFile')
+      .mockResolvedValue(
+        'Linux version 4.5.6-12345-Microsoft (gcc version 5.4.0 (GCC) )'
+      )
+
+    expect(await wsl().getWSL2NetworkingMode()).toBeNull()
+  })
+
+  it('return the result of "wslinfo --networking-mode" if running on WSL 2', async () => {
+    expect.assertions(3)
+
+    jest.doMock('is-wsl', () => true)
+
+    // WSL 2
+    process.env.WSL_DISTRO_NAME = 'Ubuntu'
+    process.env.WSL_INTEROP = '/run/WSL/11_interop'
+
+    jest
+      .spyOn(childProcess, 'execFile')
+      .mockImplementation((fn, args, cb: any): any => {
+        expect(fn).toBe('wslinfo')
+        expect(args).toStrictEqual(['--networking-mode'])
+        cb(null, { stdout: '\nmirrored\n', stderr: '' })
+      })
+
+    expect(await wsl().getWSL2NetworkingMode()).toBe('mirrored')
+  })
+
+  it('returns the default result "nat" if running on WSL 2 but "wslinfo" cannot exec', async () => {
+    jest.doMock('is-wsl', () => true)
+
+    // WSL 2
+    process.env.WSL_DISTRO_NAME = 'Ubuntu'
+    process.env.WSL_INTEROP = '/run/WSL/11_interop'
+
+    jest.spyOn(childProcess, 'execFile').mockImplementation(() => {
+      throw new Error('Failed to exec wslinfo')
+    })
+
+    expect(await wsl().getWSL2NetworkingMode()).toBe('nat')
   })
 })
 

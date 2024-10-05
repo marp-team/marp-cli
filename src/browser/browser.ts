@@ -1,9 +1,9 @@
+import { EventEmitter } from 'node:events'
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
-import { EventEmitter } from 'node:events'
-import { launch } from 'puppeteer-core'
 import { nanoid } from 'nanoid'
+import { launch } from 'puppeteer-core'
 import type {
   Browser as PuppeteerBrowser,
   ProtocolType,
@@ -11,8 +11,8 @@ import type {
   Page,
 } from 'puppeteer-core'
 import type TypedEventEmitter from 'typed-emitter'
-import { getWindowsEnv, isWSL, translateWindowsPathToWSL } from '../utils/wsl'
 import { debugBrowser } from '../utils/debug'
+import { getWindowsEnv, isWSL, translateWindowsPathToWSL } from '../utils/wsl'
 
 export type BrowserKind = 'chrome' | 'firefox'
 export type BrowserProtocol = ProtocolType
@@ -134,7 +134,7 @@ export abstract class Browser
   protected async generateLaunchOptions(
     mergeOptions: PuppeteerLaunchOptions = {}
   ): Promise<PuppeteerLaunchOptions> {
-    return {
+    const opts = {
       browser: this.kind,
       executablePath: this.path,
       headless: true,
@@ -143,10 +143,14 @@ export abstract class Browser
       timeout: this.timeout,
       ...mergeOptions,
     }
+
+    // Don't pass Linux environment variables to Windows process
+    if (await this.browserInWSLHost()) opts.env = {}
+
+    return opts
   }
 
   /** @internal */
-
   protected async puppeteerDataDir() {
     if (this._puppeteerDataDir === undefined) {
       let needToTranslateWindowsPathToWSL = false
