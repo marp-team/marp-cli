@@ -3,7 +3,6 @@ import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import { nanoid } from 'nanoid'
-import { launch } from 'puppeteer-core'
 import type {
   Browser as PuppeteerBrowser,
   ProtocolType,
@@ -123,12 +122,10 @@ export abstract class Browser
     )
   }
 
-  /** @internal Overload in subclass to customize launch behavior */
-  protected async launchPuppeteer(
+  /** @internal Overload launch behavior in subclass */
+  protected abstract launchPuppeteer(
     opts: PuppeteerLaunchOptions
-  ): Promise<PuppeteerBrowser> {
-    return await launch(await this.generateLaunchOptions(opts))
-  }
+  ): Promise<PuppeteerBrowser>
 
   /** @internal */
   protected async generateLaunchOptions(
