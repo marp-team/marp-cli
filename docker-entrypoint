@@ -1,3 +1,3 @@
-#!/bin/ash
+#!/bin/sh
 
-exec su-exec "$MARP_USER" node /home/marp/.cli/marp-cli.js "$@"
+exec gosu "$MARP_USER" node /home/marp/.cli/marp-cli.js "$@"

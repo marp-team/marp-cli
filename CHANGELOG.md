@@ -2,12 +2,17 @@
 
 ## [Unreleased]
 
-### Breaking
+> [!IMPORTANT]
+>
+> See also https://github.com/orgs/marp-team/discussions/533 about new changes in Marp Core.
+
+### ⚡️ Breaking
 
 - End-of-Lifed Node.js 16 is no longer supported, and required Node.js 18 and later ([#591](https://github.com/marp-team/marp-cli/pull/591))
 - Upgrade Marp Core to [v4.0.0](https://github.com/marp-team/marp-core/releases/v4.0.0) ([#591](https://github.com/marp-team/marp-cli/pull/591))
   - The slide container of built-in themes became the block element and adopted safe centering
   - Relax HTML allowlist: Allowed a lot of HTML elements and attributes by default
+- The container image is now based on Debian instead of Alpine ([#608](https://github.com/marp-team/marp-cli/pull/608))
 
 ### Added
 
@@ -15,14 +20,15 @@
 - `--browser` and some related options to control the browser for conversion ([#603](https://github.com/marp-team/marp-cli/pull/603))
 - Find Chrome and Edge from the host Windows as a fallback when [WSL 2 networking is mirrored mode](https://learn.microsoft.com/windows/wsl/networking#mirrored-mode-networking) ([#604](https://github.com/marp-team/marp-cli/pull/604))
 - `--debug` (`-d`) option to CLI interface ([#599](https://github.com/marp-team/marp-cli/pull/599))
+- Publish the container image to GitHub Container Registry ([#578](https://github.com/marp-team/marp-cli/issues/578), [#608](https://github.com/marp-team/marp-cli/pull/608))
 - CI testing against Node.js v22 ([#591](https://github.com/marp-team/marp-cli/pull/591))
 
 ### Changed
 
-- Use [the new headless mode of Chrome](https://developer.chrome.com/docs/chromium/headless) while converting by default ([#593](https://github.com/marp-team/marp-cli/pull/593))
-  - You can get back to the old headless mode by setting `PUPPETEER_HEADLESS_MODE=old` env.
 - Upgrade Marpit to [v3.1.1](https://github.com/marp-team/marpit/releases/tag/v3.1.1) ([#591](https://github.com/marp-team/marp-cli/pull/591))
   - Support for CSS nesting
+- Use [the new headless mode of Chrome](https://developer.chrome.com/docs/chromium/headless) while converting by default ([#593](https://github.com/marp-team/marp-cli/pull/593))
+  - You can get back to the old headless mode by setting `PUPPETEER_HEADLESS_MODE=old` env.
 - Upgrade development Node.js LTS to v20.17.0 ([#591](https://github.com/marp-team/marp-cli/pull/591))
 - Upgrade dependent packages to the latest versions ([#591](https://github.com/marp-team/marp-cli/pull/591), [#598](https://github.com/marp-team/marp-cli/pull/598))
 - Migrate ESLint config to flat config ([#606](https://github.com/marp-team/marp-cli/pull/606))

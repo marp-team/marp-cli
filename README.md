@@ -50,13 +50,25 @@ npx @marp-team/marp-cli@latest -s ./slides
 [microsoft edge]: https://www.microsoft.com/edge
 [mozilla firefox]: https://www.mozilla.org/firefox/new/
 
-### Docker
+### Container image
 
-Don't you like installing Node.js and Chrome to local? We have [an official Docker image `marpteam/marp-cli`][marp-cli-docker] ready to use CLI.
+Don't you like installing Node.js and Chrome to local? We have an official container image that is ready to use CLI.
 
-[Please refer how to use at Docker Hub.][marp-cli-docker]
+[**⏩ Please refer how to use at Docker Hub.**][marp-cli-docker]
 
 [marp-cli-docker]: https://hub.docker.com/r/marpteam/marp-cli/
+
+#### [Docker Hub][marp-cli-docker]
+
+```bash
+docker pull marpteam/marp-cli
+```
+
+#### [GitHub Container Registry](https://github.com/marp-team/marp-cli/pkgs/container/marp-cli)
+
+```bash
+docker pull ghcr.io/marp-team/marp-cli
+```
 
 ## Install
 
@@ -109,7 +121,7 @@ npm install -g @marp-team/marp-cli
 
 We also provide standalone binaries for Linux, macOS, and Windows. These have bundled Marp CLI with Node.js binary, so no need to install Node.js separately.
 
-**[:fast_forward: Download the latest standalone binary from release page.][releases]**
+**[⏩ Download the latest standalone binary from release page.][releases]**
 
 [releases]: https://github.com/marp-team/marp-cli/releases
 
@@ -548,7 +560,7 @@ By using `--version` (`-v`) option, you may confirm the version of engine that i
 
 ```console
 $ marp --version
-@marp-team/marp-cli v1.x.x (w/ @marp-team/marp-core v2.x.x)
+@marp-team/marp-cli v41.x.x (w/ @marp-team/marp-core v4.x.x)
 ```
 
 ### Use specific version of Marp Core
@@ -558,9 +570,9 @@ Marp CLI prefers to use _an installed core to local project by user_ than the bu
 If the current project has installed `@marp-team/marp-core` individually, it would show its version and the annotation: `w/ user-installed @marp-team/marp-core vX.X.X` or `w/ customized engine`.
 
 ```console
-$ npm i @marp-team/marp-cli @marp-team/marp-core@^3.2.0 --save-dev
+$ npm i @marp-team/marp-cli @marp-team/marp-core@^4.0.0 --save-dev
 $ npx marp --version
-@marp-team/marp-cli v2.x.x (w/ user-installed @marp-team/marp-core v3.2.0)
+@marp-team/marp-cli v4.x.x (w/ user-installed @marp-team/marp-core v4.0.0)
 ```
 
 ## Configuration file
