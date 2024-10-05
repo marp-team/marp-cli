@@ -1,5 +1,6 @@
 import path from 'node:path'
 import { error, CLIErrorCode } from '../../error'
+// import { getWSL2NetworkingMode } from '../../utils/wsl'
 import { FirefoxBrowser } from '../browsers/firefox'
 import type { BrowserFinder, BrowserFinderResult } from '../finder'
 import {
@@ -36,9 +37,15 @@ export const firefoxFinder: BrowserFinder = async ({ preferredPath } = {}) => {
       case 'win32':
         return await firefoxFinderWin32()
       case 'wsl1':
-        return await firefoxFinderWSL1()
+        return await firefoxFinderWSL()
     }
-    return await firefoxFinderFallback()
+
+    return await firefoxFinderLinuxOrFallback()
+    /*
+    || ((await getWSL2NetworkingMode()) === 'mirrored'
+      ? await firefoxFinderWSL() // WSL2 Fallback
+      : undefined)
+    */
   })()
 
   if (installation) return firefox(installation)
@@ -92,7 +99,7 @@ const firefoxFinderWin32 = async () => {
   )
 }
 
-const firefoxFinderWSL1 = async () => {
+const firefoxFinderWSL = async () => {
   const prefixes: string[] = []
 
   const winDriveMatcher = /^\/mnt\/[a-z]\//i
@@ -126,7 +133,7 @@ const firefoxFinderWSL1 = async () => {
   )
 }
 
-const firefoxFinderFallback = async () =>
+const firefoxFinderLinuxOrFallback = async () =>
   await findExecutableBinary(
     // In Linux, Firefox must have only an executable name `firefox` in every
     // editions, but some distributions may have provided different executable

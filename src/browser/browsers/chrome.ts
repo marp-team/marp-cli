@@ -1,7 +1,3 @@
-import fs from 'node:fs'
-import os from 'node:os'
-import path from 'node:path'
-import { nanoid } from 'nanoid'
 import { launch } from 'puppeteer-core'
 import type {
   Browser as PuppeteerBrowser,
@@ -9,31 +5,14 @@ import type {
 } from 'puppeteer-core'
 import { CLIErrorCode, error, isError } from '../../error'
 import { isInsideContainer } from '../../utils/container'
-import { debugBrowser } from '../../utils/debug'
-import {
-  isWSL,
-  getWindowsEnv,
-  translateWindowsPathToWSL,
-} from '../../utils/wsl'
+import { isWSL } from '../../utils/wsl'
 import { Browser } from '../browser'
-import type { BrowserKind, BrowserProtocol, BrowserOptions } from '../browser'
+import type { BrowserKind, BrowserProtocol } from '../browser'
 import { isSnapBrowser } from '../finders/utils'
-
-let wslTmp: string | undefined
 
 export class ChromeBrowser extends Browser {
   static readonly kind: BrowserKind = 'chrome'
   static readonly protocol: BrowserProtocol = 'webDriverBiDi'
-
-  private _puppeteerDataDir?: string
-
-  #dataDirName: string
-
-  constructor(opts: BrowserOptions) {
-    super(opts)
-
-    this.#dataDirName = `marp-cli-${nanoid(10)}`
-  }
 
   protected async launchPuppeteer(
     opts: Omit<PuppeteerLaunchOptions, 'userDataDir'> // userDataDir cannot overload in current implementation
@@ -49,7 +28,7 @@ export class ChromeBrowser extends Browser {
       ignoreDefaultArgsSet.add('--disable-extensions')
     }
 
-    const baseOpts = this.generateLaunchOptions({
+    const baseOpts = await this.generateLaunchOptions({
       headless: this.puppeteerHeadless(),
       pipe: await this.puppeteerPipe(),
       // userDataDir: await this.puppeteerDataDir(), // userDataDir will set in args option due to wrong path normalization in WSL
@@ -124,35 +103,5 @@ export class ChromeBrowser extends Browser {
   private puppeteerHeadless() {
     const modeEnv = process.env.PUPPETEER_HEADLESS_MODE?.toLowerCase() ?? ''
     return ['old', 'legacy', 'shell'].includes(modeEnv) ? 'shell' : true
-  }
-
-  private async puppeteerDataDir() {
-    if (this._puppeteerDataDir === undefined) {
-      let needToTranslateWindowsPathToWSL = false
-
-      this._puppeteerDataDir = await (async () => {
-        // In WSL environment, Marp CLI may use Chrome on Windows. If Chrome has
-        // located in host OS (Windows), we have to specify Windows path.
-        if (await this.browserInWSLHost()) {
-          if (wslTmp === undefined) wslTmp = await getWindowsEnv('TMP')
-          if (wslTmp !== undefined) {
-            needToTranslateWindowsPathToWSL = true
-            return path.win32.resolve(wslTmp, this.#dataDirName)
-          }
-        }
-        return path.resolve(os.tmpdir(), this.#dataDirName)
-      })()
-
-      debugBrowser(`Chrome data directory: %s`, this._puppeteerDataDir)
-
-      // Ensure the data directory is created
-      const mkdirPath = needToTranslateWindowsPathToWSL
-        ? await translateWindowsPathToWSL(this._puppeteerDataDir)
-        : this._puppeteerDataDir
-
-      await fs.promises.mkdir(mkdirPath, { recursive: true })
-      debugBrowser(`Created data directory: %s`, mkdirPath)
-    }
-    return this._puppeteerDataDir
   }
 }

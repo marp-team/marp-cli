@@ -161,7 +161,7 @@ export class Converter {
         const browser = await this.browser
 
         return (await browser.browserInWSLHost())
-          ? `file:${await translateWSLPathToWindows(f.absolutePath)}`
+          ? `file:${await translateWSLPathToWindows(f.absolutePath, true)}`
           : f.absoluteFileScheme
       }
 
@@ -643,7 +643,7 @@ export class Converter {
 
     if (tmpFile) {
       if (await browser.browserInWSLHost()) {
-        uri = `file:${await translateWSLPathToWindows(tmpFile.path)}`
+        uri = `file:${await translateWSLPathToWindows(tmpFile.path, true)}`
       } else {
         uri = `file://${tmpFile.path}`
       }

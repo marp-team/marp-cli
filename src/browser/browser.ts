@@ -1,5 +1,8 @@
 import { EventEmitter } from 'node:events'
-import { launch } from 'puppeteer-core'
+import fs from 'node:fs'
+import os from 'node:os'
+import path from 'node:path'
+import { nanoid } from 'nanoid'
 import type {
   Browser as PuppeteerBrowser,
   ProtocolType,
@@ -7,7 +10,8 @@ import type {
   Page,
 } from 'puppeteer-core'
 import type TypedEventEmitter from 'typed-emitter'
-import { isWSL } from '../utils/wsl'
+import { debugBrowser } from '../utils/debug'
+import { getWindowsEnv, isWSL, translateWindowsPathToWSL } from '../utils/wsl'
 
 export type BrowserKind = 'chrome' | 'firefox'
 export type BrowserProtocol = ProtocolType
@@ -24,6 +28,8 @@ type BrowserEvents = {
   launch: (browser: PuppeteerBrowser) => void
 }
 
+let wslTmp: string | undefined
+
 const wslHostMatcher = /^\/mnt\/[a-z]\//
 
 export abstract class Browser
@@ -37,10 +43,14 @@ export abstract class Browser
   protocolTimeout: number
   puppeteer: PuppeteerBrowser | undefined
   timeout: number
+  #dataDirName: string
+
+  private _puppeteerDataDir?: string
 
   constructor(opts: BrowserOptions) {
     super()
 
+    this.#dataDirName = `marp-cli-${nanoid(10)}`
     this.path = opts.path
     this.timeout = opts.timeout ?? 30000
     this.protocolTimeout =
@@ -62,6 +72,8 @@ export abstract class Browser
       puppeteer.once('disconnected', () => {
         this.emit('disconnect', puppeteer)
         this.puppeteer = undefined
+
+        debugBrowser('Browser disconnected (Cleaned up puppeteer instance)')
       })
 
       this.puppeteer = puppeteer
@@ -110,18 +122,16 @@ export abstract class Browser
     )
   }
 
-  /** @internal Overload in subclass to customize launch behavior */
-  protected async launchPuppeteer(
+  /** @internal Overload launch behavior in subclass */
+  protected abstract launchPuppeteer(
     opts: PuppeteerLaunchOptions
-  ): Promise<PuppeteerBrowser> {
-    return await launch(this.generateLaunchOptions(opts))
-  }
+  ): Promise<PuppeteerBrowser>
 
   /** @internal */
-  protected generateLaunchOptions(
+  protected async generateLaunchOptions(
     mergeOptions: PuppeteerLaunchOptions = {}
-  ): PuppeteerLaunchOptions {
-    return {
+  ): Promise<PuppeteerLaunchOptions> {
+    const opts = {
       browser: this.kind,
       executablePath: this.path,
       headless: true,
@@ -130,5 +140,41 @@ export abstract class Browser
       timeout: this.timeout,
       ...mergeOptions,
     }
+
+    // Don't pass Linux environment variables to Windows process
+    if (await this.browserInWSLHost()) opts.env = {}
+
+    return opts
+  }
+
+  /** @internal */
+  protected async puppeteerDataDir() {
+    if (this._puppeteerDataDir === undefined) {
+      let needToTranslateWindowsPathToWSL = false
+
+      this._puppeteerDataDir = await (async () => {
+        // In WSL environment, Marp CLI may use Chrome on Windows. If Chrome has
+        // located in host OS (Windows), we have to specify Windows path.
+        if (await this.browserInWSLHost()) {
+          if (wslTmp === undefined) wslTmp = await getWindowsEnv('TMP')
+          if (wslTmp !== undefined) {
+            needToTranslateWindowsPathToWSL = true
+            return path.win32.resolve(wslTmp, this.#dataDirName)
+          }
+        }
+        return path.resolve(os.tmpdir(), this.#dataDirName)
+      })()
+
+      debugBrowser(`Chrome data directory: %s`, this._puppeteerDataDir)
+
+      // Ensure the data directory is created
+      const mkdirPath = needToTranslateWindowsPathToWSL
+        ? await translateWindowsPathToWSL(this._puppeteerDataDir)
+        : this._puppeteerDataDir
+
+      await fs.promises.mkdir(mkdirPath, { recursive: true })
+      debugBrowser(`Created data directory: %s`, mkdirPath)
+    }
+    return this._puppeteerDataDir
   }
 }

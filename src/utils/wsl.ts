@@ -6,8 +6,13 @@ import { debug } from './debug'
 const execFile = promisify(cpExecFile)
 const resolveStdout = ({ stdout }: { stdout: string }) => stdout.trim()
 
-export const translateWSLPathToWindows = async (wslPath: string) =>
-  await execFile('wslpath', ['-m', wslPath]).then(resolveStdout)
+export const translateWSLPathToWindows = async (
+  wslPath: string,
+  useSlash = false
+) =>
+  await execFile('wslpath', [useSlash ? '-m' : '-w', wslPath]).then(
+    resolveStdout
+  )
 
 export const translateWindowsPathToWSL = async (winPath: string) =>
   await execFile('wslpath', ['-u', winPath]).then(resolveStdout)
@@ -18,6 +23,34 @@ export const getWindowsEnv = async (envName: string) => {
   )
   if (ret.startsWith(`${envName}=`)) return ret.slice(envName.length + 1)
   return undefined
+}
+
+type WSL2NetworkingMode = 'nat' | 'mirrored'
+
+let wslNetworkingMode:
+  | WSL2NetworkingMode
+  | null
+  | Promise<WSL2NetworkingMode | null>
+  | undefined
+
+export const getWSL2NetworkingMode = async () => {
+  if (wslNetworkingMode === undefined) {
+    wslNetworkingMode = (async () => {
+      if ((await isWSL()) !== 2) return null
+      try {
+        return (
+          await execFile('wslinfo', ['--networking-mode']).then(resolveStdout)
+        ).toLowerCase() as WSL2NetworkingMode
+      } catch (e) {
+        debug('Error while detecting WSL networking mode: %o', e)
+        return 'nat' // Default
+      }
+    })().then(
+      (correctedWSLNetworkingMode) =>
+        (wslNetworkingMode = correctedWSLNetworkingMode)
+    )
+  }
+  return await wslNetworkingMode
 }
 
 let isWsl: number | Promise<number> | undefined

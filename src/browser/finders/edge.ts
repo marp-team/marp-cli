@@ -1,6 +1,10 @@
 import path from 'node:path'
 import { error, CLIErrorCode } from '../../error'
-import { translateWindowsPathToWSL, getWindowsEnv } from '../../utils/wsl'
+import {
+  translateWindowsPathToWSL,
+  getWindowsEnv,
+  getWSL2NetworkingMode,
+} from '../../utils/wsl'
 import { ChromeBrowser } from '../browsers/chrome'
 import { ChromeCdpBrowser } from '../browsers/chrome-cdp'
 import type { BrowserFinder, BrowserFinderResult } from '../finder'
@@ -20,11 +24,16 @@ export const edgeFinder: BrowserFinder = async ({ preferredPath } = {}) => {
       case 'darwin':
         return await edgeFinderDarwin()
       case 'linux':
-        return await edgeFinderLinux()
+        return (
+          (await edgeFinderLinux()) ||
+          ((await getWSL2NetworkingMode()) === 'mirrored'
+            ? await edgeFinderWSL() // WSL2 Fallback
+            : undefined)
+        )
       case 'win32':
         return await edgeFinderWin32()
       case 'wsl1':
-        return await edgeFinderWSL1()
+        return await edgeFinderWSL()
     }
     return undefined
   })()
@@ -79,7 +88,7 @@ const edgeFinderWin32 = async ({
   return await findExecutable(paths)
 }
 
-const edgeFinderWSL1 = async () => {
+const edgeFinderWSL = async () => {
   const localAppData = await getWindowsEnv('LOCALAPPDATA')
 
   return await edgeFinderWin32({

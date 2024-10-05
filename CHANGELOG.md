@@ -13,6 +13,7 @@
 
 - Initial support for Firefox / WebDriver BiDi protocol during conversion ([#565](https://github.com/marp-team/marp-cli/issues/565), [#597](https://github.com/marp-team/marp-cli/pull/597))
 - `--browser` and some related options to control the browser for conversion ([#603](https://github.com/marp-team/marp-cli/pull/603))
+- Find Chrome and Edge from the host Windows as a fallback when [WSL 2 networking is mirrored mode](https://learn.microsoft.com/windows/wsl/networking#mirrored-mode-networking) ([#604](https://github.com/marp-team/marp-cli/pull/604))
 - `--debug` (`-d`) option to CLI interface ([#599](https://github.com/marp-team/marp-cli/pull/599))
 - CI testing against Node.js v22 ([#591](https://github.com/marp-team/marp-cli/pull/591))
 
