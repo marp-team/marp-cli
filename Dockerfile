@@ -1,5 +1,5 @@
 #################### Build Marp CLI ####################
-FROM node:20.17.0-bookworm-slim AS build
+FROM --platform=$BUILDPLATFORM node:20.17.0-bookworm-slim AS build
 WORKDIR /home/node/marp-cli
 COPY . .
 RUN npm ci && npm run build
