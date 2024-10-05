@@ -8,9 +8,6 @@ on:
   # For debugging standalone packages
   workflow_dispatch:
 
-env:
-  YARN_VERSION: '^1.22.22'
-
 jobs:
   github-release:
     runs-on: ubuntu-latest
@@ -42,13 +39,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
-      - name: Install yarn
-        run: cd $HOME && yarn policies set-version $YARN_VERSION
-      - run: yarn install --frozen-lockfile
+          cache: 'npm'
+      - run: npm ci
       - name: Build and create standalone binaries
-        run: yarn build:standalone
+        run: npm run build:standalone
       - name: Create package
-        run: yarn standalone:pack
+        run: npm run standalone:pack
         env:
           MATRIX_OS: ${{ matrix.os }}
       - uses: actions/upload-artifact@v4

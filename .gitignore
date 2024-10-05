@@ -4,6 +4,7 @@ tmp/
 types/
 node_modules/**
 !/test/_files/node_modules/ignore.*
+yarn.lock
 
 ########## gitignore.io ##########
 # Created by https://www.gitignore.io/api/node,windows,macos,linux,sublimetext,emacs,vim,visualstudiocode

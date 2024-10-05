@@ -16,10 +16,10 @@ We are following [**the contributing guideline of Marp team projects**][team-con
 
 ```bash
 # Build (Bundle and minify)
-yarn build
+npm run build
 
 # Watch (Bundle only)
-yarn watch
+npm run watch
 ```
 
 ### Use built version
@@ -36,7 +36,7 @@ Standalone binaries created by [pkg](https://github.com/zeit/pkg) will output to
 
 ```bash
 # Build & create standalone binaries
-yarn build:standalone
+npm run build:standalone
 ```
 
 ```bash

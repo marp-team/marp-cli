@@ -11,7 +11,7 @@ import typescript from '@rollup/plugin-typescript'
 import url from '@rollup/plugin-url'
 import license from 'rollup-plugin-license'
 import postcss from 'rollup-plugin-postcss'
-import pugPlugin from 'rollup-plugin-pug'
+import { pug } from './scripts/rollup-pug.mjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const require = createRequire(import.meta.url)
@@ -41,7 +41,7 @@ const plugins = (opts = {}) => [
   commonjs(),
   typescript({ noEmitOnError: false }),
   postcss({ inject: false }),
-  pugPlugin({ pugRuntime: 'pug-runtime' }),
+  pug(),
   url({
     sourceDir: path.join(__dirname, 'lib'),
     limit: 30720,

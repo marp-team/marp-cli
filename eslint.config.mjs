@@ -58,9 +58,9 @@ export default tseslint.config(
       reportUnusedDisableDirectives: 'error',
     },
     languageOptions: {
-      ecmaVersion: 'latest',
       parserOptions: {
         ecmaFeatures: { jsx: true },
+        ecmaVersion: 'latest',
       },
       globals: {
         ...globals.node,
