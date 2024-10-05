@@ -1,7 +1,11 @@
 **/*
-!lib/
+!src/
+!scripts/
 !docker-entrypoint
 !LICENSE
 !marp-cli.js
 !package.json
 !package-lock.json
+!postcss.config.js
+!rollup.config.mjs
+!tsconfig.json
