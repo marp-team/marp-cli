@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v4.0.0 - 2024-10-05
+
 > [!IMPORTANT]
 >
 > See also https://github.com/orgs/marp-team/discussions/533 about new changes in Marp Core.
