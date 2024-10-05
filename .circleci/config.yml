@@ -28,58 +28,44 @@ executors:
 commands:
   install:
     parameters:
-      force:
-        type: boolean
-        default: false
       postinstall:
         type: steps
         default: []
-      yarn:
-        type: string
-        default: '^1.22.22'
     steps:
-      - run:
-          name: Upgrade yarn for current user
-          command: cd ~ && yarn policies set-version << parameters.yarn >>
-
       - restore_cache:
           keys:
-            - v2.4-dependencies-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}-{{ .Branch }}
-            - v2.4-dependencies-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}-
-            - v2.4-dependencies-{{ .Environment.CIRCLE_JOB }}-
+            - v3-dependencies-{{ .Environment.CIRCLE_JOB }}-{{ checksum "package-lock.json" }}-{{ .Branch }}
+            - v3-dependencies-{{ .Environment.CIRCLE_JOB }}-{{ checksum "package-lock.json" }}-
+            - v3-dependencies-{{ .Environment.CIRCLE_JOB }}-
 
       - run: |
-          yarn install --frozen-lockfile <<# parameters.force >>--ignore-engines<</ parameters.force >>
-          yarn patch-package
+          npm ci
+          npx patch-package
 
       - steps: << parameters.postinstall >>
 
       - save_cache:
-          key: v2.4-dependencies-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}-{{ .Branch }}
+          key: v3-dependencies-{{ .Environment.CIRCLE_JOB }}-{{ checksum "package-lock.json" }}-{{ .Branch }}
           paths:
-            - ~/.cache/yarn
+            - ~/.npm
 
   audit:
     steps:
       - checkout
       - install:
           postinstall:
-            - run: yarn -s check:audit
+            - run: npm -s run check:audit
 
   prepare:
     parameters:
       browser:
         type: boolean
         default: false
-      force:
-        type: boolean
-        default: false
     steps:
       - run: node --version
 
       - checkout
-      - install:
-          force: << parameters.force >>
+      - install
 
       - when:
           condition: << parameters.browser >>
@@ -90,25 +76,25 @@ commands:
     steps:
       - run:
           name: Prettier formatting
-          command: yarn check:format
+          command: npm run check:format
 
       - run:
           name: TypeScript type checking
-          command: yarn check:ts
+          command: npm run check:ts
 
       - run:
           name: ESLint
-          command: yarn lint:js
+          command: npm run lint:js
 
       - run:
           name: stylelint
-          command: yarn lint:css
+          command: npm run lint:css
 
   test:
     steps:
       - run:
           name: Jest
-          command: yarn test:coverage --ci -i --reporters=default --reporters=jest-junit
+          command: npm run test:coverage -- --ci -i --reporters=default --reporters=jest-junit
           environment:
             JEST_JUNIT_OUTPUT_DIR: tmp/test-results
 
@@ -127,7 +113,7 @@ commands:
       - checkout
       - install
 
-      - run: yarn build
+      - run: npm run build
 
       - persist_to_workspace:
           root: ~/marp-cli
@@ -199,7 +185,6 @@ jobs:
       version: '18.20'
     steps:
       - prepare:
-          force: true
           browser: true
       - lint
       - test

@@ -8,9 +8,6 @@ on:
 #   group: ${{ github.workflow }}-${{ (github.ref_name == 'main' && github.run_id) || format('{0}-{1}', github.actor, github.head_ref || github.ref_name) }}
 #   cancel-in-progress: true
 
-env:
-  YARN_VERSION: '^1.22.22'
-
 jobs:
   win-test:
     runs-on: windows-latest
@@ -22,9 +19,6 @@ jobs:
           - '^18.20.4'
           - '20.17.0'
           - '^22.8.0'
-        include:
-          - node-version: '^18.20.4'
-            force: true
 
     steps:
       # - name: Output concurrency group
@@ -36,12 +30,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: yarn
+          cache: npm
 
-      - name: Install dependencies with yarn
+      - name: Install dependencies
         run: |
-          yarn install --frozen-lockfile ${{ matrix.force && '--ignore-engines' || '' }}
-          yarn patch-package
+          npm ci
+          npx patch-package
 
       # Retry tests up to 3 times due to flaky tests on Windows CI
       # https://stackoverflow.com/a/59365905
@@ -49,9 +43,9 @@ jobs:
         env:
           CI: true
         run: >-
-          yarn test:coverage --ci -i --reporters=default --reporters=jest-junit --forceExit ||
-          yarn test:coverage --ci -i --reporters=default --reporters=jest-junit --forceExit --no-cache ||
-          yarn test:coverage --ci -i --reporters=default --reporters=jest-junit --forceExit --no-cache
+          npm run test:coverage -- --ci -i --reporters=default --reporters=jest-junit --forceExit ||
+          npm run test:coverage -- --ci -i --reporters=default --reporters=jest-junit --forceExit --no-cache ||
+          npm run test:coverage -- --ci -i --reporters=default --reporters=jest-junit --forceExit --no-cache
 
       - uses: actions/upload-artifact@v4
         with:

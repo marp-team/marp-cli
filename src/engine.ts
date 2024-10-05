@@ -5,7 +5,7 @@ import type { Marp } from '@marp-team/marp-core'
 import { Marpit } from '@marp-team/marpit'
 import importFrom from 'import-from'
 import { resolve as importMetaResolve } from 'import-meta-resolve'
-import { pkgUp } from 'pkg-up'
+import { packageUp } from 'package-up'
 import { error, isError } from './error'
 import { isStandaloneBinary } from './utils/binary'
 import { debugEngine } from './utils/debug'
@@ -117,7 +117,7 @@ export class ResolvedEngine<T extends Engine = Engine> {
     const classPath = this.findClassPath(this.klass)
     if (!classPath) return null
 
-    const pkgPath = await pkgUp({ cwd: path.dirname(classPath) })
+    const pkgPath = await packageUp({ cwd: path.dirname(classPath) })
     if (!pkgPath) return null
 
     // eslint-disable-next-line @typescript-eslint/no-require-imports

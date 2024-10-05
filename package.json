@@ -50,14 +50,14 @@
     "Firefox ESR"
   ],
   "scripts": {
-    "build": "yarn -s clean && rollup -c",
+    "build": "npm -s run clean && rollup -c",
     "build:standalone": "run-s build standalone",
-    "check:audit": "yarn audit",
-    "check:format": "yarn -s format -c",
+    "check:audit": "npm audit",
+    "check:format": "npm -s run format -- -c",
     "check:ts": "tsc --noEmit",
     "clean": "node -e \"fs.rmSync('lib',{recursive:true,force:true})\"",
     "format": "prettier \"**/*.{css,js,jsx,json,md,mjs,scss,ts,tsx,yaml,yml}\"",
-    "format:write": "yarn -s format --write",
+    "format:write": "npm -s run format -- --write",
     "lint:js": "eslint --cache",
     "lint:css": "stylelint \"src/**/*.{css,scss}\"",
     "prepack": "npm-run-all --parallel check:* lint:* test:coverage --parallel build types",
@@ -125,11 +125,12 @@
     "jest-environment-jsdom": "^29.7.0",
     "jest-junit": "^16.0.0",
     "nanoid": "^5.0.7",
+    "npm-check-updates": "^17.1.3",
     "npm-run-all2": "^6.2.3",
     "os-locale": "^6.0.2",
+    "package-up": "^5.0.0",
     "patch-package": "^8.0.0",
     "pdf-lib": "^1.17.1",
-    "pkg-up": "^5.0.0",
     "portfinder": "1.0.32",
     "postcss": "^8.4.47",
     "postcss-url": "^10.1.3",
@@ -139,7 +140,6 @@
     "rollup": "^4.24.0",
     "rollup-plugin-license": "^3.5.3",
     "rollup-plugin-postcss": "^4.0.2",
-    "rollup-plugin-pug": "^1.1.1",
     "sass": "^1.79.4",
     "strip-ansi": "^7.1.0",
     "stylelint": "^16.9.0",
@@ -170,10 +170,8 @@
     "ws": "^8.18.0",
     "yargs": "^17.7.2"
   },
-  "resolutions": {
-    "pug": "^3.0.3",
-    "pug-runtime": "^3.0.1",
-    "cookie": ">=0.7.0"
+  "overrides": {
+    "cookie": "0.7.1"
   },
   "publishConfig": {
     "access": "public"

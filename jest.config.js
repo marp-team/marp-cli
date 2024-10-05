@@ -22,7 +22,7 @@ const esModules = [
   'p-locate',
   'path-exists',
   'path-type',
-  'pkg-up',
+  'package-up',
   'slash',
   'strip-ansi',
   'unicorn-magic',

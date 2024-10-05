@@ -23,13 +23,12 @@ RUN addgroup -S marp && adduser -S -g marp marp \
     && mkdir -p /home/marp/app /home/marp/.cli \
     && chown -R marp:marp /home/marp
 
-# Install node dependencies, and create v8 cache by running Marp CLI once
 USER marp
 ENV CHROME_PATH /usr/bin/chromium-browser
 
 WORKDIR /home/marp/.cli
 COPY --chown=marp:marp . .
-RUN yarn install --production --frozen-lockfile && yarn cache clean && node marp-cli.js --version
+RUN npm ci && npm cache clean --force && node marp-cli.js --version
 
 # Setup workspace for user
 USER root
