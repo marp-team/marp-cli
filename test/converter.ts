@@ -42,7 +42,11 @@ describe('Converter', () => {
   let themeSet: ThemeSet
 
   beforeEach(async () => {
-    browserManager = new BrowserManager({ timeout })
+    browserManager = new BrowserManager({
+      finders: ['chrome', 'edge'],
+      protocol: 'cdp',
+      timeout,
+    })
     themeSet = await ThemeSet.initialize([])
   })
 
@@ -910,6 +914,32 @@ describe('Converter', () => {
           ).rejects.toThrow(TimeoutError)
         })
       })
+
+      describe('with Firefox browser', () => {
+        it('outputs warning about incompatibility', async () => {
+          const warn = jest.spyOn(console, 'warn').mockImplementation()
+
+          await using browserManager = new BrowserManager({
+            finders: ['firefox'],
+          })
+
+          await pdfInstance({
+            browserManager,
+            output: 'test.pdf',
+          }).convertFile(new File(onePath))
+
+          expect(warn).toHaveBeenCalledWith(
+            expect.stringContaining(
+              'The output may include some incompatible renderings'
+            )
+          )
+          expect(fs.promises.writeFile).toHaveBeenCalled()
+
+          const [lastCall] = writeFileSpy.mock.calls.slice(-1)
+          expect(lastCall[0]).toBe('test.pdf')
+          expect(lastCall[1]).toBeInstanceOf(Buffer)
+        })
+      })
     })
 
     describe('when convert type is PPTX', () => {
@@ -1088,6 +1118,34 @@ describe('Converter', () => {
           },
           timeout
         )
+
+        describe('with Firefox browser', () => {
+          it(
+            'applies the scale factor to PNG',
+            async () => {
+              await using browserManager = new BrowserManager({
+                finders: ['firefox'],
+              })
+
+              await instance({
+                browserManager,
+                output: 'a.png',
+                type: ConvertType.png,
+                imageScale: 0.5,
+              }).convertFile(new File(onePath))
+
+              const [lastCall] = writeFileSpy.mock.calls.slice(-1)
+              expect(lastCall[1]).toBeInstanceOf(Buffer)
+
+              const png = lastCall[1] as Buffer
+              const { width, height } = imageSize(png)
+
+              expect(width).toBe(640)
+              expect(height).toBe(360)
+            },
+            timeout
+          )
+        })
       })
     })
 
@@ -1140,7 +1198,7 @@ describe('Converter', () => {
 
       describe('with imageScale option', () => {
         it(
-          'applies the scale factor to PNG',
+          'applies the scale factor to JPEG',
           async () => {
             await instance({
               output: 'b.jpg',
@@ -1155,6 +1213,93 @@ describe('Converter', () => {
 
             expect(width).toBe(640)
             expect(height).toBe(360)
+          },
+          timeout
+        )
+      })
+
+      describe('with WebDriver BiDi protocol', () => {
+        it(
+          'applies the scale factor to JPEG',
+          async () => {
+            await using browserManager = new BrowserManager({
+              finders: ['chrome', 'edge'],
+              protocol: 'webDriverBiDi',
+            })
+
+            await instance({
+              browserManager,
+              output: 'b.jpg',
+              type: ConvertType.jpeg,
+              imageScale: 0.5,
+            }).convertFile(new File(onePath))
+
+            const [lastCall] = writeFileSpy.mock.calls.slice(-1)
+            expect(lastCall[1]).toBeInstanceOf(Buffer)
+
+            const jpeg = lastCall[1] as Buffer
+            const { width, height } = imageSize(jpeg)
+
+            expect(width).toBe(640)
+            expect(height).toBe(360)
+
+            // Check JPEG quality is working
+            writeFileSpy.mockClear()
+
+            await instance({
+              browserManager,
+              output: 'b.jpg',
+              type: ConvertType.jpeg,
+              imageScale: 0.5,
+              jpegQuality: 1,
+            }).convertFile(new File(onePath))
+
+            const [secondCall] = writeFileSpy.mock.calls.slice(-1)
+            expect(secondCall[1]).toBeInstanceOf(Buffer)
+            expect((secondCall[1] as Buffer).length).toBeLessThan(jpeg.length)
+          },
+          timeout
+        )
+      })
+
+      describe('with Firefox browser', () => {
+        it(
+          'applies the scale factor to JPEG',
+          async () => {
+            await using browserManager = new BrowserManager({
+              finders: ['firefox'],
+            })
+
+            await instance({
+              browserManager,
+              output: 'b.jpg',
+              type: ConvertType.jpeg,
+              imageScale: 0.5,
+            }).convertFile(new File(onePath))
+
+            const [lastCall] = writeFileSpy.mock.calls.slice(-1)
+            expect(lastCall[1]).toBeInstanceOf(Buffer)
+
+            const jpeg = lastCall[1] as Buffer
+            const { width, height } = imageSize(jpeg)
+
+            expect(width).toBe(640)
+            expect(height).toBe(360)
+
+            // Check JPEG quality is working
+            writeFileSpy.mockClear()
+
+            await instance({
+              browserManager,
+              output: 'b.jpg',
+              type: ConvertType.jpeg,
+              imageScale: 0.5,
+              jpegQuality: 1,
+            }).convertFile(new File(onePath))
+
+            const [secondCall] = writeFileSpy.mock.calls.slice(-1)
+            expect(secondCall[1]).toBeInstanceOf(Buffer)
+            expect((secondCall[1] as Buffer).length).toBeLessThan(jpeg.length)
           },
           timeout
         )
