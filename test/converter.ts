@@ -916,29 +916,34 @@ describe('Converter', () => {
       })
 
       describe('with Firefox browser', () => {
-        it('outputs warning about incompatibility', async () => {
-          const warn = jest.spyOn(console, 'warn').mockImplementation()
+        it(
+          'outputs warning about incompatibility',
+          async () => {
+            const warn = jest.spyOn(console, 'warn').mockImplementation()
 
-          await using browserManager = new BrowserManager({
-            finders: ['firefox'],
-          })
+            await using browserManager = new BrowserManager({
+              finders: ['firefox'],
+              timeout,
+            })
 
-          await pdfInstance({
-            browserManager,
-            output: 'test.pdf',
-          }).convertFile(new File(onePath))
+            await pdfInstance({
+              browserManager,
+              output: 'test.pdf',
+            }).convertFile(new File(onePath))
 
-          expect(warn).toHaveBeenCalledWith(
-            expect.stringContaining(
-              'The output may include some incompatible renderings'
+            expect(warn).toHaveBeenCalledWith(
+              expect.stringContaining(
+                'The output may include some incompatible renderings'
+              )
             )
-          )
-          expect(fs.promises.writeFile).toHaveBeenCalled()
+            expect(fs.promises.writeFile).toHaveBeenCalled()
 
-          const [lastCall] = writeFileSpy.mock.calls.slice(-1)
-          expect(lastCall[0]).toBe('test.pdf')
-          expect(lastCall[1]).toBeInstanceOf(Buffer)
-        })
+            const [lastCall] = writeFileSpy.mock.calls.slice(-1)
+            expect(lastCall[0]).toBe('test.pdf')
+            expect(lastCall[1]).toBeInstanceOf(Buffer)
+          },
+          timeout
+        )
       })
     })
 
@@ -1125,6 +1130,7 @@ describe('Converter', () => {
             async () => {
               await using browserManager = new BrowserManager({
                 finders: ['firefox'],
+                timeout,
               })
 
               await instance({
@@ -1225,6 +1231,7 @@ describe('Converter', () => {
             await using browserManager = new BrowserManager({
               finders: ['chrome', 'edge'],
               protocol: 'webDriverBiDi',
+              timeout,
             })
 
             await instance({
@@ -1268,6 +1275,7 @@ describe('Converter', () => {
           async () => {
             await using browserManager = new BrowserManager({
               finders: ['firefox'],
+              timeout,
             })
 
             await instance({
