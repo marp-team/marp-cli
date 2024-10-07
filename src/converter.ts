@@ -34,8 +34,8 @@ import templates, {
   TemplateResult,
 } from './templates/'
 import { ThemeSet } from './theme'
-import { isOfficialDockerImage } from './utils/container'
 import { debug } from './utils/debug'
+import { png2jpegViaPuppeteer } from './utils/jpeg'
 import { pdfLib, setOutline } from './utils/pdf'
 import { translateWSLPathToWindows } from './utils/wsl'
 import { notifier } from './watcher'
@@ -110,14 +110,6 @@ export interface ConvertResult {
 }
 
 export type ConvertedCallback = (result: ConvertResult) => void
-
-// Sharp image processing library
-let _sharp: typeof import('sharp') | undefined
-
-const sharp = () => {
-  if (!_sharp) _sharp = require('sharp') as typeof import('sharp') // eslint-disable-line @typescript-eslint/no-require-imports
-  return _sharp
-}
 
 // Markdown
 const stripBOM = (s: string) => (s.charCodeAt(0) === 0xfeff ? s.slice(1) : s)
@@ -482,10 +474,14 @@ export class Converter {
           const buf = await page.screenshot({ clip, type: 'png' })
 
           if (opts.type === ConvertType.jpeg) {
-            // Convert png to jpeg via sharp
-            return await sharp()(buf)
-              .jpeg({ mozjpeg: true, quality: opts.quality })
-              .toBuffer()
+            // Convert png to jpeg
+            return await png2jpegViaPuppeteer(
+              browser,
+              buf,
+              opts.quality
+                ? Math.min(Math.max(opts.quality * 0.01, 0), 1)
+                : undefined
+            )
           }
 
           return buf
@@ -627,13 +623,7 @@ export class Converter {
         `Insecure local file accessing is enabled for conversion from ${baseFile.relativePath()}.`
       )
 
-      tmpFile = await baseFile.saveTmpFile({
-        // Snapd Chromium cannot access from sandbox container to user-land `/tmp`
-        // directory so always create tmp file to home directory if in Linux.
-        // (Except an official docker image)
-        home: process.platform === 'linux' && !isOfficialDockerImage(),
-        extension: '.html',
-      })
+      tmpFile = await baseFile.saveTmpFile({ extension: '.html' })
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -641,13 +631,7 @@ export class Converter {
 
     const browser = await this.browser
 
-    if (tmpFile) {
-      if (await browser.browserInWSLHost()) {
-        uri = `file:${await translateWSLPathToWindows(tmpFile.path, true)}`
-      } else {
-        uri = `file://${tmpFile.path}`
-      }
-    }
+    if (tmpFile) uri = await browser.resolveToFileURI(tmpFile.path)
 
     return await browser.withPage(async (page) => {
       const { missingFileSet, failedFileSet } =

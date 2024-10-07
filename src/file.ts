@@ -1,15 +1,11 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 import fs from 'node:fs'
-import os from 'node:os'
 import path from 'node:path'
 import * as url from 'node:url'
-import { promisify } from 'node:util'
 import getStdin from 'get-stdin'
 import { globby, Options as GlobbyOptions } from 'globby'
-import { tmpName } from 'tmp'
 import { debug } from './utils/debug'
-
-const tmpNamePromise = promisify(tmpName)
+import { generateTmpName } from './utils/tmp'
 
 export const markdownExtensions = ['md', 'mdown', 'markdown', 'markdn']
 
@@ -94,11 +90,10 @@ export class File {
     }
   }
 
-  async saveTmpFile(
-    opts: { extension?: string; home?: boolean } = {}
-  ): Promise<File.TmpFileInterface> {
-    let tmp: string = await tmpNamePromise({ postfix: opts.extension })
-    if (opts.home) tmp = path.join(os.homedir(), path.basename(tmp))
+  async saveTmpFile({
+    extension,
+  }: { extension?: `.${string}` } = {}): Promise<File.TmpFileInterface> {
+    const tmp = await generateTmpName(extension)
 
     debug('Saving temporary file: %s', tmp)
     await this.saveToFile(tmp)

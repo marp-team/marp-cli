@@ -11,7 +11,12 @@ import type {
 } from 'puppeteer-core'
 import type TypedEventEmitter from 'typed-emitter'
 import { debugBrowser } from '../utils/debug'
-import { getWindowsEnv, isWSL, translateWindowsPathToWSL } from '../utils/wsl'
+import {
+  getWindowsEnv,
+  isWSL,
+  translateWSLPathToWindows,
+  translateWindowsPathToWSL,
+} from '../utils/wsl'
 
 export type BrowserKind = 'chrome' | 'firefox'
 export type BrowserProtocol = ProtocolType
@@ -120,6 +125,12 @@ export abstract class Browser
       !!(await isWSL()) &&
       wslHostMatcher.test(this.puppeteer?.process()?.spawnfile ?? this.path)
     )
+  }
+
+  async resolveToFileURI(filePath: string) {
+    return (await this.browserInWSLHost())
+      ? `file:${await translateWSLPathToWindows(filePath, true)}`
+      : `file://${filePath}`
   }
 
   /** @internal Overload launch behavior in subclass */
