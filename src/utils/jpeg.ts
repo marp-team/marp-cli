@@ -15,9 +15,9 @@ export const png2jpegViaPuppeteer = async (
 
     const jpegDataURL = await page.evaluate(
       async (pngUri, q, timeout) => {
+        /* c8 ignore start */
         // This function is executed outside of Jest's scope so we have to ignore coverage.
         // https://jestjs.io/docs/puppeteer
-        /* c8 ignore start */
         const canvas = document.createElement('canvas')
         const ctx = canvas.getContext('2d')
         if (!ctx)
