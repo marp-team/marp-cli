@@ -63,6 +63,7 @@ commands:
           condition: << parameters.browser >>
           steps:
             - browser-tools/install-chrome
+            - browser-tools/install-firefox
 
   lint:
     steps:

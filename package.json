@@ -39,11 +39,7 @@
     "marp": "marp-cli.js"
   },
   "pkg": {
-    "scripts": "lib/**/*.js",
-    "assets": [
-      "node_modules/sharp/**/*",
-      "node_modules/@img/**/*"
-    ]
+    "scripts": "lib/**/*.js"
   },
   "browserslist": [
     "> 1% and last 3 versions",
@@ -165,7 +161,6 @@
     "cosmiconfig": "^9.0.0",
     "puppeteer-core": "23.5.0",
     "serve-index": "^1.9.1",
-    "sharp": "^0.33.5",
     "tmp": "^0.2.3",
     "ws": "^8.18.0",
     "yargs": "^17.7.2"

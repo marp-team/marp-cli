@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Removed
+
+- Get rid of `sharp` dependency in favor of using browser in JPEG image conversion with WebDriver BiDi ([#610](https://github.com/marp-team/marp-cli/pull/610))
+
 ## v4.0.0 - 2024-10-05
 
 > [!IMPORTANT]
