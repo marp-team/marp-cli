@@ -17,12 +17,12 @@ export class FirefoxBrowser extends Browser {
       await this.generateLaunchOptions({
         ...opts,
 
-        dumpio: process.env.NODE_ENV === 'test',
-
         // NOTE: Currently Windows path is incompatible with Puppeteer's preparing
-        userDataDir: (await this.browserInWSLHost())
-          ? undefined
-          : await this.puppeteerDataDir(),
+        // FIXME: CircleCI does not work custom user data directory
+        userDataDir:
+          !!process.env.CIRCLECI || (await this.browserInWSLHost())
+            ? undefined
+            : await this.puppeteerDataDir(),
       })
     )
   }
