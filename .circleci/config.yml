@@ -90,6 +90,7 @@ commands:
           command: npm run test:coverage -- --ci -i --reporters=default --reporters=jest-junit
           environment:
             JEST_JUNIT_OUTPUT_DIR: tmp/test-results
+            MOZ_LOG: Process:5
 
       - codecov/upload:
           flags: linux
