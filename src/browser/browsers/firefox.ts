@@ -17,6 +17,8 @@ export class FirefoxBrowser extends Browser {
       await this.generateLaunchOptions({
         ...opts,
 
+        dumpio: process.env.NODE_ENV === 'test',
+
         // NOTE: Currently Windows path is incompatible with Puppeteer's preparing
         userDataDir: (await this.browserInWSLHost())
           ? undefined
