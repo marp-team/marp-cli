@@ -41,7 +41,7 @@ jobs:
       # https://stackoverflow.com/a/59365905
       - name: Jest
         env:
-          CI: true
+          MARP_TEST_CI: 1
         run: >-
           npm run test:coverage -- --ci -i --reporters=default --reporters=jest-junit --forceExit ||
           npm run test:coverage -- --ci -i --reporters=default --reporters=jest-junit --forceExit --no-cache ||

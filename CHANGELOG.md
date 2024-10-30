@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Disable Chrome sandbox if running CLI as root ([#611](https://github.com/marp-team/marp-cli/issues/611), [#614](https://github.com/marp-team/marp-cli/pull/614))
+
 ### Removed
 
 - Get rid of `sharp` dependency in favor of using browser in JPEG image conversion with WebDriver BiDi ([#610](https://github.com/marp-team/marp-cli/pull/610))

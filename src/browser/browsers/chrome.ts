@@ -87,6 +87,7 @@ export class ChromeBrowser extends Browser {
 
   private async puppeteerArgsEnableSandbox() {
     if (process.env.CHROME_NO_SANDBOX) return false
+    if (process.getuid?.() === 0) return false // Running as root without --no-sandbox is not supported.
     if (isInsideContainer()) return false
     if (await isWSL()) return false
 
