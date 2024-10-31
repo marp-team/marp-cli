@@ -1,10 +1,15 @@
 /* Pack built standalone binaries for release. */
 
-const fs = require('node:fs')
-const path = require('node:path')
-const zlib = require('node:zlib')
-const tar = require('tar-stream')
-const ZipStream = require('zip-stream')
+import fs from 'node:fs'
+import { createRequire } from 'node:module'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+import zlib from 'node:zlib'
+import tar from 'tar-stream'
+import ZipStream from 'zip-stream'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const require = createRequire(import.meta.url)
 const { version } = require('../package.json')
 
 const bin = path.resolve(__dirname, '../bin')
