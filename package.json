@@ -59,7 +59,7 @@
     "prepack": "npm-run-all --parallel check:* lint:* test:coverage --parallel build types",
     "preversion": "run-p check:* lint:* test:coverage",
     "standalone": "node -e \"fs.rmSync('bin',{recursive:true,force:true})\" && pkg -C gzip --out-path ./bin .",
-    "standalone:pack": "node ./scripts/pack.js",
+    "standalone:pack": "node ./scripts/pack.mjs",
     "test": "jest",
     "test:coverage": "jest --coverage",
     "types": "node -e \"fs.rmSync('types',{recursive:true,force:true})\" && tsc --declaration --emitDeclarationOnly --outDir types",
