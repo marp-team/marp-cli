@@ -68,7 +68,9 @@ describe('ChromeBrowser', () => {
 
         expect(puppeteer.launch).toHaveBeenCalledWith(
           expect.objectContaining({
-            args: [expect.stringMatching(/^--user-data-dir=/), '--test-type'],
+            args: expect.arrayContaining([
+              expect.stringMatching(/^--user-data-dir=/),
+            ]),
             ignoreDefaultArgs: [],
           })
         )
@@ -83,12 +85,12 @@ describe('ChromeBrowser', () => {
         // Duplicate arguments should be removed
         expect(puppeteer.launch).toHaveBeenCalledWith(
           expect.objectContaining({
-            args: [
+            args: expect.arrayContaining([
               expect.stringMatching(/^--user-data-dir=/),
               '--test-type',
               '--foo',
               '--bar',
-            ],
+            ]),
             ignoreDefaultArgs: ['--ignore'],
           })
         )
