@@ -76,6 +76,7 @@ export class ChromeBrowser extends Browser {
   private async puppeteerArgs(extraArgs: string[] = []) {
     const args = new Set([
       `--user-data-dir=${await this.puppeteerDataDir()}`,
+      '--disable-component-update', // https://github.com/puppeteer/puppeteer/pull/13201
       '--test-type',
       ...extraArgs,
     ])
