@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix packaging script for standalone binaries ([#616](https://github.com/marp-team/marp-cli/pull/616))
+
 ## v4.0.1 - 2024-10-31
 
 ### Removed
