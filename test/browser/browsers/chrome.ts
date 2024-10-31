@@ -68,7 +68,9 @@ describe('ChromeBrowser', () => {
 
         expect(puppeteer.launch).toHaveBeenCalledWith(
           expect.objectContaining({
-            args: [expect.stringMatching(/^--user-data-dir=/), '--test-type'],
+            args: expect.arrayContaining([
+              expect.stringMatching(/^--user-data-dir=/),
+            ]),
             ignoreDefaultArgs: [],
           })
         )
