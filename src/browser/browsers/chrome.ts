@@ -82,6 +82,7 @@ export class ChromeBrowser extends Browser {
     ])
 
     if (!(await this.puppeteerArgsEnableSandbox())) args.add('--no-sandbox')
+    if (!this.puppeteerArgsEnableGPU()) args.add('--disable-gpu')
 
     return [...args]
   }
@@ -91,6 +92,12 @@ export class ChromeBrowser extends Browser {
     if (process.getuid?.() === 0) return false // Running as root without --no-sandbox is not supported.
     if (isInsideContainer()) return false
     if (await isWSL()) return false
+
+    return true
+  }
+
+  private puppeteerArgsEnableGPU() {
+    if (process.env.CHROME_DISABLE_GPU) return false
 
     return true
   }
