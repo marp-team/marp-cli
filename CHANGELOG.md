@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v4.0.3 - 2024-11-06
+
 ### Added
 
 - Allow to disable GPU use of Chrome through `CHROME_DISABLE_GPU` environment variable ([#592](https://github.com/marp-team/marp-cli/issues/592), [#617](https://github.com/marp-team/marp-cli/issues/617), [#618](https://github.com/marp-team/marp-cli/pull/618))
