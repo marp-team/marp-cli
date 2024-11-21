@@ -8,7 +8,7 @@ import { isInsideContainer } from '../../utils/container'
 import { isWSL } from '../../utils/wsl'
 import { Browser } from '../browser'
 import type { BrowserKind, BrowserProtocol } from '../browser'
-import { isSnapBrowser } from '../finders/utils'
+import { isSnapBrowser } from '../../utils/finder'
 
 export class ChromeBrowser extends Browser {
   static readonly kind: BrowserKind = 'chrome'

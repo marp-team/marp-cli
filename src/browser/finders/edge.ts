@@ -1,5 +1,6 @@
 import path from 'node:path'
 import { error, CLIErrorCode } from '../../error'
+import { findExecutable, getPlatform } from '../../utils/finder'
 import {
   translateWindowsPathToWSL,
   getWindowsEnv,
@@ -8,7 +9,6 @@ import {
 import { ChromeBrowser } from '../browsers/chrome'
 import { ChromeCdpBrowser } from '../browsers/chrome-cdp'
 import type { BrowserFinder, BrowserFinderResult } from '../finder'
-import { findExecutable, getPlatform } from './utils'
 
 const edge = (path: string): BrowserFinderResult => ({
   path,

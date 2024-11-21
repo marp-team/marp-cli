@@ -1,10 +1,10 @@
 import { CLIError, CLIErrorCode } from '../error'
 import { debugBrowserFinder } from '../utils/debug'
+import { isExecutable, normalizeDarwinAppPath } from '../utils/finder'
 import type { Browser } from './browser'
 import { chromeFinder as chrome } from './finders/chrome'
 import { edgeFinder as edge } from './finders/edge'
 import { firefoxFinder as firefox } from './finders/firefox'
-import { isExecutable, normalizeDarwinAppPath } from './finders/utils'
 
 export interface BrowserFinderResult {
   path: string

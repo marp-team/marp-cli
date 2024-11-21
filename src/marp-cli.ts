@@ -244,6 +244,11 @@ export const marpCli = async (
           group: OptionGroup.Converter,
           type: 'number',
         },
+        'pptx-editable': {
+          describe: 'Generate editable PPTX',
+          group: OptionGroup.Converter,
+          type: 'boolean',
+        },
         'allow-local-files': {
           describe:
             'Allow to access local files from Markdown while converting PDF, PPTX, or image (NOT SECURE)',
