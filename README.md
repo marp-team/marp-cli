@@ -80,7 +80,7 @@ _Disclaimer: Package manifests are maintained by the community, not Marp team._
 
 <!-- For contributors: This section describes only package managers that Marp manifest has been actively maintained. Each tools are following update within a few days of the latest CLI update. -->
 
-#### macOS: **[Homebrew](https://brew.sh/)**
+#### macOS for Apple Silicon architecture: **[Homebrew](https://brew.sh/)**
 
 ```bash
 brew install marp-cli
