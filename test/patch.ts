@@ -13,11 +13,51 @@ afterEach(() => {
 })
 
 describe('patch()', () => {
+  it('calls enableCompileCache()', () => {
+    jest.spyOn(patch, 'enableCompileCache')
+
+    patch.patch()
+    expect(patch.enableCompileCache).toHaveBeenCalled()
+  })
+
   it('calls patchSegmenter()', () => {
     jest.spyOn(patch, 'patchSegmenter')
 
     patch.patch()
     expect(patch.patchSegmenter).toHaveBeenCalled()
+  })
+})
+
+describe('enableCompileCache()', () => {
+  beforeEach(() => {
+    jest.resetModules()
+  })
+
+  const enableCompileCache = async () =>
+    (await import('../src/patch')).enableCompileCache()
+
+  it('calls module.enableCompileCache()', async () => {
+    const mock = jest.fn()
+    jest.doMock('node:module', () => ({ enableCompileCache: mock }))
+
+    await enableCompileCache()
+    expect(mock).toHaveBeenCalled()
+  })
+
+  it('ignores error raised from module.enableCompileCache()', async () => {
+    jest.doMock('node:module', () => ({
+      enableCompileCache: jest.fn(() => {
+        throw new Error('test')
+      }),
+    }))
+
+    expect(enableCompileCache).not.toThrow()
+  })
+
+  it('does nothing if module.enableCompileCache is not defined (for older versions of Node.js)', async () => {
+    jest.doMock('node:module', () => ({}))
+
+    expect(enableCompileCache).not.toThrow()
   })
 })
 

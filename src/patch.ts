@@ -3,8 +3,8 @@ import { isStandaloneBinary } from './utils/binary'
 import { debug } from './utils/debug'
 
 export const patch = () => {
-  enableCompileCache()
   patchSegmenter()
+  enableCompileCache()
 }
 
 export const enableCompileCache = () => {
