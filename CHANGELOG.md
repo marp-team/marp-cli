@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Upgrade dependent packages to the latest versions ([#623](https://github.com/marp-team/marp-cli/pull/623))
+
 ## v4.0.3 - 2024-11-06
 
 ### Added
