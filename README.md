@@ -119,7 +119,7 @@ npm install -g @marp-team/marp-cli
 
 ### [Standalone binary][releases]
 
-We also provide standalone binaries for Linux, macOS, and Windows. These have bundled Marp CLI with Node.js binary, so no need to install Node.js separately.
+We also provide standalone binaries for Linux, macOS (Apple Silicon), and Windows. These have bundled Marp CLI with Node.js binary, so no need to install Node.js separately.
 
 **[⏩ Download the latest standalone binary from release page.][releases]**
 
