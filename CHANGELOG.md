@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Make faster launching CLI on Node.js 22.8.0 and later, by enabling Node.js compile cache with `module.enableCompileCache()` ([#624](https://github.com/marp-team/marp-cli/pull/624))
+
 ### Changed
 
 - Upgrade dependent packages to the latest versions ([#623](https://github.com/marp-team/marp-cli/pull/623))
