@@ -1,15 +1,15 @@
-import { execFile as cpExecFile } from 'node:child_process'
+import { spawn } from 'node:child_process'
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import { pathToFileURL } from 'node:url'
-import { promisify } from 'node:util'
 import { nanoid } from 'nanoid'
 import { debug } from '../utils/debug'
 import { getWindowsEnv, isWSL, translateWindowsPathToWSL } from '../utils/wsl'
 import { findSOffice } from './finder'
+import { error } from '../cli'
+import chalk from 'chalk'
 
-const execFile = promisify(cpExecFile)
 const wslHostMatcher = /^\/mnt\/[a-z]\//
 
 let wslTmp: string | undefined
@@ -47,11 +47,38 @@ export class SOffice {
     return this.setProfileDir()
   }
 
-  async exec(args: string[]) {
-    return await execFile(await this.path, [
+  async spawn(args: string[]) {
+    const spawnArgs = [
       `-env:UserInstallation=${pathToFileURL(await this.profileDir).toString()}`,
       ...args,
-    ])
+    ]
+
+    debug(`[soffice] Spawning soffice with args: %o`, spawnArgs)
+
+    const childProcess = spawn(await this.path, spawnArgs, { stdio: 'pipe' })
+
+    childProcess.stdout.on('data', (data) => {
+      debug(`[soffice:stdout] %s`, data.toString())
+    })
+
+    childProcess.stderr.on('data', (data) => {
+      const output = data.toString()
+
+      debug(`[soffice:stderr] %s`, output)
+      error(`${chalk.yellow`[soffice]`} ${output.trim()}`, { singleLine: true })
+    })
+
+    return new Promise<void>((resolve, reject) => {
+      childProcess.on('close', (code) => {
+        debug(`[soffice] soffice exited with code %d`, code)
+
+        if (code === 0) {
+          resolve()
+        } else {
+          reject(new Error(`soffice exited with code ${code}.`))
+        }
+      })
+    })
   }
 
   private async binaryInWSLHost(): Promise<boolean> {

@@ -41,6 +41,7 @@ import { png2jpegViaPuppeteer } from './utils/jpeg'
 import { pdfLib, setOutline } from './utils/pdf'
 import { translateWSLPathToWindows } from './utils/wsl'
 import { notifier } from './watcher'
+import { isReadable } from './utils/finder'
 
 const CREATED_BY_MARP = 'Created by Marp'
 
@@ -585,7 +586,7 @@ export class Converter {
     // Convert PDF to PPTX
     await using tmpPdfFile = await pdf.saveTmpFile({ extension: '.pdf' })
 
-    await this.sOffice.exec([
+    await this.sOffice.spawn([
       '--nolockcheck',
       '--nologo',
       '--headless',
@@ -600,6 +601,11 @@ export class Converter {
     ])
 
     const tmpPptxFile = new File(`${tmpPdfFile.path.slice(0, -4)}.pptx`)
+
+    // soffice does not return the correct exit code when the conversion fails, so we need to check the existence of the output file
+    if (!(await isReadable(tmpPptxFile.path))) {
+      error('LibreOffice could not convert PDF to PPTX internally.')
+    }
 
     const ret = file.convert(this.options.output, { extension: 'pptx' })
     ret.buffer = await tmpPptxFile.load()

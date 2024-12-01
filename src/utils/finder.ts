@@ -20,6 +20,9 @@ export const isAccessible = async (path: string, mode?: number) => {
 export const isExecutable = async (path: string) =>
   await isAccessible(path, fs.constants.X_OK)
 
+export const isReadable = async (path: string) =>
+  await isAccessible(path, fs.constants.R_OK)
+
 const findFirst = async <T>(
   paths: string[],
   predicate: (path: string) => Promise<T>
