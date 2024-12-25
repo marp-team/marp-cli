@@ -50,7 +50,7 @@ describe('ChromeCdpBrowser', () => {
           browser: 'chrome',
           protocol: 'cdp',
           executablePath: '/path/to/chrome',
-        } as const satisfies puppeteer.PuppeteerLaunchOptions)
+        } as const satisfies puppeteer.LaunchOptions)
       )
     })
 
