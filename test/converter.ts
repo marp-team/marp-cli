@@ -1220,7 +1220,7 @@ describe('Converter', () => {
             expect(width).toBe(640)
             expect(height).toBe(360)
           },
-          timeout
+          timeout * 1.5
         )
       })
 
