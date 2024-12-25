@@ -1,8 +1,5 @@
 import { launch } from 'puppeteer-core'
-import type {
-  Browser as PuppeteerBrowser,
-  PuppeteerLaunchOptions,
-} from 'puppeteer-core'
+import type { Browser as PuppeteerBrowser, LaunchOptions } from 'puppeteer-core'
 import { Browser } from '../browser'
 import type { BrowserKind, BrowserProtocol } from '../browser'
 
@@ -11,7 +8,7 @@ export class FirefoxBrowser extends Browser {
   static readonly protocol: BrowserProtocol = 'webDriverBiDi'
 
   protected async launchPuppeteer(
-    opts: PuppeteerLaunchOptions
+    opts: LaunchOptions
   ): Promise<PuppeteerBrowser> {
     return await launch(
       await this.generateLaunchOptions({

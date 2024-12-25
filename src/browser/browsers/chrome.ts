@@ -1,8 +1,5 @@
 import { launch } from 'puppeteer-core'
-import type {
-  Browser as PuppeteerBrowser,
-  PuppeteerLaunchOptions,
-} from 'puppeteer-core'
+import type { Browser as PuppeteerBrowser, LaunchOptions } from 'puppeteer-core'
 import { CLIErrorCode, error, isError } from '../../error'
 import { isInsideContainer } from '../../utils/container'
 import { isWSL } from '../../utils/wsl'
@@ -15,7 +12,7 @@ export class ChromeBrowser extends Browser {
   static readonly protocol: BrowserProtocol = 'webDriverBiDi'
 
   protected async launchPuppeteer(
-    opts: Omit<PuppeteerLaunchOptions, 'userDataDir'> // userDataDir cannot overload in current implementation
+    opts: Omit<LaunchOptions, 'userDataDir'> // userDataDir cannot overload in current implementation
   ): Promise<PuppeteerBrowser> {
     const ignoreDefaultArgsSet = new Set(
       typeof opts.ignoreDefaultArgs === 'object' ? opts.ignoreDefaultArgs : []
@@ -41,7 +38,7 @@ export class ChromeBrowser extends Browser {
     })
 
     const tryLaunch = async (
-      extraOpts: PuppeteerLaunchOptions = {}
+      extraOpts: LaunchOptions = {}
     ): Promise<PuppeteerBrowser> => {
       const finalizedOpts = { ...baseOpts, ...extraOpts }
 

@@ -32,7 +32,7 @@ describe('ChromeBrowser', () => {
           browser: 'chrome',
           protocol: 'webDriverBiDi',
           executablePath: '/path/to/chrome',
-        } as const satisfies puppeteer.PuppeteerLaunchOptions)
+        } as const satisfies puppeteer.LaunchOptions)
       )
     })
 

@@ -8,7 +8,10 @@
 
 ### Changed
 
-- Upgrade dependent packages to the latest versions ([#623](https://github.com/marp-team/marp-cli/pull/623))
+- Upgrade dependent packages to the latest versions ([#623](https://github.com/marp-team/marp-cli/pull/623), [#625](https://github.com/marp-team/marp-cli/pull/625))
+- Upgrade Marpit to [v3.1.2](https://github.com/marp-team/marpit/releases/tag/v3.1.2) ([#625](https://github.com/marp-team/marp-cli/pull/625))
+- Upgrade Marp Core to [v4.0.1](https://github.com/marp-team/marp-core/releases/v4.0.1) ([#625](https://github.com/marp-team/marp-cli/pull/625))
+- Upgrade Node.js LTS version to the latest version ([#625](https://github.com/marp-team/marp-cli/pull/625))
 
 ## v4.0.3 - 2024-11-06
 
