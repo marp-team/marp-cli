@@ -181,7 +181,7 @@ export class Server extends (EventEmitter as new () => TypedEmitter<Server.Event
     this.server
       .get('*', (req, res, next) =>
         this.preprocess(req, res).then(() => {
-          if (!res.finished) next()
+          if (!res.writableEnded) next()
         })
       )
       .use(express.static(this.inputDir))
