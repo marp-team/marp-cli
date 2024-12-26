@@ -37,11 +37,11 @@ import templates, {
 } from './templates/'
 import { ThemeSet } from './theme'
 import { debug } from './utils/debug'
+import { isReadable } from './utils/finder'
 import { png2jpegViaPuppeteer } from './utils/jpeg'
 import { pdfLib, setOutline } from './utils/pdf'
 import { translateWSLPathToWindows } from './utils/wsl'
 import { notifier } from './watcher'
-import { isReadable } from './utils/finder'
 
 const CREATED_BY_MARP = 'Created by Marp'
 
@@ -580,6 +580,11 @@ export class Converter {
     tpl: TemplateResult,
     file: File
   ): Promise<File> {
+    // Experimental warning
+    warn(
+      `${chalk.yellow`[EXPERIMENTAL]`} Converting to editable PPTX is experimental feature. The output depends on LibreOffice and slide reproducibility is not fully guaranteed.`
+    )
+
     // Convert to PDF
     const pdf = await this.convertFileToPDF(tpl, file, { postprocess: false })
 
@@ -602,9 +607,9 @@ export class Converter {
 
     const tmpPptxFile = new File(`${tmpPdfFile.path.slice(0, -4)}.pptx`)
 
-    // soffice does not return the correct exit code when the conversion fails, so we need to check the existence of the output file
+    // soffice does not return the error exit code when the conversion fails, so we need to check the existence of the output file
     if (!(await isReadable(tmpPptxFile.path))) {
-      error('LibreOffice could not convert PDF to PPTX internally.')
+      error('LibreOffice could not convert PPTX internally.')
     }
 
     const ret = file.convert(this.options.output, { extension: 'pptx' })

@@ -2,10 +2,10 @@ import { launch } from 'puppeteer-core'
 import type { Browser as PuppeteerBrowser, LaunchOptions } from 'puppeteer-core'
 import { CLIErrorCode, error, isError } from '../../error'
 import { isInsideContainer } from '../../utils/container'
+import { isSnapBrowser } from '../../utils/finder'
 import { isWSL } from '../../utils/wsl'
 import { Browser } from '../browser'
 import type { BrowserKind, BrowserProtocol } from '../browser'
-import { isSnapBrowser } from '../../utils/finder'
 
 export class ChromeBrowser extends Browser {
   static readonly kind: BrowserKind = 'chrome'

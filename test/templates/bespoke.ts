@@ -1539,7 +1539,7 @@ describe("Bespoke template's browser context", () => {
     })
   })
 
-  describe('[Experimental] Transition', () => {
+  describe('Transition', () => {
     beforeEach(() => {
       transitionUtils._resetResolvedKeyframes()
       jest

@@ -3,12 +3,12 @@ import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import { pathToFileURL } from 'node:url'
+import chalk from 'chalk'
 import { nanoid } from 'nanoid'
+import { error } from '../cli'
 import { debug } from '../utils/debug'
 import { getWindowsEnv, isWSL, translateWindowsPathToWSL } from '../utils/wsl'
 import { findSOffice } from './finder'
-import { error } from '../cli'
-import chalk from 'chalk'
 
 const wslHostMatcher = /^\/mnt\/[a-z]\//
 

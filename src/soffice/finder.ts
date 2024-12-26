@@ -7,6 +7,7 @@ import {
   isExecutable,
   normalizeDarwinAppPath,
 } from '../utils/finder'
+import { getWSL2NetworkingMode } from '../utils/wsl'
 
 const sOffice = (path: string) => ({ path }) as const
 
@@ -108,5 +109,13 @@ const sOfficeFinderWSL = async () => {
   )
 }
 
-const sOfficeFinderLinuxOrFallback = async () =>
-  await findExecutableBinary(['soffice'])
+const sOfficeFinderLinuxOrFallback = async () => {
+  const ret = await findExecutableBinary(['soffice'])
+  if (ret) return ret
+
+  // WSL2 Fallback
+  if ((await getWSL2NetworkingMode()) === 'mirrored')
+    return await sOfficeFinderWSL()
+
+  return undefined
+}
