@@ -1,6 +1,6 @@
 import path from 'node:path'
-import { getPlatform, isSnapBrowser } from '../../../src/browser/finders/utils'
-import * as wsl from '../../../src/utils/wsl'
+import { getPlatform, isSnapBrowser } from '../../src/utils/finder'
+import * as wsl from '../../src/utils/wsl'
 
 afterEach(() => {
   jest.resetAllMocks()
@@ -8,7 +8,7 @@ afterEach(() => {
 })
 
 const executableMock = (name: string) =>
-  path.join(__dirname, `../../utils/_executable_mocks`, name)
+  path.join(__dirname, '_executable_mocks', name)
 
 describe('#getPlatform', () => {
   it('returns current platform in non WSL environment', async () => {

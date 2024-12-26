@@ -2,8 +2,8 @@ import path from 'node:path'
 import which from 'which'
 import { FirefoxBrowser } from '../../../src/browser/browsers/firefox'
 import { firefoxFinder } from '../../../src/browser/finders/firefox'
-import * as utils from '../../../src/browser/finders/utils'
 import { CLIError } from '../../../src/error'
+import * as utils from '../../../src/utils/finder'
 
 jest.mock('which')
 

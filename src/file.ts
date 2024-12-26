@@ -9,6 +9,37 @@ import { generateTmpName } from './utils/tmp'
 
 export const markdownExtensions = ['md', 'mdown', 'markdown', 'markdn']
 
+interface GenerateTmpFileInterfaceOptions {
+  extension?: `.${string}`
+}
+
+export const generateTmpFileInterface = async ({
+  extension,
+}: GenerateTmpFileInterfaceOptions = {}): Promise<File.TmpFileInterface> => {
+  const tmp = await generateTmpName(extension)
+
+  let cleaned = false
+
+  const cleanup = async () => {
+    if (cleaned) return
+
+    try {
+      await fs.promises.unlink(tmp)
+      debug('Cleaned up temporary file: %s', tmp)
+      cleaned = true
+    } catch (e) {
+      debug('Failed to clean up temporary file: %o', e)
+    }
+  }
+
+  return {
+    path: tmp,
+    cleanup,
+    [Symbol.dispose]: () => void cleanup(),
+    [Symbol.asyncDispose]: cleanup,
+  }
+}
+
 export interface FileConvertOption {
   extension?: string
   page?: number
@@ -92,31 +123,13 @@ export class File {
 
   async saveTmpFile({
     extension,
-  }: { extension?: `.${string}` } = {}): Promise<File.TmpFileInterface> {
-    const tmp = await generateTmpName(extension)
+  }: GenerateTmpFileInterfaceOptions = {}): Promise<File.TmpFileInterface> {
+    const tmp = await generateTmpFileInterface({ extension })
 
-    debug('Saving temporary file: %s', tmp)
-    await this.saveToFile(tmp)
+    debug('Saving temporary file: %s', tmp.path)
+    await this.saveToFile(tmp.path)
 
-    const cleanup = async () => {
-      try {
-        await this.cleanup(tmp)
-      } catch (e) {
-        debug('Failed to clean up temporary file: %o', e)
-      }
-    }
-
-    return {
-      path: tmp,
-      cleanup,
-      [Symbol.dispose]: () => void cleanup(),
-      [Symbol.asyncDispose]: cleanup,
-    }
-  }
-
-  private async cleanup(tmpPath: string) {
-    await fs.promises.unlink(tmpPath)
-    debug('Cleaned up temporary file: %s', tmpPath)
+    return tmp
   }
 
   private convertName(

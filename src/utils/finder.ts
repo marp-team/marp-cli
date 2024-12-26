@@ -2,8 +2,8 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { parse as parsePlist } from 'fast-plist'
 import nodeWhich from 'which'
-import { debugBrowserFinder } from '../../utils/debug'
-import { isWSL } from '../../utils/wsl'
+import { debugBrowserFinder } from './debug'
+import { isWSL } from './wsl'
 
 export const getPlatform = async () =>
   (await isWSL()) === 1 ? 'wsl1' : process.platform
@@ -19,6 +19,9 @@ export const isAccessible = async (path: string, mode?: number) => {
 
 export const isExecutable = async (path: string) =>
   await isAccessible(path, fs.constants.X_OK)
+
+export const isReadable = async (path: string) =>
+  await isAccessible(path, fs.constants.R_OK)
 
 const findFirst = async <T>(
   paths: string[],

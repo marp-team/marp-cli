@@ -210,6 +210,12 @@ export const marpCli = async (
           group: OptionGroup.Converter,
           type: 'boolean',
         },
+        'pptx-editable': {
+          describe:
+            '[EXPERIMENTAL] Generate editable PPTX when converting to PPTX',
+          group: OptionGroup.Converter,
+          type: 'boolean',
+        },
         notes: {
           conflicts: ['image', 'images', 'pptx', 'pdf'],
           describe: 'Convert slide deck notes into a text file',

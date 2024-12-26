@@ -49,6 +49,7 @@ interface IMarpCLIArguments {
   'pdfOutlines.pages'?: boolean
   'pdfOutlines.headings'?: boolean
   pptx?: boolean
+  pptxEditable?: boolean
   preview?: boolean
   server?: boolean
   template?: string
@@ -279,6 +280,8 @@ export class MarpCLIConfig {
           })()
         : false
 
+    const pptxEditable = !!(this.args.pptxEditable || this.conf.pptxEditable)
+
     const type = ((): ConvertType => {
       // CLI options
       if (this.args.pdf || this.conf.pdf) return ConvertType.pdf
@@ -310,6 +313,11 @@ export class MarpCLIConfig {
         if (pdfNotes || pdfOutlines) return ConvertType.pdf
       }
 
+      // Prefer PPTX than HTML if enabled PPTX option
+      if ((this.args.pptx ?? this.conf.pptx) !== false) {
+        if (pptxEditable) return ConvertType.pptx
+      }
+
       return ConvertType.html
     })()
 
@@ -338,6 +346,7 @@ export class MarpCLIConfig {
       output,
       pdfNotes,
       pdfOutlines,
+      pptxEditable,
       preview,
       server,
       template,

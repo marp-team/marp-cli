@@ -5,16 +5,16 @@ import {
   wsl,
 } from 'chrome-launcher/dist/chrome-finder'
 import { error, CLIErrorCode } from '../../error'
-import { getWSL2NetworkingMode } from '../../utils/wsl'
-import { ChromeBrowser } from '../browsers/chrome'
-import { ChromeCdpBrowser } from '../browsers/chrome-cdp'
-import type { BrowserFinder, BrowserFinderResult } from '../finder'
 import {
   findExecutableBinary,
   getPlatform,
   isExecutable,
   normalizeDarwinAppPath,
-} from './utils'
+} from '../../utils/finder'
+import { getWSL2NetworkingMode } from '../../utils/wsl'
+import { ChromeBrowser } from '../browsers/chrome'
+import { ChromeCdpBrowser } from '../browsers/chrome-cdp'
+import type { BrowserFinder, BrowserFinderResult } from '../finder'
 
 const chrome = (path: string): BrowserFinderResult => ({
   path,
