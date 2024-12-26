@@ -6,7 +6,7 @@ import { nanoid } from 'nanoid'
 import type {
   Browser as PuppeteerBrowser,
   ProtocolType,
-  PuppeteerLaunchOptions,
+  LaunchOptions,
   Page,
 } from 'puppeteer-core'
 import type TypedEventEmitter from 'typed-emitter'
@@ -70,7 +70,7 @@ export abstract class Browser
     return (this.constructor as typeof Browser).protocol
   }
 
-  async launch(opts: PuppeteerLaunchOptions = {}): Promise<PuppeteerBrowser> {
+  async launch(opts: LaunchOptions = {}): Promise<PuppeteerBrowser> {
     if (!this.puppeteer) {
       const puppeteer = await this.launchPuppeteer(opts)
 
@@ -135,13 +135,13 @@ export abstract class Browser
 
   /** @internal Overload launch behavior in subclass */
   protected abstract launchPuppeteer(
-    opts: PuppeteerLaunchOptions
+    opts: LaunchOptions
   ): Promise<PuppeteerBrowser>
 
   /** @internal */
   protected async generateLaunchOptions(
-    mergeOptions: PuppeteerLaunchOptions = {}
-  ): Promise<PuppeteerLaunchOptions> {
+    mergeOptions: LaunchOptions = {}
+  ): Promise<LaunchOptions> {
     const opts = {
       browser: this.kind,
       executablePath: this.path,

@@ -24,7 +24,7 @@ describe('FirefoxBrowser', () => {
           browser: 'firefox',
           protocol: 'webDriverBiDi',
           executablePath: '/path/to/firefox',
-        } as const satisfies puppeteer.PuppeteerLaunchOptions)
+        } as const satisfies puppeteer.LaunchOptions)
       )
     })
   })

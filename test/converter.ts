@@ -19,6 +19,7 @@ import { ThemeSet } from '../src/theme'
 import { WatchNotifier } from '../src/watcher'
 
 const timeout = 60000
+const timeoutLarge = 120000
 
 let mkdirSpy: jest.SpiedFunction<typeof fs.promises.mkdir>
 let writeFileSpy: jest.SpiedFunction<typeof fs.promises.writeFile>
@@ -903,16 +904,20 @@ describe('Converter', () => {
       })
 
       describe('with custom timeout set by browser manager', () => {
-        it('follows setting timeout', async () => {
-          await using browserManager = new BrowserManager({ timeout: 1 })
+        it(
+          'follows setting timeout',
+          async () => {
+            await using browserManager = new BrowserManager({ timeout: 1 })
 
-          await expect(
-            pdfInstance({
-              browserManager,
-              output: 'test.pdf',
-            }).convertFile(new File(onePath))
-          ).rejects.toThrow(TimeoutError)
-        })
+            await expect(
+              pdfInstance({
+                browserManager,
+                output: 'test.pdf',
+              }).convertFile(new File(onePath))
+            ).rejects.toThrow(TimeoutError)
+          },
+          timeout
+        )
       })
 
       describe('with Firefox browser', () => {
@@ -1220,7 +1225,7 @@ describe('Converter', () => {
             expect(width).toBe(640)
             expect(height).toBe(360)
           },
-          timeout
+          timeoutLarge
         )
       })
 

@@ -1,4 +1,4 @@
-import type { PuppeteerLaunchOptions } from 'puppeteer-core'
+import type { LaunchOptions } from 'puppeteer-core'
 import macDockIcon from '../../assets/mac-dock-icon.png'
 import { BrowserProtocol } from '../browser'
 import { ChromeBrowser } from './chrome'
@@ -6,7 +6,7 @@ import { ChromeBrowser } from './chrome'
 export class ChromeCdpBrowser extends ChromeBrowser {
   static readonly protocol: BrowserProtocol = 'cdp'
 
-  protected async launchPuppeteer(opts: PuppeteerLaunchOptions) {
+  protected async launchPuppeteer(opts: LaunchOptions) {
     const puppeteer = await super.launchPuppeteer(opts)
 
     // macOS specific: Set Marp icon asynchrnously
