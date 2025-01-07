@@ -589,7 +589,7 @@ describe('Converter', () => {
           async () => {
             const file = new File(onePath)
 
-            const fileCleanup = jest.spyOn(File.prototype as any, 'cleanup')
+            const unlink = jest.spyOn(fs.promises, 'unlink')
             const fileSave = jest
               .spyOn(File.prototype, 'save')
               .mockImplementation()
@@ -609,7 +609,7 @@ describe('Converter', () => {
             expect(fileTmp).toHaveBeenCalledWith(
               expect.objectContaining({ extension: '.html' })
             )
-            expect(fileCleanup).toHaveBeenCalledWith(
+            expect(unlink).toHaveBeenCalledWith(
               expect.stringContaining(os.tmpdir())
             )
             expect(fileSave).toHaveBeenCalled()
