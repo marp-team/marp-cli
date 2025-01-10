@@ -1501,6 +1501,20 @@ describe('Marp CLI', () => {
       })
     })
 
+    describe('with --pptx-editable options', () => {
+      it('prefers PPTX than HTML if not specified conversion type', async () => {
+        const cmd = [onePath, '--pptx-editable']
+        expect((await conversion(...cmd)).options.type).toBe(ConvertType.pptx)
+
+        // This option is actually not for defining conversion type so other
+        // options to set conversion type are always prioritized.
+        const cmdPptx = [onePath, '--pptx-editable', '--pdf']
+        expect((await conversion(...cmdPptx)).options.type).toBe(
+          ConvertType.pdf
+        )
+      })
+    })
+
     describe('with PUPPETEER_TIMEOUT env', () => {
       beforeEach(() => {
         process.env.PUPPETEER_TIMEOUT = '12345'

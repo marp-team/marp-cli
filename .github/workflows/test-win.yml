@@ -37,6 +37,9 @@ jobs:
           npm ci
           npx patch-package
 
+      - name: Set up LibreOffice
+        run: sudo apt-get install -y libreoffice-common
+
       # Retry tests up to 3 times due to flaky tests on Windows CI
       # https://stackoverflow.com/a/59365905
       - name: Jest

@@ -1060,6 +1060,54 @@ describe('Converter', () => {
           timeout
         )
       })
+
+      describe('with pptxEditable option', () => {
+        beforeEach(() => {
+          // Don't mock writeFile to use actually saved tmp file for conversion
+          writeFileSpy.mockRestore()
+        })
+
+        it(
+          'converts markdown file into PDF -> PPTX through soffice',
+          async () => {
+            const cvt = converter({ pptxEditable: true })
+            const editablePptxSpy = jest.spyOn(
+              cvt as any,
+              'convertFileToEditablePPTX'
+            )
+            const unlink = jest.spyOn(fs.promises, 'unlink')
+            const fileSave = jest
+              .spyOn(File.prototype, 'save')
+              .mockImplementation()
+            const fileTmp = jest.spyOn(File.prototype, 'saveTmpFile')
+            const warn = jest.spyOn(console, 'warn').mockImplementation()
+
+            await cvt.convertFile(new File(onePath))
+            expect(editablePptxSpy).toHaveBeenCalled()
+            expect(warn).toHaveBeenCalledWith(
+              expect.stringContaining(
+                'Converting to editable PPTX is experimental feature'
+              )
+            )
+            expect(fileTmp).toHaveBeenCalledWith(
+              expect.objectContaining({ extension: '.pdf' })
+            )
+            expect(unlink).toHaveBeenCalledWith(
+              expect.stringContaining(os.tmpdir())
+            )
+            expect(fileSave).toHaveBeenCalled()
+
+            const savedFile = fileSave.mock.instances[0] as unknown as File
+            expect(savedFile).toBeInstanceOf(File)
+            expect(savedFile.path).toBe('test.pptx')
+
+            // ZIP PK header for Office Open XML
+            expect(savedFile.buffer?.toString('ascii', 0, 2)).toBe('PK')
+            expect(savedFile.buffer?.toString('hex', 2, 4)).toBe('0304')
+          },
+          timeoutLarge
+        )
+      })
     })
 
     describe('when convert type is PNG', () => {
