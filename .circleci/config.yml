@@ -26,7 +26,9 @@ commands:
     steps:
       - run:
           name: Set up LibreOffice
-          command: sudo apt-get install -y libreoffice-common
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y libreoffice-common
 
       - restore_cache:
           keys:
