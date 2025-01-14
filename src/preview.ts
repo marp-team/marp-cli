@@ -165,15 +165,17 @@ export class Preview extends (EventEmitter as new () => TypedEmitter<Preview.Eve
           const idMatcher = (target: Target) => {
             debugPreview('Activated the window finder for %s.', id)
 
-            const url = new URL(target.url())
+            if (target.type() === 'page') {
+              const url = new URL(target.url())
 
-            if (url.searchParams.get('__marp_cli_id') === id) {
-              debugPreview('Found a target window with id: %s', id)
-              pptr.off('targetcreated', idMatcher)
+              if (url.searchParams.get('__marp_cli_id') === id) {
+                debugPreview('Found a target window with id: %s', id)
+                pptr.off('targetcreated', idMatcher)
 
-              void (async () => {
-                res((await target.page()) ?? (await target.asPage()))
-              })()
+                void (async () => {
+                  res((await target.page()) ?? (await target.asPage()))
+                })()
+              }
             }
           }
 
