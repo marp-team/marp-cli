@@ -2,7 +2,7 @@ import chalk from 'chalk'
 import { availableFinders } from './browser/finder'
 import { BrowserManager } from './browser/manager'
 import * as cli from './cli'
-import { fromArguments } from './config'
+import { DEFAULT_PARALLEL, fromArguments } from './config'
 import { Converter, ConvertedCallback, ConvertType } from './converter'
 import { CLIError, CLIErrorCode, error, isError } from './error'
 import { File, FileType } from './file'
@@ -171,6 +171,18 @@ export const marpCli = async (
           type: 'boolean',
           describe: 'Prevent looking up for a configuration file',
           group: OptionGroup.Basic,
+        },
+        parallel: {
+          alias: ['P'],
+          default: DEFAULT_PARALLEL,
+          describe: 'Number of max parallel processes for multiple conversions',
+          group: OptionGroup.Basic,
+          type: 'number',
+        },
+        'no-parallel': {
+          describe: 'Disable parallel processing',
+          group: OptionGroup.Basic,
+          type: 'boolean',
         },
         watch: {
           alias: 'w',
@@ -472,7 +484,12 @@ export const marpCli = async (
       if (cvtOpts.server) {
         await converter.convertFiles(foundFiles, { onlyScanning: true })
       } else {
-        cli.info(`Converting ${length} markdown${length > 1 ? 's' : ''}...`)
+        const isParallel = Math.min(converter.options.parallel ?? 1, length) > 1
+
+        cli.info(
+          `Converting ${length} markdown${length > 1 ? 's' : ''}...${isParallel ? ` (Parallelism: up to ${converter.options.parallel} workers)` : ''}`
+        )
+
         await converter.convertFiles(foundFiles, { onConverted })
       }
     } catch (e: unknown) {
@@ -551,7 +568,6 @@ export const marpCli = async (
         })().catch(rej)
       )
     }
-
     return 0
   } catch (e: unknown) {
     if (throwErrorAlways || !(e instanceof CLIError)) throw e

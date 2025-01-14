@@ -111,14 +111,14 @@ export class BrowserManager implements AsyncDisposable {
 
   async dispose() {
     await Promise.all([
-      async () => {
+      (async () => {
         await (await this._conversionBrowser.value)?.close()
         this._conversionBrowser.value = undefined
-      },
-      async () => {
+      })(),
+      (async () => {
         await (await this._previewBrowser.value)?.close()
         this._previewBrowser.value = undefined
-      },
+      })(),
     ])
   }
 

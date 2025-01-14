@@ -43,6 +43,7 @@ interface IMarpCLIArguments {
   notes?: boolean
   ogImage?: string
   output?: string | false
+  parallel?: number | boolean
   pdf?: boolean
   pdfNotes?: boolean
   pdfOutlines?: boolean
@@ -93,6 +94,8 @@ export type IMarpCLIConfig = Overwrite<
     themeSet?: string | string[]
   }
 >
+
+export const DEFAULT_PARALLEL = 5
 
 export class MarpCLIConfig {
   args: IMarpCLIArguments = {}
@@ -332,10 +335,25 @@ export class MarpCLIConfig {
       return scale
     })()
 
+    const parallel = (() => {
+      if (this.args.parallel === true) return DEFAULT_PARALLEL
+      if (this.args.parallel === false) return 1
+      if (typeof this.args.parallel === 'number')
+        return Math.max(1, this.args.parallel)
+
+      if (this.conf.parallel === true) return DEFAULT_PARALLEL
+      if (this.conf.parallel === false) return 1
+      if (typeof this.conf.parallel === 'number')
+        return Math.max(1, this.conf.parallel)
+
+      return 1
+    })()
+
     return {
       imageScale,
       inputDir,
       output,
+      parallel,
       pdfNotes,
       pdfOutlines,
       preview,

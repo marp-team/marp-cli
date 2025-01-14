@@ -270,17 +270,24 @@ export class Converter {
     if (!inputDir && output && output !== '-' && files.length > 1)
       error('Output path cannot specify with processing multiple files.')
 
-    const parallel = Math.min(1, this.options.parallel ?? 1)
+    const parallel = Math.max(1, this.options.parallel ?? 1)
     const queue = [...files]
 
-    const workers = Array.from({ length: parallel }, async () => {
-      while (queue.length > 0) {
-        const file = queue.shift()
-        if (file) await this.convertFile(file, opts)
+    const workers = Array.from({ length: parallel }, async (_, i) => {
+      debug(`[Worker ${i + 1}] Start processing ...`)
+
+      let file: File | undefined
+
+      while ((file = queue.shift())) {
+        debug(`[Worker ${i + 1}] Processing ${file.absolutePath} ...`)
+        await this.convertFile(file, opts)
       }
+
+      debug(`[Worker ${i + 1}] Finish processing.`)
     })
 
     await Promise.all(workers)
+    debug(`Batch processing has been completed.`)
   }
 
   private convertFileToHTML(tpl: TemplateResult, file: File): File {
