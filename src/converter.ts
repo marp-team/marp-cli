@@ -74,6 +74,7 @@ export interface ConverterOption {
   options: MarpitOptions
   output?: string | false
   pages?: boolean | number[]
+  parallel?: number
   pdfNotes?: boolean
   pdfOutlines?:
     | false
@@ -211,6 +212,8 @@ export class Converter {
     }
 
     if (!opts.onlyScanning) {
+      debug('Converting %s ...', file.relativePath())
+
       const files: File[] = []
       switch (this.options.type) {
         case ConvertType.pdf:
@@ -267,7 +270,17 @@ export class Converter {
     if (!inputDir && output && output !== '-' && files.length > 1)
       error('Output path cannot specify with processing multiple files.')
 
-    for (const file of files) await this.convertFile(file, opts)
+    const parallel = Math.min(1, this.options.parallel ?? 1)
+    const queue = [...files]
+
+    const workers = Array.from({ length: parallel }, async () => {
+      while (queue.length > 0) {
+        const file = queue.shift()
+        if (file) await this.convertFile(file, opts)
+      }
+    })
+
+    await Promise.all(workers)
   }
 
   private convertFileToHTML(tpl: TemplateResult, file: File): File {
