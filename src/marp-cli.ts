@@ -9,7 +9,7 @@ import { File, FileType } from './file'
 import { Preview, fileToURI } from './preview'
 import { Server } from './server'
 import templates from './templates'
-import { isOfficialDockerImage } from './utils/container'
+import { isOfficialContainerImage } from './utils/container'
 import { createYargs } from './utils/yargs'
 import version from './version'
 import watcher, { Watcher, notifier } from './watcher'
@@ -199,7 +199,7 @@ export const marpCli = async (
         preview: {
           alias: 'p',
           describe: 'Open preview window',
-          hidden: isOfficialDockerImage(),
+          hidden: isOfficialContainerImage(),
           group: OptionGroup.Basic,
           type: 'boolean',
         },
@@ -226,6 +226,7 @@ export const marpCli = async (
           describe:
             '[EXPERIMENTAL] Generate editable PPTX when converting to PPTX',
           group: OptionGroup.Converter,
+          hidden: isOfficialContainerImage(), // Container image does not include LibreOffice Impress
           type: 'boolean',
         },
         notes: {

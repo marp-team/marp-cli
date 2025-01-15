@@ -2,7 +2,7 @@ import os from 'node:os'
 import path from 'node:path'
 import { promisify } from 'node:util'
 import { tmpName } from 'tmp'
-import { isOfficialDockerImage } from './container'
+import { isOfficialContainerImage } from './container'
 
 const tmpNamePromise = promisify(tmpName)
 
@@ -10,7 +10,7 @@ const tmpNamePromise = promisify(tmpName)
 // directory so always create tmp file to home directory if in Linux.
 // (Except an official docker image)
 const shouldPutTmpFileToHome =
-  process.platform === 'linux' && !isOfficialDockerImage()
+  process.platform === 'linux' && !isOfficialContainerImage()
 
 export const generateTmpName = async (extension?: `.${string}`) => {
   let tmp: string = await tmpNamePromise({ postfix: extension })
