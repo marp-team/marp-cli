@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Added
+
+- Introduce parallelism for batch conversion: `--parallel` / `-P` ([#509](https://github.com/marp-team/marp-cli/issues/509), [#628](https://github.com/marp-team/marp-cli/pull/628))
+
+### Fixed
+
+- Make the preview option stable against occasional invalid URL errors ([#627](https://github.com/marp-team/marp-cli/pull/627))
+
 ## v4.0.4 - 2024-12-25
 
 ### Added

@@ -2,6 +2,7 @@ import { EventEmitter } from 'node:events'
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
+import { isPromise } from 'node:util/types'
 import { nanoid } from 'nanoid'
 import type {
   Browser as PuppeteerBrowser,
@@ -11,6 +12,7 @@ import type {
 } from 'puppeteer-core'
 import type TypedEventEmitter from 'typed-emitter'
 import { debugBrowser } from '../utils/debug'
+import { createMemoizedPromiseContext } from '../utils/memoized-promise'
 import {
   getWindowsEnv,
   isWSL,
@@ -46,11 +48,11 @@ export abstract class Browser
 
   path: string
   protocolTimeout: number
-  puppeteer: PuppeteerBrowser | undefined
   timeout: number
   #dataDirName: string
 
-  private _puppeteerDataDir?: string
+  private _puppeteerDataDir = createMemoizedPromiseContext<string>()
+  private _puppeteer = createMemoizedPromiseContext<PuppeteerBrowser>()
 
   constructor(opts: BrowserOptions) {
     super()
@@ -70,28 +72,31 @@ export abstract class Browser
     return (this.constructor as typeof Browser).protocol
   }
 
-  async launch(opts: LaunchOptions = {}): Promise<PuppeteerBrowser> {
-    if (!this.puppeteer) {
+  async launch(opts: LaunchOptions = {}) {
+    return this._puppeteer.init(async () => {
+      debugBrowser('Launching browser via Puppeteer...')
+
       const puppeteer = await this.launchPuppeteer(opts)
 
       puppeteer.once('disconnected', () => {
         this.emit('disconnect', puppeteer)
-        this.puppeteer = undefined
+        this._puppeteer.value = undefined
 
         debugBrowser('Browser disconnected (Cleaned up puppeteer instance)')
       })
 
-      this.puppeteer = puppeteer
       this.emit('launch', puppeteer)
 
       return puppeteer
-    }
-    return this.puppeteer
+    })
   }
 
   async withPage<T>(fn: (page: Page) => T) {
+    const debugPageId = nanoid(8)
     const puppeteer = await this.launch()
     const page = await puppeteer.newPage()
+
+    debugBrowser('Created a new page [%s]', debugPageId)
 
     page.setDefaultTimeout(this.timeout)
     page.setDefaultNavigationTimeout(this.timeout)
@@ -100,19 +105,20 @@ export abstract class Browser
       return await fn(page)
     } finally {
       await page.close()
+      debugBrowser('Page closed [%s]', debugPageId)
     }
   }
 
   async close() {
-    if (this.puppeteer) {
-      const { puppeteer } = this
+    const pptr = await this._puppeteer.value
 
-      if (puppeteer.connected) {
-        await puppeteer.close()
-        this.emit('close', puppeteer)
+    if (pptr) {
+      if (pptr.connected) {
+        await pptr.close()
+        this.emit('close', pptr)
       }
 
-      this.puppeteer = undefined
+      this._puppeteer.value = undefined
     }
   }
 
@@ -123,7 +129,15 @@ export abstract class Browser
   async browserInWSLHost(): Promise<boolean> {
     return (
       !!(await isWSL()) &&
-      wslHostMatcher.test(this.puppeteer?.process()?.spawnfile ?? this.path)
+      wslHostMatcher.test(
+        // This function may be called while launching Puppeteer. If the browser
+        // value awaited, Marp CLI will bring deadlock. So we should check the
+        // value is already resolved (non-Promise truthy value) or not (Promise
+        // or undefined).
+        (this._puppeteer.value && !isPromise(this._puppeteer.value)
+          ? this._puppeteer.value.process()?.spawnfile
+          : null) ?? this.path
+      )
     )
   }
 
@@ -160,10 +174,10 @@ export abstract class Browser
 
   /** @internal */
   protected async puppeteerDataDir() {
-    if (this._puppeteerDataDir === undefined) {
+    return this._puppeteerDataDir.init(async () => {
       let needToTranslateWindowsPathToWSL = false
 
-      this._puppeteerDataDir = await (async () => {
+      const dir = await (async () => {
         // In WSL environment, Marp CLI may use Chrome on Windows. If Chrome has
         // located in host OS (Windows), we have to specify Windows path.
         if (await this.browserInWSLHost()) {
@@ -176,16 +190,15 @@ export abstract class Browser
         return path.resolve(os.tmpdir(), this.#dataDirName)
       })()
 
-      debugBrowser(`Chrome data directory: %s`, this._puppeteerDataDir)
-
       // Ensure the data directory is created
       const mkdirPath = needToTranslateWindowsPathToWSL
-        ? await translateWindowsPathToWSL(this._puppeteerDataDir)
-        : this._puppeteerDataDir
+        ? await translateWindowsPathToWSL(dir)
+        : dir
 
       await fs.promises.mkdir(mkdirPath, { recursive: true })
       debugBrowser(`Created data directory: %s`, mkdirPath)
-    }
-    return this._puppeteerDataDir
+
+      return dir
+    })
   }
 }

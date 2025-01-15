@@ -256,6 +256,10 @@ marp --pdf --allow-local-files slide-deck.md
 
 ## Conversion modes
 
+### Parallelism
+
+When converting multiple files, Marp CLI will process them in parallel with 5 concurrency by default. You can set the number of concurrency by `--parallel` (`-P`) option, or disable parallelism by `--no-parallel`.
+
 ### Watch mode (`--watch` / `-w`) <a name="watch-mode"></a>
 
 Marp CLI will observe a change of Markdown and using theme CSS when passed with `--watch` (`-w`) option. The conversion will be triggered whenever the content of file is updated.

@@ -1,5 +1,6 @@
 import { error } from '../error'
 import { debugBrowser } from '../utils/debug'
+import { createMemoizedPromiseContext } from '../utils/memoized-promise'
 import type { Browser, BrowserProtocol } from './browser'
 import { ChromeCdpBrowser } from './browsers/chrome-cdp'
 import { defaultFinders, findBrowser } from './finder'
@@ -23,12 +24,12 @@ export class BrowserManager implements AsyncDisposable {
   // Finder
   private _finders: readonly FinderName[] = defaultFinders
   private _finderPreferredPath?: string
-  private _finderResult?: BrowserFinderResult
+  private _finderResult = createMemoizedPromiseContext<BrowserFinderResult>()
 
   // Browser
-  private _conversionBrowser?: Browser
+  private _conversionBrowser = createMemoizedPromiseContext<Browser>()
   private _preferredProtocol: BrowserProtocol = 'webDriverBiDi'
-  private _previewBrowser?: ChromeCdpBrowser
+  private _previewBrowser = createMemoizedPromiseContext<ChromeCdpBrowser>()
   private _timeout?: number
 
   constructor(config: BrowserManagerConfig = {}) {
@@ -42,11 +43,11 @@ export class BrowserManager implements AsyncDisposable {
   configure(config: BrowserManagerConfig) {
     if (config.finders) {
       this._finders = ([] as FinderName[]).concat(config.finders)
-      this._finderResult = undefined // Reset finder result cache
+      this._finderResult.value = undefined // Reset finder result cache
     }
     if (config.path !== undefined) {
       this._finderPreferredPath = config.path
-      this._finderResult = undefined // Reset finder result cache
+      this._finderResult.value = undefined // Reset finder result cache
     }
     if (config.protocol) {
       if (this._conversionBrowser)
@@ -62,14 +63,14 @@ export class BrowserManager implements AsyncDisposable {
   }
 
   async findBrowser() {
-    return (this._finderResult ??= await findBrowser(this._finders, {
-      preferredPath: this._finderPreferredPath,
-    }))
+    return this._finderResult.init(() =>
+      findBrowser(this._finders, { preferredPath: this._finderPreferredPath })
+    )
   }
 
   // Browser for converter
   async browserForConversion(): Promise<Browser> {
-    if (!this._conversionBrowser) {
+    return this._conversionBrowser.init(async () => {
       const { acceptedBrowsers, path } = await this.findBrowser()
 
       const browser =
@@ -90,14 +91,13 @@ export class BrowserManager implements AsyncDisposable {
       debugBrowser('Use browser class for conversion: %o', browser)
 
       // @ts-expect-error ts2511: TS cannot create an instance of an abstract class
-      this._conversionBrowser = new browser({ path, timeout: this.timeout })
-    }
-    return this._conversionBrowser!
+      return new browser({ path, timeout: this.timeout })
+    })
   }
 
   // Browser for preview window
   async browserForPreview(): Promise<ChromeCdpBrowser> {
-    if (!this._previewBrowser) {
+    return this._previewBrowser.init(async () => {
       const { acceptedBrowsers, path } = await this.findBrowser()
 
       if (!acceptedBrowsers.some((browser) => browser === ChromeCdpBrowser)) {
@@ -105,18 +105,20 @@ export class BrowserManager implements AsyncDisposable {
       }
       debugBrowser('Use browser class for preview: %o', ChromeCdpBrowser)
 
-      this._previewBrowser = new ChromeCdpBrowser({
-        path,
-        timeout: this.timeout,
-      })
-    }
-    return this._previewBrowser
+      return new ChromeCdpBrowser({ path, timeout: this.timeout })
+    })
   }
 
   async dispose() {
     await Promise.all([
-      this._conversionBrowser?.close(),
-      this._previewBrowser?.close(),
+      (async () => {
+        await (await this._conversionBrowser.value)?.close()
+        this._conversionBrowser.value = undefined
+      })(),
+      (async () => {
+        await (await this._previewBrowser.value)?.close()
+        this._previewBrowser.value = undefined
+      })(),
     ])
   }
 

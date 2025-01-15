@@ -1141,6 +1141,42 @@ describe('Marp CLI', () => {
       })
     })
 
+    for (const opt of ['--parallel', '-P']) {
+      describe(`with ${opt} option`, () => {
+        it('converts files in parallel with specified concurrency', async () => {
+          expect((await conversion(opt, '2', onePath)).options.parallel).toBe(2)
+        })
+
+        it('converts files in parallel with 5 concurrency if set as true', async () => {
+          expect((await conversion(onePath, opt)).options.parallel).toBe(5)
+        })
+
+        it('converts files in serial if set as 1', async () => {
+          expect((await conversion(opt, '1', onePath)).options.parallel).toBe(1)
+        })
+
+        it('converts files in serial if set invalid value', async () => {
+          expect((await conversion(opt, '-1', onePath)).options.parallel).toBe(
+            1
+          )
+        })
+      })
+    }
+
+    describe('without parallel option', () => {
+      it('converts files in parallel with 5 concurrency', async () => {
+        expect((await conversion(onePath)).options.parallel).toBe(5)
+      })
+    })
+
+    describe('with --no-parallel option', () => {
+      it('converts files in serial', async () => {
+        expect(
+          (await conversion('--no-parallel', onePath)).options.parallel
+        ).toBe(1)
+      })
+    })
+
     describe('with -o option', () => {
       it('converts file and output to stdout when -o is "-"', async () => {
         const stdout = jest.spyOn(process.stdout, 'write').mockImplementation()
