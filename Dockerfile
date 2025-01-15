@@ -44,3 +44,6 @@ WORKDIR /home/marp/app
 ENTRYPOINT ["docker-entrypoint"]
 CMD ["--help"]
 LABEL maintainer="Marp team"
+
+# Generate V8 compile cache
+RUN node marp-cli.js --version
