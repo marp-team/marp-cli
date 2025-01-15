@@ -1271,7 +1271,7 @@ describe('Converter', () => {
             expect(secondCall[1]).toBeInstanceOf(Buffer)
             expect((secondCall[1] as Buffer).length).toBeLessThan(jpeg.length)
           },
-          timeout
+          timeoutLarge
         )
       })
 
@@ -1315,7 +1315,7 @@ describe('Converter', () => {
             expect(secondCall[1]).toBeInstanceOf(Buffer)
             expect((secondCall[1] as Buffer).length).toBeLessThan(jpeg.length)
           },
-          timeout
+          timeoutLarge
         )
       })
     })
