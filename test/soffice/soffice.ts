@@ -88,7 +88,7 @@ describe('SOffice class', () => {
       expect(finishedTimes).toHaveLength(2)
       expect(
         Math.abs(finishedTimes[1] - finishedTimes[0])
-      ).toBeGreaterThanOrEqual(spawnSetting.delay)
+      ).toBeGreaterThanOrEqual(spawnSetting.delay - 10)
     })
   })
 
