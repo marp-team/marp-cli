@@ -87,7 +87,7 @@ commands:
     steps:
       - run:
           name: Jest
-          command: npm run test:coverage -- --ci -i --reporters=default --reporters=jest-junit
+          command: npm run test:coverage -- --ci --reporters=default --reporters=jest-junit
           environment:
             JEST_JUNIT_OUTPUT_DIR: tmp/test-results
             MARP_TEST_CI: 1

@@ -43,7 +43,8 @@ jobs:
         env:
           MARP_TEST_CI: 1
         run: >-
-          npm run test:coverage -- --ci -i --reporters=default --reporters=jest-junit --forceExit ||
+          npm run test:coverage -- --ci --reporters=default --reporters=jest-junit ||
+          npm run test:coverage -- --ci -i --reporters=default --reporters=jest-junit --forceExit --no-cache ||
           npm run test:coverage -- --ci -i --reporters=default --reporters=jest-junit --forceExit --no-cache ||
           npm run test:coverage -- --ci -i --reporters=default --reporters=jest-junit --forceExit --no-cache
 
