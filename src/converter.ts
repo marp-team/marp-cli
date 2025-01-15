@@ -128,6 +128,7 @@ export class Converter {
 
   private _sOffice: SOffice | undefined = undefined
   private _firefoxPDFConversionWarning = false
+  private _experimentalEditablePPTXWarning = false
 
   constructor(opts: ConverterOption) {
     this.options = opts
@@ -601,9 +602,13 @@ export class Converter {
     file: File
   ): Promise<File> {
     // Experimental warning
-    warn(
-      `${chalk.yellow`[EXPERIMENTAL]`} Converting to editable PPTX is experimental feature. The output depends on LibreOffice and slide reproducibility is not fully guaranteed.`
-    )
+    if (this._experimentalEditablePPTXWarning === false) {
+      this._experimentalEditablePPTXWarning = true
+
+      warn(
+        `${chalk.yellow`[EXPERIMENTAL]`} Converting to editable PPTX is experimental feature. The output depends on LibreOffice and slide reproducibility is not fully guaranteed.`
+      )
+    }
 
     // Convert to PDF
     const pdf = await this.convertFileToPDF(tpl, file, { postprocess: false })
@@ -731,6 +736,13 @@ export class Converter {
           await page.goto('data:text/html,', waitForOptions)
           await page.setContent(baseFile.buffer!.toString(), waitForOptions)
         }
+
+        // Wait for next frame (In parallel rendering, it may be needed to wait for the first rendering)
+        await page.evaluate(async () => {
+          await new Promise<void>((resolve) =>
+            window.requestAnimationFrame(() => resolve())
+          )
+        })
       }
 
       try {

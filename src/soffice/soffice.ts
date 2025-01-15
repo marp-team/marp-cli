@@ -7,6 +7,7 @@ import chalk from 'chalk'
 import { nanoid } from 'nanoid'
 import { error } from '../cli'
 import { debug } from '../utils/debug'
+import { createMemoizedPromiseContext } from '../utils/memoized-promise'
 import { getWindowsEnv, isWSL, translateWindowsPathToWSL } from '../utils/wsl'
 import { findSOffice } from './finder'
 
@@ -22,8 +23,10 @@ export class SOffice {
   preferredPath?: string
   #profileDirName: string
 
-  private _path?: string
-  private _profileDir?: string
+  private _path = createMemoizedPromiseContext<string>()
+  private _profileDir = createMemoizedPromiseContext<string>()
+
+  private static _spawnQueue: Promise<void> = Promise.resolve()
 
   constructor(opts: SOfficeOptions = {}) {
     this.#profileDirName = `marp-cli-soffice-${nanoid(10)}`
@@ -31,53 +34,57 @@ export class SOffice {
   }
 
   get path(): Promise<string> {
-    if (this._path) return Promise.resolve(this._path)
-
-    return (async () => {
-      const found = await findSOffice({ preferredPath: this.preferredPath })
-
-      this._path = found.path
-      return found.path
-    })()
+    return this._path.init(
+      async () =>
+        (await findSOffice({ preferredPath: this.preferredPath })).path
+    )
   }
 
   get profileDir(): Promise<string> {
-    if (this._profileDir) return Promise.resolve(this._profileDir)
-
-    return this.setProfileDir()
+    return this._profileDir.init(async () => await this.setProfileDir())
   }
 
   async spawn(args: string[]) {
-    const spawnArgs = [
-      `-env:UserInstallation=${pathToFileURL(await this.profileDir).toString()}`,
-      ...args,
-    ]
-
-    debug(`[soffice] Spawning soffice with args: %o`, spawnArgs)
-
-    const childProcess = spawn(await this.path, spawnArgs, { stdio: 'pipe' })
-
-    childProcess.stdout.on('data', (data) => {
-      debug(`[soffice:stdout] %s`, data.toString())
-    })
-
-    childProcess.stderr.on('data', (data) => {
-      const output = data.toString()
-
-      debug(`[soffice:stderr] %s`, output)
-      error(`${chalk.yellow`[soffice]`} ${output.trim()}`, { singleLine: true })
-    })
-
     return new Promise<void>((resolve, reject) => {
-      childProcess.on('close', (code) => {
-        debug(`[soffice] soffice exited with code %d`, code)
+      SOffice._spawnQueue = SOffice._spawnQueue
+        .then(async () => {
+          const spawnArgs = [
+            `-env:UserInstallation=${pathToFileURL(await this.profileDir).toString()}`,
+            ...args,
+          ]
 
-        if (code === 0) {
-          resolve()
-        } else {
-          reject(new Error(`soffice exited with code ${code}.`))
-        }
-      })
+          debug(`[soffice] Spawning soffice with args: %o`, spawnArgs)
+
+          const childProcess = spawn(await this.path, spawnArgs, {
+            stdio: 'pipe',
+          })
+
+          childProcess.stdout.on('data', (data) => {
+            debug(`[soffice:stdout] %s`, data.toString())
+          })
+
+          childProcess.stderr.on('data', (data) => {
+            const output = data.toString()
+
+            debug(`[soffice:stderr] %s`, output)
+            error(`${chalk.yellow`[soffice]`} ${output.trim()}`, {
+              singleLine: true,
+            })
+          })
+
+          return new Promise<void>((resolve, reject) => {
+            childProcess.on('close', (code) => {
+              debug(`[soffice] soffice exited with code %d`, code)
+
+              if (code === 0) {
+                resolve()
+              } else {
+                reject(new Error(`soffice exited with code ${code}.`))
+              }
+            })
+          })
+        })
+        .then(resolve, reject)
     })
   }
 
@@ -88,7 +95,7 @@ export class SOffice {
   private async setProfileDir(): Promise<string> {
     let needToTranslateWindowsPathToWSL = false
 
-    this._profileDir = await (async () => {
+    const dir = await (async () => {
       // In WSL environment, Marp CLI may use Chrome on Windows. If Chrome has
       // located in host OS (Windows), we have to specify Windows path.
       if (await this.binaryInWSLHost()) {
@@ -101,16 +108,16 @@ export class SOffice {
       return path.resolve(os.tmpdir(), this.#profileDirName)
     })()
 
-    debug(`soffice data directory: %s`, this._profileDir)
+    debug(`soffice data directory: %s`, dir)
 
     // Ensure the data directory is created
     const mkdirPath = needToTranslateWindowsPathToWSL
-      ? await translateWindowsPathToWSL(this._profileDir)
-      : this._profileDir
+      ? await translateWindowsPathToWSL(dir)
+      : dir
 
     await fs.promises.mkdir(mkdirPath, { recursive: true })
     debug(`Created data directory: %s`, mkdirPath)
 
-    return this._profileDir
+    return dir
   }
 }
