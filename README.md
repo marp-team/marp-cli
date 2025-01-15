@@ -701,7 +701,7 @@ This configuration will set the constructor option for Marp Core as specified:
 
 ### Auto completion
 
-For getting the power of auto completion for the config, such as [IntelliSense](https://code.visualstudio.com/docs/editor/intellisense), you can annotate the config object through JSDoc, with Marp CLI's `Config` type.
+When Marp CLI has been installed into the local project, for getting the power of auto completion for the config, such as [IntelliSense](https://code.visualstudio.com/docs/editor/intellisense), you can annotate the config object through JSDoc, with Marp CLI's `Config` type.
 
 ```javascript
 /** @type {import('@marp-team/marp-cli').Config} */
@@ -712,7 +712,7 @@ const config = {
 export default config
 ```
 
-Or you can use Vite-like `defineConfig` helper from Marp CLI instead.
+Or you can import Vite-like `defineConfig` helper from Marp CLI instead.
 
 ```javascript
 import { defineConfig } from '@marp-team/marp-cli'
