@@ -46,4 +46,4 @@ CMD ["--help"]
 LABEL maintainer="Marp team"
 
 # Generate V8 compile cache
-RUN node marp-cli.js --version
+RUN node /home/marp/.cli/marp-cli.js --version
