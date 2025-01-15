@@ -85,12 +85,13 @@ describe('Converter', () => {
         imageScale: 2,
         lang: 'fr',
         options: { html: true } as Options,
+        parallel: 3,
         server: false,
         template: 'test-template',
         templateOption: {},
         type: ConvertType.html,
         watch: false,
-      }
+      } as const satisfies ConverterOption
 
       expect(new Converter(options).options).toMatchObject(options)
     })
@@ -1386,17 +1387,50 @@ describe('Converter', () => {
   })
 
   describe('#convertFiles', () => {
+    const originalConvertFile = Converter.prototype.convertFile
+    const convertFileCallTimes: number[] = []
+
+    let convertFileSpy: jest.SpiedFunction<typeof originalConvertFile>
+
+    beforeEach(() => {
+      convertFileCallTimes.splice(0, convertFileCallTimes.length)
+
+      convertFileSpy = jest
+        .spyOn(Converter.prototype, 'convertFile')
+        .mockImplementation(function (this: Converter, ...args) {
+          convertFileCallTimes.push(Date.now())
+          return originalConvertFile.apply(this, args)
+        })
+    })
+
     describe('with multiple files', () => {
-      it('converts passed files', async () => {
-        await instance().convertFiles([new File(onePath), new File(twoPath)])
-        expect(fs.promises.writeFile).toHaveBeenCalledTimes(2)
-        expect(writeFileSpy.mock.calls[0][0]).toBe(
-          `${onePath.slice(0, -3)}.html`
-        )
-        expect(writeFileSpy.mock.calls[1][0]).toBe(
-          `${twoPath.slice(0, -6)}.html`
-        )
-      })
+      it(
+        'converts passed files',
+        async () => {
+          await instance({ type: ConvertType.pdf }).convertFiles([
+            new File(onePath),
+            new File(twoPath),
+          ])
+          expect(fs.promises.writeFile).toHaveBeenCalledTimes(2)
+
+          // Check sequential conversion
+          expect(convertFileSpy).toHaveBeenCalledTimes(2)
+          expect(convertFileCallTimes).toHaveLength(2)
+          expect(
+            Math.abs(convertFileCallTimes[1] - convertFileCallTimes[0])
+          ).toBeGreaterThanOrEqual(300)
+
+          const files = writeFileSpy.mock.calls.map(([fn]) => fn)
+          expect(files).toHaveLength(2)
+          expect(files).toStrictEqual(
+            expect.arrayContaining([
+              `${onePath.slice(0, -3)}.pdf`,
+              `${twoPath.slice(0, -6)}.pdf`,
+            ])
+          )
+        },
+        timeout
+      )
 
       it('throws CLIError when output is defined', () =>
         expect(
@@ -1416,6 +1450,34 @@ describe('Converter', () => {
 
         expect(fs.promises.writeFile).not.toHaveBeenCalled()
         expect(stdout).toHaveBeenCalledTimes(2)
+      })
+
+      describe('with parallel option', () => {
+        it(
+          'converts passed files in parallel with the number of specified workers',
+          async () => {
+            await instance({ parallel: 2, type: ConvertType.pdf }).convertFiles(
+              [new File(onePath), new File(twoPath)]
+            )
+
+            // Check parallelism
+            expect(convertFileSpy).toHaveBeenCalledTimes(2)
+            expect(convertFileCallTimes).toHaveLength(2)
+            expect(
+              Math.abs(convertFileCallTimes[1] - convertFileCallTimes[0])
+            ).toBeLessThan(300)
+
+            const files = writeFileSpy.mock.calls.map(([fn]) => fn)
+            expect(files).toHaveLength(2)
+            expect(files).toStrictEqual(
+              expect.arrayContaining([
+                `${onePath.slice(0, -3)}.pdf`,
+                `${twoPath.slice(0, -6)}.pdf`,
+              ])
+            )
+          },
+          timeout
+        )
       })
     })
   })
