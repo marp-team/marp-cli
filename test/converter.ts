@@ -12,11 +12,13 @@ import { TimeoutError } from 'puppeteer-core'
 import { fromBuffer as yauzlFromBuffer } from 'yauzl'
 import { BrowserManager } from '../src/browser/manager'
 import { Converter, ConvertType, ConverterOption } from '../src/converter'
-import { CLIError } from '../src/error'
+import * as sofficeFinder from '../src/soffice/finder'
+import { CLIError, CLIErrorCode } from '../src/error'
 import { File, FileType } from '../src/file'
 import { bare as bareTpl } from '../src/templates'
 import { ThemeSet } from '../src/theme'
 import { WatchNotifier } from '../src/watcher'
+import { SOffice } from '../src/soffice/soffice'
 
 const timeout = 60000
 const timeoutLarge = 120000
@@ -1108,6 +1110,28 @@ describe('Converter', () => {
           },
           timeoutLarge
         )
+
+        it('throws an error when soffice is not found', async () => {
+          const err = new CLIError('Error', CLIErrorCode.NOT_FOUND_SOFFICE)
+
+          jest.spyOn(console, 'warn').mockImplementation()
+          jest.spyOn(sofficeFinder, 'findSOffice').mockRejectedValue(err)
+
+          const cvt = converter({ pptxEditable: true })
+          await expect(() =>
+            cvt.convertFile(new File(onePath))
+          ).rejects.toThrow(err)
+        })
+
+        it('throws an error when soffice is spawned but does not generate a converted file', async () => {
+          jest.spyOn(console, 'warn').mockImplementation()
+          jest.spyOn(SOffice.prototype, 'spawn').mockResolvedValue()
+
+          const cvt = converter({ pptxEditable: true })
+          await expect(() =>
+            cvt.convertFile(new File(onePath))
+          ).rejects.toThrow('LibreOffice could not convert PPTX internally.')
+        })
       })
     })
 
