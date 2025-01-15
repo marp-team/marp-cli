@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v4.1.0 - 2025-01-15
+
 ### Added
 
 - Introduce parallelism for batch conversion: `--parallel` / `-P` ([#509](https://github.com/marp-team/marp-cli/issues/509), [#628](https://github.com/marp-team/marp-cli/pull/628), [#629](https://github.com/marp-team/marp-cli/pull/629))
