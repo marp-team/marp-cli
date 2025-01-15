@@ -9,6 +9,7 @@
 ### Fixed
 
 - Make the preview option stable against occasional invalid URL errors ([#627](https://github.com/marp-team/marp-cli/pull/627))
+- Generate V8 compile cache when building container image ([#630](https://github.com/marp-team/marp-cli/pull/630))
 
 ## v4.0.4 - 2024-12-25
 
