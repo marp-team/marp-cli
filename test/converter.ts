@@ -12,8 +12,10 @@ import { TimeoutError } from 'puppeteer-core'
 import { fromBuffer as yauzlFromBuffer } from 'yauzl'
 import { BrowserManager } from '../src/browser/manager'
 import { Converter, ConvertType, ConverterOption } from '../src/converter'
-import { CLIError } from '../src/error'
+import { CLIError, CLIErrorCode } from '../src/error'
 import { File, FileType } from '../src/file'
+import * as sofficeFinder from '../src/soffice/finder'
+import { SOffice } from '../src/soffice/soffice'
 import { bare as bareTpl } from '../src/templates'
 import { ThemeSet } from '../src/theme'
 import { WatchNotifier } from '../src/watcher'
@@ -590,7 +592,7 @@ describe('Converter', () => {
           async () => {
             const file = new File(onePath)
 
-            const fileCleanup = jest.spyOn(File.prototype as any, 'cleanup')
+            const unlink = jest.spyOn(fs.promises, 'unlink')
             const fileSave = jest
               .spyOn(File.prototype, 'save')
               .mockImplementation()
@@ -610,7 +612,7 @@ describe('Converter', () => {
             expect(fileTmp).toHaveBeenCalledWith(
               expect.objectContaining({ extension: '.html' })
             )
-            expect(fileCleanup).toHaveBeenCalledWith(
+            expect(unlink).toHaveBeenCalledWith(
               expect.stringContaining(os.tmpdir())
             )
             expect(fileSave).toHaveBeenCalled()
@@ -1060,6 +1062,76 @@ describe('Converter', () => {
           },
           timeout
         )
+      })
+
+      describe('with pptxEditable option', () => {
+        beforeEach(() => {
+          // Don't mock writeFile to use actually saved tmp file for conversion
+          writeFileSpy.mockRestore()
+        })
+
+        it(
+          'converts markdown file into PDF -> PPTX through soffice',
+          async () => {
+            const cvt = converter({ pptxEditable: true })
+            const editablePptxSpy = jest.spyOn(
+              cvt as any,
+              'convertFileToEditablePPTX'
+            )
+            const unlink = jest.spyOn(fs.promises, 'unlink')
+            const fileSave = jest
+              .spyOn(File.prototype, 'save')
+              .mockImplementation()
+            const fileTmp = jest.spyOn(File.prototype, 'saveTmpFile')
+            const warn = jest.spyOn(console, 'warn').mockImplementation()
+
+            await cvt.convertFile(new File(onePath))
+            expect(editablePptxSpy).toHaveBeenCalled()
+            expect(warn).toHaveBeenCalledWith(
+              expect.stringContaining(
+                'Converting to editable PPTX is experimental feature'
+              )
+            )
+            expect(fileTmp).toHaveBeenCalledWith(
+              expect.objectContaining({ extension: '.pdf' })
+            )
+            expect(unlink).toHaveBeenCalledWith(
+              expect.stringContaining(os.tmpdir())
+            )
+            expect(fileSave).toHaveBeenCalled()
+
+            const savedFile = fileSave.mock.instances[0] as unknown as File
+            expect(savedFile).toBeInstanceOf(File)
+            expect(savedFile.path).toBe('test.pptx')
+
+            // ZIP PK header for Office Open XML
+            expect(savedFile.buffer?.toString('ascii', 0, 2)).toBe('PK')
+            expect(savedFile.buffer?.toString('hex', 2, 4)).toBe('0304')
+          },
+          timeoutLarge
+        )
+
+        it('throws an error when soffice is not found', async () => {
+          const err = new CLIError('Error', CLIErrorCode.NOT_FOUND_SOFFICE)
+
+          jest.spyOn(console, 'warn').mockImplementation()
+          jest.spyOn(sofficeFinder, 'findSOffice').mockRejectedValue(err)
+
+          const cvt = converter({ pptxEditable: true })
+          await expect(() =>
+            cvt.convertFile(new File(onePath))
+          ).rejects.toThrow(err)
+        })
+
+        it('throws an error when soffice is spawned but does not generate a converted file', async () => {
+          jest.spyOn(console, 'warn').mockImplementation()
+          jest.spyOn(SOffice.prototype, 'spawn').mockResolvedValue()
+
+          const cvt = converter({ pptxEditable: true })
+          await expect(() =>
+            cvt.convertFile(new File(onePath))
+          ).rejects.toThrow('LibreOffice could not convert PPTX internally.')
+        })
       })
     })
 

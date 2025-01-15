@@ -24,6 +24,12 @@ commands:
         type: steps
         default: []
     steps:
+      - run:
+          name: Set up LibreOffice
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y libreoffice-common libreoffice-java-common libreoffice-impress default-jre
+
       - restore_cache:
           keys:
             - v3-dependencies-{{ .Environment.CIRCLE_JOB }}-{{ checksum "package-lock.json" }}-{{ .Branch }}

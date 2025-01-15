@@ -185,9 +185,23 @@ A created PPTX includes rendered Marp slide pages and the support of [Marpit pre
   <img src="https://raw.githubusercontent.com/marp-team/marp-cli/main/docs/images/pptx.png" height="300" />
 </p>
 
+#### _[EXPERIMENTAL]_ Generate editable pptx (`--pptx-editable`)
+
+A converted PPTX usually consists of pre-rendered background images, that is meaning **contents cannot to modify or re-use** in PowerPoint. If you want to generate editable PPTX for modifying texts, shapes, and images in GUI, you can pass `--pptx-editable` option together with `--pptx` option.
+
+```bash
+marp --pptx --pptx-editable slide-deck.md
+```
+
+> [!IMPORTANT]
+>
+> The experimental `--pptx-editable` option requires installing both of the browser and [LibreOffice Impress](https://www.libreoffice.org/).
+>
+> If the theme and inline styles are providing complex styles into the slide, **`--pptx-editable` may throw an error or output the incomplete result.** (e.g. `gaia` theme in Marp Core)
+
 > [!WARNING]
 >
-> A converted PPTX consists of pre-rendered images. Please note that **contents would not be able to modify** or re-use in PowerPoint.
+> Conversion to the editable PPTX results in **lower slide reproducibility compared to the conversion into regular PPTX and other formats.** Additionally, **presenter notes are not supported.** _We do not recommend to export the editable PPTX if maintaining the slide's appearance is important._
 
 ### Convert to PNG/JPEG image(s) 🌐
 
@@ -659,6 +673,7 @@ If you want to prevent looking up a configuration file, you can pass `--no-confi
 | ┗ `pages`         |           boolean           |  `--pdf-outlines.pages`   | Make PDF outlines from slide pages (`true` by default when `pdfOutlines` is enabled)                        |
 | ┗ `headings`      |           boolean           | `--pdf-outlines.headings` | Make PDF outlines from Markdown headings (`true` by default when `pdfOutlines` is enabled)                  |
 | `pptx`            |           boolean           |         `--pptx`          | Convert slide deck into PowerPoint document                                                                 |
+| `pptxEditable`    |           boolean           |     `--pptx-editable`     | _[EXPERIMENTAL]_ Generate editable PPTX when converting to PPTX                                             |
 | `preview`         |           boolean           |     `--preview` `-p`      | Open preview window                                                                                         |
 | `server`          |           boolean           |      `--server` `-s`      | Enable server mode                                                                                          |
 | `template`        |     `bare` \| `bespoke`     |       `--template`        | Choose template (`bespoke` by default)                                                                      |
@@ -701,7 +716,7 @@ This configuration will set the constructor option for Marp Core as specified:
 
 ### Auto completion
 
-For getting the power of auto completion for the config, such as [IntelliSense](https://code.visualstudio.com/docs/editor/intellisense), you can annotate the config object through JSDoc, with Marp CLI's `Config` type.
+When Marp CLI has been installed into the local project, for getting the power of auto completion for the config, such as [IntelliSense](https://code.visualstudio.com/docs/editor/intellisense), you can annotate the config object through JSDoc, with Marp CLI's `Config` type.
 
 ```javascript
 /** @type {import('@marp-team/marp-cli').Config} */
@@ -712,7 +727,7 @@ const config = {
 export default config
 ```
 
-Or you can use Vite-like `defineConfig` helper from Marp CLI instead.
+Or you can import Vite-like `defineConfig` helper from Marp CLI instead.
 
 ```javascript
 import { defineConfig } from '@marp-team/marp-cli'

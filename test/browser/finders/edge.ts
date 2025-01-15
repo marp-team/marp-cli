@@ -2,8 +2,8 @@ import path from 'node:path'
 import { ChromeBrowser } from '../../../src/browser/browsers/chrome'
 import { ChromeCdpBrowser } from '../../../src/browser/browsers/chrome-cdp'
 import { edgeFinder } from '../../../src/browser/finders/edge'
-import * as utils from '../../../src/browser/finders/utils'
 import { CLIError } from '../../../src/error'
+import * as utils from '../../../src/utils/finder'
 import * as wsl from '../../../src/utils/wsl'
 
 afterEach(() => {

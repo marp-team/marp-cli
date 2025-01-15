@@ -1,15 +1,15 @@
 import path from 'node:path'
 import { error, CLIErrorCode } from '../../error'
 // import { getWSL2NetworkingMode } from '../../utils/wsl'
-import { FirefoxBrowser } from '../browsers/firefox'
-import type { BrowserFinder, BrowserFinderResult } from '../finder'
 import {
   getPlatform,
   findExecutable,
   findExecutableBinary,
   isExecutable,
   normalizeDarwinAppPath,
-} from './utils'
+} from '../../utils/finder'
+import { FirefoxBrowser } from '../browsers/firefox'
+import type { BrowserFinder, BrowserFinderResult } from '../finder'
 
 const firefox = (path: string): BrowserFinderResult => ({
   path,

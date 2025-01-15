@@ -5,6 +5,7 @@
 ### Added
 
 - Introduce parallelism for batch conversion: `--parallel` / `-P` ([#509](https://github.com/marp-team/marp-cli/issues/509), [#628](https://github.com/marp-team/marp-cli/pull/628), [#629](https://github.com/marp-team/marp-cli/pull/629))
+- _[Experimental]_ `--pptx-editable` option to convert Markdown into editable PPTX ([#166](https://github.com/marp-team/marp-cli/issues/166), [#298](https://github.com/marp-team/marp-cli/issues/298), [#626](https://github.com/marp-team/marp-cli/pull/626))
 
 ### Fixed
 

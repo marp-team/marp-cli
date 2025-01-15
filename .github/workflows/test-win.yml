@@ -41,6 +41,9 @@ jobs:
           npm ci
           npx patch-package
 
+      - name: Set up LibreOffice
+        run: choco install libreoffice-fresh -y
+
       # Retry tests up to 3 times due to flaky tests on Windows CI
       # https://stackoverflow.com/a/59365905
       - name: Jest

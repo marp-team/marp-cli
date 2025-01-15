@@ -3,8 +3,8 @@ import * as chromeFinderModule from 'chrome-launcher/dist/chrome-finder'
 import { ChromeBrowser } from '../../../src/browser/browsers/chrome'
 import { ChromeCdpBrowser } from '../../../src/browser/browsers/chrome-cdp'
 import { chromeFinder } from '../../../src/browser/finders/chrome'
-import * as utils from '../../../src/browser/finders/utils'
 import { CLIError } from '../../../src/error'
+import * as utils from '../../../src/utils/finder'
 import * as wsl from '../../../src/utils/wsl'
 
 jest.mock('chrome-launcher/dist/chrome-finder')

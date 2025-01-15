@@ -199,11 +199,35 @@ describe('Marp CLI', () => {
 
         describe('when CLI is running in an official Docker image', () => {
           it('does not output help about --preview option', async () => {
-            jest.spyOn(container, 'isOfficialDockerImage').mockReturnValue(true)
+            jest
+              .spyOn(container, 'isOfficialContainerImage')
+              .mockReturnValue(true)
 
             expect(await run()).toBe(0)
             expect(log).toHaveBeenCalledWith(
               expect.not.stringContaining('--preview')
+            )
+          })
+        })
+      })
+
+      describe('PPTX editable option', () => {
+        it('outputs help about --pptx-editable option', async () => {
+          expect(await run()).toBe(0)
+          expect(log).toHaveBeenCalledWith(
+            expect.stringContaining('--pptx-editable')
+          )
+        })
+
+        describe('when CLI is running in an official Docker image', () => {
+          it('does not output help about --pptx-editable option', async () => {
+            jest
+              .spyOn(container, 'isOfficialContainerImage')
+              .mockReturnValue(true)
+
+            expect(await run()).toBe(0)
+            expect(log).toHaveBeenCalledWith(
+              expect.not.stringContaining('--pptx-editable')
             )
           })
         })
@@ -409,7 +433,9 @@ describe('Marp CLI', () => {
 
         describe('when CLI is running in an official Docker image', () => {
           it('ignores --preview option with warning', async () => {
-            jest.spyOn(container, 'isOfficialDockerImage').mockReturnValue(true)
+            jest
+              .spyOn(container, 'isOfficialContainerImage')
+              .mockReturnValue(true)
 
             const warn = jest.spyOn(cli, 'warn').mockImplementation()
 
@@ -1423,7 +1449,9 @@ describe('Marp CLI', () => {
 
       describe('when CLI is running in an official Docker image', () => {
         it('ignores --preview option with warning', async () => {
-          jest.spyOn(container, 'isOfficialDockerImage').mockReturnValue(true)
+          jest
+            .spyOn(container, 'isOfficialContainerImage')
+            .mockReturnValue(true)
 
           await marpCli([onePath, '--preview', '--no-output'])
 
@@ -1534,6 +1562,20 @@ describe('Marp CLI', () => {
           expect(converter.options.type).toBe(ConvertType.pdf)
           expect(converter.options.pdfOutlines).toBe(false)
         })
+      })
+    })
+
+    describe('with --pptx-editable options', () => {
+      it('prefers PPTX than HTML if not specified conversion type', async () => {
+        const cmd = [onePath, '--pptx-editable']
+        expect((await conversion(...cmd)).options.type).toBe(ConvertType.pptx)
+
+        // This option is actually not for defining conversion type so other
+        // options to set conversion type are always prioritized.
+        const cmdPptx = [onePath, '--pptx-editable', '--pdf']
+        expect((await conversion(...cmdPptx)).options.type).toBe(
+          ConvertType.pdf
+        )
       })
     })
 

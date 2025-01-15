@@ -14,7 +14,7 @@ import { error, isError } from './error'
 import { TemplateOption } from './templates'
 import { Theme, ThemeSet } from './theme'
 import { isStandaloneBinary } from './utils/binary'
-import { isOfficialDockerImage } from './utils/container'
+import { isOfficialContainerImage } from './utils/container'
 
 type Overwrite<T, U> = Omit<T, Extract<keyof T, keyof U>> & U
 
@@ -50,6 +50,7 @@ interface IMarpCLIArguments {
   'pdfOutlines.pages'?: boolean
   'pdfOutlines.headings'?: boolean
   pptx?: boolean
+  pptxEditable?: boolean
   preview?: boolean
   server?: boolean
   template?: string
@@ -213,7 +214,7 @@ export class MarpCLIConfig {
     const preview = (() => {
       const p = this.args.preview ?? this.conf.preview ?? false
 
-      if (p && isOfficialDockerImage()) {
+      if (p && isOfficialContainerImage()) {
         warn(
           `Preview window cannot show within an official docker image. Preview option was ignored.`
         )
@@ -282,6 +283,8 @@ export class MarpCLIConfig {
           })()
         : false
 
+    const pptxEditable = !!(this.args.pptxEditable || this.conf.pptxEditable)
+
     const type = ((): ConvertType => {
       // CLI options
       if (this.args.pdf || this.conf.pdf) return ConvertType.pdf
@@ -311,6 +314,11 @@ export class MarpCLIConfig {
       // Prefer PDF than HTML if enabled any PDF options
       if ((this.args.pdf ?? this.conf.pdf) !== false) {
         if (pdfNotes || pdfOutlines) return ConvertType.pdf
+      }
+
+      // Prefer PPTX than HTML if enabled PPTX option
+      if ((this.args.pptx ?? this.conf.pptx) !== false) {
+        if (pptxEditable) return ConvertType.pptx
       }
 
       return ConvertType.html
@@ -358,6 +366,7 @@ export class MarpCLIConfig {
       parallel,
       pdfNotes,
       pdfOutlines,
+      pptxEditable,
       preview,
       server,
       template,

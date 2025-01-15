@@ -2,8 +2,8 @@ import path from 'node:path'
 import which from 'which'
 import { FirefoxBrowser } from '../../../src/browser/browsers/firefox'
 import { firefoxFinder } from '../../../src/browser/finders/firefox'
-import * as utils from '../../../src/browser/finders/utils'
 import { CLIError } from '../../../src/error'
+import * as utils from '../../../src/utils/finder'
 
 jest.mock('which')
 
@@ -28,7 +28,7 @@ const executableMock = (name: string) =>
 
 describe('Firefox finder', () => {
   describe('with preferred path', () => {
-    it('returns the preferred path as edge', async () => {
+    it('returns the preferred path as firefox', async () => {
       const firefox = await firefoxFinder({
         preferredPath: '/test/preferred/firefox',
       })
@@ -152,9 +152,9 @@ describe('Firefox finder', () => {
 
     it('finds possible executable path and returns the matched path', async () => {
       const findExecutableSpy = jest.spyOn(utils, 'findExecutable')
-      const edge = await firefoxFinder({})
+      const firefox = await firefoxFinder({})
 
-      expect(edge).toStrictEqual({
+      expect(firefox).toStrictEqual({
         path: '/Applications/Firefox.app/Contents/MacOS/firefox',
         acceptedBrowsers: [FirefoxBrowser],
       })
@@ -175,9 +175,9 @@ describe('Firefox finder', () => {
             p === '/Applications/Firefox.app/Contents/MacOS/firefox'
         )
 
-      const edge = await firefoxFinder({})
+      const firefox = await firefoxFinder({})
 
-      expect(edge).toStrictEqual({
+      expect(firefox).toStrictEqual({
         path: '/Applications/Firefox Developer Edition.app/Contents/MacOS/firefox',
         acceptedBrowsers: [FirefoxBrowser],
       })
@@ -222,9 +222,9 @@ describe('Firefox finder', () => {
 
     it('finds possible executable path and returns the matched path', async () => {
       const findExecutableSpy = jest.spyOn(utils, 'findExecutable')
-      const edge = await firefoxFinder({})
+      const firefox = await firefoxFinder({})
 
-      expect(edge).toStrictEqual({
+      expect(firefox).toStrictEqual({
         path: firefoxPath,
         acceptedBrowsers: [FirefoxBrowser],
       })
@@ -321,9 +321,9 @@ describe('Firefox finder', () => {
 
     it('finds possible executable path and returns the matched path', async () => {
       const findExecutableSpy = jest.spyOn(utils, 'findExecutable')
-      const edge = await firefoxFinder({})
+      const firefox = await firefoxFinder({})
 
-      expect(edge).toStrictEqual({
+      expect(firefox).toStrictEqual({
         path: '/mnt/c/Program Files/Mozilla Firefox/firefox.exe',
         acceptedBrowsers: [FirefoxBrowser],
       })
