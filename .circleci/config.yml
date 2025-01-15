@@ -84,10 +84,14 @@ commands:
           command: npm run lint:css
 
   test:
+    parameters:
+      runInBand:
+        type: boolean
+        default: false
     steps:
       - run:
           name: Jest
-          command: npm run test:coverage -- --ci --reporters=default --reporters=jest-junit
+          command: npm run test:coverage -- --ci --reporters=default --reporters=jest-junit <<# parameters.runInBand >>-i<</ parameters.runInBand >>
           environment:
             JEST_JUNIT_OUTPUT_DIR: tmp/test-results
             MARP_TEST_CI: 1
@@ -129,7 +133,8 @@ jobs:
       - prepare:
           browser: true
       - lint
-      - test
+      - test:
+          runInBand: true
 
   test-node20:
     executor:
@@ -140,7 +145,8 @@ jobs:
       - prepare:
           browser: true
       - lint
-      - test
+      - test:
+          runInBand: true
 
   test-node22:
     executor:

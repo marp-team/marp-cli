@@ -24,6 +24,10 @@ jobs:
       # - name: Output concurrency group
       #   run: echo "${{ github.workflow }}-${{ (github.ref_name == 'main' && github.run_id) || format('{0}-{1}', github.actor, github.head_ref || github.ref_name) }}"
 
+      - name: Get number of CPU cores
+        uses: SimenB/github-actions-cpu-cores@v2
+        id: cpu-cores
+
       - uses: actions/checkout@v4
 
       - name: Use Node.js ${{ matrix.node-version }}
@@ -43,7 +47,7 @@ jobs:
         env:
           MARP_TEST_CI: 1
         run: >-
-          npm run test:coverage -- --ci --reporters=default --reporters=jest-junit ||
+          npm run test:coverage -- --ci --max-workers ${{ steps.cpu-cores.outputs.count }} --reporters=default --reporters=jest-junit ||
           npm run test:coverage -- --ci -i --reporters=default --reporters=jest-junit --forceExit --no-cache ||
           npm run test:coverage -- --ci -i --reporters=default --reporters=jest-junit --forceExit --no-cache ||
           npm run test:coverage -- --ci -i --reporters=default --reporters=jest-junit --forceExit --no-cache
