@@ -96,7 +96,7 @@ export class SOffice {
     let needToTranslateWindowsPathToWSL = false
 
     const dir = await (async () => {
-      // In WSL environment, Marp CLI may use Chrome on Windows. If Chrome has
+      // In WSL environment, Marp CLI may use soffice on Windows. If soffice has
       // located in host OS (Windows), we have to specify Windows path.
       if (await this.binaryInWSLHost()) {
         if (wslTmp === undefined) wslTmp = await getWindowsEnv('TMP')
