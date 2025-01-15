@@ -668,6 +668,13 @@ export class Converter {
           await page.goto('data:text/html,', waitForOptions)
           await page.setContent(baseFile.buffer!.toString(), waitForOptions)
         }
+
+        // Wait for next frame (In parallel rendering, it may be needed to wait for the first rendering)
+        await page.evaluate(async () => {
+          await new Promise<void>((resolve) =>
+            window.requestAnimationFrame(() => resolve())
+          )
+        })
       }
 
       try {
