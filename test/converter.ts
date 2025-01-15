@@ -12,13 +12,13 @@ import { TimeoutError } from 'puppeteer-core'
 import { fromBuffer as yauzlFromBuffer } from 'yauzl'
 import { BrowserManager } from '../src/browser/manager'
 import { Converter, ConvertType, ConverterOption } from '../src/converter'
-import * as sofficeFinder from '../src/soffice/finder'
 import { CLIError, CLIErrorCode } from '../src/error'
 import { File, FileType } from '../src/file'
+import * as sofficeFinder from '../src/soffice/finder'
+import { SOffice } from '../src/soffice/soffice'
 import { bare as bareTpl } from '../src/templates'
 import { ThemeSet } from '../src/theme'
 import { WatchNotifier } from '../src/watcher'
-import { SOffice } from '../src/soffice/soffice'
 
 const timeout = 60000
 const timeoutLarge = 120000
