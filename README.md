@@ -564,7 +564,7 @@ By using `--version` (`-v`) option, you may confirm the version of engine that i
 
 ```console
 $ marp --version
-@marp-team/marp-cli v41.x.x (w/ @marp-team/marp-core v4.x.x)
+@marp-team/marp-cli v4.x.x (w/ @marp-team/marp-core v4.x.x)
 ```
 
 ### Use specific version of Marp Core
@@ -652,6 +652,7 @@ If you want to prevent looking up a configuration file, you can pass `--no-confi
 | `ogImage`         |           string            |       `--og-image`        | Define [Open Graph] image URL                                                                               |
 | `options`         |           object            |                           | The base options for the constructor of engine                                                              |
 | `output`          |           string            |      `--output` `-o`      | Output file path (or directory when input-dir is passed)                                                    |
+| `parallel`        |      boolean \| number      |     `--parallel` `-P`     | Set the number of concurrency for parallel conversion (`5` by default)                                      |
 | `pdf`             |           boolean           |          `--pdf`          | Convert slide deck into PDF                                                                                 |
 | `pdfNotes`        |           boolean           |       `--pdf-notes`       | Add [presenter notes][marpit presenter notes] to PDF as annotations                                         |
 | `pdfOutlines`     |      boolean \| object      |     `--pdf-outlines`      | Add outlines (bookmarks) to PDF                                                                             |
