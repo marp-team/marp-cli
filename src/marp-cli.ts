@@ -174,7 +174,7 @@ export const marpCli = async (
         },
         parallel: {
           alias: ['P'],
-          default: DEFAULT_PARALLEL,
+          defaultDescription: DEFAULT_PARALLEL.toString(),
           describe: 'Number of max parallel processes for multiple conversions',
           group: OptionGroup.Basic,
           type: 'number',

@@ -336,17 +336,19 @@ export class MarpCLIConfig {
     })()
 
     const parallel = (() => {
-      if (this.args.parallel === true) return DEFAULT_PARALLEL
-      if (this.args.parallel === false) return 1
-      if (typeof this.args.parallel === 'number')
-        return Math.max(1, this.args.parallel)
+      const parseParallel = (value: boolean | number | undefined) => {
+        if (value === true) return DEFAULT_PARALLEL
+        if (value === false) return 1
+        if (typeof value === 'number') return Math.max(1, value)
 
-      if (this.conf.parallel === true) return DEFAULT_PARALLEL
-      if (this.conf.parallel === false) return 1
-      if (typeof this.conf.parallel === 'number')
-        return Math.max(1, this.conf.parallel)
+        return undefined
+      }
 
-      return 1
+      return (
+        parseParallel(this.args.parallel) ??
+        parseParallel(this.conf.parallel) ??
+        DEFAULT_PARALLEL
+      )
     })()
 
     return {
