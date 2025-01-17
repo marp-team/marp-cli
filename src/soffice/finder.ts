@@ -7,7 +7,8 @@ import {
   isExecutable,
   normalizeDarwinAppPath,
 } from '../utils/finder'
-import { getWSL2NetworkingMode } from '../utils/wsl'
+
+const scoopRestPath = ['scoop', 'apps', 'libreoffice', 'current'] as const
 
 const sOffice = (path: string) => ({ path }) as const
 
@@ -28,11 +29,9 @@ export const findSOffice = async ({
         return await sOfficeFinderDarwin()
       case 'win32':
         return await sOfficeFinderWin32()
-      case 'wsl1':
-        return await sOfficeFinderWSL()
     }
 
-    return await sOfficeFinderLinuxOrFallback()
+    return await sOfficeFinderLinux()
   })()
 
   if (installation) return sOffice(installation)
@@ -73,6 +72,14 @@ const sOfficeFinderWin32 = async () => {
     }
   }
 
+  // Scoop
+  if (process.env.USERPROFILE) {
+    prefixes.push(path.join(process.env.USERPROFILE, ...scoopRestPath))
+  }
+  if (process.env.ALLUSERSPROFILE) {
+    prefixes.push(path.join(process.env.ALLUSERSPROFILE, ...scoopRestPath))
+  }
+
   return await findExecutable(
     prefixes.map((prefix) =>
       path.join(prefix, 'LibreOffice', 'program', 'soffice.exe')
@@ -80,42 +87,4 @@ const sOfficeFinderWin32 = async () => {
   )
 }
 
-const sOfficeFinderWSL = async () => {
-  const prefixes: string[] = []
-
-  const winDriveMatcher = /^\/mnt\/[a-z]\//i
-  const winPossibleDrives = () => {
-    const possibleDriveSet = new Set<string>(['c'])
-    const pathEnvs = process.env.PATH?.split(':') ?? []
-
-    for (const pathEnv of pathEnvs) {
-      if (winDriveMatcher.test(pathEnv)) {
-        possibleDriveSet.add(pathEnv[5].toLowerCase())
-      }
-    }
-
-    return Array.from(possibleDriveSet).sort()
-  }
-
-  for (const drive of winPossibleDrives()) {
-    prefixes.push(`/mnt/${drive}/Program Files`)
-    prefixes.push(`/mnt/${drive}/Program Files (x86)`)
-  }
-
-  return await findExecutable(
-    prefixes.map((prefix) =>
-      path.posix.join(prefix, 'LibreOffice', 'program', 'soffice.exe')
-    )
-  )
-}
-
-const sOfficeFinderLinuxOrFallback = async () => {
-  const ret = await findExecutableBinary(['soffice'])
-  if (ret) return ret
-
-  // WSL2 Fallback
-  if ((await getWSL2NetworkingMode()) === 'mirrored')
-    return await sOfficeFinderWSL()
-
-  return undefined
-}
+const sOfficeFinderLinux = async () => await findExecutableBinary(['soffice'])
