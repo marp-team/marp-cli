@@ -10,18 +10,18 @@ Marp CLI's `bespoke` HTML template supports **slide transition animations**, tha
 
 ## Prerequisite
 
-The slide transition depends on **[View Transitions] API** in the using browser. _We does never lock in to a specific JavaScript library_, as same as other Marp ecosystem projects :)
+The slide transition depends on **[View Transition] API** in the using browser. _We does never lock in to a specific JavaScript library_, as same as other Marp ecosystem projects :)
 
-To show transition animations, a viewer has to show HTML slide in the browser which have supported View Transitions.
+To show transition animations, a viewer has to show HTML slide in the browser which have supported View Transition.
 
-[view transitions]: https://www.w3.org/TR/css-view-transitions-1/
+[view transition]: https://www.w3.org/TR/css-view-transitions-1/
 
 ### Supported browsers
 
 - **Chrome**: ✅ (111-)
 - **Edge**: ✅ (111-)
+- **Safari**: ✅ (18.2- / [#572](https://github.com/marp-team/marp-cli/issues/572))
 - **Firefox**: :x:
-- **Safari**: Testable in [Safari Technology Preview 192](https://webkit.org/blog/15260/release-notes-for-safari-technology-preview-192/) and later
 
 ## `transition` local directive
 
@@ -491,7 +491,7 @@ If you want to swap the order of layers during animation, try to animate `z-inde
 
 ## Morphing animations
 
-View Transitions API also provides smooth moving animation during the transition, for specific two elements before and after the transition. It gives a very similar effect to PowerPoint's Morph transition and Keynote's Magic Move, just by simple CSS declarations.
+View Transition API also provides smooth moving animation during the transition, for specific two elements before and after the transition. It gives a very similar effect to PowerPoint's Morph transition and Keynote's Magic Move, just by simple CSS declarations.
 
 If there were marked elements with the same name by [`view-transition-name` CSS property][view-transition-name] in a old page and new page between transition, the `bespoke` template will apply morphing animation automatically.
 

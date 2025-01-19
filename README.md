@@ -375,10 +375,10 @@ The `bespoke` template is using [Bespoke.js](https://github.com/bespokejs/bespok
 - **Fragmented list**: Recognize [Marpit's fragmented list](https://github.com/marp-team/marpit/issues/145) and appear list one-by-one if used `*` and `1)` as the bullet marker.
 - **Presenter view**: Open presenter view in external window by hitting <kbd>p</kbd> key. (It may become disabled when not fulfilled requirements for working)
 - **Progress bar** (optional): By setting `--bespoke.progress` option, you can add a progress bar on the top of the deck.
-- [**Slide transitions**][transitions]: Support transitions (`transition` local directive) powered by [View Transitions API].
+- [**Slide transitions**][transitions]: Support transitions (`transition` local directive) powered by [View Transition API].
 
 [transitions]: ./docs/bespoke-transitions/README.md
-[view transitions api]: https://www.w3.org/TR/css-view-transitions-1/
+[view transition api]: https://www.w3.org/TR/css-view-transitions-1/
 
 #### Docs
 
@@ -647,7 +647,7 @@ If you want to prevent looking up a configuration file, you can pass `--no-confi
 | `bespoke`         |           object            |                           | Setting options for `bespoke` template                                                                      |
 | ┗ `osc`           |           boolean           |      `--bespoke.osc`      | \[Bespoke\] Use on-screen controller (`true` by default)                                                    |
 | ┗ `progress`      |           boolean           |   `--bespoke.progress`    | \[Bespoke\] Use progress bar (`false` by default)                                                           |
-| ┗ `transition`    |           boolean           |  `--bespoke.transition`   | \[Bespoke\] Use [transitions] (Only in browsers supported [View Transitions API]: `true` by default)        |
+| ┗ `transition`    |           boolean           |  `--bespoke.transition`   | \[Bespoke\] Use [transitions] (Only in browsers supported [View Transition API]: `true` by default)         |
 | `browser`         |     string \| string[]      |        `--browser`        | The kind of browser for conversion (`auto` by default)                                                      |
 | `browserPath`     |           string            |     `--browser-path`      | Path to the browser executable                                                                              |
 | `browserProtocol` |  `cdp` \| `webdriver-bidi`  |   `--browser-protocol`    | Set the preferred protocol for connecting to the browser (`cdp` by default)                                 |
