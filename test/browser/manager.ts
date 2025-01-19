@@ -1,8 +1,15 @@
+import debug from 'debug'
+import { Browser } from '../../src/browser/browser'
 import { ChromeBrowser } from '../../src/browser/browsers/chrome'
 import { ChromeCdpBrowser } from '../../src/browser/browsers/chrome-cdp'
 import { FirefoxBrowser } from '../../src/browser/browsers/firefox'
 import * as browserFinder from '../../src/browser/finder'
 import { BrowserManager } from '../../src/browser/manager'
+
+jest.mock('debug', () => {
+  const debugMock = jest.fn()
+  return () => debugMock
+})
 
 afterEach(() => {
   jest.resetAllMocks()
@@ -24,6 +31,25 @@ describe('Browser manager', () => {
       expect(manager._finderPreferredPath).toBe('/dummy/path')
       expect(manager._preferredProtocol).toBe('webDriverBiDi')
       expect(manager.timeout).toBe(12345)
+    })
+
+    it('cannot update the browser protocol after the browser is created', async () => {
+      const manager = new BrowserManager({ protocol: 'webDriverBiDi' })
+      const debugMock = debug('test')
+
+      const browser = await manager.browserForConversion()
+      expect(browser).toBeInstanceOf(Browser)
+      expect(browser.protocol).toBe('webDriverBiDi')
+
+      manager.configure({ protocol: 'cdp' })
+      expect(debugMock).toHaveBeenCalledWith(
+        expect.stringContaining(
+          'Changing protocol after created browser for conversion is not supported'
+        )
+      )
+      expect((await manager.browserForConversion()).protocol).toBe(
+        'webDriverBiDi'
+      )
     })
   })
 

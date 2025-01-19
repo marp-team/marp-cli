@@ -5,18 +5,18 @@ import path from 'node:path'
 import { pathToFileURL } from 'node:url'
 import chalk from 'chalk'
 import { nanoid } from 'nanoid'
-import { error } from '../cli'
+import { warn } from '../cli'
 import { debug } from '../utils/debug'
 import { createMemoizedPromiseContext } from '../utils/memoized-promise'
-import { getWindowsEnv, isWSL, translateWindowsPathToWSL } from '../utils/wsl'
 import { findSOffice } from './finder'
-
-const wslHostMatcher = /^\/mnt\/[a-z]\//
-
-let wslTmp: string | undefined
 
 export interface SOfficeOptions {
   path?: string
+}
+
+export interface SOfficeProfileDir {
+  path: string
+  fileURL: string
 }
 
 export class SOffice {
@@ -24,7 +24,7 @@ export class SOffice {
   #profileDirName: string
 
   private _path = createMemoizedPromiseContext<string>()
-  private _profileDir = createMemoizedPromiseContext<string>()
+  private _profileDir = createMemoizedPromiseContext<SOfficeProfileDir>()
 
   private static _spawnQueue: Promise<void> = Promise.resolve()
 
@@ -40,7 +40,7 @@ export class SOffice {
     )
   }
 
-  get profileDir(): Promise<string> {
+  get profileDir(): Promise<SOfficeProfileDir> {
     return this._profileDir.init(async () => await this.setProfileDir())
   }
 
@@ -49,7 +49,7 @@ export class SOffice {
       SOffice._spawnQueue = SOffice._spawnQueue
         .then(async () => {
           const spawnArgs = [
-            `-env:UserInstallation=${pathToFileURL(await this.profileDir).toString()}`,
+            `-env:UserInstallation=${(await this.profileDir).fileURL}`,
             ...args,
           ]
 
@@ -67,7 +67,7 @@ export class SOffice {
             const output = data.toString()
 
             debug(`[soffice:stderr] %s`, output)
-            error(`${chalk.yellow`[soffice]`} ${output.trim()}`, {
+            warn(`${chalk.yellow`[soffice]`} ${output.trim()}`, {
               singleLine: true,
             })
           })
@@ -88,36 +88,13 @@ export class SOffice {
     })
   }
 
-  private async binaryInWSLHost(): Promise<boolean> {
-    return !!(await isWSL()) && wslHostMatcher.test(await this.path)
-  }
-
-  private async setProfileDir(): Promise<string> {
-    let needToTranslateWindowsPathToWSL = false
-
-    const dir = await (async () => {
-      // In WSL environment, Marp CLI may use soffice on Windows. If soffice has
-      // located in host OS (Windows), we have to specify Windows path.
-      if (await this.binaryInWSLHost()) {
-        if (wslTmp === undefined) wslTmp = await getWindowsEnv('TMP')
-        if (wslTmp !== undefined) {
-          needToTranslateWindowsPathToWSL = true
-          return path.win32.resolve(wslTmp, this.#profileDirName)
-        }
-      }
-      return path.resolve(os.tmpdir(), this.#profileDirName)
-    })()
-
+  private async setProfileDir(): Promise<SOfficeProfileDir> {
+    const dir = path.resolve(os.tmpdir(), this.#profileDirName)
     debug(`soffice data directory: %s`, dir)
 
-    // Ensure the data directory is created
-    const mkdirPath = needToTranslateWindowsPathToWSL
-      ? await translateWindowsPathToWSL(dir)
-      : dir
+    await fs.promises.mkdir(dir, { recursive: true })
+    debug(`soffice data directory created: %s`, dir)
 
-    await fs.promises.mkdir(mkdirPath, { recursive: true })
-    debug(`Created data directory: %s`, mkdirPath)
-
-    return dir
+    return { path: dir, fileURL: pathToFileURL(dir).toString() }
   }
 }

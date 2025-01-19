@@ -50,7 +50,7 @@ export class BrowserManager implements AsyncDisposable {
       this._finderResult.value = undefined // Reset finder result cache
     }
     if (config.protocol) {
-      if (this._conversionBrowser)
+      if (this._conversionBrowser.value)
         debugBrowser(
           'WARNING: Changing protocol after created browser for conversion is not supported'
         )
