@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v4.1.1 - 2025-01-19
+
 ### Fixed
 
 - Improve LibreOffice handling in experimental `--pptx-editable` option ([#632](https://github.com/marp-team/marp-cli/pull/632))
