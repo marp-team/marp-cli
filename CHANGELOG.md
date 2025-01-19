@@ -6,6 +6,7 @@
 
 - Improve LibreOffice handling in experimental `--pptx-editable` option ([#632](https://github.com/marp-team/marp-cli/pull/632))
   - Detect LibreOffice automatically that was installed in Windows by Scoop ([#631](https://github.com/marp-team/marp-cli/issues/631), [#632](https://github.com/marp-team/marp-cli/pull/632))
+- Fix returning wrong file extension in concurrent requests on server mode ([#633](https://github.com/marp-team/marp-cli/issues/633), [#634](https://github.com/marp-team/marp-cli/pull/634))
 
 ## v4.1.0 - 2025-01-15
 

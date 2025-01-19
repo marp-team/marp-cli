@@ -88,9 +88,7 @@ export class Server extends (EventEmitter as new () => TypedEmitter<Server.Event
     filename: string,
     query: querystring.ParsedUrlQuery = {}
   ) {
-    this.converter.options.output = false
-    this.converter.options.pages = false
-    this.converter.options.type = ((): ConvertType => {
+    const type = ((): ConvertType => {
       const queryKeys = Object.keys(query)
 
       if (queryKeys.includes('pdf')) return ConvertType.pdf
@@ -104,10 +102,14 @@ export class Server extends (EventEmitter as new () => TypedEmitter<Server.Event
       return ConvertType.html
     })()
 
-    const ret = await this.converter.convertFile(new File(filename))
-    this.emit('converted', ret)
+    this.converter.options.output = false
+    this.converter.options.pages = false
+    this.converter.options.type = type
 
-    return ret
+    const result = await this.converter.convertFile(new File(filename))
+    this.emit('converted', result)
+
+    return { result, type }
   }
 
   private async loadScript() {
@@ -127,20 +129,18 @@ export class Server extends (EventEmitter as new () => TypedEmitter<Server.Event
     if (!pathname) return
 
     const qs = querystring.parse(query || '')
-    const response = async (fn) => {
+    const response = async (fn: string) => {
       try {
-        const ret = await this.convertMarkdown(fn, qs)
+        const { result, type } = await this.convertMarkdown(fn, qs)
 
-        if (!ret.newFile)
+        if (!result.newFile)
           throw new Error('Converter must return a converted file to serve.')
-
-        const { type } = this.converter.options
 
         // Download pptx document as an attachment
         if (type === ConvertType.pptx)
           res.attachment(`${path.basename(fn, path.extname(fn))}.pptx`)
 
-        res.type(mimeTypes[type]).end(ret.newFile.buffer)
+        res.type(mimeTypes[type]).end(result.newFile.buffer)
       } catch (e: unknown) {
         let errorString = 'Internal server error'
 
