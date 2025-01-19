@@ -3,7 +3,6 @@ import which from 'which'
 import { CLIError } from '../../src/error'
 import { findSOffice } from '../../src/soffice/finder'
 import * as utils from '../../src/utils/finder'
-import * as wsl from '../../src/utils/wsl'
 
 jest.mock('which')
 
@@ -17,6 +16,13 @@ afterEach(() => {
 })
 
 const sofficePathRest = ['LibreOffice', 'program', 'soffice.exe']
+const sofficeScoopPathRest = [
+  'scoop',
+  'apps',
+  'libreoffice',
+  'current',
+  ...sofficePathRest,
+]
 
 const itExceptWin = process.platform === 'win32' ? it.skip : it
 
@@ -113,31 +119,6 @@ describe('SOffice finder', () => {
       await expect(findSOffice({})).rejects.toThrow(CLIError)
       expect(which).toHaveBeenCalled()
     })
-
-    it('fallbacks to WSL resolution if in WSL 2 with mirrored network mode', async () => {
-      jest.spyOn(wsl, 'getWSL2NetworkingMode').mockResolvedValue('mirrored')
-
-      mockedWhich.mockImplementation(async () => null)
-
-      jest
-        .spyOn(utils, 'isExecutable')
-        .mockImplementation(
-          async (p) =>
-            p === '/mnt/c/Program Files/LibreOffice/program/soffice.exe'
-        )
-
-      expect(await findSOffice({})).toStrictEqual({
-        path: '/mnt/c/Program Files/LibreOffice/program/soffice.exe',
-      })
-      expect(which).toHaveBeenCalled()
-    })
-
-    it('throws error if in WSL 2 with NAT mode', async () => {
-      jest.spyOn(wsl, 'getWSL2NetworkingMode').mockResolvedValue('nat')
-      mockedWhich.mockImplementation(async () => null)
-
-      await expect(findSOffice({})).rejects.toThrow(CLIError)
-    })
   })
 
   describe('with macOS', () => {
@@ -172,6 +153,8 @@ describe('SOffice finder', () => {
   describe('with Windows', () => {
     const winProgramFiles = ['c:', 'Mock', 'Program Files']
     const winProgramFilesX86 = ['c:', 'Mock', 'Program Files (x86)']
+    const winUserProfile = ['c:', 'Mock', 'Users', 'user']
+    const winAllUsersProfile = ['c:', 'Mock', 'ProgramData']
     const sofficePath = path.join(...winProgramFiles, ...sofficePathRest)
 
     const originalEnv = { ...process.env }
@@ -189,6 +172,8 @@ describe('SOffice finder', () => {
         PATH: undefined,
         PROGRAMFILES: path.join(...winProgramFiles),
         'PROGRAMFILES(X86)': path.join(...winProgramFilesX86),
+        USERPROFILE: path.join(...winUserProfile),
+        ALLUSERSPROFILE: path.join(...winAllUsersProfile),
       }
     })
 
@@ -204,6 +189,10 @@ describe('SOffice finder', () => {
       expect(findExecutableSpy).toHaveBeenCalledWith([
         path.join(...winProgramFiles, ...sofficePathRest),
         path.join(...winProgramFilesX86, ...sofficePathRest),
+
+        // Scoop
+        path.join(...winUserProfile, ...sofficeScoopPathRest),
+        path.join(...winAllUsersProfile, ...sofficeScoopPathRest),
       ])
     })
 
@@ -215,6 +204,8 @@ describe('SOffice finder', () => {
 
       expect(findExecutableSpy).toHaveBeenCalledWith([
         path.join(...winProgramFiles, ...sofficePathRest),
+        path.join(...winUserProfile, ...sofficeScoopPathRest),
+        path.join(...winAllUsersProfile, ...sofficeScoopPathRest),
       ])
     })
 
@@ -231,73 +222,21 @@ describe('SOffice finder', () => {
         path.join('d:', ...winProgramFilesX86.slice(1), ...sofficePathRest),
         path.join('z:', ...winProgramFiles.slice(1), ...sofficePathRest),
         path.join('z:', ...winProgramFilesX86.slice(1), ...sofficePathRest),
+        path.join(...winUserProfile, ...sofficeScoopPathRest),
+        path.join(...winAllUsersProfile, ...sofficeScoopPathRest),
       ])
     })
 
     it('throws error if no executable path is found', async () => {
       process.env.PROGRAMFILES = ''
       process.env['PROGRAMFILES(X86)'] = ''
+      process.env.USERPROFILE = ''
+      process.env.ALLUSERSPROFILE = ''
 
       const findExecutableSpy = jest.spyOn(utils, 'findExecutable')
       await expect(findSOffice({})).rejects.toThrow(CLIError)
 
       expect(findExecutableSpy).toHaveBeenCalledWith([])
-    })
-  })
-
-  describe('with WSL1', () => {
-    const originalEnv = { ...process.env }
-
-    beforeEach(() => {
-      jest.resetModules()
-
-      jest.spyOn(utils, 'getPlatform').mockResolvedValue('wsl1')
-      jest
-        .spyOn(utils, 'isExecutable')
-        .mockImplementation(
-          async (p) =>
-            p === '/mnt/c/Program Files/LibreOffice/program/soffice.exe'
-        )
-
-      process.env = { ...originalEnv, PATH: undefined }
-    })
-
-    afterEach(() => {
-      process.env = { ...originalEnv }
-    })
-
-    it('finds possible executable path and returns the matched path', async () => {
-      const findExecutableSpy = jest.spyOn(utils, 'findExecutable')
-      const soffice = await findSOffice({})
-
-      expect(soffice).toStrictEqual({
-        path: '/mnt/c/Program Files/LibreOffice/program/soffice.exe',
-      })
-      expect(findExecutableSpy).toHaveBeenCalledWith([
-        path.posix.join('/mnt/c/Program Files', ...sofficePathRest),
-        path.posix.join('/mnt/c/Program Files (x86)', ...sofficePathRest),
-      ])
-    })
-
-    it('finds from detected drives when the PATH environment has paths starting with any drive letters', async () => {
-      process.env.PATH = '/mnt/z/Mock:/mnt/d/Mock:/mnt/d/Mock/Mock'
-
-      const findExecutableSpy = jest.spyOn(utils, 'findExecutable')
-      await findSOffice({})
-
-      expect(findExecutableSpy).toHaveBeenCalledWith([
-        path.posix.join('/mnt/c/Program Files', ...sofficePathRest),
-        path.posix.join('/mnt/c/Program Files (x86)', ...sofficePathRest),
-        path.posix.join('/mnt/d/Program Files', ...sofficePathRest),
-        path.posix.join('/mnt/d/Program Files (x86)', ...sofficePathRest),
-        path.posix.join('/mnt/z/Program Files', ...sofficePathRest),
-        path.posix.join('/mnt/z/Program Files (x86)', ...sofficePathRest),
-      ])
-    })
-
-    it('throws error if no executable path is found', async () => {
-      jest.spyOn(utils, 'isExecutable').mockResolvedValue(false)
-      await expect(findSOffice({})).rejects.toThrow(CLIError)
     })
   })
 })

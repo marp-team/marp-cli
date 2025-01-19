@@ -3,7 +3,6 @@ import EventEmitter from 'node:events'
 import fs from 'node:fs'
 import * as cli from '../../src/cli'
 import { SOffice } from '../../src/soffice/soffice'
-import * as wsl from '../../src/utils/wsl'
 
 const defaultSpawnSetting = { code: 0, delay: 50 }
 const spawnSetting = { ...defaultSpawnSetting }
@@ -60,7 +59,7 @@ describe('SOffice class', () => {
     it('throws error if soffice exits with non-zero code', async () => {
       spawnSetting.code = 123
 
-      jest.spyOn(cli, 'error').mockImplementation()
+      jest.spyOn(cli, 'warn').mockImplementation()
 
       const spawnSpy = jest.spyOn(childProcess, 'spawn')
       const soffice = new SOffice()
@@ -94,7 +93,7 @@ describe('SOffice class', () => {
   })
 
   describe('get #profileDir', () => {
-    it('returns the profile directory', async () => {
+    it('returns the profile directory object', async () => {
       const mkdir = jest
         .spyOn(fs.promises, 'mkdir')
         .mockResolvedValue(undefined)
@@ -102,61 +101,10 @@ describe('SOffice class', () => {
       const soffice = new SOffice()
       const profileDir = await soffice.profileDir
 
-      expect(profileDir).toContain('marp-cli-soffice-')
-      expect(mkdir).toHaveBeenCalledWith(profileDir, { recursive: true })
-    })
-
-    it('returns the profile directory with Windows TMP if the binary is in WSL host', async () => {
-      const mkdir = jest
-        .spyOn(fs.promises, 'mkdir')
-        .mockResolvedValue(undefined)
-
-      jest.spyOn(wsl, 'getWindowsEnv').mockResolvedValue('C:\\Windows\\Temp')
-      jest
-        .spyOn(wsl, 'translateWindowsPathToWSL')
-        .mockResolvedValue('/mnt/c/Windows/Temp/test')
-
-      const soffice = new SOffice()
-      jest.spyOn(soffice as any, 'binaryInWSLHost').mockResolvedValue(true)
-
-      const profileDir = await soffice.profileDir
-      expect(profileDir).toContain('C:\\Windows\\Temp')
-      expect(profileDir).toContain('marp-cli-soffice-')
-      expect(mkdir).toHaveBeenCalledWith('/mnt/c/Windows/Temp/test', {
-        recursive: true,
-      })
-    })
-  })
-
-  describe('private #binaryInWSLHost', () => {
-    it('always returns false if the current environment is not WSL', async () => {
-      jest.spyOn(wsl, 'isWSL').mockResolvedValue(0)
-
-      const soffice: any = new SOffice({
-        path: '/mnt/c/Program Files/LibreOffice/program/soffice.exe',
-      })
-
-      expect(await soffice.binaryInWSLHost()).toBe(false)
-    })
-
-    it('returns true if the current environment is WSL and the browser path is located in the host OS', async () => {
-      jest.spyOn(wsl, 'isWSL').mockResolvedValue(1)
-
-      const soffice: any = new SOffice({
-        path: '/mnt/c/Program Files/LibreOffice/program/soffice.exe',
-      })
-
-      expect(await soffice.binaryInWSLHost()).toBe(true)
-    })
-
-    it('returns false if the current environment is WSL and the browser path is not located in the host OS', async () => {
-      jest.spyOn(wsl, 'isWSL').mockResolvedValue(1)
-
-      const soffice: any = new SOffice({
-        path: '/usr/lib/libreoffice/program/libreoffice',
-      })
-
-      expect(await soffice.binaryInWSLHost()).toBe(false)
+      expect(profileDir.path).toContain('marp-cli-soffice-')
+      expect(profileDir.fileURL).toContain('marp-cli-soffice-')
+      expect(profileDir.fileURL.startsWith('file://')).toBe(true)
+      expect(mkdir).toHaveBeenCalledWith(profileDir.path, { recursive: true })
     })
   })
 })
