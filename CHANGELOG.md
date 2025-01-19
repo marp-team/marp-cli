@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Improve LibreOffice handling in experimental `--pptx-editable` option ([#632](https://github.com/marp-team/marp-cli/pull/632))
+  - Detect LibreOffice automatically that was installed in Windows by Scoop ([#631](https://github.com/marp-team/marp-cli/issues/631), [#632](https://github.com/marp-team/marp-cli/pull/632))
+
 ## v4.1.0 - 2025-01-15
 
 ### Added
