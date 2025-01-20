@@ -22,8 +22,7 @@ jobs:
           - runner: ubuntu-latest
             platform: linux/amd64
 
-          # TODO: Change to ARM64 runner for open-sourced project if available (M1 Mac cannot run Docker due to lack of nested virtualization)
-          - runner: ubuntu-latest
+          - runner: ubuntu-24.04-arm
             platform: linux/arm64
 
     steps:
