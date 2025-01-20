@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Use arm64 hosted runner to build container image for ARM64 ([#635](https://github.com/marp-team/marp-cli/issues/635), [#637](https://github.com/marp-team/marp-cli/pull/637))
+
 ## v4.1.1 - 2025-01-19
 
 ### Fixed
