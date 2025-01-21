@@ -1335,7 +1335,7 @@ describe('Converter', () => {
               browserManager,
               output: 'b.jpg',
               type: ConvertType.jpeg,
-              imageScale: 0.5,
+              imageScale: 0.25,
               jpegQuality: 1,
             }).convertFile(new File(onePath))
 
@@ -1379,7 +1379,7 @@ describe('Converter', () => {
               browserManager,
               output: 'b.jpg',
               type: ConvertType.jpeg,
-              imageScale: 0.5,
+              imageScale: 0.25,
               jpegQuality: 1,
             }).convertFile(new File(onePath))
 
