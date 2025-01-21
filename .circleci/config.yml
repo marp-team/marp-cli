@@ -99,6 +99,7 @@ commands:
           name: Jest
           command: npm run test:coverage -- --ci --reporters=default --reporters=jest-junit <<# parameters.runInBand >>-i<</ parameters.runInBand >>
           environment:
+            JEST_JUNIT_CLASSNAME: '{filepath}'
             JEST_JUNIT_OUTPUT_DIR: tmp/test-results
             MARP_TEST_CI: 1
 
@@ -107,6 +108,11 @@ commands:
 
       - store_test_results:
           path: tmp/test-results
+
+      - codecov/upload:
+          flags: linux
+          report_type: test_results
+          dir: tmp/test-results
 
       - store_artifacts:
           path: ./coverage
