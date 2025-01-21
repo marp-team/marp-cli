@@ -1,5 +1,7 @@
+import dbg from 'debug'
 import { Browser } from '../browser/browser'
-import { debug } from './debug'
+
+const debug = dbg('marp-cli:jpeg')
 
 export const png2jpegViaPuppeteer = async (
   browser: Browser,
@@ -12,6 +14,8 @@ export const png2jpegViaPuppeteer = async (
     await page.goto('data:text/html,', {
       waitUntil: ['domcontentloaded', 'networkidle0'],
     })
+
+    debug('Evaluating JavaScript to convert PNG to JPEG')
 
     const jpegDataURL = await page.evaluate(
       async (pngUri, q, timeout) => {
@@ -51,6 +55,8 @@ export const png2jpegViaPuppeteer = async (
       quality,
       browser.timeout
     )
+
+    debug('Evaluated JavaScript to convert PNG to JPEG')
 
     if (!jpegDataURL.startsWith('data:image/jpeg;base64,'))
       throw new Error('Failed to convert PNG to JPEG')
