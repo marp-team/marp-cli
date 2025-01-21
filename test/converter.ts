@@ -1287,7 +1287,7 @@ describe('Converter', () => {
             await instance({
               output: 'b.jpg',
               type: ConvertType.jpeg,
-              imageScale: 0.5,
+              imageScale: 0.25,
             }).convertFile(new File(onePath))
 
             expect(writeFileSpy.mock.calls[0][1]).toBeInstanceOf(Buffer)
@@ -1295,8 +1295,8 @@ describe('Converter', () => {
             const jpeg = writeFileSpy.mock.calls[0][1] as Buffer
             const { width, height } = imageSize(jpeg)
 
-            expect(width).toBe(640)
-            expect(height).toBe(360)
+            expect(width).toBe(320)
+            expect(height).toBe(180)
           },
           timeoutLarge
         )
@@ -1309,14 +1309,14 @@ describe('Converter', () => {
             await using browserManager = new BrowserManager({
               finders: ['chrome', 'edge'],
               protocol: 'webDriverBiDi',
-              timeout,
+              timeout: timeoutLarge,
             })
 
             await instance({
               browserManager,
               output: 'b.jpg',
               type: ConvertType.jpeg,
-              imageScale: 0.5,
+              imageScale: 0.25,
             }).convertFile(new File(onePath))
 
             const [lastCall] = writeFileSpy.mock.calls.slice(-1)
@@ -1325,8 +1325,8 @@ describe('Converter', () => {
             const jpeg = lastCall[1] as Buffer
             const { width, height } = imageSize(jpeg)
 
-            expect(width).toBe(640)
-            expect(height).toBe(360)
+            expect(width).toBe(320)
+            expect(height).toBe(180)
 
             // Check JPEG quality is working
             writeFileSpy.mockClear()
@@ -1353,14 +1353,14 @@ describe('Converter', () => {
           async () => {
             await using browserManager = new BrowserManager({
               finders: ['firefox'],
-              timeout,
+              timeout: timeoutLarge,
             })
 
             await instance({
               browserManager,
               output: 'b.jpg',
               type: ConvertType.jpeg,
-              imageScale: 0.5,
+              imageScale: 0.25,
             }).convertFile(new File(onePath))
 
             const [lastCall] = writeFileSpy.mock.calls.slice(-1)
@@ -1369,8 +1369,8 @@ describe('Converter', () => {
             const jpeg = lastCall[1] as Buffer
             const { width, height } = imageSize(jpeg)
 
-            expect(width).toBe(640)
-            expect(height).toBe(360)
+            expect(width).toBe(320)
+            expect(height).toBe(180)
 
             // Check JPEG quality is working
             writeFileSpy.mockClear()
