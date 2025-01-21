@@ -97,7 +97,7 @@ commands:
     steps:
       - run:
           name: Jest
-          command: npm run test:coverage -- --ci --maxWorkers=2 --reporters=default --reporters=jest-junit <<# parameters.runInBand >>-i<</ parameters.runInBand >>
+          command: npm run test:coverage -- --ci --reporters=default --reporters=jest-junit <<#parameters.runInBand>>-i<</parameters.runInBand>><<^parameters.runInBand>>--maxWorkers=2<</parameters.runInBand>>
           environment:
             JEST_JUNIT_CLASSNAME: '{filepath}'
             JEST_JUNIT_OUTPUT_DIR: tmp/test-results
