@@ -1111,27 +1111,35 @@ describe('Converter', () => {
           timeoutLarge
         )
 
-        it('throws an error when soffice is not found', async () => {
-          const err = new CLIError('Error', CLIErrorCode.NOT_FOUND_SOFFICE)
+        it(
+          'throws an error when soffice is not found',
+          async () => {
+            const err = new CLIError('Error', CLIErrorCode.NOT_FOUND_SOFFICE)
 
-          jest.spyOn(console, 'warn').mockImplementation()
-          jest.spyOn(sofficeFinder, 'findSOffice').mockRejectedValue(err)
+            jest.spyOn(console, 'warn').mockImplementation()
+            jest.spyOn(sofficeFinder, 'findSOffice').mockRejectedValue(err)
 
-          const cvt = converter({ pptxEditable: true })
-          await expect(() =>
-            cvt.convertFile(new File(onePath))
-          ).rejects.toThrow(err)
-        })
+            const cvt = converter({ pptxEditable: true })
+            await expect(() =>
+              cvt.convertFile(new File(onePath))
+            ).rejects.toThrow(err)
+          },
+          timeout
+        )
 
-        it('throws an error when soffice is spawned but does not generate a converted file', async () => {
-          jest.spyOn(console, 'warn').mockImplementation()
-          jest.spyOn(SOffice.prototype, 'spawn').mockResolvedValue()
+        it(
+          'throws an error when soffice is spawned but does not generate a converted file',
+          async () => {
+            jest.spyOn(console, 'warn').mockImplementation()
+            jest.spyOn(SOffice.prototype, 'spawn').mockResolvedValue()
 
-          const cvt = converter({ pptxEditable: true })
-          await expect(() =>
-            cvt.convertFile(new File(onePath))
-          ).rejects.toThrow('LibreOffice could not convert PPTX internally.')
-        })
+            const cvt = converter({ pptxEditable: true })
+            await expect(() =>
+              cvt.convertFile(new File(onePath))
+            ).rejects.toThrow('LibreOffice could not convert PPTX internally.')
+          },
+          timeout
+        )
       })
     })
 
