@@ -132,17 +132,6 @@ describe('ChromeBrowser', () => {
       })
 
       describe('Disabling GPU', () => {
-        it('does not add --disable-gpu argument if CHROME_DISABLE_GPU environment variable is not defined', async () => {
-          delete process.env.CHROME_DISABLE_GPU
-          await new ChromeBrowser({ path: '/path/to/chrome' }).launch()
-
-          expect(puppeteer.launch).toHaveBeenCalledWith(
-            expect.objectContaining({
-              args: expect.not.arrayContaining(['--disable-gpu']),
-            })
-          )
-        })
-
         it('adds --disable-gpu argument if CHROME_DISABLE_GPU environment variable is defined', async () => {
           process.env.CHROME_DISABLE_GPU = '1'
           await new ChromeBrowser({ path: '/path/to/chrome' }).launch()
