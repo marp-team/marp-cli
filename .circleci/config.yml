@@ -99,6 +99,7 @@ commands:
           name: Jest
           command: npm run test:coverage -- --ci --reporters=default --reporters=jest-junit <<#parameters.runInBand>>-i<</parameters.runInBand>><<^parameters.runInBand>>--maxWorkers=2<</parameters.runInBand>>
           environment:
+            CHROME_DISABLE_GPU: 1 # Disable GPU acceleration to mitigate flaky tests
             JEST_JUNIT_CLASSNAME: '{filepath}'
             JEST_JUNIT_OUTPUT_DIR: tmp/test-results
             MARP_TEST_CI: 1
