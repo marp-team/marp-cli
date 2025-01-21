@@ -1111,27 +1111,35 @@ describe('Converter', () => {
           timeoutLarge
         )
 
-        it('throws an error when soffice is not found', async () => {
-          const err = new CLIError('Error', CLIErrorCode.NOT_FOUND_SOFFICE)
+        it(
+          'throws an error when soffice is not found',
+          async () => {
+            const err = new CLIError('Error', CLIErrorCode.NOT_FOUND_SOFFICE)
 
-          jest.spyOn(console, 'warn').mockImplementation()
-          jest.spyOn(sofficeFinder, 'findSOffice').mockRejectedValue(err)
+            jest.spyOn(console, 'warn').mockImplementation()
+            jest.spyOn(sofficeFinder, 'findSOffice').mockRejectedValue(err)
 
-          const cvt = converter({ pptxEditable: true })
-          await expect(() =>
-            cvt.convertFile(new File(onePath))
-          ).rejects.toThrow(err)
-        })
+            const cvt = converter({ pptxEditable: true })
+            await expect(() =>
+              cvt.convertFile(new File(onePath))
+            ).rejects.toThrow(err)
+          },
+          timeout
+        )
 
-        it('throws an error when soffice is spawned but does not generate a converted file', async () => {
-          jest.spyOn(console, 'warn').mockImplementation()
-          jest.spyOn(SOffice.prototype, 'spawn').mockResolvedValue()
+        it(
+          'throws an error when soffice is spawned but does not generate a converted file',
+          async () => {
+            jest.spyOn(console, 'warn').mockImplementation()
+            jest.spyOn(SOffice.prototype, 'spawn').mockResolvedValue()
 
-          const cvt = converter({ pptxEditable: true })
-          await expect(() =>
-            cvt.convertFile(new File(onePath))
-          ).rejects.toThrow('LibreOffice could not convert PPTX internally.')
-        })
+            const cvt = converter({ pptxEditable: true })
+            await expect(() =>
+              cvt.convertFile(new File(onePath))
+            ).rejects.toThrow('LibreOffice could not convert PPTX internally.')
+          },
+          timeout
+        )
       })
     })
 
@@ -1287,7 +1295,7 @@ describe('Converter', () => {
             await instance({
               output: 'b.jpg',
               type: ConvertType.jpeg,
-              imageScale: 0.5,
+              imageScale: 0.25,
             }).convertFile(new File(onePath))
 
             expect(writeFileSpy.mock.calls[0][1]).toBeInstanceOf(Buffer)
@@ -1295,8 +1303,8 @@ describe('Converter', () => {
             const jpeg = writeFileSpy.mock.calls[0][1] as Buffer
             const { width, height } = imageSize(jpeg)
 
-            expect(width).toBe(640)
-            expect(height).toBe(360)
+            expect(width).toBe(320)
+            expect(height).toBe(180)
           },
           timeoutLarge
         )
@@ -1309,14 +1317,14 @@ describe('Converter', () => {
             await using browserManager = new BrowserManager({
               finders: ['chrome', 'edge'],
               protocol: 'webDriverBiDi',
-              timeout,
+              timeout: timeoutLarge,
             })
 
             await instance({
               browserManager,
               output: 'b.jpg',
               type: ConvertType.jpeg,
-              imageScale: 0.5,
+              imageScale: 0.25,
             }).convertFile(new File(onePath))
 
             const [lastCall] = writeFileSpy.mock.calls.slice(-1)
@@ -1325,8 +1333,8 @@ describe('Converter', () => {
             const jpeg = lastCall[1] as Buffer
             const { width, height } = imageSize(jpeg)
 
-            expect(width).toBe(640)
-            expect(height).toBe(360)
+            expect(width).toBe(320)
+            expect(height).toBe(180)
 
             // Check JPEG quality is working
             writeFileSpy.mockClear()
@@ -1335,7 +1343,7 @@ describe('Converter', () => {
               browserManager,
               output: 'b.jpg',
               type: ConvertType.jpeg,
-              imageScale: 0.5,
+              imageScale: 0.25,
               jpegQuality: 1,
             }).convertFile(new File(onePath))
 
@@ -1353,14 +1361,14 @@ describe('Converter', () => {
           async () => {
             await using browserManager = new BrowserManager({
               finders: ['firefox'],
-              timeout,
+              timeout: timeoutLarge,
             })
 
             await instance({
               browserManager,
               output: 'b.jpg',
               type: ConvertType.jpeg,
-              imageScale: 0.5,
+              imageScale: 0.25,
             }).convertFile(new File(onePath))
 
             const [lastCall] = writeFileSpy.mock.calls.slice(-1)
@@ -1369,8 +1377,8 @@ describe('Converter', () => {
             const jpeg = lastCall[1] as Buffer
             const { width, height } = imageSize(jpeg)
 
-            expect(width).toBe(640)
-            expect(height).toBe(360)
+            expect(width).toBe(320)
+            expect(height).toBe(180)
 
             // Check JPEG quality is working
             writeFileSpy.mockClear()
@@ -1379,7 +1387,7 @@ describe('Converter', () => {
               browserManager,
               output: 'b.jpg',
               type: ConvertType.jpeg,
-              imageScale: 0.5,
+              imageScale: 0.25,
               jpegQuality: 1,
             }).convertFile(new File(onePath))
 

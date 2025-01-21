@@ -53,7 +53,7 @@ jobs:
           MARP_TEST_CI: 1
         run: >-
           npm run test:coverage -- --ci --max-workers ${{ steps.cpu-cores.outputs.count }} --reporters=default --reporters=jest-junit ||
-          npm run test:coverage -- --ci --bail -i --reporters=default --reporters=jest-junit --no-cache ||
+          npm run test:coverage -- --ci --bail -i --reporters=default --reporters=jest-junit ||
           npm run test:coverage -- --ci --bail -i --reporters=default --reporters=jest-junit --no-cache ||
           npm run test:coverage -- --ci --bail -i --reporters=default --reporters=jest-junit --no-cache
 
