@@ -48,6 +48,7 @@ jobs:
       # https://stackoverflow.com/a/59365905
       - name: Jest
         env:
+          DEBUG: marp-cli:jpeg
           JEST_JUNIT_CLASSNAME: '{filepath}'
           JEST_JUNIT_OUTPUT_DIR: tmp/test-results
           MARP_TEST_CI: 1
