@@ -6,6 +6,10 @@
 
 - Use arm64 hosted runner to build container image for ARM64 ([#635](https://github.com/marp-team/marp-cli/issues/635), [#637](https://github.com/marp-team/marp-cli/pull/637))
 
+### Fixed
+
+- Improve bespoke transition animations for Safari compatibility ([#572](https://github.com/marp-team/marp-cli/issues/572), [#641](https://github.com/marp-team/marp-cli/pull/641))
+
 ## v4.1.1 - 2025-01-19
 
 ### Fixed
