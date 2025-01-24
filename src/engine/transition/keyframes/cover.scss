@@ -6,11 +6,16 @@
     transform: translateX(10%);
     animation-timing-function: ease-out;
   }
+
+  to {
+    transform: translateX(0%);
+  }
 }
 
 @keyframes marp-outgoing-transition-backward-__builtin__cover {
   from {
     animation-timing-function: ease-out;
+    transform: translateX(0%);
   }
 
   to {

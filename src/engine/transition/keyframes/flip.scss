@@ -4,9 +4,9 @@
   }
 
   50% {
-    transform: perspective(800px) translateZ(-400px)
+    transform: perspective(75vw)
       rotateY(calc(var(--marp-transition-direction, 1) * -90deg));
-    opacity: 0.5;
+    opacity: 0.75;
     animation-timing-function: step-start;
   }
 
@@ -22,9 +22,9 @@
   }
 
   50% {
-    transform: perspective(800px) translateZ(-400px)
+    transform: perspective(75vw)
       rotateY(calc(var(--marp-transition-direction, 1) * 90deg));
-    opacity: 0.5;
+    opacity: 0.75;
     animation-timing-function: ease-out;
   }
 }

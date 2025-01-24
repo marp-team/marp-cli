@@ -1,16 +1,18 @@
 @keyframes marp-outgoing-transition-__builtin__rotate {
   from {
     z-index: 1;
-    transform: perspective(100vw) translateZ(-40vw) rotateY(0deg)
-      translateZ(40vw);
+
+    // NOTE: 0.0001deg is a workaround for a bug in Safari
+    transform: perspective(100vw) translateZ(-50vw) rotateY(0.0001deg)
+      translateZ(50vw);
     animation-timing-function: ease-in-out;
   }
 
   to {
     z-index: 0;
-    transform: perspective(100vw) translateZ(-40vw)
+    transform: perspective(100vw) translateZ(-50vw)
       rotateY(calc(var(--marp-transition-direction, 1) * -180deg))
-      translateZ(40vw)
+      translateZ(50vw)
       rotateY(calc(var(--marp-transition-direction, 1) * 180deg));
     opacity: 0;
   }
@@ -20,16 +22,16 @@
   from {
     opacity: 0;
     z-index: 0;
-    transform: perspective(100vw) translateZ(-40vw)
+    transform: perspective(100vw) translateZ(-50vw)
       rotateY(calc(var(--marp-transition-direction, 1) * 180deg))
-      translateZ(40vw)
+      translateZ(50vw)
       rotateY(calc(var(--marp-transition-direction, 1) * -180deg));
     animation-timing-function: ease-in-out;
   }
 
   to {
     z-index: 1;
-    transform: perspective(100vw) translateZ(-40vw) rotateY(0deg)
-      translateZ(40vw);
+    transform: perspective(100vw) translateZ(-50vw) rotateY(0.0001deg)
+      translateZ(50vw);
   }
 }
