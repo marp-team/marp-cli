@@ -20,7 +20,7 @@ To show transition animations, a viewer has to show HTML slide in the browser wh
 
 - **Chrome**: ✅ (111-)
 - **Edge**: ✅ (111-)
-- **Safari**: ✅ (18.2- / [#572](https://github.com/marp-team/marp-cli/issues/572))
+- **Safari**: ✅ (18.2-)
 - **Firefox**: :x:
 
 ## `transition` local directive
@@ -231,7 +231,8 @@ Marp CLI has provided useful [33 built-in transitions](../../src/engine/transiti
   </tbody>
 </table>
 
-> **Note**
+> [!NOTE]
+>
 > If the viewer has enabled the reduce motion feature on their device, the transition animation will be forced to a simple `fade` animation regardless of the specified transition. See also "[Reduce transitions by a viewer](#reduce-transitions-by-a-viewer)".
 
 ### Duration
@@ -252,6 +253,8 @@ For making custom transitions, all you have to know is only about CSS. Define an
 
 Marp prefers the custom transition if defined the transition with same name as built-in transitions.
 
+> [!TIP]
+>
 > See also our blog article: **"[Marp CLI: How to make custom transition](https://marp.app/blog/how-to-make-custom-transition)"**
 
 ### Simple keyframe declaration
@@ -487,7 +490,7 @@ If you want to swap the order of layers during animation, try to animate `z-inde
 }
 ```
 
-> `z-index` is always taking an integer value, and interpolated `z-index` value by animation does not take any decimal points too.
+`z-index` is always taking an integer value, and interpolated `z-index` value by animation does not take any decimal points too.
 
 ## Morphing animations
 
@@ -505,7 +508,11 @@ The slide author can visualize the relationship between the different elements i
 
 If there were multiple pairs defined by `view-transition-name` CSS property with different names, each elements will morph at the same time. Elements that were not marked by `view-transition-name` still follow the selected animation by `transition` local directive.
 
-> **Warning** Each morphable elements marked by `view-transition-name` must have uniquely named in a slide page. If there were multiple elements named by `view-transition-name` with the same name in a single page, View Transition API does not apply _the whole of transition animation_.
+> [!WARNING]
+>
+> Each morphable elements marked by `view-transition-name` must have uniquely named in a slide page. If there were multiple elements named by `view-transition-name` with the same name in a single page, View Transition API does not apply _the whole of transition animation_.
+>
+> The morphing animation has been confirmed working correctly on Chrome and Edge. Safari also supports this kind of animation, but the correct animation is not granted, due to the effect of [WebKit's a long-standing bug](https://bugs.webkit.org/show_bug.cgi?id=23113) (and [marpit-svg-polyfill](https://github.com/marp-team/marpit-svg-polyfill) to patch that).
 
 ### Example
 
