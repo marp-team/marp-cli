@@ -1,13 +1,43 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 import fs from 'node:fs'
 import path from 'node:path'
+import { setTimeout as setTimeoutPromise } from 'node:timers/promises'
 import * as url from 'node:url'
-import getStdin from 'get-stdin'
+import chalk from 'chalk'
+import _getStdin from 'get-stdin'
 import { globby, Options as GlobbyOptions } from 'globby'
+import { info } from './cli'
 import { debug } from './utils/debug'
 import { generateTmpName } from './utils/tmp'
 
 export const markdownExtensions = ['md', 'mdown', 'markdown', 'markdn']
+
+const STDIN_NOTICE_DELAY = 3000
+
+const getStdin = async () => {
+  const delayedNoticeController = new AbortController()
+
+  setTimeoutPromise(STDIN_NOTICE_DELAY, null, {
+    ref: false,
+    signal: delayedNoticeController.signal,
+  })
+    .then(() => {
+      info(
+        `Currently waiting data from stdin stream. Conversion will start after finished reading. (Pass ${chalk.yellow`--no-stdin`} option if it was not intended)`
+      )
+    })
+    .catch(() => {
+      // No ops
+    })
+
+  debug('Reading stdin stream...')
+  const buf = await _getStdin.buffer()
+
+  debug('Read from stdin: %d bytes', buf.length)
+  delayedNoticeController.abort()
+
+  return buf
+}
 
 interface GenerateTmpFileInterfaceOptions {
   extension?: `.${string}`
@@ -236,7 +266,7 @@ export class File {
   }
 
   static async stdin(): Promise<File | undefined> {
-    this.stdinBuffer = this.stdinBuffer || (await getStdin.buffer())
+    this.stdinBuffer = this.stdinBuffer || (await getStdin())
     if (this.stdinBuffer.length === 0) return undefined
 
     return this.initialize('-', (f) => {
