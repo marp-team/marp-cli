@@ -1,12 +1,18 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 import crypto from 'node:crypto'
 import path from 'node:path'
-import { watch as chokidarWatch, type FSWatcher } from 'chokidar'
+import { watch as _watch, type FSWatcher } from 'chokidar'
 import { getPortPromise } from 'portfinder'
 import WS, { type ServerOptions } from 'ws'
 import { Converter, ConvertedCallback } from './converter'
 import { isError } from './error'
 import { File, FileType } from './file'
+import { debugWatcher } from './utils/debug'
+
+const chokidarWatch: typeof _watch = (...args) => {
+  debugWatcher('Start watching with chokidar: %O', args)
+  return _watch(...args)
+}
 
 export class Watcher {
   chokidar: FSWatcher
@@ -23,6 +29,9 @@ export class Watcher {
     this.mode = opts.mode
 
     this.chokidar = chokidarWatch(watchPath, { ignoreInitial: true })
+      .on('all', (event, path) =>
+        debugWatcher('Chokidar event: [%s] %s', event, path)
+      )
       .on('change', (f) => this.convert(f))
       .on('add', (f) => this.convert(f))
       .on('unlink', (f) => this.delete(f))
