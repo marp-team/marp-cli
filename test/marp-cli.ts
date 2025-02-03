@@ -4,7 +4,6 @@ import path from 'node:path'
 import { version as coreVersion } from '@marp-team/marp-core/package.json'
 import { version as marpitVersion } from '@marp-team/marpit/package.json'
 import * as cosmiconfigExplorer from 'cosmiconfig/dist/Explorer' // eslint-disable-line import-x/namespace
-import getStdin from 'get-stdin'
 import stripAnsi from 'strip-ansi'
 import { version as cliVersion } from '../package.json'
 import { defaultFinders } from '../src/browser/finder'
@@ -22,6 +21,7 @@ import { Preview } from '../src/preview'
 import { Server } from '../src/server'
 import { ThemeSet } from '../src/theme'
 import * as container from '../src/utils/container'
+import * as stdin from '../src/utils/stdin'
 import * as version from '../src/version'
 import { Watcher } from '../src/watcher'
 
@@ -1752,9 +1752,7 @@ describe('Marp CLI', () => {
       cliInfo = jest.spyOn(cli, 'info').mockImplementation()
       stdout = jest.spyOn(process.stdout, 'write').mockImplementation()
 
-      jest
-        .spyOn(getStdin, 'buffer')
-        .mockResolvedValue(Buffer.from('# markdown'))
+      jest.spyOn(stdin, 'getStdin').mockResolvedValue(Buffer.from('# markdown'))
 
       // reset cached stdin buffer
       ;(File as any).stdinBuffer = undefined
