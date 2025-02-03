@@ -15,6 +15,7 @@ import { TemplateOption } from './templates'
 import { Theme, ThemeSet } from './theme'
 import { isStandaloneBinary } from './utils/binary'
 import { isOfficialContainerImage } from './utils/container'
+import { debugConfig } from './utils/debug'
 
 type Overwrite<T, U> = Omit<T, Extract<keyof T, keyof U>> & U
 
@@ -108,6 +109,8 @@ export class MarpCLIConfig {
 
   static async fromArguments(args: IMarpCLIArguments) {
     const conf = new MarpCLIConfig()
+
+    debugConfig('Passed arguments: %o', args)
     conf.args = args
 
     if (args.configFile !== false) await conf.loadConf(args.configFile)
@@ -437,15 +440,37 @@ export class MarpCLIConfig {
       : cosmiconfigSync(MarpCLIConfig.moduleName)
 
     try {
-      const ret = await (confPath === undefined
-        ? explorer.search(process.cwd())
-        : explorer.load(confPath))
+      const ret = await (async () => {
+        if (confPath !== undefined) {
+          debugConfig(
+            'Loading configuration file from specified path: %s',
+            confPath
+          )
+          return explorer.load(confPath)
+        }
+
+        const currentDir = process.cwd()
+        debugConfig(
+          'Finding configuration file from current directory: %s',
+          currentDir
+        )
+
+        return explorer.search(currentDir)
+      })()
+
+      if (ret && !ret.isEmpty) {
+        debugConfig('Loaded configuration file: %s', ret.filepath)
+      } else {
+        debugConfig('No configuration file found.')
+      }
 
       if (ret) {
         this.confPath = ret.filepath
         this.conf = ret.config
       }
     } catch (e: unknown) {
+      debugConfig('Error occurred during loading configuration file: %o', e)
+
       const isErr = isError(e)
 
       if (isErr && e.code === 'ERR_REQUIRE_ESM') {

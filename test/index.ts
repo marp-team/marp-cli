@@ -1,7 +1,7 @@
 import path from 'node:path'
-import getStdin from 'get-stdin'
 import api, { CLIError } from '../src/index'
 import * as marpCli from '../src/marp-cli'
+import * as stdin from '../src/utils/stdin'
 
 afterEach(() => {
   jest.clearAllMocks()
@@ -27,7 +27,7 @@ describe('Marp CLI API interface', () => {
   it('does not read input from stdin if called API', async () => {
     jest.spyOn(console, 'log').mockImplementation()
 
-    const stdinBuffer = jest.spyOn(getStdin, 'buffer')
+    const stdinBuffer = jest.spyOn(stdin, 'getStdin')
 
     await marpCli.cliInterface([])
     expect(stdinBuffer).toHaveBeenCalled()
