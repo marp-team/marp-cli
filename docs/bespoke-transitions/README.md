@@ -571,7 +571,7 @@ transition: fade
 style: |
   /* Define the style of morphable elements (Requires Chrome 133 and later) */
   [data-morph] {
-    view-transition-name: attr(data-morph type(<custom-ident>), auto);
+    view-transition-name: attr(data-morph type(<custom-ident>), none);
   }
 
   /* Global style */
