@@ -518,10 +518,6 @@ If there were multiple pairs defined by `view-transition-name` CSS property with
 
 In this example, the icon image of "1" on every page is marked as morphable elements named "one" by `view-transition-name` CSS property.
 
-Generally setting [`contain` CSS property][contain] as `layout` or `paint` is also required together with `view-transition-name`. If it lacked, the browser may ignore the morph transition with the error `Shared element must contain paint or layout`.
-
-[contain]: https://developer.mozilla.org/en-US/docs/Web/CSS/contain
-
 ```markdown
 ---
 theme: gaia
@@ -565,8 +561,6 @@ It provides a writing experience of presentation slides by Markdown.
 ```
 
 #### Use HTML to mark morphable contents
-
-By using an inline HTML with enabling raw HTML rendering by `--html` Marp CLI option, you can mark a group of morphable contents with more flexibility.
 
 This example is defining the style for `data-morph` attribute, to mark the inner elements as morphable.
 
