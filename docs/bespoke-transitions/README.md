@@ -527,39 +527,37 @@ Generally setting [`contain` CSS property][contain] as `layout` or `paint` is al
 theme: gaia
 transition: fade
 style: |
-  /* ⬇️ Mark the image of "1" in every pages as morphable image named as "one" ⬇️ */
-  img[alt="1"] {
-    view-transition-name: one;
-    contain: layout; /* required */
-  }
-
-  /* Generic image styling for number icons */
-  img:is([alt="1"], [alt="2"], [alt="3"]) {
+  img[title~="step"] {
     height: 64px;
     position: relative;
     top: -0.1em;
     vertical-align: middle;
     width: 64px;
+
+    /* ⬇️ Mark the image of "1" in every pages as morphable image named as "one" ⬇️ */
+    &[alt="1"] {
+      view-transition-name: one;
+    }
   }
 ---
 
 # Today's topics
 
-- ![1](https://icongr.am/material/numeric-1-circle.svg?color=666666) Introduction
-- ![2](https://icongr.am/material/numeric-2-circle.svg?color=666666) Features
-- ![3](https://icongr.am/material/numeric-3-circle.svg?color=666666) Conclusion
+- ![1](https://icongr.am/material/numeric-1-circle.svg?color=666666 'step') Introduction
+- ![2](https://icongr.am/material/numeric-2-circle.svg?color=666666 'step') Features
+- ![3](https://icongr.am/material/numeric-3-circle.svg?color=666666 'step') Conclusion
 
 ---
 
 <!-- _class: lead -->
 
-![1 w:256 h:256](https://icongr.am/material/numeric-1-circle.svg?color=ff9900)
+![1 w:256 h:256](https://icongr.am/material/numeric-1-circle.svg?color=ff9900 'step')
 
 # Introduction
 
 ---
 
-# ![1](https://icongr.am/material/numeric-1-circle.svg?color=666666) Introduction
+# ![1](https://icongr.am/material/numeric-1-circle.svg?color=666666 'step') Introduction
 
 Marp is an open-sourced Markdown presentation ecosystem.
 
@@ -570,19 +568,16 @@ It provides a writing experience of presentation slides by Markdown.
 
 By using an inline HTML with enabling raw HTML rendering by `--html` Marp CLI option, you can mark a group of morphable contents with more flexibility.
 
-This example is defining the style of `morph` class, to mark the inner elements as morphable.
+This example is defining the style for `data-morph` attribute, to mark the inner elements as morphable.
 
 ```markdown
 ---
 header: Bubble sort
 transition: fade
 style: |
-  /* Define the style of "morph" class */
-  .morph {
-    display: inline-block;
-    view-transition-name: var(--morph-name);
-    contain: layout;
-    vertical-align: top;
+  /* Define the style of morphable elements (Requires Chrome 133 and later) */
+  [data-morph] {
+    view-transition-name: attr(data-morph type(<custom-ident>), auto);
   }
 
   /* Global style */
@@ -591,40 +586,40 @@ style: |
   }
 ---
 
-<span class="morph" style="--morph-name:b7;">███████</span> 7
-<span class="morph" style="--morph-name:b5;">█████</span> 5
-<span class="morph" style="--morph-name:b3;">███</span> 3
-<span class="morph" style="--morph-name:b9;">█████████</span> 9
+<span data-morph="bar7">███████</span> 7
+<span data-morph="bar5">█████</span> 5
+<span data-morph="bar3">███</span> 3
+<span data-morph="bar9">█████████</span> 9
 
 ---
 
-<span class="morph" style="--morph-name:b5;">█████</span> 5
-<span class="morph" style="--morph-name:b7;">███████</span> 7
-<span class="morph" style="--morph-name:b3;">███</span> 3
-<span class="morph" style="--morph-name:b9;">█████████</span> 9
+<span data-morph="bar5">█████</span> 5
+<span data-morph="bar7">███████</span> 7
+<span data-morph="bar3">███</span> 3
+<span data-morph="bar9">█████████</span> 9
 
 ---
 
-<span class="morph" style="--morph-name:b5;">█████</span> 5
-<span class="morph" style="--morph-name:b3;">███</span> 3
-<span class="morph" style="--morph-name:b7;">███████</span> 7
-<span class="morph" style="--morph-name:b9;">█████████</span> 9
+<span data-morph="bar5">█████</span> 5
+<span data-morph="bar3">███</span> 3
+<span data-morph="bar7">███████</span> 7
+<span data-morph="bar9">█████████</span> 9
 
 ---
 
-<span class="morph" style="--morph-name:b3;">███</span> 3
-<span class="morph" style="--morph-name:b5;">█████</span> 5
-<span class="morph" style="--morph-name:b7;">███████</span> 7
-<span class="morph" style="--morph-name:b9;">█████████</span> 9
+<span data-morph="bar3">███</span> 3
+<span data-morph="bar5">█████</span> 5
+<span data-morph="bar7">███████</span> 7
+<span data-morph="bar9">█████████</span> 9
 ```
 
-The name of group can set through CSS variable in `style` attribute.
+The name of morphable elements can set through `data-morph` attribute. Please note that this example is using [advanced `attr()` function](https://developer.chrome.com/blog/advanced-attr), that requires Chrome 133 and later.
 
 <p align="center">
   <img src="./images/morphing-animation-2.gif" alt="Use HTML to mark morphable contents" width="480" height="270" />
 </p>
 
-Due to the security reason, Marp CLI does not render raw HTML tags in Markdown by default. You have to should add `--html` option to use inline HTMLs.
+Due to the security reason, Marp CLI does not render `data-*` attributes in raw `<span>` elements in Markdown by default. You have to should add `--html` option to use.
 
 ```bash
 marp morphable.md --html
