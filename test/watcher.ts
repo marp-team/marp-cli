@@ -16,7 +16,7 @@ jest.mock('chokidar', () => ({
 }))
 
 jest.mock('ws', () => ({
-  Server: jest.fn(() => ({
+  WebSocketServer: jest.fn(() => ({
     clients: [],
     close: jest.fn((callback) => callback()),
     on: mockWsOn,

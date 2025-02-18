@@ -1,11 +1,11 @@
 #################### Build Marp CLI ####################
-FROM --platform=$BUILDPLATFORM node:22.12.0-bookworm-slim AS build
+FROM --platform=$BUILDPLATFORM node:22.14.0-bookworm-slim AS build
 WORKDIR /home/node/marp-cli
 COPY . .
 RUN npm ci && npm run build
 
 #################### Create Marp CLI image ####################
-FROM node:22.12.0-bookworm-slim
+FROM node:22.14.0-bookworm-slim
 
 # Set up user for Marp CLI
 RUN groupadd -r marp && useradd -r -g marp marp && mkdir -p /home/marp/app /home/marp/.cli && chown -R marp:marp /home/marp

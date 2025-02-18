@@ -3,7 +3,8 @@ import crypto from 'node:crypto'
 import path from 'node:path'
 import { watch as _watch, type FSWatcher } from 'chokidar'
 import { getPortPromise } from 'portfinder'
-import WS, { type ServerOptions } from 'ws'
+import { WebSocketServer } from 'ws'
+import type { ServerOptions } from 'ws'
 import { Converter, ConvertedCallback } from './converter'
 import { isError } from './error'
 import { File, FileType } from './file'
@@ -91,7 +92,7 @@ export class Watcher {
 export class WatchNotifier {
   listeners = new Map<string, Set<any>>()
 
-  private wss?: WS.Server
+  private wss?: WebSocketServer
   private portNumber?: number
 
   async port() {
@@ -121,7 +122,7 @@ export class WatchNotifier {
   }
 
   async start(opts: ServerOptions = {}) {
-    this.wss = new WS.Server({ ...opts, port: await this.port() })
+    this.wss = new WebSocketServer({ ...opts, port: await this.port() })
     this.wss.on('connection', (ws, sock) => {
       if (sock.url) {
         const [, identifier] = sock.url.split('/')
