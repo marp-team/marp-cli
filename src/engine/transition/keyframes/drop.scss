@@ -1,6 +1,7 @@
 :root {
-  --bespoke-marp-transition-drop-shadow: 0 0.3vh 0.6vh rgba(0, 0, 0, 39%),
-    rgba(0, 0, 0, 30%) 0 3vh 5vh, rgba(0, 0, 0, 22%) 0 2vh 1.5vh;
+  --bespoke-marp-transition-drop-shadow:
+    0 0.3vh 0.6vh rgba(0, 0, 0, 39%), rgba(0, 0, 0, 30%) 0 3vh 5vh,
+    rgba(0, 0, 0, 22%) 0 2vh 1.5vh;
 }
 
 // [Safari CSS hack]
