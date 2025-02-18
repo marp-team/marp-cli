@@ -4,6 +4,7 @@
 
 ### Changed
 
+- Upgrade dependent packages to the latest versions ([#648](https://github.com/marp-team/marp-cli/pull/648))
 - Use arm64 hosted runner to build container image for ARM64 ([#635](https://github.com/marp-team/marp-cli/issues/635), [#637](https://github.com/marp-team/marp-cli/pull/637))
 
 ### Fixed
