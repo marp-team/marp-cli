@@ -30,9 +30,7 @@ export class Watcher {
     this.mode = opts.mode
 
     this.chokidar = chokidarWatch(watchPath, { ignoreInitial: true })
-      .on('all', (event, path) =>
-        debugWatcher('Chokidar event: [%s] %s', event, path)
-      )
+      .on('all', (event, path) => this.log(event, path))
       .on('change', (f) => this.convert(f))
       .on('add', (f) => this.convert(f))
       .on('unlink', (f) => this.delete(f))
@@ -40,6 +38,10 @@ export class Watcher {
     this.converter.options.themeSet.onThemeUpdated = (f) => this.convert(f)
 
     notifier.start()
+  }
+
+  private log(event: string, path: string) {
+    debugWatcher('Chokidar event: [%s] %s', event, path)
   }
 
   private async convert(filename: string) {

@@ -68,19 +68,25 @@ describe('Watcher', () => {
       // Chokidar events
       const on = watcher.chokidar.on as jest.Mock
 
+      expect(on).toHaveBeenCalledWith('all', expect.any(Function))
       expect(on).toHaveBeenCalledWith('change', expect.any(Function))
       expect(on).toHaveBeenCalledWith('add', expect.any(Function))
       expect(on).toHaveBeenCalledWith('unlink', expect.any(Function))
 
+      const onAll = on.mock.calls.find(([e]) => e === 'all')[1]
       const onChange = on.mock.calls.find(([e]) => e === 'change')[1]
       const onAdd = on.mock.calls.find(([e]) => e === 'add')[1]
       const onUnlink = on.mock.calls.find(([e]) => e === 'unlink')[1]
 
       // Callbacks
+      const log = jest.spyOn(watcher as any, 'log').mockImplementation()
       const conv = jest.spyOn(watcher as any, 'convert').mockImplementation()
       const del = jest.spyOn(watcher as any, 'delete').mockImplementation()
 
       try {
+        onAll('event', 'path')
+        expect(log).toHaveBeenCalledWith('event', 'path')
+
         onChange('change')
         expect(conv).toHaveBeenCalledWith('change')
 
