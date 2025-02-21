@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Add a delayed notification for reading Markdown from the stdin stream ([#573](https://github.com/marp-team/marp-cli/issues/573), [#644](https://github.com/marp-team/marp-cli/pull/644))
+
 ### Changed
 
 - Upgrade dependent packages to the latest versions ([#648](https://github.com/marp-team/marp-cli/pull/648))
