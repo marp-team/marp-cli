@@ -2,9 +2,9 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import * as url from 'node:url'
-import getStdin from 'get-stdin'
 import { globby, Options as GlobbyOptions } from 'globby'
 import { debug } from './utils/debug'
+import { getStdin } from './utils/stdin'
 import { generateTmpName } from './utils/tmp'
 
 export const markdownExtensions = ['md', 'mdown', 'markdown', 'markdn']
@@ -236,7 +236,7 @@ export class File {
   }
 
   static async stdin(): Promise<File | undefined> {
-    this.stdinBuffer = this.stdinBuffer || (await getStdin.buffer())
+    this.stdinBuffer = this.stdinBuffer || (await getStdin())
     if (this.stdinBuffer.length === 0) return undefined
 
     return this.initialize('-', (f) => {
