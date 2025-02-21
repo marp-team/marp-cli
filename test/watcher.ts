@@ -79,7 +79,7 @@ describe('Watcher', () => {
       const onUnlink = on.mock.calls.find(([e]) => e === 'unlink')[1]
 
       // Callbacks
-      const log = jest.spyOn(watcher as any, 'log').mockImplementation()
+      const log = jest.spyOn(watcher as any, 'log')
       const conv = jest.spyOn(watcher as any, 'convert').mockImplementation()
       const del = jest.spyOn(watcher as any, 'delete').mockImplementation()
 
