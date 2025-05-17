@@ -23,6 +23,7 @@ const esModules = [
   'path-exists',
   'path-type',
   'package-up',
+  'pptxgenjs',
   'slash',
   'strip-ansi',
   'unicorn-magic',
