@@ -127,7 +127,7 @@
     "portfinder": "^1.0.37",
     "postcss": "^8.5.3",
     "postcss-url": "^10.1.3",
-    "pptxgenjs": "^3.12.0",
+    "pptxgenjs": "^4.0.0",
     "prettier": "^3.5.3",
     "pug": "^3.0.3",
     "rollup": "^4.40.2",
