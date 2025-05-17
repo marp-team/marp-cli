@@ -5,6 +5,7 @@ import { URL } from 'node:url'
 import { promisify } from 'node:util'
 import { Marp } from '@marp-team/marp-core'
 import { Options } from '@marp-team/marpit'
+import type { Cheerio } from 'cheerio'
 import { load } from 'cheerio'
 import { imageSize } from 'image-size'
 import { PDFDocument, PDFDict, PDFName, PDFHexString, PDFNumber } from 'pdf-lib'
@@ -35,6 +36,11 @@ afterEach(() => {
   jest.resetAllMocks()
   jest.restoreAllMocks()
 })
+
+type JSON = string | number | boolean | null | JSON[] | { [key: string]: JSON }
+
+const data = <T extends JSON>(elm: Cheerio<any>, name: string) =>
+  elm.data(name) as Record<string, T> | undefined
 
 describe('Converter', () => {
   const onePath = path.resolve(__dirname, '_files/1.md')
@@ -381,15 +387,16 @@ describe('Converter', () => {
           $enabled('[data-transition-back]').length
         ).toBeGreaterThanOrEqual(1)
 
-        const enabledData = $enabled('[data-transition]').data('transition')
-        const enabledDataBack = $enabled('[data-transition-back]').data(
+        const enabledData = data($enabled('[data-transition]'), 'transition')
+        const enabledDataBack = data(
+          $enabled('[data-transition-back]'),
           'transitionBack'
         )
 
-        expect(enabledData.name).toBe('cover')
-        expect(enabledData.builtinFallback).toBe(true)
-        expect(enabledDataBack.name).toBe('cover')
-        expect(enabledDataBack.builtinFallback).toBe(true)
+        expect(enabledData?.name).toBe('cover')
+        expect(enabledData?.builtinFallback).toBe(true)
+        expect(enabledDataBack?.name).toBe('cover')
+        expect(enabledDataBack?.builtinFallback).toBe(true)
 
         // Non built-in transition will remain for custom transition
         const { result: unknownResult } = await instance({
@@ -400,9 +407,9 @@ describe('Converter', () => {
         const $unknown = load(unknownResult)
         expect($unknown('[data-transition]')).toHaveLength(1)
 
-        const unknownData = $unknown('[data-transition]').data('transition')
-        expect(unknownData.name).toBe('unknown')
-        expect(unknownData.builtinFallback).toBeFalsy()
+        const unknownData = data($unknown('[data-transition]'), 'transition')
+        expect(unknownData?.name).toBe('unknown')
+        expect(unknownData?.builtinFallback).toBeFalsy()
 
         // Turn on and off
         const { result: toggleResult } = await instance({
@@ -417,14 +424,16 @@ describe('Converter', () => {
 
         expect(sections).toHaveLength(3)
 
-        expect($toggle(sections[0]).data('transition').name).toBe('reveal')
-        expect($toggle(sections[1]).data('transition').name).toBe('none')
-        expect($toggle(sections[2]).data('transition').name).toBe('none')
+        expect(data($toggle(sections[0]), 'transition')?.name).toBe('reveal')
+        expect(data($toggle(sections[1]), 'transition')?.name).toBe('none')
+        expect(data($toggle(sections[2]), 'transition')?.name).toBe('none')
 
         // Assigning slides are shifted in backward transition
-        expect($toggle(sections[0]).data('transitionBack')).toBeUndefined()
-        expect($toggle(sections[1]).data('transitionBack').name).toBe('reveal')
-        expect($toggle(sections[2]).data('transitionBack').name).toBe('none')
+        expect(data($toggle(sections[0]), 'transitionBack')).toBeUndefined()
+        expect(data($toggle(sections[1]), 'transitionBack')?.name).toBe(
+          'reveal'
+        )
+        expect(data($toggle(sections[2]), 'transitionBack')?.name).toBe('none')
       })
     })
 
@@ -440,10 +449,10 @@ describe('Converter', () => {
         )
 
         const $result = load(result)
-        const data = $result('section').first().data('transition')
+        const transitionData = data($result('section').first(), 'transition')
 
-        expect(data.name).toBe('reveal')
-        expect(data.duration).toBe('1s')
+        expect(transitionData?.name).toBe('reveal')
+        expect(transitionData?.duration).toBe('1s')
       })
     })
 
@@ -465,12 +474,12 @@ describe('Converter', () => {
         )
         const $result = load(result)
 
-        const data = $result('section').first().data('transition')
-        expect(data.name).toMatch(/^hello-\w+$/)
+        const transitionData = data($result('section').first(), 'transition')
+        const bData = data($result($result('section').get(1)), 'transitionBack')
 
-        const bData = $result($result('section').get(1)).data('transitionBack')
-        expect(bData.name).toMatch(/^hello-\w+$/)
-        expect(bData.name).toBe(data.name)
+        expect(transitionData?.name).toMatch(/^hello-\w+$/)
+        expect(bData?.name).toMatch(/^hello-\w+$/)
+        expect(bData?.name).toBe(transitionData?.name)
       })
     })
   })
