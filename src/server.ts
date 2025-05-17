@@ -179,7 +179,7 @@ export class Server extends (EventEmitter as new () => TypedEmitter<Server.Event
 
     this.server = express.default()
     this.server
-      .get('*', (req, res, next) =>
+      .get('*all', (req, res, next) =>
         this.preprocess(req, res).then(() => {
           if (!res.writableEnded) next()
         })
