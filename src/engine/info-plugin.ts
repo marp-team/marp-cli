@@ -47,7 +47,7 @@ export default function infoPlugin(md: any) {
     const globalDirectives = lastGlobalDirectives || {}
     const theme = globalDirectives.theme || (themeSet.default || {}).name
     const title =
-      globalDirectives.marpCLITitle ||
+      globalDirectives.marpCLITitle ??
       extractTitleFromFirstHeading(state.tokens)
 
     const info: EngineInfo = {
