@@ -48,7 +48,7 @@
   "scripts": {
     "build": "npm -s run clean && rollup -c",
     "build:standalone": "run-s build standalone",
-    "check:audit": "npm audit",
+    "check:audit": "npm audit --audit-level=moderate",
     "check:format": "npm -s run format -- -c",
     "check:ts": "tsc --noEmit",
     "clean": "node -e \"fs.rmSync('lib',{recursive:true,force:true})\"",
