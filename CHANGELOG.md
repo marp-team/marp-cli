@@ -14,6 +14,10 @@
 - Upgrade dependent packages to the latest version ([#657](https://github.com/marp-team/marp-cli/pull/657), [#663](https://github.com/marp-team/marp-cli/pull/663))
 - Upgrade development Node.js LTS ([#658](https://github.com/marp-team/marp-cli/pull/658))
 
+### Fixed
+
+- The default duration setting for custom defined transitions `--marp-transition-duration` was not working in Safari and Firefox ([#665](https://github.com/marp-team/marp-cli/pull/665))
+
 ## v4.1.2 - 2025-02-21
 
 ### Added
