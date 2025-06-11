@@ -4,6 +4,7 @@
 
 ### Added
 
+- Assign the slide title from first heading in Markdown automatically ([#131](https://github.com/marp-team/marp-cli/issues/131), [#655](https://github.com/marp-team/marp-cli/pull/655) by [@Alberthor47](https://github.com/Alberthor47))
 - Test against Node.js v24 ([#658](https://github.com/marp-team/marp-cli/pull/658))
 
 ### Changed
