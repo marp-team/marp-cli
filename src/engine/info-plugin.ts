@@ -15,6 +15,8 @@ export const engineInfo = Symbol()
 
 /**
  * Extracts the title from the higher hierarchy heading in the Markdown tokens.
+ *
+ * @todo Move from info plugin to meta plugin.
  * @param tokens - The list of Markdown tokens.
  * @returns The extracted title or undefined if no heading is found.
  */
