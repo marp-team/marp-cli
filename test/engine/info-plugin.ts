@@ -1,4 +1,8 @@
+import { Marp } from '@marp-team/marp-core'
+import { Marpit } from '@marp-team/marpit'
+import MarkdownIt from 'markdown-it'
 import infoPlugin, { engineInfo } from '../../src/engine/info-plugin'
+import metaPlugin from '../../src/engine/meta-plugin'
 
 describe('Engine info plugin', () => {
   // Helper to create mock heading tokens
@@ -192,122 +196,82 @@ describe('Engine info plugin', () => {
     })
   })
 
-  describe('#infoPlugin', () => {
-    const marpitMock = () => {
-      const marpit = {
-        customDirectives: { global: {} },
-        themeSet: {
-          default: { name: 'default' },
-          getThemeProp: jest.fn(() => 1080),
-        },
-        options: { lang: 'en' },
-      }
-      return marpit
-    }
+  describe('Marp CLI info plugin', () => {
+    it('stores info to marp[engineInfo] after rendered', () => {
+      const marp = new Marp().use(infoPlugin)
+      expect(marp[engineInfo]).toBeUndefined()
 
-    const mdMock = () => {
-      const md: any = {
-        core: { ruler: { push: jest.fn() } },
-        marpit: marpitMock(),
-      }
-      return md
-    }
-
-    it('adds marp_cli_info ruler to markdown-it', () => {
-      const md = mdMock()
-      infoPlugin(md)
-
-      expect(md.core.ruler.push).toHaveBeenCalledWith(
-        'marp_cli_info',
-        expect.any(Function)
-      )
+      marp.render('')
+      expect(marp[engineInfo]).toBeDefined()
     })
 
-    it('returns early when in inline mode', () => {
-      const md = mdMock()
-      infoPlugin(md)
+    it('works with Marpit instance', () => {
+      const marpit = new Marpit().use(infoPlugin)
+      expect(marpit[engineInfo]).toBeUndefined()
 
-      const infoRule = md.core.ruler.push.mock.calls[0][1]
-      const state = { inlineMode: true }
-
-      expect(infoRule(state)).toBeUndefined()
-      expect(md.marpit[engineInfo]).toBeUndefined()
+      marpit.render('')
+      expect(marpit[engineInfo]).toBeDefined()
     })
 
-    it('uses global directive title when available', () => {
-      const md = mdMock()
-      md.marpit.lastGlobalDirectives = { marpCLITitle: 'Title from Directive' }
+    it('does not store info when rendered by inline mode', () => {
+      const marp = new Marp().use(infoPlugin)
+      expect(marp[engineInfo]).toBeUndefined()
 
-      infoPlugin(md)
-
-      const infoRule = md.core.ruler.push.mock.calls[0][1]
-      const state = {
-        inlineMode: false,
-        tokens: createHeadingTokens('h1', 'Heading Title'),
-      }
-
-      infoRule(state)
-
-      expect(md.marpit[engineInfo].title).toBe('Title from Directive')
+      const md: MarkdownIt = marp.markdown
+      md.renderInline('# Hello')
+      expect(marp[engineInfo]).toBeUndefined()
     })
 
-    it('counts slides correctly', () => {
-      const md = mdMock()
-      infoPlugin(md)
+    describe('with meta plugin', () => {
+      const instanceWithMeta = () => new Marp().use(infoPlugin).use(metaPlugin)
 
-      const infoRule = md.core.ruler.push.mock.calls[0][1]
-      const state = {
-        inlineMode: false,
-        tokens: [
-          { type: 'slide_open', meta: { marpitSlideElement: 1 } },
-          ...createHeadingTokens('h1', 'Slide 1'),
-          { type: 'slide_close' },
-          { type: 'slide_open', meta: { marpitSlideElement: 1 } },
-          ...createHeadingTokens('h2', 'Slide 2'),
-          { type: 'slide_close' },
-        ],
-      }
+      it('stores parsed info from global directives', () => {
+        const marp = instanceWithMeta()
 
-      infoRule(state)
+        marp.render(
+          `
+---
+title: Title
+author: Author
+description: Description
+keywords:
+  - keyword1
+  - keyword2
+url: https://example.com/slide
+image: https://example.com/slide.png
+lang: en
+theme: gaia
+size: 4:3
+---
 
-      expect(md.marpit[engineInfo]).toHaveLength(2)
-    })
+# Slide title
 
-    it('sets all info properties correctly', () => {
-      const md = mdMock()
-      md.marpit.lastGlobalDirectives = {
-        theme: 'gaia',
-        marpCLITitle: 'Presentation Title',
-        marpCLIAuthor: 'Author Name',
-        marpCLIDescription: 'Description text',
-        marpCLIImage: 'image.png',
-        marpCLIKeywords: ['key1', 'key2'],
-        marpCLIURL: 'https://example.com',
-        lang: 'es',
-      }
+---
 
-      infoPlugin(md)
+## Page 2
+`.trim()
+        )
 
-      const infoRule = md.core.ruler.push.mock.calls[0][1]
-      const state = { inlineMode: false, tokens: [] }
-
-      infoRule(state)
-
-      const info = md.marpit[engineInfo]
-      expect(info).toMatchObject({
-        theme: 'gaia',
-        title: 'Presentation Title',
-        author: 'Author Name',
-        description: 'Description text',
-        image: 'image.png',
-        keywords: ['key1', 'key2'],
-        url: 'https://example.com',
-        lang: 'es',
-        length: 0,
-        size: {
-          height: 1080,
-          width: 1080,
-        },
+        expect(marp[engineInfo]).toMatchInlineSnapshot(`
+{
+  "author": "Author",
+  "description": "Description",
+  "image": "https://example.com/slide.png",
+  "keywords": [
+    "keyword1",
+    "keyword2",
+  ],
+  "lang": "en",
+  "length": 2,
+  "size": {
+    "height": 720,
+    "width": 960,
+  },
+  "theme": "gaia",
+  "title": "Title",
+  "url": "https://example.com/slide",
+}
+`)
       })
     })
   })

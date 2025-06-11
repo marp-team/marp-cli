@@ -326,6 +326,7 @@ describe('Marp CLI', () => {
 
     beforeEach(() => {
       writeFile = jest.spyOn(fs.promises, 'writeFile').mockImplementation()
+      jest.spyOn(fs.promises, 'mkdir').mockImplementation()
     })
 
     it('converts files in specified dir', async () => {
