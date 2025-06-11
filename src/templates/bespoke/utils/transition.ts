@@ -96,23 +96,9 @@ const resolveKeyframeSetting = (keyframe: string) =>
     const currentStyle = getComputedStyle(elm)
     const durationVar = currentStyle.getPropertyValue(publicCSSVar('duration'))
 
-    if (durationVar) {
+    if (durationVar && Number.parseFloat(durationVar) >= 0) {
       setting.defaultDuration = durationVar
     }
-    // TODO: Consider to abuse animatable property with custom-ident if View
-    // Transition API had supported in cross-browser and `@property` CSS at-rule
-    // was not yet supported in other browsers well
-    //
-    // else if (
-    //   // CSS variable that is setting within the keyframe cannot read in some
-    //   // browsers (Firefox, Safari). So Marp abuses grid-row-start property
-    //   // in "from" keyframe as a custom value.
-    //   currentStyle.gridRowStart.startsWith('marp-transition-duration-')
-    // ) {
-    //   setting.defaultDuration = currentStyle.gridRowStart
-    //     .slice(25)
-    //     .replace(/\\./g, '.')
-    // }
 
     _testElementAnimation(elm, resolve)
   })
@@ -177,6 +163,13 @@ export const isMarpTransitionKeyframesEmpty = (
     .every((v) => !v)
 
 export const prepareMarpTransitions = (...transitionNames: string[]) => {
+  CSS.registerProperty({
+    name: publicCSSVar('duration'),
+    syntax: '<time>',
+    inherits: true,
+    initialValue: '-1s', // Use negative value to show that the duration is not set
+  })
+
   const names = [...new Set(transitionNames).values()]
 
   return Promise.all(
