@@ -20,6 +20,9 @@ import { CLIError, CLIErrorCode, error, isError } from './error'
 import { File, markdownExtensions } from './file'
 import serverIndex from './server/index.pug'
 import style from './server/index.scss'
+import { notifier } from './watcher'
+
+export const watchNotifierWebSocketEntrypoint = '.__marp-cli-watch-notifier__'
 
 export class Server extends (EventEmitter as new () => TypedEmitter<Server.Events>) {
   readonly converter: Converter
@@ -69,6 +72,20 @@ export class Server extends (EventEmitter as new () => TypedEmitter<Server.Event
           }
         })()
       )
+
+      this.httpServer.on('upgrade', (request, socket, head) => {
+        if (request.url?.startsWith(`/${watchNotifierWebSocketEntrypoint}/`)) {
+          const ws = notifier.server
+
+          if (ws) {
+            ws.handleUpgrade(request, socket, head, (client) => {
+              ws.emit('connection', client, request)
+            })
+            return
+          }
+        }
+        socket.destroy()
+      })
     })
   }
 
@@ -105,6 +122,7 @@ export class Server extends (EventEmitter as new () => TypedEmitter<Server.Event
     this.converter.options.output = false
     this.converter.options.pages = false
     this.converter.options.type = type
+    this.converter.options.watch = 'server'
 
     const result = await this.converter.convertFile(new File(filename))
     this.emit('converted', result)
@@ -179,6 +197,9 @@ export class Server extends (EventEmitter as new () => TypedEmitter<Server.Event
 
     this.server = express.default()
     this.server
+      .get(`/${watchNotifierWebSocketEntrypoint}/*all`, (_, res) => {
+        res.status(426).end('Upgrade Required')
+      })
       .get('*all', (req, res, next) =>
         this.preprocess(req, res).then(() => {
           if (!res.writableEnded) next()

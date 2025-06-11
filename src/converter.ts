@@ -41,7 +41,7 @@ import { isReadable } from './utils/finder'
 import { png2jpegViaPuppeteer } from './utils/jpeg'
 import { pdfLib, setOutline } from './utils/pdf'
 import { translateWSLPathToWindows } from './utils/wsl'
-import { notifier } from './watcher'
+import { notifier, type WatchNotifierEntrypointType } from './watcher'
 
 const CREATED_BY_MARP = 'Created by Marp'
 
@@ -93,7 +93,7 @@ export interface ConverterOption {
   templateOption?: TemplateOption
   themeSet: ThemeSet
   type: ConvertType
-  watch: boolean
+  watch: boolean | WatchNotifierEntrypointType
 }
 
 export interface ConvertFileOption {
@@ -184,7 +184,12 @@ export class Converter {
       base: await resolveBase(file),
       notifyWS:
         isFile(file) && this.options.watch && type === ConvertType.html
-          ? await notifier.register(file.absolutePath)
+          ? await notifier.register(
+              file.absolutePath,
+              typeof this.options.watch === 'string'
+                ? this.options.watch
+                : undefined
+            )
           : undefined,
       renderer: async (tplOpts) => {
         const engine = await this.generateEngine(tplOpts)
