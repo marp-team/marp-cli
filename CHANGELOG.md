@@ -11,7 +11,7 @@
 - Upgrade Marpit to [v3.1.3](https://github.com/marp-team/marpit/releases/tag/v3.1.3) ([#654](https://github.com/marp-team/marp-cli/pull/654), [#657](https://github.com/marp-team/marp-cli/pull/657))
 - Upgrade Marp Core to [v4.1.0](https://github.com/marp-team/marp-core/releases/v4.1.0) ([#657](https://github.com/marp-team/marp-cli/pull/657))
   - Transform Unicode 16 emojis into Twemoji images by default
-- Upgrade dependent packages to the latest version ([#657](https://github.com/marp-team/marp-cli/pull/657))
+- Upgrade dependent packages to the latest version ([#657](https://github.com/marp-team/marp-cli/pull/657), [#663](https://github.com/marp-team/marp-cli/pull/663))
 - Upgrade development Node.js LTS ([#658](https://github.com/marp-team/marp-cli/pull/658))
 
 ## v4.1.2 - 2025-02-21
