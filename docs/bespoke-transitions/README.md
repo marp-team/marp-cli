@@ -10,7 +10,7 @@ Marp CLI's `bespoke` HTML template supports **slide transition animations**, tha
 
 ## Prerequisite
 
-The slide transition depends on **[View Transition] API** in the using browser. _We does never lock in to a specific JavaScript library_, as same as other Marp ecosystem projects :)
+The slide transition depends on **[View Transition API][view transition]** in the using browser. _We does never lock in to a specific JavaScript library_, as same as other Marp ecosystem projects :)
 
 To show transition animations, a viewer has to show HTML slide in the browser which have supported View Transition.
 
@@ -21,7 +21,7 @@ To show transition animations, a viewer has to show HTML slide in the browser wh
 - **Chrome**: ✅ (111-)
 - **Edge**: ✅ (111-)
 - **Safari**: ✅ (18.2-)
-- **Firefox**: :x:
+- **Firefox**: Testable in [Firefox 139](https://developer.mozilla.org/en-US/docs/Mozilla/Firefox/Releases/139#experimental_web_features) and later (requires `dom.viewTransitions.enabled` preference to be set to `true` in `about:config`)
 
 ## `transition` local directive
 
