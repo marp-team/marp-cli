@@ -419,6 +419,8 @@ Through [global directives] or CLI options, you can set metadata for a converted
 [canonical url]: https://en.wikipedia.org/wiki/Canonical_link_element
 [open graph]: http://ogp.me/
 
+When a title was not defined, Marp CLI may assign the title from the first heading of Markdown automatically. If not wanted this detection, specify the title as empty string `""`.
+
 ### By [global directives]
 
 Marp CLI supports _additional [global directives]_ to specify metadata in Markdown. You can define meta values in Markdown front-matter.
