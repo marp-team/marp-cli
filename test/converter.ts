@@ -564,7 +564,7 @@ describe('Converter', () => {
 
       describe('with meta global directives', () => {
         it(
-          'assigns meta info thorugh pdf-lib',
+          'assigns meta info through pdf-lib',
           async () => {
             await pdfInstance({
               output: 'test.pdf',
@@ -1040,7 +1040,7 @@ describe('Converter', () => {
 
       describe('with meta global directives', () => {
         it(
-          'assigns meta info thorugh PptxGenJs',
+          'assigns meta info through PptxGenJs',
           async () => {
             const cvt = converter({
               imageScale: 1,
