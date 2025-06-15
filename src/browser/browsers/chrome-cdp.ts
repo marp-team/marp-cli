@@ -9,7 +9,7 @@ export class ChromeCdpBrowser extends ChromeBrowser {
   protected async launchPuppeteer(opts: LaunchOptions) {
     const puppeteer = await super.launchPuppeteer(opts)
 
-    // macOS specific: Set Marp icon asynchrnously
+    // macOS specific: Set Marp icon asynchronously
     if (process.platform === 'darwin') {
       puppeteer
         .target()

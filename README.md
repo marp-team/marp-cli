@@ -371,7 +371,7 @@ The `bespoke` template is using [Bespoke.js](https://github.com/bespokejs/bespok
 
 - **Navigation**: Navigate the deck through keyboard and swipe geasture.
 - **Fullscreen**: Toggle fullscreen by hitting <kbd>f</kbd> / <kbd>F11</kbd> key.
-- **On-screen controller**: There is a touch-friendly OSC. You may also disable by `--bespoke.osc=false` if unneccesary.
+- **On-screen controller**: There is a touch-friendly OSC. You may also disable by `--bespoke.osc=false` if unnecessary.
 - **Fragmented list**: Recognize [Marpit's fragmented list](https://github.com/marp-team/marpit/issues/145) and appear list one-by-one if used `*` and `1)` as the bullet marker.
 - **Presenter view**: Open presenter view in external window by hitting <kbd>p</kbd> key. (It may become disabled when not fulfilled requirements for working)
 - **Progress bar** (optional): By setting `--bespoke.progress` option, you can add a progress bar on the top of the deck.
@@ -468,7 +468,7 @@ marp --theme custom-theme.css
 
 ### Theme set
 
-`--theme-set` option has to specify theme set composed by multiple theme CSS files. The registed themes are usable in [Marpit's `theme` directive](https://marpit.marp.app/directives?id=theme).
+`--theme-set` option has to specify theme set composed by multiple theme CSS files. The registered themes are usable in [Marpit's `theme` directive](https://marpit.marp.app/directives?id=theme).
 
 ```bash
 # Multiple theme CSS files
@@ -798,7 +798,7 @@ marpCli(['test.md', '--pdf'])
 
 We have exported [`CLIError` class and `CLIErrorCode` enum](https://github.com/marp-team/marp-cli/blob/main/src/error.ts) from `@marp-team/marp-cli`, to allow handling for specific errors that have already known by Marp CLI.
 
-If `CLIError` instance was thrown, you can identify the reason why CLI throwed error by checking `errorCode` member.
+If `CLIError` instance was thrown, you can identify the reason why CLI threw error by checking `errorCode` member.
 
 ### Wait for observation
 
