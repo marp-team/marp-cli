@@ -1434,7 +1434,7 @@ describe('Marp CLI', () => {
         await runForObservation([onePath, '-p', '--no-output'])
         expect(Preview.prototype.open).toHaveBeenCalledTimes(1)
 
-        // Simualte opening event
+        // Simulate opening event
         previewEmitter.emit('opening', '<location>')
         expect(warn).toHaveBeenCalledWith(
           expect.stringContaining('Opening <location>')
