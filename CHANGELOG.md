@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Follow up for auto-detection of the slide title: Make accessible auto-detected title from other injected plugins ([#131](https://github.com/marp-team/marp-cli/issues/131), [#666](https://github.com/marp-team/marp-cli/pull/666))
+
 ## v4.2.0 - 2025-06-11
 
 ### Added
