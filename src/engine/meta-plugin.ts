@@ -76,17 +76,17 @@ export default function metaPlugin(md: MarkdownIt & { marpit: Marpit }) {
     },
     title: (v) => (typeof v === 'string' ? { marpCLITitle: v } : {}),
     url: (v) => {
-      if (!v || Array.isArray(v)) return {}
+      if (Array.isArray(v)) return {}
 
       // URL validation
       try {
-        new URL(v)
+        if (v) new URL(v)
       } catch {
         warn(`Specified canonical URL is ignored since invalid URL: ${v}`)
         return {}
       }
 
-      return { marpCLIURL: v }
+      return { marpCLIURL: v ?? undefined }
     },
   })
 
