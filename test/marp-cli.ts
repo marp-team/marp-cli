@@ -326,6 +326,7 @@ describe('Marp CLI', () => {
 
     beforeEach(() => {
       writeFile = jest.spyOn(fs.promises, 'writeFile').mockImplementation()
+      jest.spyOn(fs.promises, 'mkdir').mockImplementation()
     })
 
     it('converts files in specified dir', async () => {
@@ -1433,7 +1434,7 @@ describe('Marp CLI', () => {
         await runForObservation([onePath, '-p', '--no-output'])
         expect(Preview.prototype.open).toHaveBeenCalledTimes(1)
 
-        // Simualte opening event
+        // Simulate opening event
         previewEmitter.emit('opening', '<location>')
         expect(warn).toHaveBeenCalledWith(
           expect.stringContaining('Opening <location>')

@@ -700,7 +700,7 @@ export class Converter {
 
   private async usePuppeteer<T>(
     baseFile: File,
-    processer: (
+    processor: (
       page: Page,
       helpers: {
         browser: Browser
@@ -753,7 +753,7 @@ export class Converter {
       }
 
       try {
-        return await processer(page, { browser, render })
+        return await processor(page, { browser, render })
       } finally {
         if (missingFileSet.size > 0) {
           warn(

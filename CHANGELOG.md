@@ -2,8 +2,15 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Follow up for auto-detection of the slide title: Make accessible auto-detected title from other injected plugins ([#131](https://github.com/marp-team/marp-cli/issues/131), [#666](https://github.com/marp-team/marp-cli/pull/666))
+
+## v4.2.0 - 2025-06-11
+
 ### Added
 
+- Assign the slide title from first heading in Markdown automatically ([#131](https://github.com/marp-team/marp-cli/issues/131), [#655](https://github.com/marp-team/marp-cli/pull/655) by [@Alberthor47](https://github.com/Alberthor47))
 - Test against Node.js v24 ([#658](https://github.com/marp-team/marp-cli/pull/658))
 
 ### Changed
@@ -13,6 +20,10 @@
   - Transform Unicode 16 emojis into Twemoji images by default
 - Upgrade dependent packages to the latest version ([#657](https://github.com/marp-team/marp-cli/pull/657), [#663](https://github.com/marp-team/marp-cli/pull/663))
 - Upgrade development Node.js LTS ([#658](https://github.com/marp-team/marp-cli/pull/658))
+
+### Fixed
+
+- The default duration setting for custom defined transitions `--marp-transition-duration` was not working in Safari and Firefox ([#665](https://github.com/marp-team/marp-cli/pull/665))
 
 ## v4.1.2 - 2025-02-21
 
