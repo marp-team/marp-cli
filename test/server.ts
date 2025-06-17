@@ -4,7 +4,6 @@ import { Marp } from '@marp-team/marp-core'
 import { load } from 'cheerio'
 import express, { application } from 'express'
 import type { Express } from 'express'
-import { getPortPromise } from 'portfinder'
 import request from 'supertest'
 import { BrowserManager } from '../src/browser/manager'
 import {
