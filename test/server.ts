@@ -4,6 +4,7 @@ import { Marp } from '@marp-team/marp-core'
 import { load } from 'cheerio'
 import express, { application } from 'express'
 import type { Express } from 'express'
+import { getPortPromise } from 'portfinder'
 import request from 'supertest'
 import { BrowserManager } from '../src/browser/manager'
 import {
@@ -273,6 +274,18 @@ describe('Server', () => {
         const response = await request(server.server).get('/__NOT_FOUND__')
 
         expect(response.status).toBe(404)
+      })
+    })
+
+    describe('when there is GET request to a proxy for watch notifier WebSocket', () => {
+      it('returns 426', async () => {
+        const server = await setupServer()
+        const response = await request(server.server).get(
+          '/.__marp-cli-watch-notifier__/xxxxxxxx'
+        )
+
+        expect(response.status).toBe(426)
+        expect(response.text).toBe('Upgrade Required')
       })
     })
 
