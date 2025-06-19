@@ -15,7 +15,7 @@ import {
 import { CLIError } from '../src/error'
 import { Server } from '../src/server'
 import { ThemeSet } from '../src/theme'
-import { WatchNotifier, notifier } from '../src/watcher'
+import { notifier } from '../src/watcher'
 
 jest.mock('express')
 
