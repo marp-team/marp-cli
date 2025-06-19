@@ -5,6 +5,7 @@ import { load } from 'cheerio'
 import express, { application } from 'express'
 import type { Express } from 'express'
 import request from 'supertest'
+import { WebSocket } from 'ws'
 import { BrowserManager } from '../src/browser/manager'
 import {
   Converter,
