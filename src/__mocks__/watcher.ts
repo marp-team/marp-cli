@@ -1,6 +1,8 @@
 const watcher = jest.requireActual('../watcher')
 
-watcher.notifier.start = jest.fn()
-watcher.notifier.sendTo = jest.fn()
+if (watcher.notifier) {
+  watcher.notifier.start = jest.fn()
+  watcher.notifier.sendTo = jest.fn()
+}
 
-export = watcher
+module.exports = watcher

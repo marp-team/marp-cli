@@ -8,7 +8,8 @@ import type { ServerOptions } from 'ws'
 import { Converter, ConvertedCallback } from './converter'
 import { isError } from './error'
 import { File, FileType } from './file'
-import { debugWatcher } from './utils/debug'
+import { watchNotifierWebSocketEntrypoint } from './server'
+import { debugWatcher, debugWatcherWS } from './utils/debug'
 
 const chokidarWatch: typeof _watch = (...args) => {
   debugWatcher('Start watching with chokidar: %O', args)
@@ -91,11 +92,17 @@ export class Watcher {
   }
 }
 
+export type WatchNotifierEntrypointType = 'static' | 'server'
+
 export class WatchNotifier {
   listeners = new Map<string, Set<any>>()
 
   private wss?: WebSocketServer
   private portNumber?: number
+
+  get server() {
+    return this.wss
+  }
 
   async port() {
     if (this.portNumber === undefined)
@@ -104,13 +111,28 @@ export class WatchNotifier {
     return this.portNumber
   }
 
-  async register(fn: string) {
+  async register(
+    fn: string,
+    entrypointType: WatchNotifierEntrypointType = 'static'
+  ) {
     const identifier = WatchNotifier.sha256(fn)
 
     if (!this.listeners.has(identifier))
       this.listeners.set(identifier, new Set())
 
-    return `ws://localhost:${await this.port()}/${identifier}`
+    return await this.entrypoint(identifier, entrypointType)
+  }
+
+  async entrypoint(
+    identifier: string,
+    entrypointType: WatchNotifierEntrypointType = 'static'
+  ) {
+    if (entrypointType === 'server') {
+      return `/${watchNotifierWebSocketEntrypoint}/${identifier}`
+    }
+
+    const port = await this.port()
+    return `ws://localhost:${port}/${identifier}`
   }
 
   sendTo(fn: string, command: string) {
@@ -124,21 +146,64 @@ export class WatchNotifier {
   }
 
   async start(opts: ServerOptions = {}) {
-    this.wss = new WebSocketServer({ ...opts, port: await this.port() })
+    const port = await this.port()
+
+    this.wss = new WebSocketServer({ ...opts, port })
+
+    debugWatcherWS(
+      'WebSocket server for watch notifier started on port %d.',
+      port
+    )
+
     this.wss.on('connection', (ws, sock) => {
       if (sock.url) {
-        const [, identifier] = sock.url.split('/')
-        const wsSet = this.listeners.get(identifier)
+        debugWatcherWS('New WebSocket connection: %s', sock.url)
 
-        if (wsSet !== undefined) {
-          this.listeners.set(identifier, wsSet.add(ws))
+        const identifier = (() => {
+          try {
+            const parsedUrl = new URL(sock.url, `ws://localhost:${port}`)
+            const detectedIdentifier = parsedUrl.pathname.split('/').pop()
 
-          ws.on('close', () => this.listeners.get(identifier)!.delete(ws))
+            debugWatcherWS(
+              'Detected identifier from WebSocket connection: %s',
+              detectedIdentifier
+            )
 
-          ws.send('ready')
-          return
+            return detectedIdentifier
+          } catch (e: unknown) {
+            debugWatcherWS('Error occurred during parsing identifier: %o', e)
+            return undefined
+          }
+        })()
+
+        if (identifier) {
+          const wsSet = this.listeners.get(identifier)
+
+          if (wsSet !== undefined) {
+            this.listeners.set(identifier, wsSet.add(ws))
+            debugWatcherWS(
+              'WebSocket connection for identifier "%s" registered',
+              identifier
+            )
+
+            ws.on('close', () => {
+              this.listeners.get(identifier)!.delete(ws)
+              debugWatcherWS(
+                'WebSocket connection for identifier "%s" closed',
+                identifier
+              )
+            })
+
+            ws.send('ready')
+            return
+          }
         }
       }
+
+      debugWatcherWS(
+        'WebSocket connection request has been dismissed: %s',
+        sock.url
+      )
       ws.close()
     })
   }

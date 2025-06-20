@@ -1,6 +1,7 @@
 import http from 'node:http'
 import { watch as chokidarWatch } from 'chokidar'
 import { File, FileType } from '../src/file'
+import { watchNotifierWebSocketEntrypoint } from '../src/server'
 import { ThemeSet } from '../src/theme'
 import { Watcher, WatchNotifier, notifier } from '../src/watcher'
 
@@ -219,6 +220,13 @@ describe('WatchNotifier', () => {
       await instance?.register('test')
       expect(listenerSet?.size).toBe(1)
     })
+
+    it('generates WebSocket URL with relative path for server entrypoint if specified entrypoint type as "server"', async () => {
+      const instance = new WatchNotifier()
+      expect(await instance.register('test', 'server')).toBe(
+        `/${watchNotifierWebSocketEntrypoint}/${testIdentifier}`
+      )
+    })
   })
 
   describe('#sendTo', () => {
@@ -301,11 +309,21 @@ describe('WatchNotifier', () => {
         expect(instance.listeners.get(testIdentifier)?.has(ws)).toBe(false)
       })
 
-      it('closes client socket immediately when passed invalid URL', async () => {
+      it('closes client socket immediately when passed URL that is invalid as watch notifier', async () => {
         await instance.start()
 
         const [, connection] = mockWsOn.mock.calls[0]
         connection(ws, { url: '/invalid' })
+
+        expect(ws.send).not.toHaveBeenCalled()
+        expect(ws.close).toHaveBeenCalled()
+      })
+
+      it('closes client socket immediately when passed invalid URL', async () => {
+        await instance.start()
+
+        const [, connection] = mockWsOn.mock.calls[0]
+        connection(ws, { url: '//' })
 
         expect(ws.send).not.toHaveBeenCalled()
         expect(ws.close).toHaveBeenCalled()

@@ -2,8 +2,16 @@ import { EventEmitter } from 'node:events'
 
 const express = jest.requireActual('express')
 
+express.__listenActually = undefined
 express.__errorOnListening = undefined
-express.application.listen = () => {
+
+const { listen } = express.application
+
+express.application.listen = (...args) => {
+  if (express.__listenActually) {
+    return listen.apply(express.application, args)
+  }
+
   const serverMock = Object.assign(new EventEmitter(), {
     close: (callback) => callback(),
   })
