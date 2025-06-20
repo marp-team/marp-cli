@@ -16,7 +16,7 @@ import {
 import { CLIError } from '../src/error'
 import { Server } from '../src/server'
 import { ThemeSet } from '../src/theme'
-import { notifier } from '../src/watcher'
+import { WatchNotifier } from '../src/watcher'
 
 jest.mock('express')
 
@@ -26,7 +26,6 @@ describe('Server', () => {
 
   beforeAll(() => (browserManager = new BrowserManager()))
   beforeEach(async () => (themeSet = await ThemeSet.initialize([])))
-  afterEach(async () => await notifier.stop())
   afterAll(async () => browserManager?.dispose())
 
   const converter = (opts: Partial<ConverterOption> = {}) =>
@@ -292,15 +291,25 @@ describe('Server', () => {
     })
 
     describe('when connected WebSocket client to a proxy for watch notifier', () => {
-      let originalMockState: boolean
+      let server: Server
+      let notifier: WatchNotifier
+      let ws: WebSocket | undefined
 
-      beforeEach(() => {
-        originalMockState = (express as any).__mocked
-        ;(express as any).__mocked = false // Disable mock and use real express server
+      beforeEach(async () => {
+        ;(express as any).__listenActually = true
+        ws = undefined
+
+        // Import fresh server and notifier
+        await jest.isolateModulesAsync(async () => {
+          server = new (await import('../src/server')).Server(converter())
+          notifier = (await import('../src/watcher')).notifier
+        })
       })
 
-      afterEach(() => {
-        ;(express as any).__mocked = originalMockState
+      afterEach(async () => {
+        ws?.close()
+        await Promise.all([server.stop(), notifier.stop()])
+        ;(express as any).__errorOnListening = undefined
       })
 
       const connectWebSocket = async (url: string) => {
@@ -314,41 +323,37 @@ describe('Server', () => {
       }
 
       it('does not open WebSocket connection if watch notifier is not ready', async () => {
-        let ws: WebSocket | undefined
-
-        const server = new Server(converter())
         await server.start()
 
-        try {
-          ws = await connectWebSocket(
-            `ws://localhost:${server.port}/.__marp-cli-watch-notifier__/xxxxxxxx`
-          )
+        ws = await connectWebSocket(
+          `ws://localhost:${server.port}/.__marp-cli-watch-notifier__/${WatchNotifier.sha256('test.md')}`
+        )
 
-          expect(ws.readyState).not.toBe(WebSocket.OPEN)
-        } finally {
-          ws?.close()
-          await server.stop()
-        }
+        expect([WebSocket.CLOSING, WebSocket.CLOSED]).toContain(ws.readyState)
       })
 
       it('opens WebSocket connection if watch notifier is ready', async () => {
-        let ws: WebSocket | undefined
+        await notifier.start()
+        await notifier.register('test.md')
 
-        await notifier.start() // Start notifier
-
-        const server = new Server(converter())
         await server.start()
 
-        try {
-          ws = await connectWebSocket(
-            `ws://localhost:${server.port}/.__marp-cli-watch-notifier__/xxxxxxxx`
-          )
+        ws = await connectWebSocket(
+          `ws://localhost:${server.port}/.__marp-cli-watch-notifier__/${WatchNotifier.sha256('test.md')}`
+        )
 
-          expect(ws.readyState).toBe(WebSocket.OPEN)
-        } finally {
-          ws?.close()
-          await server.stop()
-        }
+        expect(ws.readyState).toBe(WebSocket.OPEN)
+      })
+
+      it('does not open WebSocket connection if watch notifier is ready but the identifier is not registered', async () => {
+        await notifier.start()
+        await server.start()
+
+        ws = await connectWebSocket(
+          `ws://localhost:${server.port}/.__marp-cli-watch-notifier__/${WatchNotifier.sha256('test.md')}`
+        )
+
+        expect([WebSocket.CLOSING, WebSocket.CLOSED]).toContain(ws.readyState)
       })
     })
 
