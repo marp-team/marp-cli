@@ -309,7 +309,7 @@ describe('Server', () => {
       afterEach(async () => {
         ws?.close()
         await Promise.all([server.stop(), notifier.stop()])
-        ;(express as any).__errorOnListening = undefined
+        ;(express as any).__listenActually = undefined
       })
 
       const connectWebSocket = async (url: string) => {
