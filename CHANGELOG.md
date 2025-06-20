@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Server mode: Connect to proxied watch notifier WebSocket server instead of `localhost` ([#513](https://github.com/marp-team/marp-cli/issues/513), [#664](https://github.com/marp-team/marp-cli/pull/664))
+
 ### Fixed
 
 - Follow up for auto-detection of the slide title: Make accessible auto-detected title from other injected plugins ([#131](https://github.com/marp-team/marp-cli/issues/131), [#666](https://github.com/marp-team/marp-cli/pull/666))
