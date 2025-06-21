@@ -8,11 +8,30 @@ We are following [**the contributing guideline of Marp team projects**][team-con
 
 ## Table of contents
 
-- [Marp team contributing guideline][team-contributing-guideline]
+- [Marp team contributing guideline ↗️][team-contributing-guideline]
 - [Development](#development)
+  - [Installation](#installation)
+  - [Build and watch](#build-and-watch)
+  - [Use built version](#use-built-version)
+  - [Testing](#testing)
 - [Debug](#debug)
 
 ## Development
+
+### Installation
+
+```bash
+npm install
+npx patch-package
+```
+
+Running [`npx patch-package`](https://github.com/ds300/patch-package) after `npm install` is required to apply patches for development dependencies. See also [the documentation of patches](../patches/README.md) for details.
+
+> [!NOTE]
+>
+> `patch-package` recommends to [add `postinstall` script to `package.json` to run it automatically after `npm install`](https://github.com/ds300/patch-package?tab=readme-ov-file#set-up). However, Marp CLI does not use it because it will run also when installing CLI by users.
+
+### Build and watch
 
 ```bash
 # Build (Bundle and minify)
@@ -30,7 +49,7 @@ Use `./marp-cli.js` instead of `marp` command.
 ./marp-cli.js --help
 ```
 
-### Standalone binary
+#### Standalone binary
 
 Standalone binaries created by [pkg](https://github.com/zeit/pkg) will output to `./bin` directory.
 
@@ -42,6 +61,21 @@ npm run build:standalone
 ```bash
 ./bin/marp-cli-linux --help
 ```
+
+### Testing
+
+```bash
+# Run all tests
+npm run test
+
+# Run tests with code coverage
+npm run test:coverage
+
+# Run test for specific file(s)
+npm run test -- ./test/marp-cli.ts
+```
+
+You need to install [Google Chrome](https://www.google.com/chrome/), [Mozilla Firefox](https://www.mozilla.org/firefox/), and [LibreOffice](https://www.libreoffice.org/download/download-libreoffice/) for running all tests.
 
 ## Debug
 

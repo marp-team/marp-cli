@@ -30,9 +30,14 @@ commands:
             sudo apt-get update
             sudo apt-get install -y libreoffice-common libreoffice-java-common libreoffice-impress default-jre
 
+      - run:
+          name: Hash patches
+          command: md5sum patches/* > ~/.patches.hash
+
       - restore_cache:
           keys:
-            - v3-dependencies-{{ .Environment.CIRCLE_JOB }}-{{ checksum "package-lock.json" }}-{{ .Branch }}
+            - v3-dependencies-{{ .Environment.CIRCLE_JOB }}-{{ checksum "package-lock.json" }}-{{ checksum "~/.patches.hash" }}-{{ .Branch }}
+            - v3-dependencies-{{ .Environment.CIRCLE_JOB }}-{{ checksum "package-lock.json" }}-{{ checksum "~/.patches.hash" }}-
             - v3-dependencies-{{ .Environment.CIRCLE_JOB }}-{{ checksum "package-lock.json" }}-
             - v3-dependencies-{{ .Environment.CIRCLE_JOB }}-
 
@@ -43,7 +48,7 @@ commands:
       - steps: << parameters.postinstall >>
 
       - save_cache:
-          key: v3-dependencies-{{ .Environment.CIRCLE_JOB }}-{{ checksum "package-lock.json" }}-{{ .Branch }}
+          key: v3-dependencies-{{ .Environment.CIRCLE_JOB }}-{{ checksum "package-lock.json" }}-{{ checksum "~/.patches.hash" }}-{{ .Branch }}
           paths:
             - ~/.npm
 
