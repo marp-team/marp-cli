@@ -122,7 +122,7 @@ export const marpCli = async (
   let watcherInstance: Watcher | undefined
 
   try {
-    const program = createYargs(argv)
+    const program = createYargs()
       .parserConfiguration({ 'dot-notation': false })
       .usage(usage)
       .help(false)
@@ -407,7 +407,7 @@ export const marpCli = async (
         error(msg, CLIErrorCode.INVALID_OPTIONS)
       })
 
-    const argvRet = await program.argv
+    const argvRet = await program.parseAsync(argv)
     const args = {
       baseUrl, // It's not intended using by the consumer so can't set through CLI arguments
       ...argvRet,

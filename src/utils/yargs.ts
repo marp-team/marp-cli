@@ -1,11 +1,15 @@
 import type { Argv } from 'yargs'
-import yargs from 'yargs/yargs'
+import yargs from 'yargs'
 
 let currentYargsRef: WeakRef<Argv> | null = null
 
-export const createYargs = (...opts: Parameters<typeof yargs>) => {
-  const currentYargs = yargs(...opts)
+export const createYargs = () => {
+  const currentYargs = yargs()
   currentYargsRef = new WeakRef(currentYargs)
+
+  // Force to use English locale while testing
+  if (process.env.NODE_ENV === 'test') currentYargs.locale('en')
+
   return currentYargs
 }
 

@@ -92,6 +92,7 @@
     "@types/yargs": "^17.0.33",
     "@yao-pkg/pkg": "^6.5.1",
     "autoprefixer": "^10.4.21",
+    "babel-plugin-transform-import-meta": "^2.3.3",
     "bespoke": "bespokejs/bespoke",
     "chalk": "^5.4.1",
     "cheerio": "^1.1.0",
@@ -148,6 +149,7 @@
     "vhtml": "^2.2.0",
     "which": "^4.0.0",
     "wrap-ansi": "^9.0.0",
+    "yargs": "^18.0.0",
     "yauzl": "^3.2.0",
     "zip-stream": "^7.0.2"
   },
@@ -159,8 +161,7 @@
     "puppeteer-core": "^24.10.0",
     "serve-index": "^1.9.1",
     "tmp": "^0.2.3",
-    "ws": "^8.18.2",
-    "yargs": "^17.7.2"
+    "ws": "^8.18.2"
   },
   "publishConfig": {
     "access": "public"
