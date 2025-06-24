@@ -27,7 +27,6 @@ import { Watcher } from '../src/watcher'
 
 jest.mock('cosmiconfig')
 jest.mock('../src/preview')
-jest.mock('../src/utils/yargs')
 jest.mock('../src/watcher', () => jest.createMockFromModule('../src/watcher'))
 
 const { Explorer } = cosmiconfigExplorer as any

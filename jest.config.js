@@ -8,7 +8,9 @@ const esModules = [
   'array-union',
   'chalk',
   'chrome-launcher',
+  'cliui',
   'find-up',
+  'get-east-asian-width',
   'globby',
   'import-meta-resolve',
   'is-docker',
@@ -26,7 +28,9 @@ const esModules = [
   'pptxgenjs',
   'slash',
   'strip-ansi',
+  'string-width',
   'unicorn-magic',
+  'yargs',
   'yocto-queue',
 ]
 
@@ -41,6 +45,8 @@ module.exports = {
   transform: {
     ...jsWithBabel.transform,
     '_configs[/\\\\].+\\.mjs$': 'babel-jest',
+    [`[/\\\\]node_modules[/\\\\](?:${esModules.join('|')})[/\\\\].+\\.mjs$`]:
+      'babel-jest',
     '\\.s?css$': '<rootDir>/test/_transformers/css.js',
     '\\.png$': '<rootDir>/test/_transformers/png.js',
     '\\.pug$': '<rootDir>/test/_transformers/pug.js',
