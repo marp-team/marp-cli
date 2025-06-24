@@ -1,7 +1,6 @@
 import http from 'node:http'
 import { watch as chokidarWatch } from 'chokidar'
 import { File, FileType } from '../src/file'
-import { watchNotifierWebSocketEntrypoint } from '../src/server'
 import { ThemeSet } from '../src/theme'
 import { Watcher, WatchNotifier, notifier } from '../src/watcher'
 
@@ -224,7 +223,7 @@ describe('WatchNotifier', () => {
     it('generates WebSocket URL with relative path for server entrypoint if specified entrypoint type as "server"', async () => {
       const instance = new WatchNotifier()
       expect(await instance.register('test', 'server')).toBe(
-        `/${watchNotifierWebSocketEntrypoint}/${testIdentifier}`
+        `/${WatchNotifier.webSocketEntrypoint}/${testIdentifier}`
       )
     })
   })
