@@ -8,7 +8,6 @@ import type { ServerOptions } from 'ws'
 import { Converter, ConvertedCallback } from './converter'
 import { isError } from './error'
 import { File, FileType } from './file'
-import { watchNotifierWebSocketEntrypoint } from './server'
 import { debugWatcher, debugWatcherWS } from './utils/debug'
 
 const chokidarWatch: typeof _watch = (...args) => {
@@ -100,6 +99,8 @@ export class WatchNotifier {
   private wss?: WebSocketServer
   private portNumber?: number
 
+  static readonly webSocketEntrypoint = '.__marp-cli-watch-notifier__'
+
   get server() {
     return this.wss
   }
@@ -128,7 +129,7 @@ export class WatchNotifier {
     entrypointType: WatchNotifierEntrypointType = 'static'
   ) {
     if (entrypointType === 'server') {
-      return `/${watchNotifierWebSocketEntrypoint}/${identifier}`
+      return `/${WatchNotifier.webSocketEntrypoint}/${identifier}`
     }
 
     const port = await this.port()
