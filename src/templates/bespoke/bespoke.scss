@@ -212,7 +212,7 @@ $progress-height: 5px;
       // Grid layout for presenter view
       display: grid;
       grid-template:
-        'current dragbar next' minmax(140px, 1fr)
+        'current dragbar thumbnails' minmax(140px, 1fr)
         'current dragbar note' 2fr
         'info    dragbar note' 3em;
       grid-template-columns:
@@ -261,31 +261,76 @@ $progress-height: 5px;
         }
       }
 
-      // Next slide view
-      .bespoke-marp-presenter-next-container {
+      // Thumbnails view
+      .bespoke-marp-presenter-thumbnails-container {
         background: #222;
-        cursor: pointer;
-        display: none;
-        grid-area: next;
+        grid-area: thumbnails;
         overflow: hidden;
         position: relative;
 
-        &.active {
-          display: block;
+        .bespoke-marp-presenter-thumbnails-wrapper {
+          height: 100%;
+          overflow-y: auto;
+          padding: 10px;
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+
+          // Scrollbar (Firefox)
+          scrollbar-width: thin;
+          scrollbar-color: rgba(#eee, 0.3) transparent;
+
+          // Scrollbar (Chrome)
+          &::-webkit-scrollbar {
+            width: 6px;
+          }
+
+          &::-webkit-scrollbar-track {
+            background: transparent;
+          }
+
+          &::-webkit-scrollbar-thumb {
+            background: rgba(#eee, 0.3);
+            border-radius: 6px;
+          }
         }
 
-        iframe.bespoke-marp-presenter-next {
-          background: transparent;
-          border: 0;
-          display: block;
-          filter: drop-shadow(0 3px 10px rgba(#000, 0.5));
-          height: calc(100% - 40px);
-          left: 20px;
-          position: absolute;
-          pointer-events: none;
-          user-select: none;
-          top: 20px;
-          width: calc(100% - 40px);
+        .bespoke-marp-presenter-thumbnail {
+          background: #333;
+          border: 2px solid transparent;
+          border-radius: 4px;
+          cursor: pointer;
+          height: 80px;
+          min-height: 80px;
+          overflow: hidden;
+          position: relative;
+          transition: all 0.2s ease;
+          width: 100%;
+
+          &:hover {
+            background: #444;
+            border-color: #666;
+            transform: scale(1.02);
+          }
+
+          &.bespoke-marp-presenter-thumbnail-active {
+            border-color: #0288d1;
+            border-width: 3px;
+            box-shadow: 0 0 12px rgba(#0288d1, 0.8), inset 0 0 8px rgba(#0288d1, 0.2);
+            background: #2a2a2a;
+            transform: scale(1.05);
+          }
+
+          iframe {
+            background: transparent;
+            border: 0;
+            display: block;
+            filter: drop-shadow(0 2px 4px rgba(#000, 0.3));
+            height: 100%;
+            pointer-events: none;
+            user-select: none;
+            width: 100%;
+          }
         }
       }
 
@@ -459,7 +504,7 @@ $progress-height: 5px;
 }
 
 @media print {
-  .bespoke-marp-presenter-next-container,
+  .bespoke-marp-presenter-thumbnails-container,
   .bespoke-marp-presenter-note-container,
   .bespoke-marp-presenter-info-container {
     display: none;
