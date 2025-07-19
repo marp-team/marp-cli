@@ -2,7 +2,7 @@ import js from '@eslint/js'
 import eslintConfigPrettier from 'eslint-config-prettier'
 import eslintPluginImportX from 'eslint-plugin-import-x'
 import eslintPluginJest from 'eslint-plugin-jest'
-import eslintPluginUnicorn from 'eslint-plugin-unicorn'
+import eslintPluginN from 'eslint-plugin-n'
 import globals from 'globals'
 import tseslint from 'typescript-eslint'
 
@@ -15,10 +15,10 @@ export default tseslint.config(
   eslintPluginImportX.flatConfigs.recommended,
   {
     plugins: {
-      unicorn: eslintPluginUnicorn,
+      n: eslintPluginN,
     },
     rules: {
-      'unicorn/prefer-node-protocol': 'error',
+      'n/prefer-node-protocol': 'error',
     },
   },
   ...forFiles(tsFiles, [
