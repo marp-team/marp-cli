@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v4.2.1 - 2025-07-19
+
 ### Changed
 
 - Server mode: Connect to proxied watch notifier WebSocket server instead of `localhost` ([#513](https://github.com/marp-team/marp-cli/issues/513), [#664](https://github.com/marp-team/marp-cli/pull/664))
