@@ -6,6 +6,7 @@
 
 - Server mode: Connect to proxied watch notifier WebSocket server instead of `localhost` ([#513](https://github.com/marp-team/marp-cli/issues/513), [#664](https://github.com/marp-team/marp-cli/pull/664))
 - Upgrade Jest to v30 ([#669](https://github.com/marp-team/marp-cli/pull/669))
+- Upgrade dependent packages to the latest version ([#674](https://github.com/marp-team/marp-cli/pull/674))
 
 ### Fixed
 
