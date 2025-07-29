@@ -39,7 +39,7 @@ import { ThemeSet } from './theme'
 import { debug } from './utils/debug'
 import { isReadable } from './utils/finder'
 import { png2jpegViaPuppeteer } from './utils/jpeg'
-import { pdfLib, setOutline } from './utils/pdf'
+import { setOutline } from './utils/pdf'
 import { translateWSLPathToWindows } from './utils/wsl'
 import { notifier, type WatchNotifierEntrypointType } from './watcher'
 
@@ -382,7 +382,7 @@ export class Converter {
     if (postprocess) {
       // Apply PDF metadata and annotations
       const creationDate = new Date()
-      const { PDFDocument, PDFHexString, PDFString } = await pdfLib()
+      const { PDFDocument, PDFHexString, PDFString } = await import('pdf-lib')
       const pdfDoc = await PDFDocument.load(ret.buffer)
 
       pdfDoc.setCreator(CREATED_BY_MARP)

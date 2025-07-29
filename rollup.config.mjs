@@ -27,7 +27,10 @@ const compact = !process.env.ROLLUP_WATCH
 const plugins = (opts = {}) => [
   json({ preferConst: true }),
   alias({
-    entries: [{ find: 'jszip', replacement: 'jszip/dist/jszip.min.js' }],
+    entries: [
+      { find: 'jszip', replacement: 'jszip/dist/jszip.min.js' },
+      { find: 'pdf-lib', replacement: 'pdf-lib/dist/pdf-lib.esm.js' },
+    ],
   }),
   nodeResolve({
     browser: !!opts.browser,
@@ -59,6 +62,13 @@ const plugins = (opts = {}) => [
         output: path.join(__dirname, opts.license),
       },
     }),
+  !opts.browser && {
+    name: 'marp-cli-dynamic-import',
+    renderDynamicImport: ({ targetModuleId }) => {
+      // We should keep `import()` syntax when the target module has not been determined.
+      if (!targetModuleId) return { left: `import(`, right: `)` }
+    },
+  },
 ]
 
 const browser = (opts = {}) => ({

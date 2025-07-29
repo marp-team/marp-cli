@@ -1,10 +1,5 @@
 import type { PDFDocument, PDFRef } from 'pdf-lib'
 
-// Use pre-bundled pdf-lib to avoid circular dependency warning. pdf-lib as an
-// external dependency will make failure in the standalone binary.
-// @see https://github.com/marp-team/marp-cli/issues/373
-export const pdfLib = async () => await import('pdf-lib/dist/pdf-lib.min.js')
-
 // --- Outline ---
 
 type PDFOutlineTo =
@@ -58,7 +53,7 @@ export const setOutline = async (
   doc: PDFDocument,
   outlines: readonly PDFOutline[]
 ) => {
-  const { PDFHexString } = await pdfLib()
+  const { PDFHexString } = await import('pdf-lib')
 
   // Refs
   const rootRef = doc.context.nextRef()
