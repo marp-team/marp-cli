@@ -97,6 +97,12 @@ export default [
       'src/patch.ts', // CLI patch
       'src/prepare.ts', // CLI preparation
     ],
-    output: { compact, dir: 'lib', exports: 'named', format: 'cjs' },
+    output: {
+      compact,
+      dir: 'lib',
+      exports: 'named',
+      format: 'cjs',
+      dynamicImportInCjs: false, // Required to avoid using `import()` that is incompatible with standalone binary
+    },
   },
 ]
