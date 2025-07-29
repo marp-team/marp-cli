@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Standalone binary: Fix `ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING` error when exporting to pptx ([#676](https://github.com/marp-team/marp-cli/issues/676), [#677](https://github.com/marp-team/marp-cli/pull/677))
+
 ## v4.2.1 - 2025-07-19
 
 ### Changed
