@@ -1030,7 +1030,7 @@
 - Upgrade [Marpit v1.4.0](https://github.com/marp-team/marpit/releases/tag/v1.4.0) and [Marp Core v0.13.0](https://github.com/marp-team/marp-core/releases/tag/v0.13.0) ([#151](https://github.com/marp-team/marp-cli/pull/151))
 - Hold the progress state of fragments on to URL query parameter ([#149](https://github.com/marp-team/marp-cli/pull/149))
 - Reduce HTML file size of bespoke template by shortened container tag name and id ([#150](https://github.com/marp-team/marp-cli/pull/150))
-- Upgrade Node and depedent packages to the latest version ([#151](https://github.com/marp-team/marp-cli/pull/151))
+- Upgrade Node and dependent packages to the latest version ([#151](https://github.com/marp-team/marp-cli/pull/151))
 
 ## v0.13.1 - 2019-09-10
 
@@ -1450,7 +1450,7 @@
 
 ### Changed
 
-- Upgrade Node LTS and depenent packages ([#17](https://github.com/marp-team/marp-cli/pull/17))
+- Upgrade Node LTS and dependent packages ([#17](https://github.com/marp-team/marp-cli/pull/17))
 
 ### Fixed
 
