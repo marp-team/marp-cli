@@ -246,7 +246,7 @@ describe('Server', () => {
         expect($('li a[href*="?pptx"]')).toHaveLength(3)
       })
 
-      describe('with specified directoryIndex costructor option', () => {
+      describe('with specified directoryIndex constructor option', () => {
         it('serves the found convertible markdown', async () => {
           const server = await setupServer({ directoryIndex: ['1.md'] })
           const response = await request(server.server).get('/')
