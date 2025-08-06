@@ -81,7 +81,7 @@ const bespokeNavigation =
         if (e.webkitForce === undefined) {
           // [Chromium]
           // Chromium has (a deprecated) wheelDelta value and it is following the
-          // pre-defeind WHEEL_DELTA (=120). It means a required delta for
+          // pre-defined WHEEL_DELTA (=120). It means a required delta for
           // scrolling 3 lines. We have set a threshold as 40 (required to scroll
           // 1 line).
           if (Math.abs(e.wheelDelta) < 40) return
