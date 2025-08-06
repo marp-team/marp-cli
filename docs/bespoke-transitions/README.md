@@ -639,6 +639,6 @@ This option is also useful when using [a customized engine](../../README.md#func
 
 _Even if the slide author used transitions,_ every viewer do not always prefer to see dizzy animations. [Reducing motion is important especially for people with vestibular disorders.](https://www.w3.org/WAI/WCAG21/Understanding/animation-from-interactions.html)
 
-If the browser has detected that the viewer set a setting an operating system preference to reduce motions and animations in the interface, every effects by transitions will force to a simple `fade` animation.
+If the browser detects that the viewer has an operating system preference to reduce motions and animations, all transition effects will be replaced with a simple `fade` animation.
 
 If you want to know details about why required this, see the article "[`prefers-reduced-motion`: Sometimes less movement is more](https://web.dev/prefers-reduced-motion/)" by [web.dev](https://web.dev/).
