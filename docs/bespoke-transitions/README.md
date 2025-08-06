@@ -365,7 +365,7 @@ Declare animation keyframes with the name that has prefixed `backward-` to the c
 }
 ```
 
-In backward navigation, each slide pages will try to use the backward keyframes first, and fallback to the normal keyframes if not declared.
+In backward navigation, each slide pages will try to use the backward keyframes first, and fall back to the normal keyframes if not declared.
 
 You can avoid the unintended fallback by setting an empty `@keyframes` declaration for the backward animation.
 
