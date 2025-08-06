@@ -251,7 +251,7 @@ The custom duration accepts a unit `s` or `ms`.
 
 ## Custom transitions
 
-You also can define the custom transitions and animations, both in theme CSS and Markdown inline style. We provide unlimited extensibillity of your own transitions with your creativity.
+You also can define the custom transitions and animations, both in theme CSS and Markdown inline style. We provide unlimited extensibility of your own transitions with your creativity.
 
 For making custom transitions, all you have to know is only about CSS. Define animation [`@keyframes`](https://developer.mozilla.org/en-US/docs/Web/CSS/@keyframes), with a specific keyframe name ruled by Marp. There are no extra plugins and JavaScript codes.
 
