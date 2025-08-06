@@ -10,7 +10,7 @@ Marp CLI's `bespoke` HTML template supports **slide transition animations**, tha
 
 ## Prerequisite
 
-The slide transition depends on **[View Transition API][view transition]** in the using browser. _We does never lock in to a specific JavaScript library_, as same as other Marp ecosystem projects :)
+The slide transition depends on **[View Transition API][view transition]** in the using browser. _We never lock in a specific JavaScript library_, as same as other Marp ecosystem projects :)
 
 To show transition animations, a viewer has to show HTML slide in the browser which have supported View Transition. Transitions will not be applied if the page is viewed in an unsupported browser.
 
