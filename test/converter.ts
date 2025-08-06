@@ -644,8 +644,8 @@ describe('Converter', () => {
             const pdf = await PDFDocument.load(
               writeFileSpy.mock.calls[0][1] as Buffer
             )
-            const annotaionRef = pdf.getPage(0).node.Annots()?.get(0)
-            const annotation = pdf.context.lookup(annotaionRef, PDFDict)
+            const annotationRef = pdf.getPage(0).node.Annots()?.get(0)
+            const annotation = pdf.context.lookup(annotationRef, PDFDict)
 
             const kv = (name: string) => annotation.get(PDFName.of(name))
 
@@ -670,8 +670,8 @@ describe('Converter', () => {
           const pdf = await PDFDocument.load(
             writeFileSpy.mock.calls[0][1] as Buffer
           )
-          const annotaionRef = pdf.getPage(0).node.Annots()?.get(0)
-          const annotation = pdf.context.lookup(annotaionRef, PDFDict)
+          const annotationRef = pdf.getPage(0).node.Annots()?.get(0)
+          const annotation = pdf.context.lookup(annotationRef, PDFDict)
 
           expect(annotation.get(PDFName.of('T'))).toStrictEqual(
             PDFHexString.fromText('author')
