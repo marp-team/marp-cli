@@ -258,7 +258,7 @@ describe('ChromeBrowser', () => {
         )
       })
 
-      it('launches with using headless shell if PUPPETEER_HEADLESS_MODE environment variable is "OLD" (case sensitive)', async () => {
+      it('launches with using headless shell if PUPPETEER_HEADLESS_MODE environment variable is "OLD" (case-sensitive)', async () => {
         process.env.PUPPETEER_HEADLESS_MODE = 'OLD'
         await new ChromeBrowser({ path: '/path/to/chrome' }).launch()
 
