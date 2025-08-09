@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix the navigation timeout error during conversion with Chrome 139 + macOS/Linux ([#682](https://github.com/marp-team/marp-cli/issues/682), [#683](https://github.com/marp-team/marp-cli/pull/683))
+
 ## v4.2.2 - 2025-07-29
 
 ### Fixed

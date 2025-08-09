@@ -3,12 +3,7 @@ import { URL } from 'node:url'
 import type { Marp, MarpOptions } from '@marp-team/marp-core'
 import { Marpit, Options as MarpitOptions } from '@marp-team/marpit'
 import chalk from 'chalk'
-import type {
-  Page,
-  HTTPRequest,
-  WaitForOptions,
-  Viewport,
-} from 'puppeteer-core'
+import type { Page, HTTPRequest, Viewport } from 'puppeteer-core'
 import type { Browser } from './browser/browser'
 import type { BrowserManager } from './browser/manager'
 import { silence, warn } from './cli'
@@ -731,16 +726,16 @@ export class Converter {
         this.trackFailedLocalFileAccess(page)
 
       const render = async () => {
-        const waitForOptions: WaitForOptions = {
-          waitUntil: ['domcontentloaded', 'networkidle0'],
-        }
+        const waitUntil = 'domcontentloaded' as const
 
         if (uri) {
-          await page.goto(uri, waitForOptions)
+          await page.goto(uri, { waitUntil })
         } else {
-          await page.goto('data:text/html,', waitForOptions)
-          await page.setContent(baseFile.buffer!.toString(), waitForOptions)
+          await page.goto('data:text/html,', { waitUntil })
+          await page.setContent(baseFile.buffer!.toString(), { waitUntil })
         }
+
+        await page.waitForNetworkIdle()
 
         // Wait for next frame (In parallel rendering, it may be needed to wait for the first rendering)
         await page.evaluate(async () => {
