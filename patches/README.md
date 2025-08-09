@@ -1,11 +1,8 @@
 # Patches
 
-This directory contains patches for Marp CLI (dev) dependencies. For Marp CLI development, you need to run [`npx patch-package`](https://github.com/ds300/patch-package) after `npm install` to apply these patches.
+This directory contains patches for Marp CLI dev dependencies, powered by [patch-package](https://github.com/ds300/patch-package).
 
-```bash
-npm install
-npx patch-package
-```
+Patches in this directory will be applied when `npm install` run, through `prepare` script hook in `package.json`.
 
 > [!WARNING]
 >
