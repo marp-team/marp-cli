@@ -125,7 +125,7 @@
 
 ### ⚡️ Breaking
 
-- End-of-Lifed Node.js 16 is no longer supported, and required Node.js 18 and later ([#591](https://github.com/marp-team/marp-cli/pull/591))
+- End-of-Life Node.js 16 is no longer supported, and required Node.js 18 and later ([#591](https://github.com/marp-team/marp-cli/pull/591))
 - Upgrade Marp Core to [v4.0.0](https://github.com/marp-team/marp-core/releases/v4.0.0) ([#591](https://github.com/marp-team/marp-cli/pull/591))
   - The slide container of built-in themes became the block element and adopted safe centering
   - Relax HTML allowlist: Allowed a lot of HTML elements and attributes by default
@@ -248,7 +248,7 @@
 
 ### Breaking
 
-- End-of-Lifed Node.js 14 is no longer supported, and required the latest Node.js 16 and later ([#523](https://github.com/marp-team/marp-cli/pull/523))
+- End-of-Life Node.js 14 is no longer supported, and required the latest Node.js 16 and later ([#523](https://github.com/marp-team/marp-cli/pull/523))
 
 ### Added
 
@@ -416,7 +416,7 @@
 
 ### ⚡️ Breaking
 
-- End-of-Lifed Node.js 12 is no longer supported, and required the latest Node.js 14 and later ([#450](https://github.com/marp-team/marp-cli/pull/450))
+- End-of-Life Node.js 12 is no longer supported, and required the latest Node.js 14 and later ([#450](https://github.com/marp-team/marp-cli/pull/450))
 - Upgrade Marp Core to [v3.2.0](https://github.com/marp-team/marp-core/releases/tag/v3.2.0) ([#450](https://github.com/marp-team/marp-cli/pull/450))
   - This is the first version of using v3 core as a bundled engine. [Refer to major changes in Marp Core v3.0.0.](https://github.com/marp-team/marp-core/releases/tag/v3.0.0)
 
@@ -535,7 +535,7 @@
 
 ### Fixed
 
-- Prevent outputting a warning about `CHROME_PATH` env if fallbacked to Edge ([#388](https://github.com/marp-team/marp-cli/pull/388))
+- Prevent outputting a warning about `CHROME_PATH` env if falling back to Edge ([#388](https://github.com/marp-team/marp-cli/pull/388))
 - Improve Docker detection for better Chromium execution within general images ([#389](https://github.com/marp-team/marp-cli/pull/389))
 
 ## v1.4.0 - 2021-08-29
@@ -1008,7 +1008,7 @@
 - Upgrade [Marpit v1.4.0](https://github.com/marp-team/marpit/releases/tag/v1.4.0) and [Marp Core v0.13.0](https://github.com/marp-team/marp-core/releases/tag/v0.13.0) ([#151](https://github.com/marp-team/marp-cli/pull/151))
 - Hold the progress state of fragments on to URL query parameter ([#149](https://github.com/marp-team/marp-cli/pull/149))
 - Reduce HTML file size of bespoke template by shortened container tag name and id ([#150](https://github.com/marp-team/marp-cli/pull/150))
-- Upgrade Node and depedent packages to the latest version ([#151](https://github.com/marp-team/marp-cli/pull/151))
+- Upgrade Node and dependent packages to the latest version ([#151](https://github.com/marp-team/marp-cli/pull/151))
 
 ## v0.13.1 - 2019-09-10
 
@@ -1428,7 +1428,7 @@
 
 ### Changed
 
-- Upgrade Node LTS and depenent packages ([#17](https://github.com/marp-team/marp-cli/pull/17))
+- Upgrade Node LTS and dependent packages ([#17](https://github.com/marp-team/marp-cli/pull/17))
 
 ### Fixed
 
