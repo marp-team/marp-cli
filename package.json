@@ -57,7 +57,7 @@
     "lint:js": "eslint --cache",
     "lint:css": "stylelint \"src/**/*.{css,scss}\"",
     "prepack": "npm-run-all --parallel check:* lint:* test:coverage --parallel build types",
-    "prepare": "patch-package",
+    "prepare": "npx --no patch-package || exit 0",
     "preversion": "run-p check:* lint:* test:coverage",
     "standalone": "node -e \"fs.rmSync('bin',{recursive:true,force:true})\" && pkg -C gzip --out-path ./bin .",
     "standalone:pack": "node ./scripts/pack.mjs",
