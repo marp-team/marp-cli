@@ -57,6 +57,7 @@
     "lint:js": "eslint --cache",
     "lint:css": "stylelint \"src/**/*.{css,scss}\"",
     "prepack": "npm-run-all --parallel check:* lint:* test:coverage --parallel build types",
+    "prepare": "patch-package",
     "preversion": "run-p check:* lint:* test:coverage",
     "standalone": "node -e \"fs.rmSync('bin',{recursive:true,force:true})\" && pkg -C gzip --out-path ./bin .",
     "standalone:pack": "node ./scripts/pack.mjs",
@@ -158,9 +159,14 @@
     "cosmiconfig": "^9.0.0",
     "puppeteer-core": "^24.14.0",
     "serve-index": "^1.9.1",
-    "tmp": "^0.2.3",
+    "tmp": "^0.2.5",
     "ws": "^8.18.3",
     "yargs": "^17.7.2"
+  },
+  "overrides": {
+    "patch-package": {
+      "tmp": "^0.2.5"
+    }
   },
   "publishConfig": {
     "access": "public"

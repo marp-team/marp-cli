@@ -22,14 +22,7 @@ We are following [**the contributing guideline of Marp team projects**][team-con
 
 ```bash
 npm install
-npx patch-package
 ```
-
-Running [`npx patch-package`](https://github.com/ds300/patch-package) after `npm install` is required to apply patches for development dependencies. See also [the documentation of patches](../patches/README.md) for details.
-
-> [!NOTE]
->
-> `patch-package` recommends to [add `postinstall` script to `package.json` to run it automatically after `npm install`](https://github.com/ds300/patch-package?tab=readme-ov-file#set-up). However, Marp CLI does not use it because it will run also when installing CLI by users.
 
 ### Build and watch
 

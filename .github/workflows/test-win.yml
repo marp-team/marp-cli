@@ -38,9 +38,7 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: |
-          npm ci
-          npx patch-package
+        run: npm ci
 
       - name: Set up LibreOffice
         run: choco install libreoffice-fresh -y

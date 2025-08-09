@@ -41,9 +41,7 @@ commands:
             - v3-dependencies-{{ .Environment.CIRCLE_JOB }}-{{ checksum "package-lock.json" }}-
             - v3-dependencies-{{ .Environment.CIRCLE_JOB }}-
 
-      - run: |
-          npm ci
-          npx patch-package
+      - run: npm ci
 
       - steps: << parameters.postinstall >>
 
