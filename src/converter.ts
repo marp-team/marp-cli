@@ -731,15 +731,20 @@ export class Converter {
         this.trackFailedLocalFileAccess(page)
 
       const render = async () => {
-        const waitForOptions: WaitForOptions = {
-          waitUntil: ['domcontentloaded', 'networkidle0'],
-        }
-
         if (uri) {
-          await page.goto(uri, waitForOptions)
+          await page.goto(uri, {
+            waitUntil: ['domcontentloaded', 'networkidle0'],
+          })
         } else {
-          await page.goto('data:text/html,', waitForOptions)
-          await page.setContent(baseFile.buffer!.toString(), waitForOptions)
+          await page.goto('data:text/html,', {
+            waitUntil: ['domcontentloaded', 'networkidle0'],
+          })
+
+          // https://github.com/marp-team/marp-cli/issues/682 -- Use page.waitForNetworkIdle() instead of `waitUntil: 'networkidle0'`
+          await page.setContent(baseFile.buffer!.toString(), {
+            waitUntil: 'domcontentloaded',
+          })
+          await page.waitForNetworkIdle()
         }
 
         // Wait for next frame (In parallel rendering, it may be needed to wait for the first rendering)
