@@ -3,12 +3,7 @@ import { URL } from 'node:url'
 import type { Marp, MarpOptions } from '@marp-team/marp-core'
 import { Marpit, Options as MarpitOptions } from '@marp-team/marpit'
 import chalk from 'chalk'
-import type {
-  Page,
-  HTTPRequest,
-  WaitForOptions,
-  Viewport,
-} from 'puppeteer-core'
+import type { Page, HTTPRequest, Viewport } from 'puppeteer-core'
 import type { Browser } from './browser/browser'
 import type { BrowserManager } from './browser/manager'
 import { silence, warn } from './cli'
