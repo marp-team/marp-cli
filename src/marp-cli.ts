@@ -153,6 +153,7 @@ export const marpCli = async (
           describe: 'Output file path (or directory when input-dir is passed)',
           group: OptionGroup.Basic,
           type: 'string',
+          nargs: 1, // Required to work `--output -` (stdout)
         },
         'input-dir': {
           alias: 'I',
