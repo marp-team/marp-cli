@@ -1204,12 +1204,30 @@ describe('Marp CLI', () => {
       })
     })
 
+    describe('with --output option', () => {
+      it('converts file and output to stdout when --output is "-"', async () => {
+        const stdout = jest.spyOn(process.stdout, 'write').mockImplementation()
+        jest.spyOn(cli, 'info').mockImplementation()
+
+        expect(await marpCli([onePath, '--output', '-'])).toBe(0)
+        expect(stdout).toHaveBeenCalledTimes(1)
+
+        stdout.mockClear()
+        expect(await marpCli([onePath, '--output=-'])).toBe(0)
+        expect(stdout).toHaveBeenCalledTimes(1)
+      })
+    })
+
     describe('with -o option', () => {
       it('converts file and output to stdout when -o is "-"', async () => {
         const stdout = jest.spyOn(process.stdout, 'write').mockImplementation()
         jest.spyOn(cli, 'info').mockImplementation()
 
         expect(await marpCli([onePath, '-o', '-'])).toBe(0)
+        expect(stdout).toHaveBeenCalledTimes(1)
+
+        stdout.mockClear()
+        expect(await marpCli([onePath, '-o-'])).toBe(0)
         expect(stdout).toHaveBeenCalledTimes(1)
       })
 
