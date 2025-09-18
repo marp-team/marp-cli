@@ -17,9 +17,9 @@ jobs:
       matrix:
         node-version:
           - '^18.20.8'
-          - '^20.19.2'
-          - '22.15.0'
-          - '^24.0.2'
+          - '^20.19.5'
+          - '22.19.0'
+          - '^24.8.0'
 
     steps:
       # - name: Output concurrency group
