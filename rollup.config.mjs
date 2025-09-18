@@ -46,6 +46,10 @@ const plugins = (opts = {}) => [
   postcss({ inject: false }),
   pug(),
   url({
+    include: '**/mac-dock-*.png',
+    limit: Number.POSITIVE_INFINITY, // Always inline the icon
+  }),
+  url({
     sourceDir: path.join(__dirname, 'lib'),
     limit: 30720,
   }),

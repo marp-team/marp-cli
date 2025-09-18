@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Set Liquid Glass icon while preview mode on macOS 26 Tahoe ([#688](https://github.com/marp-team/marp-cli/pull/688))
+
 ### Fixed
 
 - Fix ambiguous CLI arguments parsing for `--output` ([#684](https://github.com/marp-team/marp-cli/issues/684), [#685](https://github.com/marp-team/marp-cli/pull/685))

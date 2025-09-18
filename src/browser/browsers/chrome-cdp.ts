@@ -1,5 +1,7 @@
 import type { LaunchOptions } from 'puppeteer-core'
 import macDockIcon from '../../assets/mac-dock-icon.png'
+import macDockLiquidIcon from '../../assets/mac-dock-liquid-icon.png'
+import { shouldUseLiquidGlass } from '../../utils/mac'
 import { BrowserProtocol } from '../browser'
 import { ChromeBrowser } from './chrome'
 
@@ -16,7 +18,12 @@ export class ChromeCdpBrowser extends ChromeBrowser {
         .createCDPSession()
         .then((session) => {
           session
-            .send('Browser.setDockTile', { image: macDockIcon.slice(22) })
+            .send('Browser.setDockTile', {
+              image: (shouldUseLiquidGlass()
+                ? macDockLiquidIcon
+                : macDockIcon
+              ).slice(22),
+            })
             .catch(() => void 0)
         })
     }
