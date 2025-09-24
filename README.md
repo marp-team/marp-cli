@@ -80,7 +80,7 @@ _Disclaimer: Package manifests are maintained by the community, not Marp team._
 
 <!-- For contributors: This section describes only package managers that Marp manifest has been actively maintained. Each tools are following update within a few days of the latest CLI update. -->
 
-#### macOS: **[Homebrew](https://brew.sh/)**
+#### macOS / Linux: **[Homebrew](https://brew.sh/)**
 
 ```bash
 brew install marp-cli
@@ -127,7 +127,7 @@ We also provide standalone binaries for Linux, macOS (Apple Silicon), and Window
 [releases]: https://github.com/marp-team/marp-cli/releases
 
 > [!NOTE]
-> The standalone binary only supports specific architectures, and cannot load configuration files or engines written as ES Module. For the best experience, _we recommend installing Marp CLI via Node.js whenever possible._
+> The standalone binary only supports specific architectures, and cannot load configuration files or engines written as ES Module. For the best experience, _we recommend installing Marp CLI through Node.js or Homebrew whenever possible._
 
 ## Basic usage
 
