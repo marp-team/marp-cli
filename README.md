@@ -96,7 +96,11 @@ scoop install marp
 
 <!-- https://github.com/ScoopInstaller/Main/blob/master/bucket/marp.json -->
 
-### Local installation
+### Use Node.js
+
+[Node.js](https://nodejs.org/) v18 and later is required to use Marp CLI.
+
+#### Local installation
 
 We recommend to install Marp CLI into your Node.js project. You may control the CLI version (and engine if you want) exactly.
 
@@ -105,9 +109,6 @@ npm install --save-dev @marp-team/marp-cli
 ```
 
 The installed `marp` command is available in [npm-scripts](https://docs.npmjs.com/misc/scripts) or `npx marp`.
-
-> [!NOTE]
-> Marp CLI is working only with [actively supported Node.js versions](https://endoflife.date/nodejs), so Node.js v18 and later is required when installing into your Node.js project.
 
 #### Global installation
 
@@ -124,6 +125,9 @@ We also provide standalone binaries for Linux, macOS (Apple Silicon), and Window
 **[⏩ Download the latest standalone binary from release page.][releases]**
 
 [releases]: https://github.com/marp-team/marp-cli/releases
+
+> [!NOTE]
+> The standalone binary only supports specific architectures, and cannot load configuration files or engines written as ES Module. For the best experience, _we recommend installing Marp CLI via Node.js whenever possible._
 
 ## Basic usage
 
