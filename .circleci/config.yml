@@ -12,7 +12,7 @@ executors:
         default: false
       version:
         type: string
-        default: '22.15.0' # Specify LTS major and minor for development
+        default: '22.19.0' # Specify LTS major and minor for development
     docker:
       - image: cimg/node:<< parameters.version >><<# parameters.browser >>-browsers<</ parameters.browser >>
     working_directory: ~/marp-cli
@@ -177,7 +177,7 @@ jobs:
     executor:
       name: node
       browser: true
-      version: '24.0'
+      version: '24.8'
     steps:
       - prepare:
           browser: true
