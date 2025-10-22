@@ -12,16 +12,18 @@ Marp CLI's `bespoke` HTML template supports **slide transition animations**, tha
 
 The slide transition depends on **[View Transition API][view transition]** in the using browser. _We does never lock in to a specific JavaScript library_, as same as other Marp ecosystem projects :)
 
-To show transition animations, a viewer has to show HTML slide in the browser which have supported View Transition.
+To show transition animations, a viewer has to show HTML slide in the browser which have supported View Transition. Transitions will not be applied if the page is viewed in an unsupported browser.
 
 [view transition]: https://www.w3.org/TR/css-view-transitions-1/
 
 ### Supported browsers
 
+As of October 2025, View Transition is supported in all major browsers.
+
 - **Chrome**: ✅ (111-)
 - **Edge**: ✅ (111-)
 - **Safari**: ✅ (18.2-)
-- **Firefox**: Testable in [Firefox 139](https://developer.mozilla.org/en-US/docs/Mozilla/Firefox/Releases/139#experimental_web_features) and later (requires `dom.viewTransitions.enabled` preference to be set to `true` in `about:config`)
+- **Firefox**: ✅ (144-)
 
 ## `transition` local directive
 
@@ -71,7 +73,9 @@ Got back cover transition.
 
 ### Built-in transitions
 
-Marp CLI has provided useful [33 built-in transitions](../../src/engine/transition/keyframes/) out of the box. [You also can see the showcase of all transitions](https://marp-cli-page-transitions.glitch.me/) in the supported browser.
+Marp CLI has provided useful [33 built-in transitions](../../src/engine/transition/keyframes/) out of the box.
+
+<!-- [You also can see the showcase of all transitions](https://marp-cli-page-transitions.glitch.me/) in the supported browser. -->
 
 <table align="center">
   <tbody>
