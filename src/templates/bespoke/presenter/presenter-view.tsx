@@ -12,11 +12,6 @@ export const classes = {
   dragbar: `${presenterPrefix}dragbar-container`,
   next: `${presenterPrefix}next`,
   nextContainer: `${presenterPrefix}next-container`,
-  verticalDragbar: `${presenterPrefix}vertical-dragbar-container`,
-  thumbnailsContainer: `${presenterPrefix}thumbnails-container`,
-  thumbnailsWrapper: `${presenterPrefix}thumbnails-wrapper`,
-  thumbnail: `${presenterPrefix}thumbnail`,
-  thumbnailActive: `${presenterPrefix}thumbnail-active`,
   noteContainer: `${presenterPrefix}note-container`,
   noteWrapper: `${presenterPrefix}note-wrapper`,
   noteButtons: `${presenterPrefix}note-buttons`,
@@ -33,7 +28,6 @@ export const classes = {
 
 export const properties = {
   noteFontScale: '--bespoke-marp-note-font-scale',
-  verticalSplitRatio: '--bespoke-marp-presenter-vertical-split-ratio',
 } as const
 
 /** Create function to send message to iframe for navigation */
@@ -45,8 +39,6 @@ const createNavigateFunc =
     )
 
 const presenterView = (deck) => {
-  const thumbnailsEnabled = !!document.querySelector('[data-bespoke-thumbnails]')
-
   const { title } = document
   document.title = `[Presenter view]${title ? ` - ${title}` : ''}`
 
@@ -55,95 +47,49 @@ const presenterView = (deck) => {
     const container = document.createElement('div')
     container.className = classes.container
 
-    if (thumbnailsEnabled) {
-      container.classList.add('bespoke-marp-presenter-thumbnails-mode')
-    }
-
     container.appendChild(deckElement)
     container.insertAdjacentHTML(
       'beforeend',
-      thumbnailsEnabled
-        ? (
-          <>
-            <div class={classes.thumbnailsContainer}>
-              <div class={classes.thumbnailsWrapper} />
+      (
+        <>
+          <div class={classes.nextContainer}>
+            <iframe class={classes.next} src="?view=next" />
+          </div>
+          <div class={classes.dragbar}></div>
+          <div class={classes.noteContainer}>
+            <div class={classes.noteWrapper} />
+            <div class={classes.noteButtons}>
+              <button
+                class={classes.noteButtonsSmaller}
+                tabindex="-1"
+                title="Smaller notes font size"
+              >
+                Smaller notes font size
+              </button>
+              <button
+                class={classes.noteButtonsBigger}
+                tabindex="-1"
+                title="Bigger notes font size"
+              >
+                Bigger notes font size
+              </button>
             </div>
-            <div class={classes.dragbar}></div>
-            <div class={classes.verticalDragbar}></div>
-            <div class={classes.noteContainer}>
-              <div class={classes.noteWrapper} />
-              <div class={classes.noteButtons}>
-                <button
-                  class={classes.noteButtonsSmaller}
-                  tabindex="-1"
-                  title="Smaller notes font size"
-                >
-                  Smaller notes font size
-                </button>
-                <button
-                  class={classes.noteButtonsBigger}
-                  tabindex="-1"
-                  title="Bigger notes font size"
-                >
-                  Bigger notes font size
-                </button>
-              </div>
+          </div>
+          <div class={classes.infoContainer}>
+            <div class={classes.infoPage}>
+              <button class={classes.infoPagePrev} tabindex="-1" title="Previous">
+                Previous
+              </button>
+              <span class={classes.infoPageText}></span>
+              <button class={classes.infoPageNext} tabindex="-1" title="Next">
+                Next
+              </button>
             </div>
-            <div class={classes.infoContainer}>
-              <div class={classes.infoPage}>
-                <button class={classes.infoPagePrev} tabindex="-1" title="Previous">
-                  Previous
-                </button>
-                <span class={classes.infoPageText}></span>
-                <button class={classes.infoPageNext} tabindex="-1" title="Next">
-                  Next
-                </button>
-              </div>
-              <time class={classes.infoTime} title="Current time"></time>
-              <time class={classes.infoTimer} title="Timer"></time>
-            </div>
-          </>
-        )
-        : (
-          <>
-            <div class={classes.nextContainer}>
-              <iframe class={classes.next} src="?view=next" />
-            </div>
-            <div class={classes.dragbar}></div>
-            <div class={classes.noteContainer}>
-              <div class={classes.noteWrapper} />
-              <div class={classes.noteButtons}>
-                <button
-                  class={classes.noteButtonsSmaller}
-                  tabindex="-1"
-                  title="Smaller notes font size"
-                >
-                  Smaller notes font size
-                </button>
-                <button
-                  class={classes.noteButtonsBigger}
-                  tabindex="-1"
-                  title="Bigger notes font size"
-                >
-                  Bigger notes font size
-                </button>
-              </div>
-            </div>
-            <div class={classes.infoContainer}>
-              <div class={classes.infoPage}>
-                <button class={classes.infoPagePrev} tabindex="-1" title="Previous">
-                  Previous
-                </button>
-                <span class={classes.infoPageText}></span>
-                <button class={classes.infoPageNext} tabindex="-1" title="Next">
-                  Next
-                </button>
-              </div>
-              <time class={classes.infoTime} title="Current time"></time>
-              <time class={classes.infoTimer} title="Timer"></time>
-            </div>
-          </>
-        )
+            <time class={classes.infoTime} title="Current time"></time>
+            <time class={classes.infoTimer} title="Timer"></time>
+          </div>
+        </>
+      )
     )
 
     return container
@@ -188,115 +134,22 @@ const presenterView = (deck) => {
     window.addEventListener('mouseup', endDragging)
     window.addEventListener('mousemove', onDragging)
 
-    if (thumbnailsEnabled) {
-      // Vertical splitter
-      let isVerticalDragging = false
+    // Next slide view
+    $(classes.nextContainer).addEventListener('click', () => deck.next())
 
-      const startVerticalDragging = () => {
-        isVerticalDragging = true
-        $(classes.verticalDragbar).classList.add('active')
-      }
+    const nextIframe = $(classes.next) as HTMLIFrameElement
+    const nextNav = createNavigateFunc(nextIframe)
 
-      const endVerticalDragging = () => {
-        isVerticalDragging = false
-        $(classes.verticalDragbar).classList.remove('active')
-      }
+    nextIframe.addEventListener('load', () => {
+      $(classes.nextContainer).classList.add('active')
 
-      const onVerticalDragging = (event: MouseEvent) => {
-        if (!isVerticalDragging) return
+      // Navigate slide
+      nextNav(deck.slide(), deck.fragmentIndex)
 
-        const rightPanelElement = $(classes.thumbnailsContainer).parentElement
-        if (!rightPanelElement) return
-
-        const rightPanelRect = rightPanelElement.getBoundingClientRect()
-        const relativeY = event.clientY - rightPanelRect.top
-        const verticalSplitRatio = (relativeY / rightPanelRect.height) * 100
-
-        $(classes.container).style.setProperty(
-          properties.verticalSplitRatio,
-          `${Math.max(10, Math.min(90, verticalSplitRatio))}%`
-        )
-      }
-
-      $(classes.verticalDragbar).addEventListener(
-        'mousedown',
-        startVerticalDragging
+      deck.on('fragment', ({ index, fragmentIndex }) =>
+        nextNav(index, fragmentIndex)
       )
-      window.addEventListener('mouseup', endVerticalDragging)
-      window.addEventListener('mousemove', onVerticalDragging)
-
-      // Thumbnails view — clone SVG slides from the deck.
-      // Each thumbnail div gets the same ID as the bespoke parent so that
-      // Marpit theme CSS selectors (div#\:\$p > svg > foreignObject > section)
-      // match the cloned SVGs without needing to re-scope styles.
-      const createThumbnails = () => {
-        const thumbnailsWrapper = $(classes.thumbnailsWrapper)
-        const parentId = (deck.parent as HTMLElement).id
-
-        deck.slides.forEach((slideEl, i) => {
-          const container = document.createElement('div')
-          container.id = parentId
-          container.className = classes.thumbnail
-          container.dataset.slideIndex = i.toString()
-
-          const clone = slideEl.cloneNode(true) as SVGElement
-
-          // Set aspect-ratio on the container from the SVG viewBox so it
-          // reserves the correct space; the SVG then fills it 100%x100%.
-          const viewBox = clone.getAttribute('viewBox')
-          if (viewBox) {
-            const [, , w, h] = viewBox.split(/\s+/)
-            container.style.aspectRatio = `${w} / ${h}`
-          }
-
-          container.appendChild(clone)
-          container.addEventListener('click', () => deck.slide(i))
-          thumbnailsWrapper.appendChild(container)
-        })
-      }
-
-      // Set active thumbnail and scroll it into view
-      const setActiveThumbnail = (index: number) => {
-        const thumbnails = document.querySelectorAll(`.${classes.thumbnail}`)
-        thumbnails.forEach((thumb) => {
-          const slideIndex = parseInt(
-            (thumb as HTMLElement).dataset.slideIndex || '0',
-            10
-          )
-          const isActive = slideIndex === index
-          thumb.classList.toggle(classes.thumbnailActive, isActive)
-          if (isActive) {
-            ;(thumb as HTMLElement).scrollIntoView({
-              block: 'nearest',
-              behavior: 'smooth',
-            })
-          }
-        })
-      }
-
-      createThumbnails()
-      setActiveThumbnail(deck.slide())
-
-      // Update active thumbnail when slide changes
-      deck.on('activate', ({ index }) => setActiveThumbnail(index))
-    } else {
-      // Next slide view (iframe mode)
-      $(classes.nextContainer).addEventListener('click', () => deck.next())
-
-      const nextIframe = $(classes.next) as HTMLIFrameElement
-      const nextNav = createNavigateFunc(nextIframe)
-
-      nextIframe.addEventListener('load', () => {
-        $(classes.nextContainer).classList.add('active')
-
-        // Navigate slide
-        nextNav(deck.slide(), deck.fragmentIndex)
-
-        deck.on('fragment', ({ index, fragmentIndex }) =>
-          nextNav(index, fragmentIndex)
-        )
-      })
-    }
+    })
 
     // Presenter note
     const notes = document.querySelectorAll<HTMLElement>('.bespoke-marp-note')

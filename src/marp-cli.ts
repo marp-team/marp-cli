@@ -296,12 +296,6 @@ export const marpCli = async (
           group: OptionGroup.Template,
           type: 'boolean',
         },
-        'bespoke.thumbnails': {
-          describe: '[Bespoke] Use slide thumbnails in presenter view',
-          defaultDescription: 'false',
-          group: OptionGroup.Template,
-          type: 'boolean',
-        },
         browser: {
           describe:
             'The kind of browser to use for PDF, PPTX, and image conversion',

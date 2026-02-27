@@ -52,7 +52,6 @@ interface TemplateBespokeOption {
   osc?: boolean
   progress?: boolean
   transition?: boolean
-  thumbnails?: boolean
 }
 
 export interface TemplateResult {
@@ -96,7 +95,6 @@ export const bespoke: Template<TemplateBespokeOption> = async (opts) => {
   const osc = opts.osc ?? true
   const progress = opts.progress ?? false
   const transition = opts.transition ?? true
-  const thumbnails = opts.thumbnails ?? false
 
   // Hide template-specific modifier from options which have exposed to the functional engine
   Object.defineProperty(rendererOptions, 'modifier', {
@@ -117,7 +115,6 @@ export const bespoke: Template<TemplateBespokeOption> = async (opts) => {
         js: await libJs('bespoke.js'),
         osc,
         progress,
-        thumbnails,
         transitionStyle: rendered.transition?.builtinTransitionStyle,
       },
       watchJs: await watchJs(opts.notifyWS),
