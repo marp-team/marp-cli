@@ -27,7 +27,6 @@ interface IMarpCLIArguments {
   'bespoke.osc'?: boolean
   'bespoke.progress'?: boolean
   'bespoke.transition'?: boolean
-  'bespoke.thumbnails'?: boolean
   browser?: string | string[]
   browserPath?: string
   browserProtocol?: string
@@ -71,7 +70,6 @@ export type IMarpCLIConfig = Overwrite<
     | 'bespoke.osc'
     | 'bespoke.progress'
     | 'bespoke.transition'
-    | 'bespoke.thumbnails'
     | 'pdfOutlines'
     | 'pdfOutlines.pages'
     | 'pdfOutlines.headings'
@@ -81,7 +79,6 @@ export type IMarpCLIConfig = Overwrite<
       osc?: boolean
       progress?: boolean
       transition?: boolean
-      thumbnails?: boolean
     }
     browser?: 'auto' | FinderName | FinderName[]
     browserProtocol?: 'cdp' | 'webdriver-bidi'
@@ -239,7 +236,6 @@ export class MarpCLIConfig {
           osc: this.args['bespoke.osc'] ?? bespoke.osc,
           progress: this.args['bespoke.progress'] ?? bespoke.progress,
           transition: this.args['bespoke.transition'] ?? bespoke.transition,
-          thumbnails: this.args['bespoke.thumbnails'] ?? bespoke.thumbnails,
         }
       }
       return {}

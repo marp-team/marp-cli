@@ -7,6 +7,7 @@ import bespokeInteractive from './interactive'
 import bespokeLoad from './load'
 import bespokeNavigation from './navigation'
 import bespokeOSC from './osc'
+import bespokeOverview from './overview'
 import bespokePresenter from './presenter/'
 import bespokeProgress from './progress'
 import bespokeState from './state'
@@ -46,6 +47,7 @@ const bespokeTemplate = (target = document.getElementById(':$p')!) => {
       [[1, 0, 0], bespokeProgress],
       [[1, 1, 0], bespokeTouch()],
       [[1, 0, 0], bespokeOSC()],
+      [[1, 1, 0], bespokeOverview],
       [[1, 0, 0], bespokeTransition],
       [[1, 1, 1], bespokeFragments],
       [[1, 1, 0], bespokeWakeLock]
