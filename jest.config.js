@@ -10,7 +10,6 @@ const esModules = [
   'chalk',
   'chrome-launcher',
   'find-up',
-  'globby',
   'import-meta-resolve',
   'is-docker',
   'is-inside-container',
