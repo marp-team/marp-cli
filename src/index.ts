@@ -16,23 +16,24 @@ export default apiInterface
 // ---
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface Config<Engine extends typeof Marpit = typeof Marp>
-  extends Overwrite<
-    Omit<
-      IMarpCLIConfig,
-      /**
-       * This option is internal setting for collaboration with Marp team tools such as Marp for VS Code.
-       * It is not designed for users because the result of conversion may break if set wrong base URL.
-       */
-      'baseUrl'
-    >,
-    {
-      engine?: ResolvableEngine<Engine>
-      image?: 'png' | 'jpeg'
-      images?: 'png' | 'jpeg'
-      options?: ConstructorParameters<Engine>[0]
-    }
-  > {}
+export interface Config<
+  Engine extends typeof Marpit = typeof Marp,
+> extends Overwrite<
+  Omit<
+    IMarpCLIConfig,
+    /**
+     * This option is internal setting for collaboration with Marp team tools such as Marp for VS Code.
+     * It is not designed for users because the result of conversion may break if set wrong base URL.
+     */
+    'baseUrl'
+  >,
+  {
+    engine?: ResolvableEngine<Engine>
+    image?: 'png' | 'jpeg'
+    images?: 'png' | 'jpeg'
+    options?: ConstructorParameters<Engine>[0]
+  }
+> {}
 
 export const defineConfig = <Engine extends typeof Marpit = typeof Marp>(
   config: Config<Engine>

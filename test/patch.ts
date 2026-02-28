@@ -3,7 +3,7 @@ import * as binary from '../src/utils/binary'
 
 const intlSegmenterPolyfilled = jest.fn()
 
-jest.mock('@formatjs/intl-segmenter/polyfill-force', () =>
+jest.mock('@formatjs/intl-segmenter/polyfill-force.js', () =>
   intlSegmenterPolyfilled()
 )
 
