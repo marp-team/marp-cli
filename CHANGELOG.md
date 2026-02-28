@@ -8,11 +8,18 @@
 
 ### Changed
 
-- Upgrade development Node.js LTS ([#689](https://github.com/marp-team/marp-cli/pull/689))
+- Upgrade Marpit to [v3.2.1](https://github.com/marp-team/marpit/releases/tag/v3.2.1) ([#706](https://github.com/marp-team/marp-cli/pull/706))
+  - [v3.2.0](https://github.com/marp-team/marpit/releases/tag/v3.2.0): PostCSS plugin support by `use()` is available in the custom engine
+- Upgrade Marp Core to [v4.3.0](https://github.com/marp-team/marp-core/releases/v4.3.0) ([#706](https://github.com/marp-team/marp-cli/pull/706))
+  - [v4.2.0](https://github.com/marp-team/marp-core/releases/v4.2.0): Built-in themes now set color variants based on the color scheme defined by `color-scheme` CSS property
+  - [v4.3.0](https://github.com/marp-team/marp-core/releases/v4.3.0): Added Unicode 17 support by Twemoji
+- Upgrade development Node.js LTS ([#689](https://github.com/marp-team/marp-cli/pull/689), [#706](https://github.com/marp-team/marp-cli/pull/706))
+- Upgrade dependent packages to the latest version ([#706](https://github.com/marp-team/marp-cli/pull/706))
 
 ### Fixed
 
 - Fix ambiguous CLI arguments parsing for `--output` ([#684](https://github.com/marp-team/marp-cli/issues/684), [#685](https://github.com/marp-team/marp-cli/pull/685))
+- Make more sensible error detection while connecting to browser ([#706](https://github.com/marp-team/marp-cli/pull/706))
 
 ## v4.2.3 - 2025-08-09
 

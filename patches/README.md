@@ -10,13 +10,6 @@ Patches in this directory will be applied when `npm install` run, through `prepa
 
 ## Reasons for patches
 
-### [collect-v8-coverage](https://github.com/SimenB/collect-v8-coverage)
-
-This patch is required to fix reporting flaky coverage when running Jest (`npm run test:coverage`).
-
-- https://github.com/jestjs/jest/issues/14766#issuecomment-1908191939
-- https://github.com/SimenB/collect-v8-coverage/pull/235
-
 ### [jsdom](https://github.com/jsdom/jsdom)
 
 This patch makes the latest JSDOM allow to mock `window.location` in tests.

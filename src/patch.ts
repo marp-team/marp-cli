@@ -21,6 +21,6 @@ export const patchSegmenter = () => {
   // https://github.com/nodejs/node/issues/51752
   if (isStandaloneBinary() && process.config.variables['icu_small']) {
     debug('Using a polyfilled implementation for Intl.Segmenter.')
-    require('@formatjs/intl-segmenter/polyfill-force') // eslint-disable-line @typescript-eslint/no-require-imports
+    require('@formatjs/intl-segmenter/polyfill-force.js') // eslint-disable-line @typescript-eslint/no-require-imports
   }
 }

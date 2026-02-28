@@ -3,6 +3,7 @@ const { createJsWithBabelPreset } = require('ts-jest')
 const jsWithBabel = createJsWithBabelPreset()
 
 const esModules = [
+  '@formatjs/intl-segmenter',
   '@sindresorhus/merge-streams',
   'ansi-regex',
   'array-union',

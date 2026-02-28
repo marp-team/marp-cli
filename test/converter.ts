@@ -1246,6 +1246,77 @@ describe('Converter', () => {
             },
             timeout
           )
+
+          it(
+            'continues conversion even if setViewport fails with screen orientation override error',
+            async () => {
+              await using browserManager = new BrowserManager({
+                finders: ['firefox'],
+                timeout,
+              })
+
+              const browser = await browserManager.browserForConversion()
+              const originalWithPage = browser.withPage.bind(browser)
+
+              jest.spyOn(browser, 'withPage').mockImplementationOnce(
+                async (fn) =>
+                  await originalWithPage(async (page) => {
+                    page.setViewport = async () => {
+                      throw new Error(
+                        'Protocol error (emulation.setScreenOrientationOverride): unknown command emulation.setScreenOrientationOverride'
+                      )
+                    }
+                    return await fn(page)
+                  })
+              )
+
+              await instance({
+                browserManager,
+                output: 'a.png',
+                type: ConvertType.png,
+                imageScale: 0.5,
+              }).convertFile(new File(onePath))
+
+              const [lastCall] = writeFileSpy.mock.calls.slice(-1)
+              expect(lastCall[1]).toBeInstanceOf(Buffer)
+
+              const png = lastCall[1] as Buffer
+              const { width, height } = imageSize(png)
+
+              expect(width).toBe(640)
+              expect(height).toBe(360)
+            },
+            timeout
+          )
+
+          it('throws an error if setViewport fails with other error', async () => {
+            await using browserManager = new BrowserManager({
+              finders: ['firefox'],
+              timeout,
+            })
+
+            const browser = await browserManager.browserForConversion()
+            const originalWithPage = browser.withPage.bind(browser)
+
+            jest.spyOn(browser, 'withPage').mockImplementationOnce(
+              async (fn) =>
+                await originalWithPage(async (page) => {
+                  page.setViewport = async () => {
+                    throw new Error('Unexpected error')
+                  }
+                  return await fn(page)
+                })
+            )
+
+            await expect(
+              instance({
+                browserManager,
+                output: 'a.png',
+                type: ConvertType.png,
+                imageScale: 0.5,
+              }).convertFile(new File(onePath))
+            ).rejects.toThrow('Unexpected error')
+          })
         })
       })
     })

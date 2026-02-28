@@ -93,9 +93,10 @@ describe('Browser finder', () => {
           (m) => m.ChromeBrowser
         )
 
-        $ChromeCdpBrowser = await import(
-          '../../src/browser/browsers/chrome-cdp'
-        ).then((m) => m.ChromeCdpBrowser)
+        $ChromeCdpBrowser =
+          await import('../../src/browser/browsers/chrome-cdp').then(
+            (m) => m.ChromeCdpBrowser
+          )
       })
 
       const browser = await $findBrowser(['firefox', 'chrome'], {
