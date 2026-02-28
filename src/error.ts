@@ -1,3 +1,4 @@
+import { PuppeteerError } from 'puppeteer-core'
 import { debug } from './utils/debug'
 
 export class CLIError extends Error {
@@ -40,7 +41,8 @@ export function error(
 
 export const isError = (e: unknown): e is NodeJS.ErrnoException => {
   if (e instanceof Error) return true
+  if (e instanceof PuppeteerError) return true
 
   const tag = Object.prototype.toString.call(e)
-  return tag === '[object Error]' || /\[object .+Error\]/.test(tag)
+  return tag === '[object Error]' || /^\[object .+Error\]$/i.test(tag)
 }
