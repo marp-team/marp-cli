@@ -38,5 +38,9 @@ export function error(
   throw cliError
 }
 
-export const isError = (e: unknown): e is NodeJS.ErrnoException =>
-  Object.prototype.toString.call(e) === '[object Error]'
+export const isError = (e: unknown): e is NodeJS.ErrnoException => {
+  if (e instanceof Error) return true
+
+  const tag = Object.prototype.toString.call(e)
+  return tag === '[object Error]' || /\[object .+Error\]/.test(tag)
+}

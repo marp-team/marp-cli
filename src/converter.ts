@@ -20,7 +20,7 @@ import {
   OutlineData,
 } from './engine/pdf/outline-plugin'
 import { engineTransition, EngineTransition } from './engine/transition-plugin'
-import { error } from './error'
+import { error, isError } from './error'
 import { File, FileType } from './file'
 import { SOffice } from './soffice/soffice'
 import templates, {
@@ -464,7 +464,23 @@ export class Converter {
             } as const)
       ) satisfies Viewport
 
-      await page.setViewport(viewPort)
+      try {
+        await page.setViewport(viewPort)
+      } catch (e) {
+        // Workaround: `setViewport()` in WebDriver BiDi may throw an error by failing `setScreenOrientationOverride`.
+        // The other command (`setViewport`) is expected to work even if it fails, so just ignore the error and continue conversion.
+        // ref. https://github.com/puppeteer/puppeteer/pull/14391
+        if (
+          isError(e) &&
+          e.message.includes('emulation.setScreenOrientationOverride')
+        ) {
+          debug('%o', e)
+          debug('Continuing conversion without screen orientation emulation...')
+        } else {
+          throw e
+        }
+      }
+
       await render()
       await page.addStyleTag({
         content: ':root,body { scrollbar-width:none !important; }',
