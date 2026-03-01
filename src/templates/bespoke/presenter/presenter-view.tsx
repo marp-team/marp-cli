@@ -103,7 +103,7 @@ const presenterView = (deck) => {
   }
 
   const subscribe = (deck) => {
-    // Splitter
+    // Horizontal splitter
     let isDragging = false
 
     const startDragging = () => {
@@ -183,6 +183,7 @@ const presenterView = (deck) => {
       noteButtonBigger.blur()
       biggerNotesFont()
     })
+
     noteButtonSmaller.addEventListener('click', () => {
       noteButtonSmaller.blur()
       smallerNotesFont()
