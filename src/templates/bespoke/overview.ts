@@ -15,18 +15,6 @@ const bespokeOverview = (deck) => {
     const cellW = (rect.width - gap * (cols + 1)) / cols
     const cellH = (rect.height - gap * (rows + 1)) / rows
 
-    // Use the slide's intrinsic aspect ratio to determine the scale
-    const firstSlide = slides()[0]
-    const viewBox = firstSlide?.getAttribute('viewBox')
-    let slideW = rect.width
-    let slideH = rect.height
-
-    if (viewBox) {
-      const parts = viewBox.split(/\s+/)
-      slideW = parseFloat(parts[2])
-      slideH = parseFloat(parts[3])
-    }
-
     // Scale so the slide fits within the cell
     const scaleX = cellW / rect.width
     const scaleY = cellH / rect.height
