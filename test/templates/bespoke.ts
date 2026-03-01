@@ -1861,17 +1861,19 @@ describe("Bespoke template's browser context", () => {
       parent = render()
 
       // Mock getBoundingClientRect for layout calculations
-      jest.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue({
-        x: 0,
-        y: 0,
-        width: 1024,
-        height: 768,
-        top: 0,
-        right: 1024,
-        bottom: 768,
-        left: 0,
-        toJSON: () => {},
-      })
+      jest
+        .spyOn(HTMLElement.prototype, 'getBoundingClientRect')
+        .mockReturnValue({
+          x: 0,
+          y: 0,
+          width: 1024,
+          height: 768,
+          top: 0,
+          right: 1024,
+          bottom: 768,
+          left: 0,
+          toJSON: () => {},
+        })
 
       deck = bespoke()
     })
@@ -2003,7 +2005,9 @@ describe("Bespoke template's browser context", () => {
 
       const transformBefore = deck.slides[0].style.transform
 
-      ;(HTMLElement.prototype.getBoundingClientRect as jest.Mock).mockReturnValue({
+      ;(
+        HTMLElement.prototype.getBoundingClientRect as jest.Mock
+      ).mockReturnValue({
         x: 0,
         y: 0,
         width: 800,
