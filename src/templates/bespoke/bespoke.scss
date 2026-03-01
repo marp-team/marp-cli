@@ -208,7 +208,6 @@ $progress-height: 5px;
       position: absolute;
       top: 0;
       width: 100%;
-
       display: grid;
       grid-template:
         'current dragbar next' minmax(140px, 1fr)
@@ -457,6 +456,7 @@ $progress-height: 5px;
   }
 
   // Overview mode (shared styles for normal + presenter views)
+  /* stylelint-disable no-descending-specificity */
   body[data-bespoke-overview] {
     .bespoke-progress-parent {
       display: none !important;
@@ -470,7 +470,6 @@ $progress-height: 5px;
         opacity: 1;
         cursor: pointer;
         transition: filter 0.2s ease;
-
         filter: drop-shadow(0 2px 8px rgba(#000, 0.3));
 
         &:hover {
@@ -525,6 +524,7 @@ $progress-height: 5px;
       }
     }
   }
+  /* stylelint-enable no-descending-specificity */
 }
 
 @media print {
