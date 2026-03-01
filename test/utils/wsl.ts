@@ -240,7 +240,7 @@ describe('#isWSL', () => {
     expect(readFile).toHaveBeenCalledTimes(1)
   })
 
-  it('returns 2 if throing an error while checking WSL 2 because 2 is the primary version of current WSL', async () => {
+  it('returns 2 if throwing an error while checking WSL 2 because 2 is the primary version of current WSL', async () => {
     jest.doMock('is-wsl', () => true)
 
     const readFile = jest

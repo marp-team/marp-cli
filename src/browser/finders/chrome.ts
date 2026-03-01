@@ -41,7 +41,7 @@ export const chromeFinder: BrowserFinder = async ({ preferredPath } = {}) => {
       case 'wsl1':
         return chromeFinderWSL()
     }
-    return await chromeFinderFallack()
+    return await chromeFinderFallback()
   })()
 
   if (installation) return chrome(installation)
@@ -66,7 +66,7 @@ const chromeFinderLinux = async () => {
 const chromeFinderWin32 = (): string | undefined => win32()[0]
 const chromeFinderWSL = (): string | undefined => wsl()[0]
 
-const chromeFinderFallack = async () =>
+const chromeFinderFallback = async () =>
   await findExecutableBinary([
     'google-chrome-stable',
     'google-chrome',

@@ -18,7 +18,7 @@ import bespokeWakeLock from './wake-lock'
 
 const parse = (
   ...patterns: [
-    [normalView: 1 | 0, presnterView: 1 | 0, nextView: 1 | 0],
+    [normalView: 1 | 0, presenterView: 1 | 0, nextView: 1 | 0],
     (...args: unknown[]) => void,
   ][]
 ) => {

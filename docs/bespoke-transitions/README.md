@@ -10,7 +10,7 @@ Marp CLI's `bespoke` HTML template supports **slide transition animations**, tha
 
 ## Prerequisite
 
-The slide transition depends on **[View Transition API][view transition]** in the using browser. _We does never lock in to a specific JavaScript library_, as same as other Marp ecosystem projects :)
+The slide transition depends on **[View Transition API][view transition]** in the using browser. _We never lock in a specific JavaScript library_, as same as other Marp ecosystem projects :)
 
 To show transition animations, a viewer has to show HTML slide in the browser which have supported View Transition. Transitions will not be applied if the page is viewed in an unsupported browser.
 
@@ -251,7 +251,7 @@ The custom duration accepts a unit `s` or `ms`.
 
 ## Custom transitions
 
-You also can define the custom transitions and animations, both in theme CSS and Markdown inline style. We provide unlimited extensibillity of your own transitions with your creativity.
+You also can define the custom transitions and animations, both in theme CSS and Markdown inline style. We provide unlimited extensibility of your own transitions with your creativity.
 
 For making custom transitions, all you have to know is only about CSS. Define animation [`@keyframes`](https://developer.mozilla.org/en-US/docs/Web/CSS/@keyframes), with a specific keyframe name ruled by Marp. There are no extra plugins and JavaScript codes.
 
@@ -365,7 +365,7 @@ Declare animation keyframes with the name that has prefixed `backward-` to the c
 }
 ```
 
-In backward navigation, each slide pages will try to use the backward keyframes first, and fallback to the normal keyframes if not declared.
+In backward navigation, each slide pages will try to use the backward keyframes first, and fall back to the normal keyframes if not declared.
 
 You can avoid the unintended fallback by setting an empty `@keyframes` declaration for the backward animation.
 
@@ -461,7 +461,7 @@ If you want to swap the order of layers during animation, try to animate `z-inde
 ```css
 /** Declare `swap` transition */
 @keyframes marp-incoming-transition-swap {
-  /* Incoming slide will swap from back to front at 50% of animation */
+  /* Incoming slide will swap from `back` to `front` at 50% of animation */
   from {
     z-index: -1;
   }
@@ -639,6 +639,6 @@ This option is also useful when using [a customized engine](../../README.md#func
 
 _Even if the slide author used transitions,_ every viewer do not always prefer to see dizzy animations. [Reducing motion is important especially for people with vestibular disorders.](https://www.w3.org/WAI/WCAG21/Understanding/animation-from-interactions.html)
 
-If the browser has detected that the viewer set a setting an operating system preference to reduce motions and animations in the interface, every effects by transitions will force to a simple `fade` animation.
+If the browser detects that the viewer has an operating system preference to reduce motions and animations, all transition effects will be replaced with a simple `fade` animation.
 
 If you want to know details about why required this, see the article "[`prefers-reduced-motion`: Sometimes less movement is more](https://web.dev/prefers-reduced-motion/)" by [web.dev](https://web.dev/).
