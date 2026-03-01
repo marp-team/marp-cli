@@ -240,7 +240,7 @@ export class Preview extends (EventEmitter as new () => TypedEmitter<Preview.Eve
     this.puppeteerInternal.on('targetcreated', (target) => {
       debugPreview('Target created: %o', target.url())
 
-      // NOTE: PDF viewer on headfull Chrome may return `null`.
+      // NOTE: PDF viewer on headful Chrome may return `null`.
       target.page().then((page) => page?.on('close', handlePageOnClose))
     })
 
