@@ -1872,7 +1872,7 @@ describe("Bespoke template's browser context", () => {
           right: 1024,
           bottom: 768,
           left: 0,
-          toJSON: () => {},
+          toJSON: () => undefined,
         })
 
       deck = bespoke()
@@ -2016,7 +2016,7 @@ describe("Bespoke template's browser context", () => {
         right: 800,
         bottom: 600,
         left: 0,
-        toJSON: () => {},
+        toJSON: () => undefined,
       })
 
       window.dispatchEvent(new Event('resize'))
