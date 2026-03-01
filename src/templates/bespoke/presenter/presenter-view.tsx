@@ -50,46 +50,44 @@ const presenterView = (deck) => {
     container.appendChild(deckElement)
     container.insertAdjacentHTML(
       'beforeend',
-      (
-        <>
-          <div class={classes.nextContainer}>
-            <iframe class={classes.next} src="?view=next" />
+      <>
+        <div class={classes.nextContainer}>
+          <iframe class={classes.next} src="?view=next" />
+        </div>
+        <div class={classes.dragbar}></div>
+        <div class={classes.noteContainer}>
+          <div class={classes.noteWrapper} />
+          <div class={classes.noteButtons}>
+            <button
+              class={classes.noteButtonsSmaller}
+              tabindex="-1"
+              title="Smaller notes font size"
+            >
+              Smaller notes font size
+            </button>
+            <button
+              class={classes.noteButtonsBigger}
+              tabindex="-1"
+              title="Bigger notes font size"
+            >
+              Bigger notes font size
+            </button>
           </div>
-          <div class={classes.dragbar}></div>
-          <div class={classes.noteContainer}>
-            <div class={classes.noteWrapper} />
-            <div class={classes.noteButtons}>
-              <button
-                class={classes.noteButtonsSmaller}
-                tabindex="-1"
-                title="Smaller notes font size"
-              >
-                Smaller notes font size
-              </button>
-              <button
-                class={classes.noteButtonsBigger}
-                tabindex="-1"
-                title="Bigger notes font size"
-              >
-                Bigger notes font size
-              </button>
-            </div>
+        </div>
+        <div class={classes.infoContainer}>
+          <div class={classes.infoPage}>
+            <button class={classes.infoPagePrev} tabindex="-1" title="Previous">
+              Previous
+            </button>
+            <span class={classes.infoPageText}></span>
+            <button class={classes.infoPageNext} tabindex="-1" title="Next">
+              Next
+            </button>
           </div>
-          <div class={classes.infoContainer}>
-            <div class={classes.infoPage}>
-              <button class={classes.infoPagePrev} tabindex="-1" title="Previous">
-                Previous
-              </button>
-              <span class={classes.infoPageText}></span>
-              <button class={classes.infoPageNext} tabindex="-1" title="Next">
-                Next
-              </button>
-            </div>
-            <time class={classes.infoTime} title="Current time"></time>
-            <time class={classes.infoTimer} title="Timer"></time>
-          </div>
-        </>
-      )
+          <time class={classes.infoTime} title="Current time"></time>
+          <time class={classes.infoTimer} title="Timer"></time>
+        </div>
+      </>
     )
 
     return container
