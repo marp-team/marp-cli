@@ -1289,34 +1289,38 @@ describe('Converter', () => {
             timeout
           )
 
-          it('throws an error if setViewport fails with other error', async () => {
-            await using browserManager = new BrowserManager({
-              finders: ['firefox'],
-              timeout,
-            })
+          it(
+            'throws an error if setViewport fails with other error',
+            async () => {
+              await using browserManager = new BrowserManager({
+                finders: ['firefox'],
+                timeout,
+              })
 
-            const browser = await browserManager.browserForConversion()
-            const originalWithPage = browser.withPage.bind(browser)
+              const browser = await browserManager.browserForConversion()
+              const originalWithPage = browser.withPage.bind(browser)
 
-            jest.spyOn(browser, 'withPage').mockImplementationOnce(
-              async (fn) =>
-                await originalWithPage(async (page) => {
-                  page.setViewport = async () => {
-                    throw new Error('Unexpected error')
-                  }
-                  return await fn(page)
-                })
-            )
+              jest.spyOn(browser, 'withPage').mockImplementationOnce(
+                async (fn) =>
+                  await originalWithPage(async (page) => {
+                    page.setViewport = async () => {
+                      throw new Error('Unexpected error')
+                    }
+                    return await fn(page)
+                  })
+              )
 
-            await expect(
-              instance({
-                browserManager,
-                output: 'a.png',
-                type: ConvertType.png,
-                imageScale: 0.5,
-              }).convertFile(new File(onePath))
-            ).rejects.toThrow('Unexpected error')
-          })
+              await expect(
+                instance({
+                  browserManager,
+                  output: 'a.png',
+                  type: ConvertType.png,
+                  imageScale: 0.5,
+                }).convertFile(new File(onePath))
+              ).rejects.toThrow('Unexpected error')
+            },
+            timeout
+          )
         })
       })
     })
