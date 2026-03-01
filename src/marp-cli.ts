@@ -450,7 +450,7 @@ export const marpCli = async (
       // @see https://github.com/marp-team/marp-cli/issues/93
       const stdin = args.stdin ? await File.stdin() : undefined
 
-      // Regular file finding powered by globby
+      // Regular file finding powered by glob matcher
       return [stdin, ...(await File.find(...config.files))].filter(
         (f): f is File => !!f
       )

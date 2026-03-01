@@ -2,7 +2,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import * as url from 'node:url'
-import { globby, Options as GlobbyOptions } from 'globby'
+import { glob, GlobOptions } from 'tinyglobby'
 import { debug } from './utils/debug'
 import { getStdin } from './utils/stdin'
 import { generateTmpName } from './utils/tmp'
@@ -49,6 +49,11 @@ export enum FileType {
   File,
   StandardIO,
   Null,
+}
+
+export interface FindPathOptions {
+  ignore?: GlobOptions['ignore']
+  files: string[]
 }
 
 export class File {
@@ -176,7 +181,7 @@ export class File {
   private static stdinBuffer?: Buffer
 
   static async findPath(
-    opts: GlobbyOptions,
+    opts: FindPathOptions,
     ...paths: string[]
   ): Promise<string[]> {
     const filepaths = new Set<string>()
@@ -203,12 +208,22 @@ export class File {
       globs.push(p.split(path.sep).join('/'))
     }
 
-    // Find remaining path through globby
-    const gOpts = { absolute: true, ignore: ['**/node_modules'], ...opts }
-    ;(await globby(globs, gOpts)).forEach((p) => filepaths.add(p))
+    const { files, ignore } = opts
+    const gOpts = {
+      absolute: true,
+      ignore: ['**/node_modules', ...(ignore ?? [])],
+    } satisfies GlobOptions
+
+    // Find remaining path through glob patterns
+    ;(await glob(globs, gOpts)).forEach((p) => filepaths.add(p))
 
     for (const cwd of dirs) {
-      ;(await globby('.', { cwd, ...gOpts })).forEach((p) => filepaths.add(p))
+      ;(
+        await glob(
+          files.map((pattern) => `**/${pattern}`),
+          { ...gOpts, cwd }
+        )
+      ).forEach((p) => filepaths.add(p))
     }
 
     return [...filepaths.values()].map((p) => path.normalize(p))
@@ -217,12 +232,7 @@ export class File {
   static async find(...paths: string[]): Promise<File[]> {
     return (
       await this.findPath(
-        {
-          expandDirectories: {
-            extensions: [],
-            files: markdownExtensions.map((ext) => `*.${ext}`),
-          },
-        },
+        { files: markdownExtensions.map((ext) => `*.${ext}`) },
         ...paths
       )
     ).map((p) => new File(p))

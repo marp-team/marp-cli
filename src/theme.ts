@@ -2,7 +2,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { Marpit } from '@marp-team/marpit'
-import { isDynamicPattern } from 'globby'
+import { isDynamicPattern } from 'tinyglobby'
 import { warn } from './cli'
 import { isError } from './error'
 import { File } from './file'
@@ -124,7 +124,7 @@ export class ThemeSet {
     const fnForWatch = new Set<string>(found.map((f) => path.resolve(f)))
 
     for (const f of fn) {
-      // globby's hasMagic (backed by fast-glob) always recognizes "\\" (Windows path separator) as the escape character.
+      // tinyglobby's dynamic pattern check expects "/" as a path separator.
       if (!isDynamicPattern(f.split(path.sep).join('/'))) {
         try {
           const stat: fs.Stats = await fs.promises.lstat(f)
@@ -146,15 +146,7 @@ export class ThemeSet {
   }
 
   private static async findPath(fn: string[]): Promise<string[]> {
-    return File.findPath(
-      {
-        expandDirectories: {
-          extensions: [],
-          files: ['*.css'],
-        },
-      },
-      ...fn
-    )
+    return File.findPath({ files: ['*.css'] }, ...fn)
   }
 }
 
