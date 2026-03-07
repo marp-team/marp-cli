@@ -1,18 +1,3 @@
 #!/bin/sh
 
-set -eu
-
-can_write_dir() {
-  [ -n "$1" ] || return 1
-  gosu "$MARP_USER" sh -c '[ -d "$1" ] && [ -w "$1" ]' _ "$1" >/dev/null 2>&1
-}
-
-if ! can_write_dir "${XDG_CONFIG_HOME:-}"; then
-  export XDG_CONFIG_HOME=/tmp/marp/config
-fi
-
-if ! can_write_dir "${XDG_CACHE_HOME:-}"; then
-  export XDG_CACHE_HOME=/tmp/marp/cache
-fi
-
 exec gosu "$MARP_USER" node /home/marp/.cli/marp-cli.js "$@"
