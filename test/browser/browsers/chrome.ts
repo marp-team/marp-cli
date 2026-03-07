@@ -71,7 +71,7 @@ describe('ChromeBrowser', () => {
             args: expect.arrayContaining([
               expect.stringMatching(/^--user-data-dir=/),
             ]),
-            ignoreDefaultArgs: [],
+            enableExtensions: false,
           })
         )
       })
@@ -145,29 +145,25 @@ describe('ChromeBrowser', () => {
       })
 
       describe('Disabling extensions', () => {
-        it('ignores --disable-extensions argument if CHROME_ENABLE_EXTENSIONS environment variable is defined', async () => {
+        it('enables extensions if CHROME_ENABLE_EXTENSIONS environment variable is defined', async () => {
           process.env.CHROME_ENABLE_EXTENSIONS = '1'
           await new ChromeBrowser({ path: '/path/to/chrome' }).launch()
 
           expect(puppeteer.launch).toHaveBeenCalledWith(
-            expect.objectContaining({
-              ignoreDefaultArgs: expect.arrayContaining([
-                '--disable-extensions',
-              ]),
-            })
+            expect.objectContaining({ enableExtensions: true })
           )
         })
 
-        it('does not ignore --disable-extensions argument if CHROME_ENABLE_EXTENSIONS environment variable is empty', async () => {
+        it('does not enable extensions if CHROME_ENABLE_EXTENSIONS environment variable is empty', async () => {
           process.env.CHROME_ENABLE_EXTENSIONS = ''
           await new ChromeBrowser({ path: '/path/to/chrome' }).launch()
 
           expect(puppeteer.launch).toHaveBeenCalledWith(
-            expect.objectContaining({ ignoreDefaultArgs: [] })
+            expect.objectContaining({ enableExtensions: false })
           )
         })
 
-        it('merges ignoreDefaultArgs if passed extra ignore args', async () => {
+        it('passes through ignoreDefaultArgs if passed extra ignore args', async () => {
           process.env.CHROME_ENABLE_EXTENSIONS = 'true'
           await new ChromeBrowser({ path: '/path/to/chrome' }).launch({
             ignoreDefaultArgs: ['--foo', '--bar'],
@@ -175,11 +171,8 @@ describe('ChromeBrowser', () => {
 
           expect(puppeteer.launch).toHaveBeenCalledWith(
             expect.objectContaining({
-              ignoreDefaultArgs: expect.arrayContaining([
-                '--disable-extensions',
-                '--foo',
-                '--bar',
-              ]),
+              enableExtensions: true,
+              ignoreDefaultArgs: expect.arrayContaining(['--foo', '--bar']),
             })
           )
         })
@@ -191,22 +184,21 @@ describe('ChromeBrowser', () => {
           })
 
           expect(puppeteer.launch).toHaveBeenCalledWith(
-            expect.objectContaining({ ignoreDefaultArgs: true })
+            expect.objectContaining({
+              enableExtensions: true,
+              ignoreDefaultArgs: true,
+            })
           )
         })
 
-        it('keeps ignoring --disable-extensions argument even if explicitly passed ignoreDefaultArgs as false', async () => {
+        it('enables extensions even if explicitly passed ignoreDefaultArgs as false', async () => {
           process.env.CHROME_ENABLE_EXTENSIONS = 'enabled'
           await new ChromeBrowser({ path: '/path/to/chrome' }).launch({
             ignoreDefaultArgs: false,
           })
 
           expect(puppeteer.launch).toHaveBeenCalledWith(
-            expect.objectContaining({
-              ignoreDefaultArgs: expect.arrayContaining([
-                '--disable-extensions',
-              ]),
-            })
+            expect.objectContaining({ enableExtensions: true })
           )
         })
       })

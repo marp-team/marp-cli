@@ -27,7 +27,7 @@ RUN apt update && \
   npm cache clean --force
 
 # Set environments
-ENV MARP_USER=marp:marp PATH=$PATH:/home/marp/.cli CHROME_PATH=/usr/local/bin/chrome
+ENV MARP_USER=marp:marp PATH=$PATH:/home/marp/.cli CHROME_PATH=/usr/local/bin/chrome CHROME_CONFIG_HOME=/tmp/marp-config
 
 # Copy Marp CLI files
 USER marp
