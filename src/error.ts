@@ -38,6 +38,8 @@ export function error(
   throw cliError
 }
 
+// TODO: Use Error.isError instead, in Node.js v24.3+
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/isError
 export const isError = (e: unknown): e is NodeJS.ErrnoException => {
   if (e instanceof Error) return true
 

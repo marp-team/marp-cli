@@ -14,27 +14,17 @@ export class ChromeBrowser extends Browser {
   protected async launchPuppeteer(
     opts: Omit<LaunchOptions, 'userDataDir'> // userDataDir cannot overload in current implementation
   ): Promise<PuppeteerBrowser> {
-    const ignoreDefaultArgsSet = new Set(
-      typeof opts.ignoreDefaultArgs === 'object' ? opts.ignoreDefaultArgs : []
-    )
-
-    // Escape hatch for force-extensions policy for Chrome enterprise
-    // https://github.com/puppeteer/puppeteer/blob/master/docs/troubleshooting.md#chrome-headless-doesnt-launch-on-windows
-    // https://github.com/marp-team/marp-cli/issues/231
-    if (process.env.CHROME_ENABLE_EXTENSIONS) {
-      ignoreDefaultArgsSet.add('--disable-extensions')
-    }
-
     const baseOpts = await this.generateLaunchOptions({
+      // Escape hatch for force-extensions policy for Chrome enterprise
+      // https://github.com/puppeteer/puppeteer/blob/master/docs/troubleshooting.md#chrome-headless-doesnt-launch-on-windows
+      // https://github.com/marp-team/marp-cli/issues/231
+      enableExtensions: !!process.env.CHROME_ENABLE_EXTENSIONS,
       headless: this.puppeteerHeadless(),
       pipe: await this.puppeteerPipe(),
       // userDataDir: await this.puppeteerDataDir(), // userDataDir will set in args option due to wrong path normalization in WSL
       ...opts,
       userDataDir: undefined,
       args: await this.puppeteerArgs(opts.args ?? []),
-      ignoreDefaultArgs: opts.ignoreDefaultArgs === true || [
-        ...ignoreDefaultArgsSet,
-      ],
     })
 
     const tryLaunch = async (

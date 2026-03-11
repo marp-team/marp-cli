@@ -21,6 +21,7 @@
 
 - Fix ambiguous CLI arguments parsing for `--output` ([#684](https://github.com/marp-team/marp-cli/issues/684), [#685](https://github.com/marp-team/marp-cli/pull/685))
 - Make more sensible error detection while connecting to browser ([#706](https://github.com/marp-team/marp-cli/pull/706))
+- Fix failure to launch Chromium if the user specified by `MARP_USER` env does not exist in the Docker container image ([#702](https://github.com/marp-team/marp-cli/issues/702), [#709](https://github.com/marp-team/marp-cli/pull/709))
 
 ## v4.2.3 - 2025-08-09
 
