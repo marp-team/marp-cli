@@ -1856,7 +1856,6 @@ describe("Bespoke template's browser context", () => {
   describe('Overview', () => {
     describe('In normal view mode', () => {
       beforeEach(() => {
-        jest.spyOn(window, 'open').mockImplementation()
         render()
       })
 
@@ -1870,36 +1869,27 @@ describe("Bespoke template's browser context", () => {
         })
       })
 
-      it('injects deck.openOverviewView() to open overview view', () => {
+      it('injects deck.openOverviewView() to navigate to overview view', () => {
         replaceLocation('/?sync=synckey', () => {
           const deck = bespoke()
           expect(deck.openOverviewView).toBeInstanceOf(Function)
-
-          deck.openOverviewView()
-          expect(window.open).toHaveBeenCalledWith(
-            deck.overviewUrl,
-            'bespoke-marp-overview-synckey',
-            expect.stringContaining('menubar=no,toolbar=no')
-          )
         })
       })
 
-      it('opens overview view by hitting o key', () => {
-        bespoke()
-        keydown({ key: 'o' })
-        expect(window.open).toHaveBeenCalled()
+      it('does not open overview with modifier keys', () => {
+        replaceLocation('/?sync=xxx', () => {
+          bespoke()
+          const hrefBefore = location.href
 
-        // Ignore hitting o key with modifier
-        ;(window.open as jest.Mock).mockClear()
+          keydown({ key: 'o', ctrlKey: true })
+          expect(location.href).toBe(hrefBefore)
 
-        keydown({ key: 'o', ctrlKey: true })
-        expect(window.open).not.toHaveBeenCalled()
+          keydown({ key: 'o', metaKey: true })
+          expect(location.href).toBe(hrefBefore)
 
-        keydown({ key: 'o', metaKey: true })
-        expect(window.open).not.toHaveBeenCalled()
-
-        keydown({ key: 'o', altKey: true })
-        expect(window.open).not.toHaveBeenCalled()
+          keydown({ key: 'o', altKey: true })
+          expect(location.href).toBe(hrefBefore)
+        })
       })
     })
 
@@ -1974,14 +1964,6 @@ describe("Bespoke template's browser context", () => {
           keydown({ key: 'ArrowRight' })
           keydown({ key: 'ArrowRight' })
           keydown({ key: 'ArrowRight' })
-          expect(deck.slide()).toBe(2)
-        }))
-
-      it('navigates to clicked slide', () =>
-        testOverviewView(({ deck }) => {
-          deck.slides[2].dispatchEvent(
-            new MouseEvent('click', { bubbles: true })
-          )
           expect(deck.slide()).toBe(2)
         }))
 

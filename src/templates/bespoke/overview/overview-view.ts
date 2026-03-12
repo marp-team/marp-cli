@@ -1,6 +1,18 @@
-import { classPrefix } from '../utils'
+import { classPrefix, generateURLfromParams } from '../utils'
 
 const overviewActiveClass = `${classPrefix}overview-active`
+
+const navigateBack = (slideIndex: number) => {
+  const params = new URLSearchParams(location.search)
+
+  params.delete('view')
+  params.delete('sync')
+
+  location.href = generateURLfromParams(params, {
+    ...location,
+    hash: `#${slideIndex + 1}`,
+  })
+}
 
 const overviewView = () => (deck) => {
   const { title } = document
@@ -43,19 +55,25 @@ const overviewView = () => (deck) => {
     })
   }
 
-  // Click a slide to navigate (syncs to other windows via bespokeSync)
+  // Click a slide to navigate back to normal view at that slide
   slides().forEach((slide, i) => {
     slide.addEventListener('click', () => {
-      deck.slide(i)
+      navigateBack(i)
     })
   })
 
-  // Arrow key navigation within the grid
+  // Arrow key navigation within the grid, Escape/Enter to go back
   document.addEventListener('keydown', (e) => {
     const cols = columns()
     const current = deck.slide()
 
-    if (e.key === 'ArrowRight') {
+    if (e.key === 'Escape' || e.key === 'o') {
+      e.preventDefault()
+      navigateBack(current)
+    } else if (e.key === 'Enter') {
+      e.preventDefault()
+      navigateBack(current)
+    } else if (e.key === 'ArrowRight') {
       e.preventDefault()
       deck.slide(Math.min(current + 1, slideCount() - 1))
     } else if (e.key === 'ArrowLeft') {
