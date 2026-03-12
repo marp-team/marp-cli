@@ -1,4 +1,6 @@
-import { generateURLfromParams, storage } from '../utils'
+import { classPrefix, generateURLfromParams, storage } from '../utils'
+
+export const overviewPrefix = `${classPrefix}overview-` as const
 
 interface BespokeForOverview {
   syncKey: string
@@ -26,7 +28,15 @@ const normalView = (deck) => {
 }
 
 function openOverviewView(this: BespokeForOverview) {
-  location.href = this.overviewUrl
+  const { max, floor } = Math
+  const w = max(floor(window.innerWidth * 0.85), 640)
+  const h = max(floor(window.innerHeight * 0.85), 360)
+
+  return window.open(
+    this.overviewUrl,
+    overviewPrefix + this.syncKey,
+    `width=${w},height=${h},menubar=no,toolbar=no`
+  )
 }
 
 function overviewUrl(this: BespokeForOverview) {
