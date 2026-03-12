@@ -7,7 +7,7 @@ import bespokeInteractive from './interactive'
 import bespokeLoad from './load'
 import bespokeNavigation from './navigation'
 import bespokeOSC from './osc'
-import bespokeOverview from './overview'
+import bespokeOverview from './overview/'
 import bespokePresenter from './presenter/'
 import bespokeProgress from './progress'
 import bespokeState from './state'
@@ -19,7 +19,12 @@ import bespokeWakeLock from './wake-lock'
 
 const parse = (
   ...patterns: [
-    [normalView: 1 | 0, presenterView: 1 | 0, nextView: 1 | 0],
+    [
+      normalView: 1 | 0,
+      presenterView: 1 | 0,
+      nextView: 1 | 0,
+      overviewView: 1 | 0,
+    ],
     (...args: unknown[]) => void,
   ][]
 ) => {
@@ -34,23 +39,23 @@ const bespokeTemplate = (target = document.getElementById(':$p')!) => {
   const deck = bespoke.from(
     target,
     parse(
-      //   P  N
-      [[1, 1, 0], bespokeSync({ key })],
-      [[1, 1, 1], bespokePresenter(target)],
-      [[1, 1, 0], bespokeInteractive],
-      [[1, 1, 1], bespokeClasses],
-      [[1, 0, 0], bespokeInactive()],
-      [[1, 1, 1], bespokeLoad],
-      [[1, 1, 1], bespokeState({ history: false })],
-      [[1, 1, 0], bespokeNavigation()],
-      [[1, 1, 0], bespokeFullscreen],
-      [[1, 0, 0], bespokeProgress],
-      [[1, 1, 0], bespokeTouch()],
-      [[1, 0, 0], bespokeOSC()],
-      [[1, 1, 0], bespokeOverview],
-      [[1, 0, 0], bespokeTransition],
-      [[1, 1, 1], bespokeFragments],
-      [[1, 1, 0], bespokeWakeLock]
+      //   P  N  O
+      [[1, 1, 0, 1], bespokeSync({ key })],
+      [[1, 1, 1, 0], bespokePresenter(target)],
+      [[1, 1, 0, 0], bespokeInteractive],
+      [[1, 1, 1, 1], bespokeClasses],
+      [[1, 0, 0, 0], bespokeInactive()],
+      [[1, 1, 1, 1], bespokeLoad],
+      [[1, 1, 1, 1], bespokeState({ history: false })],
+      [[1, 1, 0, 0], bespokeNavigation()],
+      [[1, 1, 0, 0], bespokeFullscreen],
+      [[1, 0, 0, 0], bespokeProgress],
+      [[1, 1, 0, 0], bespokeTouch()],
+      [[1, 0, 0, 0], bespokeOSC()],
+      [[1, 1, 0, 1], bespokeOverview()],
+      [[1, 0, 0, 0], bespokeTransition],
+      [[1, 1, 1, 1], bespokeFragments],
+      [[1, 1, 0, 0], bespokeWakeLock]
     )
   )
 

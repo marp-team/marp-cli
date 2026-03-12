@@ -1854,190 +1854,159 @@ describe("Bespoke template's browser context", () => {
   })
 
   describe('Overview', () => {
-    let parent: HTMLElement
-    let deck
+    describe('In normal view mode', () => {
+      beforeEach(() => {
+        jest.spyOn(window, 'open').mockImplementation()
+        render()
+      })
 
-    beforeEach(() => {
-      parent = render()
+      it('injects deck.overviewUrl property to get URL of overview view', () => {
+        replaceLocation('/?sync=xxx', () => {
+          const deck = bespoke()
 
-      // Mock getBoundingClientRect for layout calculations
-      jest
-        .spyOn(HTMLElement.prototype, 'getBoundingClientRect')
-        .mockReturnValue({
-          x: 0,
-          y: 0,
-          width: 1024,
-          height: 768,
-          top: 0,
-          right: 1024,
-          bottom: 768,
-          left: 0,
-          toJSON: () => undefined,
+          expect(typeof deck.overviewUrl).toBe('string')
+          expect(deck.overviewUrl).toContain('view=overview')
+          expect(deck.overviewUrl).toContain('sync=xxx')
+        })
+      })
+
+      it('injects deck.openOverviewView() to open overview view', () => {
+        replaceLocation('/?sync=synckey', () => {
+          const deck = bespoke()
+          expect(deck.openOverviewView).toBeInstanceOf(Function)
+
+          deck.openOverviewView()
+          expect(window.open).toHaveBeenCalledWith(
+            deck.overviewUrl,
+            'bespoke-marp-overview-synckey',
+            expect.stringContaining('menubar=no,toolbar=no')
+          )
+        })
+      })
+
+      it('opens overview view by hitting o key', () => {
+        bespoke()
+        keydown({ key: 'o' })
+        expect(window.open).toHaveBeenCalled()
+
+        // Ignore hitting o key with modifier
+        ;(window.open as jest.Mock).mockClear()
+
+        keydown({ key: 'o', ctrlKey: true })
+        expect(window.open).not.toHaveBeenCalled()
+
+        keydown({ key: 'o', metaKey: true })
+        expect(window.open).not.toHaveBeenCalled()
+
+        keydown({ key: 'o', altKey: true })
+        expect(window.open).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('In overview view mode', () => {
+      const mockRect = (width = 1024, height = 768) => {
+        jest
+          .spyOn(HTMLElement.prototype, 'getBoundingClientRect')
+          .mockReturnValue({
+            x: 0,
+            y: 0,
+            width,
+            height,
+            top: 0,
+            right: width,
+            bottom: height,
+            left: 0,
+            toJSON: () => undefined,
+          })
+      }
+
+      const testOverviewView = (
+        func: (obj: { deck: any; parent: HTMLElement }) => void
+      ) =>
+        replaceLocation('/?view=overview', () => {
+          const parent = render()
+          mockRect()
+          const deck = bespoke()
+
+          func({ deck, parent })
         })
 
-      deck = bespoke()
-    })
+      it('sets document title', () =>
+        testOverviewView(() => {
+          expect(document.title).toContain('[Overview]')
+        }))
 
-    const isOverviewActive = () =>
-      document.body.hasAttribute('data-bespoke-overview')
+      it('applies grid layout transforms to all slides', () =>
+        testOverviewView(({ deck }) => {
+          deck.slides.forEach((slide) => {
+            expect(slide.style.transform).toContain('translate(')
+            expect(slide.style.transform).toContain('scale(')
+            expect(slide.style.transformOrigin).toBe('0 0')
+          })
+        }))
 
-    const focusedSlide = () =>
-      parent.querySelector('.bespoke-marp-overview-focus')
+      it('highlights the current slide', () =>
+        testOverviewView(({ deck, parent }) => {
+          const active = parent.querySelector('.bespoke-marp-overview-active')
+          expect(active).toBe(deck.slides[0])
+        }))
 
-    it('toggles overview mode with "o" key', () => {
-      expect(isOverviewActive()).toBe(false)
+      it('navigates with arrow keys', () =>
+        testOverviewView(({ deck }) => {
+          keydown({ key: 'ArrowRight' })
+          expect(deck.slide()).toBe(1)
 
-      keydown({ key: 'o', bubbles: true, cancelable: true })
-      expect(isOverviewActive()).toBe(true)
+          keydown({ key: 'ArrowLeft' })
+          expect(deck.slide()).toBe(0)
 
-      keydown({ key: 'o', bubbles: true, cancelable: true })
-      expect(isOverviewActive()).toBe(false)
-    })
+          keydown({ key: 'ArrowDown' })
+          expect(deck.slide()).toBe(2)
 
-    it('toggles overview mode with Escape key', () => {
-      keydown({ key: 'o', bubbles: true, cancelable: true })
-      expect(isOverviewActive()).toBe(true)
+          keydown({ key: 'ArrowUp' })
+          expect(deck.slide()).toBe(0)
+        }))
 
-      keydown({ key: 'Escape', bubbles: true, cancelable: true })
-      expect(isOverviewActive()).toBe(false)
-    })
+      it('clamps navigation within slide bounds', () =>
+        testOverviewView(({ deck }) => {
+          keydown({ key: 'ArrowLeft' })
+          expect(deck.slide()).toBe(0)
 
-    it('does not toggle with modifier keys', () => {
-      keydown({ key: 'o', ctrlKey: true, bubbles: true, cancelable: true })
-      expect(isOverviewActive()).toBe(false)
+          keydown({ key: 'ArrowRight' })
+          keydown({ key: 'ArrowRight' })
+          keydown({ key: 'ArrowRight' })
+          expect(deck.slide()).toBe(2)
+        }))
 
-      keydown({ key: 'o', metaKey: true, bubbles: true, cancelable: true })
-      expect(isOverviewActive()).toBe(false)
+      it('navigates to clicked slide', () =>
+        testOverviewView(({ deck }) => {
+          deck.slides[2].dispatchEvent(
+            new MouseEvent('click', { bubbles: true })
+          )
+          expect(deck.slide()).toBe(2)
+        }))
 
-      keydown({ key: 'o', altKey: true, bubbles: true, cancelable: true })
-      expect(isOverviewActive()).toBe(false)
-    })
+      it('recalculates layout on window resize', () =>
+        testOverviewView(({ deck }) => {
+          const transformBefore = deck.slides[0].style.transform
 
-    it('sets focus on the current slide when activated', () => {
-      deck.slide(1)
+          ;(
+            HTMLElement.prototype.getBoundingClientRect as jest.Mock
+          ).mockReturnValue({
+            x: 0,
+            y: 0,
+            width: 800,
+            height: 600,
+            top: 0,
+            right: 800,
+            bottom: 600,
+            left: 0,
+            toJSON: () => undefined,
+          })
 
-      keydown({ key: 'o', bubbles: true, cancelable: true })
-      expect(focusedSlide()).toBe(deck.slides[1])
-    })
+          window.dispatchEvent(new Event('resize'))
 
-    it('applies transform layout to slides when activated', () => {
-      keydown({ key: 'o', bubbles: true, cancelable: true })
-
-      deck.slides.forEach((slide) => {
-        expect(slide.style.transform).toContain('translate(')
-        expect(slide.style.transform).toContain('scale(')
-        expect(slide.style.transformOrigin).toBe('0 0')
-      })
-    })
-
-    it('clears layout when deactivated', () => {
-      keydown({ key: 'o', bubbles: true, cancelable: true })
-      keydown({ key: 'o', bubbles: true, cancelable: true })
-
-      deck.slides.forEach((slide) => {
-        expect(slide.style.transform).toBe('')
-        expect(slide.style.transformOrigin).toBe('')
-      })
-    })
-
-    it('navigates focus with arrow keys', () => {
-      keydown({ key: 'o', bubbles: true, cancelable: true })
-      expect(focusedSlide()).toBe(deck.slides[0])
-
-      keydown({ key: 'ArrowRight', bubbles: true, cancelable: true })
-      expect(focusedSlide()).toBe(deck.slides[1])
-
-      keydown({ key: 'ArrowLeft', bubbles: true, cancelable: true })
-      expect(focusedSlide()).toBe(deck.slides[0])
-
-      keydown({ key: 'ArrowDown', bubbles: true, cancelable: true })
-      expect(focusedSlide()).toBe(deck.slides[2])
-
-      keydown({ key: 'ArrowUp', bubbles: true, cancelable: true })
-      expect(focusedSlide()).toBe(deck.slides[0])
-    })
-
-    it('clamps focus within slide bounds', () => {
-      keydown({ key: 'o', bubbles: true, cancelable: true })
-
-      keydown({ key: 'ArrowLeft', bubbles: true, cancelable: true })
-      expect(focusedSlide()).toBe(deck.slides[0])
-
-      // Navigate to last slide
-      keydown({ key: 'ArrowRight', bubbles: true, cancelable: true })
-      keydown({ key: 'ArrowRight', bubbles: true, cancelable: true })
-      expect(focusedSlide()).toBe(deck.slides[2])
-
-      keydown({ key: 'ArrowRight', bubbles: true, cancelable: true })
-      expect(focusedSlide()).toBe(deck.slides[2])
-    })
-
-    it('deactivates and navigates to focused slide on Enter', () => {
-      keydown({ key: 'o', bubbles: true, cancelable: true })
-      keydown({ key: 'ArrowRight', bubbles: true, cancelable: true })
-      keydown({ key: 'Enter', bubbles: true, cancelable: true })
-
-      expect(isOverviewActive()).toBe(false)
-      expect(deck.slide()).toBe(1)
-    })
-
-    it('deactivates and navigates to clicked slide', () => {
-      keydown({ key: 'o', bubbles: true, cancelable: true })
-
-      deck.slides[2].dispatchEvent(new MouseEvent('click', { bubbles: true }))
-
-      expect(isOverviewActive()).toBe(false)
-      expect(deck.slide()).toBe(2)
-    })
-
-    it('blocks deck navigation while overview is active', () => {
-      keydown({ key: 'o', bubbles: true, cancelable: true })
-
-      deck.next()
-      expect(deck.slide()).toBe(0)
-
-      deck.prev()
-      expect(deck.slide()).toBe(0)
-    })
-
-    it('recalculates layout on window resize', () => {
-      keydown({ key: 'o', bubbles: true, cancelable: true })
-
-      const transformBefore = deck.slides[0].style.transform
-
-      ;(
-        HTMLElement.prototype.getBoundingClientRect as jest.Mock
-      ).mockReturnValue({
-        x: 0,
-        y: 0,
-        width: 800,
-        height: 600,
-        top: 0,
-        right: 800,
-        bottom: 600,
-        left: 0,
-        toJSON: () => undefined,
-      })
-
-      window.dispatchEvent(new Event('resize'))
-
-      expect(deck.slides[0].style.transform).not.toBe(transformBefore)
-    })
-
-    it('updates focus on sync slide event', () => {
-      keydown({ key: 'o', bubbles: true, cancelable: true })
-      expect(focusedSlide()).toBe(deck.slides[0])
-
-      deck.fire('slide', { forSync: true, index: 2 })
-      expect(focusedSlide()).toBe(deck.slides[2])
-    })
-
-    it('does not recalculate layout on resize when inactive', () => {
-      const transformBefore = deck.slides[0].style.transform
-
-      window.dispatchEvent(new Event('resize'))
-
-      expect(deck.slides[0].style.transform).toBe(transformBefore)
+          expect(deck.slides[0].style.transform).not.toBe(transformBefore)
+        }))
     })
   })
 })

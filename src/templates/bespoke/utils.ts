@@ -11,11 +11,13 @@ const replacer: QuerySetter = (...args) => history.replaceState(...args)
 export const ViewModeNormal = ''
 export const ViewModePresenter = 'presenter'
 export const ViewModeNext = 'next'
+export const ViewModeOverview = 'overview'
 
 export const viewModes = [
   ViewModeNormal,
   ViewModePresenter,
   ViewModeNext,
+  ViewModeOverview,
 ] as const
 
 export const classPrefix = 'bespoke-marp-'
@@ -78,7 +80,11 @@ export const setViewMode = () => {
   const view = readQuery('view')
 
   body.dataset.bespokeView =
-    view === ViewModeNext || view === ViewModePresenter ? view : ViewModeNormal
+    view === ViewModeNext ||
+    view === ViewModePresenter ||
+    view === ViewModeOverview
+      ? view
+      : ViewModeNormal
 }
 
 export const storage = (() => {
