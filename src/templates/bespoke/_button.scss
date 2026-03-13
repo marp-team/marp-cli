@@ -77,4 +77,8 @@
   %button-minus {
     @include button-icon-internal('../../assets/minus.svg');
   }
+
+  %button-overview {
+    @include button-icon-internal('../../assets/overview.svg');
+  }
 }

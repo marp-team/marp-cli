@@ -151,6 +151,10 @@ $progress-height: 5px;
           &[data-bespoke-marp-osc='presenter'] {
             @include button.button-icon(presenter);
           }
+
+          &[data-bespoke-marp-osc='overview'] {
+            @include button.button-icon(overview);
+          }
         }
       }
 
@@ -425,13 +429,15 @@ $progress-height: 5px;
           }
         }
 
-        .bespoke-marp-presenter-info-page {
+        .bespoke-marp-presenter-info-page-area {
           @extend %info-element;
 
           order: 2;
           text-align: center;
 
-          .bespoke-marp-presenter-info-page-text {
+          .bespoke-marp-presenter-info-page {
+            @extend %button;
+
             display: inline-block;
             min-width: 120px;
             text-align: center;
@@ -486,8 +492,7 @@ $progress-height: 5px;
 
     button.bespoke-marp-overview-close {
       @extend %button;
-      @extend %button-plus;
-      @include button.button-size(28px);
+      @include button.button-icon(plus, 28px);
 
       transform: rotate(45deg); /* To reduce bundled HTML size :p */
     }

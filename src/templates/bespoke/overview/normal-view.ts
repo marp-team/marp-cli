@@ -65,6 +65,10 @@ const normalView =
       }, 0)
     }
 
+    Object.defineProperties(deck, {
+      toggleOverviewView: { enumerable: true, value: toggleOverviewView },
+    })
+
     window.addEventListener('message', (e) => {
       if (e.origin !== window.origin) return
       if (e.data === 'closeOverview') toggleOverviewView(false)

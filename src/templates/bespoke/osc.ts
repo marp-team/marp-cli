@@ -27,12 +27,19 @@ const bespokeOSC = (selector = `.${classPrefix}osc`) => {
   if (!isFullscreenEnabled())
     oscElements('fullscreen', (btn) => (btn.style.display = 'none'))
 
-  // Disable presenter button if using localStorage is restricted
-  if (!storage.available)
-    oscElements('presenter', (btn: HTMLButtonElement) => {
+  // Disable presenter/overview button if using localStorage is restricted
+  if (!storage.available) {
+    const disableBtn = (btn: HTMLButtonElement, name: string) => {
       btn.disabled = true
-      btn.title = 'Presenter view is disabled due to restricted localStorage.'
-    })
+      btn.title = `${name} is disabled due to restricted localStorage.`
+    }
+    oscElements('presenter', (btn: HTMLButtonElement) =>
+      disableBtn(btn, 'Presenter view')
+    )
+    oscElements('overview', (btn: HTMLButtonElement) =>
+      disableBtn(btn, 'Overview view')
+    )
+  }
 
   return (deck) => {
     osc.addEventListener('click', (e) => {
@@ -50,6 +57,8 @@ const bespokeOSC = (selector = `.${classPrefix}osc`) => {
           deck?.fullscreen()
         } else if (bespokeMarpOsc === 'presenter') {
           deck.openPresenterView()
+        } else if (bespokeMarpOsc === 'overview') {
+          deck.toggleOverviewView()
         }
       }
     })
