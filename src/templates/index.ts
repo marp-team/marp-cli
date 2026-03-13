@@ -90,7 +90,7 @@ export const bespoke: Template<TemplateBespokeOption> = async (opts) => {
     container: new Element('div', { id: ':$p' }),
     inlineSVG: true,
     slideContainer: [],
-  }
+  } satisfies Options
 
   const osc = opts.osc ?? true
   const progress = opts.progress ?? false

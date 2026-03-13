@@ -99,6 +99,7 @@ const bespokeTransition = (deck) => {
 
       // Check condition
       // (The conditional function may modify event object so should be called at first of checks)
+      if (deck.skipTransition) return true
       if (!cond(e)) return true
 
       // Check transition

@@ -11,10 +11,12 @@ const replacer: QuerySetter = (...args) => history.replaceState(...args)
 export const ViewModeNormal = ''
 export const ViewModePresenter = 'presenter'
 export const ViewModeNext = 'next'
+export const ViewModeOverview = 'overview'
 
 export const viewModes = [
   ViewModeNormal,
   ViewModePresenter,
+  ViewModeOverview,
   ViewModeNext,
 ] as const
 
@@ -77,8 +79,9 @@ export const setHistoryState = (state: Record<string, any>) =>
 export const setViewMode = () => {
   const view = readQuery('view')
 
-  body.dataset.bespokeView =
-    view === ViewModeNext || view === ViewModePresenter ? view : ViewModeNormal
+  body.dataset.bespokeView = viewModes.some((v) => v && v === view)
+    ? (view as (typeof viewModes)[number])
+    : ViewModeNormal
 }
 
 export const storage = (() => {

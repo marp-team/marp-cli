@@ -11,6 +11,23 @@ export interface BespokeSyncState {
   fragmentIndex: number
 }
 
+export interface BespokeWithSyncKey {
+  syncKey: string
+  [key: string]: any
+}
+
+export const assertBespokeWithSyncKey = <
+  T extends Record<string, any> = Record<string, any>,
+>(
+  deck: T
+): deck is T & BespokeWithSyncKey => {
+  if (deck.syncKey && typeof deck.syncKey === 'string') return true
+
+  throw new Error(
+    'The current instance of Bespoke.js is incompatible with Marp bespoke sync plugin.'
+  )
+}
+
 const bespokeSync = (opts: BespokeSyncOption = {}) => {
   const key =
     opts.key ||
