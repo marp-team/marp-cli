@@ -115,10 +115,10 @@ $progress-height: 5px;
         /* View Transition */
         view-transition-name: __bespoke_marp_transition_osc__;
 
-        > * {
+        > :where(*) {
           margin-left: 6px;
 
-          &:first-child {
+          &:where(:first-child) {
             margin-left: 0;
           }
         }
@@ -185,7 +185,7 @@ $progress-height: 5px;
       height: $progress-height;
       width: 100%;
 
-      & + .bespoke-marp-parent {
+      & + :where(.bespoke-marp-parent) {
         top: $progress-height;
       }
 
@@ -226,12 +226,12 @@ $progress-height: 5px;
         minmax(3px, var(--bespoke-marp-presenter-split-ratio, 66%))
         0 minmax(3px, 1fr);
 
-      .bespoke-marp-parent {
+      :where(.bespoke-marp-parent) {
         grid-area: current;
         position: relative;
         overflow: hidden;
 
-        svg.bespoke-marp-slide {
+        :where(svg.bespoke-marp-slide) {
           height: calc(100% - 40px);
           left: 20px;
           position: absolute;
@@ -469,7 +469,7 @@ $progress-height: 5px;
 
   // Overview view
   body[data-bespoke-view='overview'] {
-    background: #222;
+    background: #161616;
     overflow: auto;
 
     [data-bespoke-marp-fragment='inactive'] {
@@ -481,7 +481,7 @@ $progress-height: 5px;
       display: flex;
       justify-content: flex-end;
       inset: 0 0 auto;
-      background: rgba(#000, 0.85);
+      background: rgba(#222, 0.85);
       backdrop-filter: blur(4px);
       box-shadow: 0 3px 10px rgba(#000, 0.5);
       padding: 10px;
@@ -506,11 +506,11 @@ $progress-height: 5px;
 
       svg.bespoke-marp-slide {
         --bov-selected: transparent;
-        --bov-focus: #222;
+        --bov-focus: #161616;
         --bov-focus-outline: transparent;
 
         box-shadow:
-          0 0 0 1px #222,
+          0 0 0 1px #161616,
           0 0 0 3px var(--bov-focus),
           0 0 0 4px var(--bov-focus-outline),
           0 0 0 6px var(--bov-selected);
@@ -535,7 +535,7 @@ $progress-height: 5px;
         &:hover,
         &:focus-visible,
         &:active {
-          --bov-focus-outline: #222;
+          --bov-focus-outline: #161616;
         }
 
         &:hover {
