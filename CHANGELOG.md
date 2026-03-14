@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v4.3.0 - 2026-03-14
+
 ### Added
 
 - Add the overview view to `bespoke` template ([#464](https://github.com/marp-team/marp-cli/issues/464), [#705](https://github.com/marp-team/marp-cli/pull/705) by [@mil-ad](https://github.com/mil-ad), [#710](https://github.com/marp-team/marp-cli/pull/710))
