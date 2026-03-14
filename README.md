@@ -813,11 +813,13 @@ try {
 
 ### Error handling
 
-We have exported [`CLIError` class and `CLIErrorCode` enum](https://github.com/marp-team/marp-cli/blob/main/src/error.ts) from `@marp-team/marp-cli`, to allow handling for specific errors that have already known by Marp CLI.
+We have exported [`CLIError` class and `CLIErrorCode` enum](https://github.com/marp-team/marp-cli/blob/main/src/error.ts), to allow handling for specific errors that have already known by Marp CLI.
 
 If `CLIError` instance was thrown, you can identify the reason why CLI threw error by checking `errorCode` member.
 
 ```js
+import { marpCli, CLIError } from '@marp-team/marp-cli'
+
 try {
   await marpCli(['foobar.md', '--pdf'])
 } catch (err) {
@@ -833,7 +835,7 @@ try {
 
 `marpCli()` would not be resolved initiatively if started some observation: Watch mode, server mode, and preview window.
 
-`waitForObservation()` is helpful to handle them. It returns `Promise` that would be resolved with helper object when ready to observe resources in `marpCli()`.
+`waitForObservation()` is helpful for handling them. It returns a `Promise` that resolves with a helper object when ready to observe resources in `marpCli()`.
 
 ```javascript
 import { marpCli, waitForObservation } from '@marp-team/marp-cli'
@@ -853,7 +855,7 @@ console.log('Observed')
 stop()
 ```
 
-The resolved helper has `stop()` method for telling Marp CLI to stop observation and resolve `Promise`.
+The resolved helper has `stop()` method for telling Marp CLI to stop observation and resolve the `Promise` from `marpCli()`.
 
 ## Contributing
 
