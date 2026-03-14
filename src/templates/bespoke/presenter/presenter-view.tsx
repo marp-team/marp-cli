@@ -16,8 +16,8 @@ export const classes = {
   noteWrapper: `${presenterPrefix}note-wrapper`,
   noteButtons: `${presenterPrefix}note-buttons`,
   infoContainer: `${presenterPrefix}info-container`,
+  infoPageArea: `${presenterPrefix}info-page-area`,
   infoPage: `${presenterPrefix}info-page`,
-  infoPageText: `${presenterPrefix}info-page-text`,
   infoPagePrev: `${presenterPrefix}info-page-prev`,
   infoPageNext: `${presenterPrefix}info-page-next`,
   noteButtonsBigger: `${presenterPrefix}note-bigger`,
@@ -75,11 +75,11 @@ const presenterView = (deck) => {
           </div>
         </div>
         <div class={classes.infoContainer}>
-          <div class={classes.infoPage}>
+          <div class={classes.infoPageArea}>
             <button class={classes.infoPagePrev} tabindex="-1" title="Previous">
               Previous
             </button>
-            <span class={classes.infoPageText}></span>
+            <button class={classes.infoPage}></button>
             <button class={classes.infoPageNext} tabindex="-1" title="Next">
               Next
             </button>
@@ -198,10 +198,15 @@ const presenterView = (deck) => {
     )
 
     // Page info
+    const info = $<HTMLButtonElement>(classes.infoPage)
+
     deck.on('activate', ({ index }) => {
-      $(classes.infoPageText).textContent = `${index + 1} / ${
-        deck.slides.length
-      }`
+      info.textContent = `${index + 1} / ${deck.slides.length}`
+    })
+
+    info.addEventListener('click', () => {
+      info.blur()
+      deck.toggleOverviewView()
     })
 
     const prev = $<HTMLButtonElement>(classes.infoPagePrev)

@@ -83,8 +83,11 @@ describe("Bespoke template's browser context", () => {
     }
   }
 
-  const keydown = (opts, target: EventTarget = document) =>
+  const keydown = (opts: KeyboardEventInit, target: EventTarget = document) =>
     target.dispatchEvent(new KeyboardEvent('keydown', opts))
+
+  const mockWindowFocus = (targetWindow: Window) =>
+    jest.spyOn(targetWindow, 'focus').mockImplementation()
 
   describe('Classes', () => {
     it('adds bespoke classes to #p', () => {
@@ -111,7 +114,7 @@ describe("Bespoke template's browser context", () => {
   })
 
   describe('Fragments', () => {
-    let deck
+    let deck: Record<string, any>
     let parent: HTMLElement
 
     beforeEach(() => {
@@ -241,7 +244,7 @@ describe("Bespoke template's browser context", () => {
   })
 
   describe('Fullscreen', () => {
-    let deck
+    let deck: Record<string, any>
     let toggle: jest.SpyInstance
 
     beforeEach(() => {
@@ -350,11 +353,9 @@ describe("Bespoke template's browser context", () => {
         '<audio controls src="https://example.com/audio.mp3" id="element"></audio>',
       video:
         '<video controls src="https://example.com/video.mp3" id="element"></video>',
-    }
+    } as const
 
-    for (const kind of Object.keys(elements)) {
-      const element = elements[kind]
-
+    for (const [kind, element] of Object.entries(elements)) {
       it(`prevents navigation on ${kind} element`, () => {
         render(`${element}\n\n---\n\n2`)
         const deck = bespoke()
@@ -458,7 +459,7 @@ describe("Bespoke template's browser context", () => {
 
     describe('with wheel', () => {
       let parent: HTMLElement
-      let deck
+      let deck: Record<string, any>
 
       beforeEach(() => {
         parent = render()
@@ -598,7 +599,9 @@ describe("Bespoke template's browser context", () => {
       })
 
       describe('when the target element is scrollable', () => {
-        const overflowAuto = (decl = 'overflow') => {
+        const overflowAuto = (
+          decl: 'overflow' | 'overflowX' | 'overflowY' = 'overflow'
+        ) => {
           const elm = document.createElement('div')
           elm.style[decl] = 'auto'
 
@@ -615,7 +618,8 @@ describe("Bespoke template's browser context", () => {
         const overflowYAutoElement = overflowAuto('overflowY')
 
         beforeEach(() => {
-          const section = (idx) => deck.slides[idx].querySelector('section')
+          const section = (idx: number) =>
+            deck.slides[idx].querySelector('section')
 
           section(0).appendChild(notScrollableElement)
           section(0).appendChild(overflowAutoElement)
@@ -659,6 +663,7 @@ describe("Bespoke template's browser context", () => {
             <button data-bespoke-marp-osc="prev">Prev</button>
             <button data-bespoke-marp-osc="next">Next</button>
             <button data-bespoke-marp-osc="fullscreen">Toggle fullscreen</button>
+            <button data-bespoke-marp-osc="overview">Toggle overview view</button>
             <button data-bespoke-marp-osc="presenter">Open presenter view</button>
           `
 
@@ -750,6 +755,22 @@ describe("Bespoke template's browser context", () => {
         expect(windowOpen).toHaveBeenCalled()
       })
 
+      it('opens overview view when clicked overview view button', () => {
+        bespoke()
+        const button = osc.querySelector<HTMLButtonElement>(
+          'button[data-bespoke-marp-osc="overview"]'
+        )
+
+        button?.click()
+        mockOverviewPopupFocus()
+        jest.runOnlyPendingTimers()
+        expect(
+          document
+            .querySelector('.bespoke-marp-overview')
+            ?.getAttribute('data-open')
+        ).toBe('1')
+      })
+
       describe('when browser does not support fullscreen', () => {
         it('hides fullscreen button', () => {
           jest.spyOn(fullscreen, 'isEnabled').mockImplementation(() => false)
@@ -773,16 +794,306 @@ describe("Bespoke template's browser context", () => {
           })
         })
 
-        it('disables OSC button for opening presenter view', async () => {
+        it('disables OSC button for opening presenter and overview view', async () => {
           // Whether storage is available will determine while initializing
           // module, so we have to use isolated bespoke instance.
           ;(await import('../../src/templates/bespoke/bespoke')).default()
 
-          const button = osc.querySelector<HTMLButtonElement>(
+          const presenterButton = osc.querySelector<HTMLButtonElement>(
             'button[data-bespoke-marp-osc="presenter"]'
           )
+          const overviewButton = osc.querySelector<HTMLButtonElement>(
+            'button[data-bespoke-marp-osc="overview"]'
+          )
 
-          expect(button?.disabled).toBe(true)
+          expect(presenterButton?.disabled).toBe(true)
+          expect(overviewButton?.disabled).toBe(true)
+        })
+      })
+    })
+  })
+
+  const mockOverviewPopupFocus = () => {
+    const windowFocus = mockWindowFocus(window)
+
+    const iframe = document.querySelector(
+      '.bespoke-marp-overview iframe'
+    ) as HTMLIFrameElement | null
+
+    const iframeFocus = iframe?.contentWindow
+      ? mockWindowFocus(iframe.contentWindow as Window)
+      : undefined
+
+    return { iframe, iframeFocus, windowFocus }
+  }
+
+  describe('Overview view', () => {
+    describe('In normal view mode', () => {
+      beforeEach(() => render())
+
+      it('injects deck.toggleOverviewView() to toggle overview popup', () => {
+        replaceLocation('/?sync=overview-sync', () => {
+          const deck = bespoke()
+
+          expect(deck.toggleOverviewView).toBeInstanceOf(Function)
+
+          deck.toggleOverviewView()
+          const { iframe, windowFocus } = mockOverviewPopupFocus()
+          jest.runOnlyPendingTimers()
+
+          const container = document.querySelector(
+            '.bespoke-marp-overview'
+          ) as HTMLDivElement
+
+          expect(container.dataset.open).toBe('1')
+          expect(container.inert).toBe(false)
+          expect(deck.skipTransition).toBe(true)
+          expect(iframe?.src).toContain('view=overview')
+          expect(iframe?.src).toContain('sync=overview-sync')
+          expect(iframe?.src).toContain('closeOnSelect=1')
+
+          deck.toggleOverviewView(false)
+          jest.runOnlyPendingTimers()
+
+          expect(container.dataset.open).toBe('')
+          expect(container.inert).toBe(true)
+          expect(deck.skipTransition).toBe(false)
+          expect(windowFocus).toHaveBeenCalled()
+        })
+      })
+
+      it('toggles overview popup by hitting o key or Esc key', () => {
+        replaceLocation('/?sync=overview-sync', () => {
+          const deck = bespoke()
+
+          keydown({ key: 'o' })
+          mockOverviewPopupFocus()
+          jest.runOnlyPendingTimers()
+          expect(
+            document
+              .querySelector('.bespoke-marp-overview')
+              ?.getAttribute('data-open')
+          ).toBe('1')
+          expect(deck.skipTransition).toBe(true)
+
+          keydown({ key: 'o', ctrlKey: true })
+          jest.runOnlyPendingTimers()
+          expect(
+            document
+              .querySelector('.bespoke-marp-overview')
+              ?.getAttribute('data-open')
+          ).toBe('1')
+
+          keydown({ key: 'Escape' })
+          jest.runOnlyPendingTimers()
+          expect(
+            document
+              .querySelector('.bespoke-marp-overview')
+              ?.getAttribute('data-open')
+          ).toBe('')
+          expect(deck.skipTransition).toBe(false)
+        })
+      })
+
+      it('closes overview popup only when receiving same-origin close message', () => {
+        replaceLocation('/?sync=overview-sync', () => {
+          const deck = bespoke()
+          deck.toggleOverviewView(true)
+          mockOverviewPopupFocus()
+          jest.runOnlyPendingTimers()
+
+          const container = document.querySelector(
+            '.bespoke-marp-overview'
+          ) as HTMLDivElement
+
+          window.dispatchEvent(
+            new MessageEvent('message', {
+              data: 'closeOverview',
+              origin: 'https://example.com',
+            })
+          )
+          jest.runOnlyPendingTimers()
+          expect(container.dataset.open).toBe('1')
+
+          window.dispatchEvent(
+            new MessageEvent('message', {
+              data: 'closeOverview',
+              origin: 'null',
+            })
+          )
+          jest.runOnlyPendingTimers()
+          expect(container.dataset.open).toBe('')
+        })
+      })
+
+      it('falls back to iframe.focus() if contentWindow.focus() throws', () => {
+        replaceLocation('/?sync=overview-sync', () => {
+          const deck = bespoke()
+
+          deck.toggleOverviewView()
+
+          const iframe = document.querySelector(
+            '.bespoke-marp-overview iframe'
+          ) as HTMLIFrameElement
+          const contentWindowFocus = jest
+            .spyOn(iframe.contentWindow as Window, 'focus')
+            .mockImplementation(() => {
+              throw new Error('focus')
+            })
+          const iframeFocus = jest.spyOn(iframe, 'focus').mockImplementation()
+
+          jest.runOnlyPendingTimers()
+
+          expect(contentWindowFocus).toHaveBeenCalled()
+          expect(iframeFocus).toHaveBeenCalled()
+        })
+      })
+    })
+
+    describe('In overview view mode', () => {
+      const $o = (klass: string) =>
+        document.querySelector(`.${klass}`) as HTMLElement
+
+      const mockOverviewSlideMethods = (deck: any) => {
+        const scrollIntoView = jest.fn()
+        const focus = jest.fn()
+
+        deck.slides.forEach((slide: Record<string, any>) => {
+          Object.defineProperty(slide, 'focus', {
+            configurable: true,
+            value: focus,
+          })
+          Object.defineProperty(slide, 'scrollIntoView', {
+            configurable: true,
+            value: scrollIntoView,
+          })
+        })
+
+        return { focus, scrollIntoView }
+      }
+
+      const testOverviewView = (
+        func: (obj: { deck: any; parent: HTMLElement }) => void,
+        { md, path = '/?view=overview' }: { md?: string; path?: string } = {}
+      ) =>
+        replaceLocation(path, () => {
+          const parent = render(md, document, { resetHead: false })
+          const deck = bespoke()
+
+          func({ deck, parent })
+        })
+
+      it('adds header and closes overview from popup controls', () => {
+        document.title = 'TITLE'
+
+        const postMessage = jest.fn()
+        jest.spyOn(window, 'parent', 'get').mockReturnValue({
+          postMessage,
+        } as any)
+
+        testOverviewView(() => {
+          const closeButton = $o('bespoke-marp-overview-close')
+
+          expect(document.title).toBe('[Overview] - TITLE')
+          expect($o('bespoke-marp-overview-header')).toBeTruthy()
+
+          closeButton.click()
+          expect(postMessage).toHaveBeenCalledWith('closeOverview', '*')
+
+          keydown({ key: 'Escape' })
+          expect(postMessage).toHaveBeenCalledTimes(2)
+        })
+      })
+
+      it('navigates to selected slide and closes when closeOnSelect is enabled', () => {
+        const postMessage = jest.fn()
+        jest.spyOn(window, 'parent', 'get').mockReturnValue({
+          postMessage,
+        } as any)
+
+        testOverviewView(
+          ({ deck }) => {
+            mockOverviewSlideMethods(deck)
+            expect(deck.slide()).toBe(0)
+
+            deck.slide(0, { fragment: 1 })
+            deck.slides[1].dispatchEvent(
+              new MouseEvent('click', { bubbles: true })
+            )
+
+            expect(deck.slide()).toBe(1)
+            expect(deck.fragmentIndex).toBe(0)
+            expect(postMessage).toHaveBeenCalledWith('closeOverview', '*')
+          },
+          {
+            md: '* a\n* b\n\n---\n\n## 2\n\n---\n\n### 3',
+            path: '/?view=overview&closeOnSelect=1',
+          }
+        )
+      })
+
+      it('keeps overview open in presenter-linked mode and supports keyboard selection', () => {
+        const postMessage = jest.fn()
+        jest.spyOn(window, 'parent', 'get').mockReturnValue({
+          postMessage,
+        } as any)
+
+        testOverviewView(
+          ({ deck }) => {
+            mockOverviewSlideMethods(deck)
+            deck.slide(0, { fragment: 1 })
+
+            deck.slides[2].dispatchEvent(
+              new KeyboardEvent('keydown', { key: 'Enter', bubbles: true })
+            )
+            expect(deck.slide()).toBe(2)
+            expect(deck.fragmentIndex).toBe(0)
+
+            deck.slides[1].dispatchEvent(
+              new KeyboardEvent('keydown', { key: ' ', bubbles: true })
+            )
+            expect(deck.slide()).toBe(1)
+            expect(postMessage).not.toHaveBeenCalled()
+          },
+          { md: '* a\n* b\n\n---\n\n## 2\n\n---\n\n### 3' }
+        )
+      })
+
+      it('navigates slides by overview keyboard shortcuts', () => {
+        testOverviewView(({ deck }) => {
+          const { focus, scrollIntoView } = mockOverviewSlideMethods(deck)
+          const rects = [
+            { left: 0, right: 100, top: 0, bottom: 60 },
+            { left: 120, right: 220, top: 0, bottom: 60 },
+            { left: 0, right: 100, top: 100, bottom: 160 },
+          ]
+
+          deck.slides.forEach((slide: Element, i: number) => {
+            jest
+              .spyOn(slide, 'getBoundingClientRect')
+              .mockReturnValue(rects[i] as DOMRect)
+          })
+
+          keydown({ key: Key.ArrowRight }, window)
+          expect(deck.slide()).toBe(1)
+
+          keydown({ key: Key.ArrowLeft }, window)
+          expect(deck.slide()).toBe(0)
+
+          keydown({ key: Key.ArrowDown }, window)
+          expect(deck.slide()).toBe(2)
+
+          keydown({ key: Key.ArrowUp }, window)
+          expect(deck.slide()).toBe(0)
+
+          keydown({ key: Key.End }, window)
+          expect(deck.slide()).toBe(2)
+
+          keydown({ key: Key.Home }, window)
+          expect(deck.slide()).toBe(0)
+
+          expect(focus).toHaveBeenCalled()
+          expect(scrollIntoView).toHaveBeenCalled()
         })
       })
     })
@@ -858,7 +1169,7 @@ describe("Bespoke template's browser context", () => {
 
       it('navigates slide when clicked navigation button', () =>
         testPresenterView(({ deck }) => {
-          const text = $p(classes.infoPageText)
+          const text = $p(classes.infoPage)
 
           expect(deck.slide()).toBe(0)
           expect(text.textContent).toBe('1 / 2')
@@ -876,6 +1187,20 @@ describe("Bespoke template's browser context", () => {
           expect(deck.slide()).toBe(1)
           expect(deck.fragmentIndex).toBe(0)
         }, '\n\n---\n\n* a\n* b'))
+
+      it('opens overview without closeOnSelect flag when clicked page info button', () =>
+        replaceLocation('/?view=presenter&sync=presenter-sync', () => {
+          render()
+          bespoke()
+
+          $p(classes.infoPage).click()
+          const { iframe } = mockOverviewPopupFocus()
+          jest.runOnlyPendingTimers()
+
+          expect(iframe?.src).toContain('view=overview')
+          expect(iframe?.src).toContain('sync=presenter-sync')
+          expect(iframe?.src).not.toContain('closeOnSelect=1')
+        }))
 
       describe('Next slide view', () => {
         describe('when next slide frame is loaded', () => {
@@ -930,11 +1255,13 @@ describe("Bespoke template's browser context", () => {
           testPresenterView(() => {
             expect($p(classes.infoTimer).textContent).toBe('00:00:00')
           }))
+
         it('timer should be at 00:00:01 after one second', () =>
           testPresenterView(() => {
             jest.advanceTimersByTime(12000)
             expect($p(classes.infoTimer).textContent).toBe('00:00:12')
           }))
+
         it('timer should be at 00:00:00 after clicking', () =>
           testPresenterView(() => {
             jest.advanceTimersByTime(12000)
@@ -1004,7 +1331,7 @@ describe("Bespoke template's browser context", () => {
       })
 
       describe('Drag resize', () => {
-        let spy
+        let spy: jest.SpyInstance<number, []>
 
         beforeAll(() => {
           spy = jest
@@ -1239,8 +1566,8 @@ describe("Bespoke template's browser context", () => {
     })
 
     it('updates reference count stored in localStorage', () => {
-      let deck
-      let anotherDeck
+      let deck!: Record<string, any>
+      let anotherDeck!: Record<string, any>
 
       replaceLocation('/?sync=test', () => {
         deck = bespoke()
@@ -1378,30 +1705,22 @@ describe("Bespoke template's browser context", () => {
   })
 
   describe('Touch', () => {
-    let parent
-    let deck
+    let parent: HTMLElement
+    let deck: Record<string, any>
 
     beforeEach(() => {
       parent = render()
-
-      // jsdom is not supported touch events currently.
-      const original = parent.addEventListener
-
-      parent.addEventListener = (type: string, listener, useCapture?) => {
-        if (!type.startsWith('touch'))
-          return original.call(parent, type, listener, useCapture)
-
-        parent[type] = listener
-      }
-
-      parent.getBoundingClientRect = () => ({
-        left: 0,
-        top: 0,
-        right: 200,
-        bottom: 200,
-        width: 200,
-        height: 200,
-      })
+      parent.getBoundingClientRect = () =>
+        ({
+          left: 0,
+          top: 0,
+          x: 0,
+          y: 0,
+          right: 200,
+          bottom: 200,
+          width: 200,
+          height: 200,
+        }) as DOMRect
 
       deck = bespoke()
     })
@@ -1409,11 +1728,11 @@ describe("Bespoke template's browser context", () => {
     const touch = (event: string, ...touches: [number, number][]) => {
       const type = `touch${event}`
 
-      return parent[type]({
-        touches: touches.map((t) => ({ pageX: t[0], pageY: t[1] })),
-        preventDefault: jest.fn(),
-        stopPropagation: jest.fn(),
-      })
+      return parent.dispatchEvent(
+        new TouchEvent(type, {
+          touches: touches.map((t) => ({ pageX: t[0], pageY: t[1] }) as Touch),
+        })
+      )
     }
 
     it('supports swipe navigation', () => {

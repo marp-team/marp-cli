@@ -378,6 +378,7 @@ The `bespoke` template is using [Bespoke.js](https://github.com/bespokejs/bespok
 - **On-screen controller**: There is a touch-friendly OSC. You may also disable by `--bespoke.osc=false` if unnecessary.
 - **Fragmented list**: Recognize [Marpit's fragmented list](https://github.com/marp-team/marpit/issues/145) and appear list one-by-one if used `*` and `1)` as the bullet marker.
 - **Presenter view**: Open presenter view in external window by hitting <kbd>p</kbd> key. (It may become disabled when not fulfilled requirements for working)
+- **Overview view**: Toggle overview view with <kbd>o</kbd> or <kbd>Esc</kbd> key in presentation and presenter views.
 - **Progress bar** (optional): By setting `--bespoke.progress` option, you can add a progress bar on the top of the deck.
 - [**Slide transitions**][transitions]: Support transitions (`transition` local directive) powered by [View Transition API].
 

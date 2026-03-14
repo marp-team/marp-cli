@@ -1,6 +1,7 @@
 @use './button';
 @use './transition';
 
+$brand: #0288d1;
 $progress-height: 5px;
 
 .bespoke-marp-note,
@@ -27,6 +28,7 @@ $progress-height: 5px;
   // Common visibility control for slides
   svg.bespoke-marp-slide {
     content-visibility: hidden;
+    interactivity: inert;
     z-index: -1;
 
     /* Fallback */
@@ -42,6 +44,7 @@ $progress-height: 5px;
 
     &.bespoke-marp-active {
       content-visibility: visible;
+      interactivity: auto;
       z-index: 0;
 
       /* Fallback */
@@ -112,10 +115,10 @@ $progress-height: 5px;
         /* View Transition */
         view-transition-name: __bespoke_marp_transition_osc__;
 
-        > * {
+        > :where(*) {
           margin-left: 6px;
 
-          &:first-child {
+          &:where(:first-child) {
             margin-left: 0;
           }
         }
@@ -148,6 +151,10 @@ $progress-height: 5px;
           &[data-bespoke-marp-osc='presenter'] {
             @include button.button-icon(presenter);
           }
+
+          &[data-bespoke-marp-osc='overview'] {
+            @include button.button-icon(overview);
+          }
         }
       }
 
@@ -178,13 +185,13 @@ $progress-height: 5px;
       height: $progress-height;
       width: 100%;
 
-      & + .bespoke-marp-parent {
+      & + :where(.bespoke-marp-parent) {
         top: $progress-height;
       }
 
       .bespoke-progress-bar {
         flex: 0 0 0;
-        background: #0288d1;
+        background: $brand;
         transition: flex-basis 0.2s cubic-bezier(0, 1, 1, 1);
       }
     }
@@ -219,12 +226,12 @@ $progress-height: 5px;
         minmax(3px, var(--bespoke-marp-presenter-split-ratio, 66%))
         0 minmax(3px, 1fr);
 
-      .bespoke-marp-parent {
+      :where(.bespoke-marp-parent) {
         grid-area: current;
         position: relative;
         overflow: hidden;
 
-        svg.bespoke-marp-slide {
+        :where(svg.bespoke-marp-slide) {
           height: calc(100% - 40px);
           left: 20px;
           position: absolute;
@@ -242,7 +249,7 @@ $progress-height: 5px;
       // Dragbar
       .bespoke-marp-presenter-dragbar-container {
         grid-area: dragbar;
-        background: #0288d1; // Marp brand color
+        background: $brand; // Marp brand color
         cursor: col-resize;
         width: 6px;
         margin-left: -3px;
@@ -283,6 +290,7 @@ $progress-height: 5px;
           left: 20px;
           position: absolute;
           pointer-events: none;
+          interactivity: inert;
           user-select: none;
           top: 20px;
           width: calc(100% - 40px);
@@ -421,13 +429,15 @@ $progress-height: 5px;
           }
         }
 
-        .bespoke-marp-presenter-info-page {
+        .bespoke-marp-presenter-info-page-area {
           @extend %info-element;
 
           order: 2;
           text-align: center;
 
-          .bespoke-marp-presenter-info-page-text {
+          .bespoke-marp-presenter-info-page {
+            @extend %button;
+
             display: inline-block;
             min-width: 120px;
             text-align: center;
@@ -456,12 +466,140 @@ $progress-height: 5px;
       }
     }
   }
+
+  // Overview view
+  body[data-bespoke-view='overview'] {
+    background: #161616;
+    overflow: auto;
+
+    [data-bespoke-marp-fragment='inactive'] {
+      visibility: visible;
+    }
+
+    .bespoke-marp-overview-header {
+      position: fixed;
+      display: flex;
+      justify-content: flex-end;
+      inset: 0 0 auto;
+      background: rgba(#222, 0.85);
+      backdrop-filter: blur(4px);
+      box-shadow: 0 3px 10px rgba(#000, 0.5);
+      padding: 10px;
+      z-index: 1;
+      height: 48px;
+      box-sizing: border-box;
+    }
+
+    button.bespoke-marp-overview-close {
+      @extend %button;
+      @include button.button-icon(plus, 28px);
+
+      transform: rotate(45deg); /* To reduce bundled HTML size :p */
+    }
+
+    .bespoke-marp-parent {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(0, 240px));
+      padding: 30px;
+      gap: 40px;
+      justify-content: space-around;
+
+      svg.bespoke-marp-slide {
+        --bov-selected: transparent;
+        --bov-focus: #161616;
+        --bov-focus-outline: transparent;
+
+        box-shadow:
+          0 0 0 1px #161616,
+          0 0 0 3px var(--bov-focus),
+          0 0 0 4px var(--bov-focus-outline),
+          0 0 0 6px var(--bov-selected);
+        content-visibility: visible;
+        cursor: pointer;
+        filter: drop-shadow(0 3px 10px rgba(#000, 0.5));
+        interactivity: auto;
+        opacity: 1;
+        outline: 0;
+        pointer-events: auto;
+        scroll-margin-block: 30px;
+        z-index: 0;
+
+        &,
+        &.bespoke-marp-active {
+          * {
+            pointer-events: none;
+            interactivity: inert;
+          }
+        }
+
+        &:hover,
+        &:focus-visible,
+        &:active {
+          --bov-focus-outline: #161616;
+        }
+
+        &:hover {
+          --bov-focus: #999;
+        }
+
+        &:focus-visible {
+          --bov-focus: #999;
+        }
+
+        &:active {
+          --bov-focus: #eee;
+        }
+
+        &.bespoke-marp-active {
+          --bov-selected: #{$brand};
+        }
+      }
+    }
+
+    &:has(.bespoke-marp-overview-header) {
+      .bespoke-marp-parent {
+        padding-top: 78px;
+
+        svg.bespoke-marp-slide {
+          scroll-margin-top: 78px;
+        }
+      }
+    }
+  }
+
+  // Overview popup
+  .bespoke-marp-overview {
+    inset: 0;
+    position: fixed;
+    pointer-events: none;
+    opacity: 0;
+    background: rgba(#000, 0.65);
+    transition: opacity 0.1s ease;
+    z-index: 10;
+
+    iframe {
+      background: #222;
+      border: 0;
+      display: block;
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    &[data-open='1'] {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
 }
 
 @media print {
   .bespoke-marp-presenter-next-container,
   .bespoke-marp-presenter-note-container,
-  .bespoke-marp-presenter-info-container {
+  .bespoke-marp-presenter-info-container,
+  .bespoke-marp-overview {
     display: none;
   }
 }
