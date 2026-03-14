@@ -779,7 +779,7 @@ export default defineConfig<typeof Marpit>({
 })
 ```
 
-## API _(EXPERIMENTAL)_
+## API
 
 You can use Marp CLI through Node.js [if installed Marp CLI into your local project](#local-installation).
 
