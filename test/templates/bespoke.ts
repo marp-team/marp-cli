@@ -967,7 +967,7 @@ describe("Bespoke template's browser context", () => {
           postMessage,
         } as any)
 
-        testOverviewView(({ deck }) => {
+        testOverviewView(() => {
           const closeButton = $o('bespoke-marp-overview-close')
 
           expect(document.title).toBe('[Overview] - TITLE')
