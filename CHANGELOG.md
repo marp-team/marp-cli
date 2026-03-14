@@ -14,7 +14,7 @@
   - [v4.2.0](https://github.com/marp-team/marp-core/releases/v4.2.0): Built-in themes now set color variants based on the color scheme defined by `color-scheme` CSS property
   - [v4.3.0](https://github.com/marp-team/marp-core/releases/v4.3.0): Added Unicode 17 support by Twemoji
 - Upgrade development Node.js LTS ([#689](https://github.com/marp-team/marp-cli/pull/689), [#706](https://github.com/marp-team/marp-cli/pull/706))
-- Upgrade dependent packages to the latest version ([#706](https://github.com/marp-team/marp-cli/pull/706))
+- Upgrade dependent packages to the latest version ([#706](https://github.com/marp-team/marp-cli/pull/706), [#711](https://github.com/marp-team/marp-cli/pull/711))
 - Replace `globby` with `tinyglobby` ([#707](https://github.com/marp-team/marp-cli/pull/707))
 
 ### Fixed
