@@ -17,6 +17,7 @@
 - Upgrade development Node.js LTS ([#689](https://github.com/marp-team/marp-cli/pull/689), [#706](https://github.com/marp-team/marp-cli/pull/706))
 - Upgrade dependent packages to the latest version ([#706](https://github.com/marp-team/marp-cli/pull/706), [#711](https://github.com/marp-team/marp-cli/pull/711))
 - Replace `globby` with `tinyglobby` ([#707](https://github.com/marp-team/marp-cli/pull/707))
+- Mark API as stable ([#712](https://github.com/marp-team/marp-cli/pull/712))
 
 ### Fixed
 
