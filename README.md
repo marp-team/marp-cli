@@ -515,24 +515,35 @@ When you specified the path to JavaScript file (`.js`, `.cjs`, or `.mjs`) in `--
 
 The functional engine should export a function as the default export, which should have a single argument representing [the constructor option of Marpit](https://marpit-api.marp.app/marpit)/[Marp Core](https://github.com/marp-team/marp-core#constructor-options).
 
-The function must return a class inherited from Marpit, or an instance of Marpit-based engine made by the parameter passed by argument.
+The function must return a class that inherits from Marpit, or an instance of a Marpit-based engine created with the constructor options passed as an argument.
 
 ```javascript
 // engine.mjs (ES modules)
 import { MarpitBasedEngine } from 'marpit-based-engine'
 
 export default () => MarpitBasedEngine // Return a class inherited from Marpit
+
+// or return an instance of Marpit-based engine
+// export default (constructorOptions) => new MarpitBasedEngine(constructorOptions)
 ```
+
+<details>
+<summary>Example in CommonJS (<code>.cjs</code>)</summary>
 
 ```javascript
 // engine.cjs (CommonJS)
 const { MarpitBasedEngine } = require('marpit-based-engine')
 
-module.exports = function (constructorOptions) {
-  // Return an instance of Marpit initialized by passed constructor options
-  return new MarpitBasedEngine(constructorOptions)
-}
+module.exports = () => MarpitBasedEngine
+
+// module.exports = function (constructorOptions) {
+//   return new MarpitBasedEngine(constructorOptions)
+// }
 ```
+
+</details>
+
+#### Async function
 
 This function can return [`Promise`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) object so you can use [async function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function) too.
 
@@ -552,18 +563,17 @@ export default async (constructorOptions) => {
 Marp CLI also exposes `marp` getter property to the parameter. It returns a prepared instance of the built-in Marp Core engine, so you can apply several customizations to Marp engine with simple declarations.
 
 ```javascript
-const marpPlugin = require('marp-plugin-foo')
-const andMorePlugin = require('marp-plugin-bar')
+import marpPlugin from 'marp-plugin-foo'
+import andMorePlugin from 'marp-plugin-bar'
 
-module.exports = ({ marp }) => marp.use(marpPlugin).use(andMorePlugin)
+export default ({ marp }) => marp.use(marpPlugin).use(andMorePlugin)
 ```
 
 It allows converting Markdown with additional syntaxes that were provided by Marp (or compatible markdown-it) plugins.
 
-#### Example: [markdown-it-mark](https://github.com/markdown-it/markdown-it-mark)
+#### Example: Use [markdown-it-mark](https://github.com/markdown-it/markdown-it-mark) plugin
 
 ```javascript
-// engine.mjs
 import markdownItMark from 'markdown-it-mark'
 
 export default ({ marp }) => marp.use(markdownItMark)
@@ -784,17 +794,19 @@ export default defineConfig<typeof Marpit>({
 You can use Marp CLI through Node.js [if installed Marp CLI into your local project](#local-installation).
 
 ```js
-const { marpCli } = require('@marp-team/marp-cli')
+import { marpCli } from '@marp-team/marp-cli'
 
-marpCli(['test.md', '--pdf'])
-  .then((exitStatus) => {
-    if (exitStatus > 0) {
-      console.error(`Failure (Exit status: ${exitStatus})`)
-    } else {
-      console.log('Success')
-    }
-  })
-  .catch(console.error)
+try {
+  const exitStatus = await marpCli(['test.md', '--pdf'])
+
+  if (exitStatus > 0) {
+    console.error(`Failure (Exit status: ${exitStatus})`)
+  } else {
+    console.log('Success')
+  }
+} catch (err) {
+  console.error(err)
+}
 ```
 
 `marpCli()` accepts an argument of CLI options as array, and returns `Promise` to resolve an expected exit status in CLI. It would be rejected with the instance of `Error` if CLI met an error to suspend the conversion process.
@@ -805,6 +817,18 @@ We have exported [`CLIError` class and `CLIErrorCode` enum](https://github.com/m
 
 If `CLIError` instance was thrown, you can identify the reason why CLI threw error by checking `errorCode` member.
 
+```js
+try {
+  await marpCli(['foobar.md', '--pdf'])
+} catch (err) {
+  if (err instanceof CLIError) {
+    console.error(`Marp CLI Error (Error code: ${err.errorCode}):`, err)
+  } else {
+    console.error('Unexpected error:', err)
+  }
+}
+```
+
 ### Wait for observation
 
 `marpCli()` would not be resolved initiatively if started some observation: Watch mode, server mode, and preview window.
@@ -812,18 +836,21 @@ If `CLIError` instance was thrown, you can identify the reason why CLI threw err
 `waitForObservation()` is helpful to handle them. It returns `Promise` that would be resolved with helper object when ready to observe resources in `marpCli()`.
 
 ```javascript
-const { marpCli, waitForObservation } = require('@marp-team/marp-cli')
+import { marpCli, waitForObservation } from '@marp-team/marp-cli'
 
+// This call is not awaited so the server startup will continue in the background
 marpCli(['--server', './slides/'])
   .then((exitCode) => console.log(`Done with exit code ${exitCode}`))
   .catch(console.error)
 
-waitForObservation().then(({ stop }) => {
-  console.log('Observed')
+// Wait for the server to be ready
+const { stop } = await waitForObservation()
+console.log('Observed')
 
-  // Stop observations to resolve marpCli()'s Promise
-  stop()
-})
+// ... Do something while observing resources ...
+
+// Stop observing, and resolve the Promise from `marpCli()`
+stop()
 ```
 
 The resolved helper has `stop()` method for telling Marp CLI to stop observation and resolve `Promise`.
