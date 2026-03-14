@@ -83,7 +83,7 @@ describe("Bespoke template's browser context", () => {
     }
   }
 
-  const keydown = (opts, target: EventTarget = document) =>
+  const keydown = (opts: KeyboardEventInit, target: EventTarget = document) =>
     target.dispatchEvent(new KeyboardEvent('keydown', opts))
 
   const mockWindowFocus = (targetWindow: Window) =>
@@ -114,7 +114,7 @@ describe("Bespoke template's browser context", () => {
   })
 
   describe('Fragments', () => {
-    let deck
+    let deck: Record<string, any>
     let parent: HTMLElement
 
     beforeEach(() => {
@@ -244,7 +244,7 @@ describe("Bespoke template's browser context", () => {
   })
 
   describe('Fullscreen', () => {
-    let deck
+    let deck: Record<string, any>
     let toggle: jest.SpyInstance
 
     beforeEach(() => {
@@ -353,11 +353,9 @@ describe("Bespoke template's browser context", () => {
         '<audio controls src="https://example.com/audio.mp3" id="element"></audio>',
       video:
         '<video controls src="https://example.com/video.mp3" id="element"></video>',
-    }
+    } as const
 
-    for (const kind of Object.keys(elements)) {
-      const element = elements[kind]
-
+    for (const [kind, element] of Object.entries(elements)) {
       it(`prevents navigation on ${kind} element`, () => {
         render(`${element}\n\n---\n\n2`)
         const deck = bespoke()
@@ -461,7 +459,7 @@ describe("Bespoke template's browser context", () => {
 
     describe('with wheel', () => {
       let parent: HTMLElement
-      let deck
+      let deck: Record<string, any>
 
       beforeEach(() => {
         parent = render()
@@ -601,7 +599,9 @@ describe("Bespoke template's browser context", () => {
       })
 
       describe('when the target element is scrollable', () => {
-        const overflowAuto = (decl = 'overflow') => {
+        const overflowAuto = (
+          decl: 'overflow' | 'overflowX' | 'overflowY' = 'overflow'
+        ) => {
           const elm = document.createElement('div')
           elm.style[decl] = 'auto'
 
@@ -618,7 +618,8 @@ describe("Bespoke template's browser context", () => {
         const overflowYAutoElement = overflowAuto('overflowY')
 
         beforeEach(() => {
-          const section = (idx) => deck.slides[idx].querySelector('section')
+          const section = (idx: number) =>
+            deck.slides[idx].querySelector('section')
 
           section(0).appendChild(notScrollableElement)
           section(0).appendChild(overflowAutoElement)
@@ -924,6 +925,29 @@ describe("Bespoke template's browser context", () => {
           expect(container.dataset.open).toBe('')
         })
       })
+
+      it('falls back to iframe.focus() if contentWindow.focus() throws', () => {
+        replaceLocation('/?sync=overview-sync', () => {
+          const deck = bespoke()
+
+          deck.toggleOverviewView()
+
+          const iframe = document.querySelector(
+            '.bespoke-marp-overview iframe'
+          ) as HTMLIFrameElement
+          const contentWindowFocus = jest
+            .spyOn(iframe.contentWindow as Window, 'focus')
+            .mockImplementation(() => {
+              throw new Error('focus')
+            })
+          const iframeFocus = jest.spyOn(iframe, 'focus').mockImplementation()
+
+          jest.runOnlyPendingTimers()
+
+          expect(contentWindowFocus).toHaveBeenCalled()
+          expect(iframeFocus).toHaveBeenCalled()
+        })
+      })
     })
 
     describe('In overview view mode', () => {
@@ -934,7 +958,7 @@ describe("Bespoke template's browser context", () => {
         const scrollIntoView = jest.fn()
         const focus = jest.fn()
 
-        deck.slides.forEach((slide) => {
+        deck.slides.forEach((slide: Record<string, any>) => {
           Object.defineProperty(slide, 'focus', {
             configurable: true,
             value: focus,
@@ -1044,7 +1068,7 @@ describe("Bespoke template's browser context", () => {
             { left: 0, right: 100, top: 100, bottom: 160 },
           ]
 
-          deck.slides.forEach((slide, i) => {
+          deck.slides.forEach((slide: Element, i: number) => {
             jest
               .spyOn(slide, 'getBoundingClientRect')
               .mockReturnValue(rects[i] as DOMRect)
@@ -1307,7 +1331,7 @@ describe("Bespoke template's browser context", () => {
       })
 
       describe('Drag resize', () => {
-        let spy
+        let spy: jest.SpyInstance<number, []>
 
         beforeAll(() => {
           spy = jest
@@ -1542,8 +1566,8 @@ describe("Bespoke template's browser context", () => {
     })
 
     it('updates reference count stored in localStorage', () => {
-      let deck
-      let anotherDeck
+      let deck!: Record<string, any>
+      let anotherDeck!: Record<string, any>
 
       replaceLocation('/?sync=test', () => {
         deck = bespoke()
@@ -1681,30 +1705,22 @@ describe("Bespoke template's browser context", () => {
   })
 
   describe('Touch', () => {
-    let parent
-    let deck
+    let parent: HTMLElement
+    let deck: Record<string, any>
 
     beforeEach(() => {
       parent = render()
-
-      // jsdom is not supported touch events currently.
-      const original = parent.addEventListener
-
-      parent.addEventListener = (type: string, listener, useCapture?) => {
-        if (!type.startsWith('touch'))
-          return original.call(parent, type, listener, useCapture)
-
-        parent[type] = listener
-      }
-
-      parent.getBoundingClientRect = () => ({
-        left: 0,
-        top: 0,
-        right: 200,
-        bottom: 200,
-        width: 200,
-        height: 200,
-      })
+      parent.getBoundingClientRect = () =>
+        ({
+          left: 0,
+          top: 0,
+          x: 0,
+          y: 0,
+          right: 200,
+          bottom: 200,
+          width: 200,
+          height: 200,
+        }) as DOMRect
 
       deck = bespoke()
     })
@@ -1712,11 +1728,11 @@ describe("Bespoke template's browser context", () => {
     const touch = (event: string, ...touches: [number, number][]) => {
       const type = `touch${event}`
 
-      return parent[type]({
-        touches: touches.map((t) => ({ pageX: t[0], pageY: t[1] })),
-        preventDefault: jest.fn(),
-        stopPropagation: jest.fn(),
-      })
+      return parent.dispatchEvent(
+        new TouchEvent(type, {
+          touches: touches.map((t) => ({ pageX: t[0], pageY: t[1] }) as Touch),
+        })
+      )
     }
 
     it('supports swipe navigation', () => {
