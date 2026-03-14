@@ -24,7 +24,7 @@ const normalView =
     }
 
     const getOverviewContainer = () => {
-      if (!overviewContainer) {
+      if (!overviewContainer || !overviewContainer.isConnected) {
         overviewContainer = document.createElement('div')
         overviewContainer.className = `${classPrefix}overview`
         overviewContainer.inert = true

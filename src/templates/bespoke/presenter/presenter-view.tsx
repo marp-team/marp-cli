@@ -2,7 +2,6 @@
 /** @jsxFrag Fragment */
 import h from 'vhtml'
 import { classPrefix } from '../utils'
-import { checkPrime } from 'crypto'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const Fragment: any = ({ children }) => h(null, null, ...children)

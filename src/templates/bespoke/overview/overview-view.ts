@@ -86,14 +86,20 @@ const overviewView = (deck) => {
 
     // Focus and scroll the updated slide into view
     const i = deck.slide()
-    deck.slides[i]?.focus()
-    deck.slides[i]?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    deck.slides[i]?.focus?.()
+    deck.slides[i]?.scrollIntoView?.({
+      behavior: 'smooth',
+      block: 'nearest',
+    })
   })
 
   deck.on('slide', ({ index }) => {
     // Run only scrolling the current slide into view
     // (If applied focus, `keydown` event would be over-triggered and cause unexpected behavior)
-    deck.slides[index]?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    deck.slides[index]?.scrollIntoView?.({
+      behavior: 'smooth',
+      block: 'nearest',
+    })
   })
 
   if (window.parent !== window) {
