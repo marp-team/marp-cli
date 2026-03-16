@@ -509,20 +509,33 @@ $progress-height: 5px;
         --bov-focus: #161616;
         --bov-focus-outline: transparent;
 
-        box-shadow:
-          0 0 0 1px #161616,
-          0 0 0 3px var(--bov-focus),
-          0 0 0 4px var(--bov-focus-outline),
-          0 0 0 6px var(--bov-selected);
+        margin: -6px;
+        padding: 6px;
+        background-image:
+          conic-gradient(#161616 0 0), conic-gradient(var(--bov-focus) 0 0),
+          conic-gradient(var(--bov-focus-outline) 0 0),
+          conic-gradient(var(--bov-selected) 0 0);
+        background-repeat: no-repeat;
+        background-size:
+          calc(100% - 10px) calc(100% - 10px),
+          calc(100% - 6px) calc(100% - 6px),
+          calc(100% - 4px) calc(100% - 4px),
+          100% 100%;
+        background-position:
+          5px 5px,
+          3px 3px,
+          2px 2px,
+          0 0;
+        filter: drop-shadow(0 3px 10px rgba(#000, 0.5));
         content-visibility: visible;
         cursor: pointer;
-        filter: drop-shadow(0 3px 10px rgba(#000, 0.5));
         interactivity: auto;
         opacity: 1;
         outline: 0;
         pointer-events: auto;
         scroll-margin-block: 30px;
         z-index: 0;
+        width: 100%;
 
         &,
         &.bespoke-marp-active {
