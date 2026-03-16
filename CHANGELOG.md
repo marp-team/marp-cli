@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v4.3.1 - 2026-03-16
+
 ### Fixed
 
 - Fix collapsed rendering of the `bespoke` template overview view in Safari ([#713](https://github.com/marp-team/marp-cli/issues/713), [#714](https://github.com/marp-team/marp-cli/pull/714))
