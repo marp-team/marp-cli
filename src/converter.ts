@@ -783,7 +783,7 @@ export class Converter {
               failedFileSet.size > 1 ? 'They are' : 'That is'
             } blocked by security reason. Instead we recommend using assets uploaded to online. (Or you can use ${chalk.yellow(
               '--allow-local-files'
-            )} option if you are understood of security risk)`
+            )} option if you understand the security risk)`
           )
         }
       }
