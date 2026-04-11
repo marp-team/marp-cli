@@ -10,6 +10,7 @@ import { silence, warn } from './cli'
 import { Engine, ResolvedEngine } from './engine'
 import { generateOverrideGlobalDirectivesPlugin } from './engine/directive-plugin'
 import infoPlugin, { engineInfo, EngineInfo } from './engine/info-plugin'
+import mermaidPlugin, { mermaidEnabled } from './engine/mermaid-plugin'
 import metaPlugin from './engine/meta-plugin'
 import {
   generatePDFOutlines,
@@ -198,11 +199,12 @@ export class Converter {
         const outline = engine[pdfOutlineInfo]
         const transition: EngineTransition | undefined =
           engine[engineTransition]
+        const hasMermaid = !!engine[mermaidEnabled]
 
         if (isFile(file))
           this.options.themeSet.observe(file.absolutePath, info?.theme)
 
-        return { ...ret, ...info!, outline, transition }
+        return { ...ret, ...info!, outline, transition, hasMermaid }
       },
     })
   }
@@ -661,7 +663,9 @@ export class Converter {
 
   private async generateEngine(
     mergeOptions: MarpitOptions
-  ): Promise<Marpit & { [engineInfo]?: EngineInfo }> {
+  ): Promise<
+    Marpit & { [engineInfo]?: EngineInfo; [mermaidEnabled]?: boolean }
+  > {
     const { html, lang, options } = this.options
     const opts = { lang, ...options, ...mergeOptions, html }
 
@@ -698,7 +702,7 @@ export class Converter {
     if (html !== undefined) engine.markdown.set({ html })
 
     // Marpit plugins
-    engine.use(metaPlugin).use(infoPlugin)
+    engine.use(metaPlugin).use(infoPlugin).use(mermaidPlugin)
 
     if (this.options.type === ConvertType.pdf && this.options.pdfOutlines)
       engine.use(pdfOutlinePlugin)
@@ -761,6 +765,18 @@ export class Converter {
           )
           /* c8 ignore end */
         })
+
+        // Wait for Mermaid diagrams to finish rendering (if any)
+        await page
+          .waitForFunction(
+            () =>
+              !document.querySelector('.mermaid') ||
+              (window as any).__mermaidRendered === true,
+            { timeout: 30_000 }
+          )
+          .catch(() => {
+            // noop: ignore timeout
+          })
       }
 
       try {

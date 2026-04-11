@@ -14,6 +14,7 @@ type RendererResult = RenderResult &
     size: RenderedSize
     transition?: EngineTransition
     outline?: OutlinePage[]
+    hasMermaid?: boolean
   }
 
 interface TemplateRendererOptions extends Options {
@@ -78,6 +79,7 @@ export const bare: Template<TemplateBareOption> = async (opts) => {
       ...opts,
       ...rendered,
       bare: { css: bareScss },
+      mermaidJs: rendered.hasMermaid ? await libJs('mermaid.js') : undefined,
       watchJs: await watchJs(opts.notifyWS),
     }),
   }
@@ -117,6 +119,7 @@ export const bespoke: Template<TemplateBespokeOption> = async (opts) => {
         progress,
         transitionStyle: rendered.transition?.builtinTransitionStyle,
       },
+      mermaidJs: rendered.hasMermaid ? await libJs('mermaid.js') : undefined,
       watchJs: await watchJs(opts.notifyWS),
     }),
   }

@@ -99,6 +99,17 @@ export default [
     output: { compact, file: 'lib/watch.js', format: 'iife' },
   },
   {
+    ...browser({ license: 'lib/mermaid.js.LICENSE.txt' }),
+    input: 'src/templates/mermaid.js',
+    output: {
+      compact,
+      file: 'lib/mermaid.js',
+      format: 'iife',
+      inlineDynamicImports: true,
+      banner: `/*!! License: https://unpkg.com/${name}@${version}/lib/mermaid.js.LICENSE.txt */\n`,
+    },
+  },
+  {
     ...browser(),
     input: 'src/server/server-index.js',
     output: { compact, file: 'lib/server/server-index.js', format: 'iife' },
