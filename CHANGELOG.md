@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Added Linux AArch64 (ARM64) build for standalone binary ([#718](https://github.com/marp-team/marp-cli/pull/718) by [@philips](https://github.com/philips))
+
 ## v4.3.1 - 2026-03-16
 
 ### Fixed
