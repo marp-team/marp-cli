@@ -1,9 +1,4 @@
 import { storage, dataAttrPrefix, classPrefix, toggleAriaHidden } from './utils'
-import {
-  isEnabled as isFullscreenEnabled,
-  onChange as onFullscreenChange,
-  isFullscreen,
-} from './utils/fullscreen'
 
 const bespokeOSC = (selector = `.${classPrefix}osc`) => {
   const osc = document.querySelector<HTMLElement>(selector)
@@ -13,6 +8,9 @@ const bespokeOSC = (selector = `.${classPrefix}osc`) => {
       /* empty */
     }
   }
+
+  const isFullscreenEnabled = () => !!document.fullscreenEnabled
+  const isFullscreen = () => !!document.fullscreenElement
 
   const oscElements = <T extends HTMLElement = HTMLElement>(
     type: string,
@@ -92,7 +90,7 @@ const bespokeOSC = (selector = `.${classPrefix}osc`) => {
     deck.on('marp-inactive', () => toggleAriaHidden(osc, true))
 
     if (isFullscreenEnabled()) {
-      onFullscreenChange(() =>
+      document.addEventListener('fullscreenchange', () =>
         oscElements('fullscreen', (fs) =>
           fs.classList.toggle('exit', isFullscreenEnabled() && isFullscreen())
         )

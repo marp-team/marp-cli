@@ -9,7 +9,6 @@ import {
   properties,
 } from '../../src/templates/bespoke/presenter/presenter-view'
 import { transitionStyleId } from '../../src/templates/bespoke/transition'
-import * as fullscreen from '../../src/templates/bespoke/utils/fullscreen'
 import * as transitionUtils from '../../src/templates/bespoke/utils/transition'
 import { _clearCachedWakeLockApi } from '../../src/templates/bespoke/wake-lock'
 import * as viewTransition from '../_browser/viewTransition'
@@ -21,7 +20,14 @@ beforeAll(() => {
 })
 
 beforeEach(() => {
-  jest.spyOn(fullscreen, 'isEnabled').mockImplementation(() => true)
+  Object.defineProperties(document, {
+    fullscreenEnabled: { configurable: true, value: true, writable: true },
+    fullscreenElement: {
+      configurable: true,
+      value: undefined,
+      writable: true,
+    },
+  })
 })
 
 afterEach(() => {
@@ -245,27 +251,28 @@ describe("Bespoke template's browser context", () => {
 
   describe('Fullscreen', () => {
     let deck: Record<string, any>
-    let toggle: jest.SpyInstance
+    let requestFullscreen: jest.Mock
 
     beforeEach(() => {
       render()
+      requestFullscreen = jest.fn()
+      Object.assign(document.body, { requestFullscreen })
       deck = bespoke()
-      toggle = jest.spyOn(fullscreen, 'toggle')
     })
 
     it('injects deck.fullscreen() to toggle fullscreen', async () => {
       await deck.fullscreen()
-      expect(toggle).toHaveBeenCalled()
+      expect(requestFullscreen).toHaveBeenCalled()
     })
 
     it('toggles fullscreen by hitting f key', () => {
       keydown({ key: 'f' })
-      expect(toggle).toHaveBeenCalled()
+      expect(requestFullscreen).toHaveBeenCalled()
     })
 
     it('toggles fullscreen by hitting F11 key', () => {
       keydown({ key: Key.F11 })
-      expect(toggle).toHaveBeenCalled()
+      expect(requestFullscreen).toHaveBeenCalled()
     })
   })
 
@@ -738,7 +745,11 @@ describe("Bespoke template's browser context", () => {
         )
         expect(button?.className).not.toContain('exit')
 
-        jest.spyOn(fullscreen, 'isFullscreen').mockImplementation(() => true)
+        Object.defineProperty(document, 'fullscreenElement', {
+          configurable: true,
+          value: document.body,
+          writable: true,
+        })
 
         document.dispatchEvent(new Event('fullscreenchange'))
         expect(button?.className).toContain('exit')
@@ -773,7 +784,11 @@ describe("Bespoke template's browser context", () => {
 
       describe('when browser does not support fullscreen', () => {
         it('hides fullscreen button', () => {
-          jest.spyOn(fullscreen, 'isEnabled').mockImplementation(() => false)
+          Object.defineProperty(document, 'fullscreenEnabled', {
+            configurable: true,
+            value: false,
+            writable: true,
+          })
 
           bespoke()
 

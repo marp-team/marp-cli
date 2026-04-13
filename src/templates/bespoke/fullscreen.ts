@@ -1,8 +1,14 @@
-import { isEnabled, toggle } from './utils/fullscreen'
-
 const bespokeFullscreen = (deck) => {
+  const isEnabled = () => !!document.fullscreenEnabled
+
   deck.fullscreen = () => {
-    if (isEnabled()) toggle()
+    if (!isEnabled()) return
+
+    if (document.fullscreenElement) {
+      document.exitFullscreen?.()
+    } else {
+      document.body.requestFullscreen?.()
+    }
   }
 
   document.addEventListener('keydown', (e) => {
