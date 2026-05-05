@@ -184,6 +184,17 @@ jobs:
       - lint
       - test
 
+  test-node26:
+    executor:
+      name: node
+      browser: true
+      version: '26.0'
+    steps:
+      - prepare:
+          browser: true
+      - lint
+      - test
+
 workflows:
   test:
     jobs:
@@ -200,3 +211,6 @@ workflows:
       - test-node24:
           requires:
             - audit
+      # - test-node26:
+      #     requires:
+      #       - audit
