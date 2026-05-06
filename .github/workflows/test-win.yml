@@ -20,6 +20,7 @@ jobs:
           - '^20.20.0'
           - '22.22.0'
           - '^24.14.0'
+          - '^26.0.0'
 
     steps:
       # - name: Output concurrency group

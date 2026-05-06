@@ -149,6 +149,7 @@
     "vhtml": "^2.2.0",
     "which": "^4.0.0",
     "wrap-ansi": "^9.0.2",
+    "yargs": "^17.7.2",
     "yauzl": "^3.2.1",
     "zip-stream": "^7.0.2"
   },
@@ -160,15 +161,11 @@
     "puppeteer-core": "^24.39.1",
     "serve-index": "^1.9.2",
     "tmp": "^0.2.5",
-    "ws": "^8.19.0",
-    "yargs": "^17.7.2"
+    "ws": "^8.19.0"
   },
   "overrides": {
     "@rollup/plugin-terser": {
-      "serialize-javascript": "^7.0.3"
-    },
-    "extract-zip": {
-      "yauzl": "^3.2.1"
+      "serialize-javascript": "^7.0.5"
     },
     "postcss-url": {
       "minimatch": "^3.1.5"
