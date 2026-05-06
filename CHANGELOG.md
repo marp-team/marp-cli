@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v4.4.0 - 2026-05-06
+
 ### Added
 
 - Node.js v26 support ([#722](https://github.com/marp-team/marp-cli/pull/722))
