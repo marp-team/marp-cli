@@ -165,10 +165,7 @@
   },
   "overrides": {
     "@rollup/plugin-terser": {
-      "serialize-javascript": "^7.0.3"
-    },
-    "extract-zip": {
-      "yauzl": "^3.2.1"
+      "serialize-javascript": "^7.0.5"
     },
     "postcss-url": {
       "minimatch": "^3.1.5"
