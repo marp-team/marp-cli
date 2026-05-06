@@ -211,6 +211,6 @@ workflows:
       - test-node24:
           requires:
             - audit
-      # - test-node26:
-      #     requires:
-      #       - audit
+      - test-node26:
+          requires:
+            - audit
