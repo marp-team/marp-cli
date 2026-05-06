@@ -4,7 +4,12 @@
 
 ### Added
 
-- Added Linux AArch64 (ARM64) build for standalone binary ([#718](https://github.com/marp-team/marp-cli/pull/718) by [@philips](https://github.com/philips))
+- Node.js v26 support ([#722](https://github.com/marp-team/marp-cli/pull/722))
+- Linux AArch64 (ARM64) build for standalone binary ([#718](https://github.com/marp-team/marp-cli/pull/718) by [@philips](https://github.com/philips))
+
+### Fixed
+
+- Failure to run due to an error while requiring yargs v17 in Node.js v25.7, v25.8.0, and v26 ([#708](https://github.com/marp-team/marp-cli/issues/708), [#722](https://github.com/marp-team/marp-cli/pull/722))
 
 ## v4.3.1 - 2026-03-16
 
