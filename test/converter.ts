@@ -1150,6 +1150,44 @@ describe('Converter', () => {
           timeout
         )
       })
+
+      describe('with pptxNative option', () => {
+        beforeEach(() => {
+          // Use the actually saved tmp file for conversion
+          writeFileSpy.mockRestore()
+        })
+
+        it(
+          'converts markdown into editable PPTX directly from the DOM',
+          async () => {
+            const cvt = converter({ pptxNative: true })
+            const nativePptxSpy = jest.spyOn(
+              cvt as any,
+              'convertFileToNativePPTX'
+            )
+            const fileSave = jest
+              .spyOn(File.prototype, 'save')
+              .mockImplementation()
+            const warn = jest.spyOn(console, 'warn').mockImplementation()
+
+            await cvt.convertFile(new File(onePath))
+            expect(nativePptxSpy).toHaveBeenCalled()
+            expect(warn).toHaveBeenCalledWith(
+              expect.stringContaining('Native editable PPTX is an experimental')
+            )
+            expect(fileSave).toHaveBeenCalled()
+
+            const savedFile = fileSave.mock.instances[0] as unknown as File
+            expect(savedFile).toBeInstanceOf(File)
+            expect(savedFile.path).toBe('test.pptx')
+
+            // ZIP PK header for Office Open XML
+            expect(savedFile.buffer?.toString('ascii', 0, 2)).toBe('PK')
+            expect(savedFile.buffer?.toString('hex', 2, 4)).toBe('0304')
+          },
+          timeoutLarge
+        )
+      })
     })
 
     describe('when convert type is PNG', () => {

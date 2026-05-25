@@ -207,6 +207,20 @@ marp --pptx --pptx-editable slide-deck.md
 >
 > Conversion to the editable PPTX results in **lower slide reproducibility compared to the conversion into regular PPTX and other formats.** Additionally, **presenter notes are not supported.** _We do not recommend to export the editable PPTX if maintaining the slide's appearance is important._
 
+#### _[EXPERIMENTAL]_ Generate native editable pptx (`--pptx-native`)
+
+`--pptx-native` generates an editable PPTX **directly from the rendered DOM** using the [`dom-to-pptx`](https://www.npmjs.com/package/dom-to-pptx) engine, instead of going through PDF and LibreOffice. Because a PDF stores text as one positioned block per line, the LibreOffice route (`--pptx-editable`) cannot reflow text; `--pptx-native` emits **native text boxes and tables** with no per-line splitting and **does not require LibreOffice**.
+
+```bash
+marp --pptx --pptx-native slide-deck.md
+```
+
+> [!IMPORTANT]
+>
+> `--pptx-native` requires the browser only (no LibreOffice). It is mutually exclusive with `--pptx-editable`.
+>
+> Text and tables are emitted as native PowerPoint objects. Some advanced CSS (gradients, shadows, rotation) is rasterized by the engine, and font embedding depends on the fonts being readable.
+
 ### Convert to PNG/JPEG image(s) 🌐
 
 #### Multiple images (`--images`)
