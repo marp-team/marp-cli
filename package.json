@@ -158,6 +158,7 @@
     "@marp-team/marpit": "^3.2.1",
     "chokidar": "^4.0.3",
     "cosmiconfig": "^9.0.1",
+    "dom-to-pptx": "^1.1.9",
     "puppeteer-core": "^24.39.1",
     "serve-index": "^1.9.2",
     "tmp": "^0.2.5",

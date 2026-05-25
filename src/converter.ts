@@ -1,5 +1,6 @@
+import { readFile } from 'node:fs/promises'
 import path from 'node:path'
-import { URL } from 'node:url'
+import { URL, fileURLToPath } from 'node:url'
 import type { Marp, MarpOptions } from '@marp-team/marp-core'
 import { Marpit, Options as MarpitOptions } from '@marp-team/marpit'
 import chalk from 'chalk'
@@ -81,6 +82,7 @@ export interface ConverterOption {
         headings: boolean
       }
   pptxEditable?: boolean
+  pptxNative?: boolean
   preview?: boolean
   jpegQuality?: number
   server?: boolean
@@ -118,12 +120,68 @@ export type ConvertedCallback = (result: ConvertResult) => void
 // Markdown
 const stripBOM = (s: string) => (s.charCodeAt(0) === 0xfeff ? s.slice(1) : s)
 
+// Runs in the page: collect every local (file://) image URL referenced by
+// <img> elements or CSS background-image, so the Node side can inline them.
+const pptrCollectLocalImages = (): string[] => {
+  const urls = new Set<string>()
+  document.querySelectorAll('img').forEach((img) => {
+    if (img.src.startsWith('file://')) urls.add(img.src)
+  })
+  document.querySelectorAll('*').forEach((el) => {
+    const bg = window.getComputedStyle(el).backgroundImage
+    const m = bg && bg.match(/url\(["']?(file:\/\/[^"')]+)["']?\)/)
+    if (m) urls.add(m[1])
+  })
+  return [...urls]
+}
+
+// Runs in the page: replace file:// image references with provided data URIs.
+const pptrInlineImages = (map: Record<string, string>) => {
+  document.querySelectorAll('img').forEach((img) => {
+    if (map[img.src]) img.src = map[img.src]
+  })
+  document.querySelectorAll('*').forEach((el) => {
+    const bg = window.getComputedStyle(el).backgroundImage
+    const m = bg && bg.match(/url\(["']?(file:\/\/[^"')]+)["']?\)/)
+    if (m && map[m[1]]) (el as HTMLElement).style.backgroundImage = `url("${map[m[1]]}")`
+  })
+}
+
+// Runs inside the rendered page (Puppeteer). The dom-to-pptx browser bundle is
+// injected beforehand and exposes `window.domToPptx`. Builds a native editable
+// PPTX from every slide <section> and returns it base64-encoded.
+const pptrNativePptxExporter = async (
+  widthPx: number,
+  heightPx: number
+): Promise<string> => {
+  const { domToPptx } = window as unknown as {
+    domToPptx: {
+      exportToPptx: (
+        targets: Element[],
+        options: Record<string, unknown>
+      ) => Promise<Blob>
+    }
+  }
+  const sections = Array.from(document.querySelectorAll('section'))
+  const blob = await domToPptx.exportToPptx(sections, {
+    skipDownload: true,
+    width: widthPx / 96,
+    height: heightPx / 96,
+    autoEmbedFonts: true,
+  })
+  const bytes = new Uint8Array(await blob.arrayBuffer())
+  let binary = ''
+  for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i])
+  return btoa(binary)
+}
+
 export class Converter {
   readonly options: ConverterOption
 
   private _sOffice: SOffice | undefined = undefined
   private _firefoxPDFConversionWarning = false
   private _experimentalEditablePPTXWarning = false
+  private _experimentalNativePPTXWarning = false
 
   constructor(opts: ConverterOption) {
     this.options = opts
@@ -250,11 +308,13 @@ export class Converter {
         case ConvertType.pptx:
           template = await useTemplate(true)
           files.push(
-            this.options.pptxEditable
-              ? await this.convertFileToEditablePPTX(template, file)
-              : await this.convertFileToPPTX(template, file, {
-                  scale: this.options.imageScale ?? 2,
-                })
+            this.options.pptxNative
+              ? await this.convertFileToNativePPTX(template, file)
+              : this.options.pptxEditable
+                ? await this.convertFileToEditablePPTX(template, file)
+                : await this.convertFileToPPTX(template, file, {
+                    scale: this.options.imageScale ?? 2,
+                  })
           )
           break
         case ConvertType.notes:
@@ -655,6 +715,72 @@ export class Converter {
 
     const ret = file.convert(this.options.output, { extension: 'pptx' })
     ret.buffer = await tmpPptxFile.load()
+
+    return ret
+  }
+
+  private async convertFileToNativePPTX(
+    tpl: TemplateResult,
+    file: File
+  ): Promise<File> {
+    // Experimental warning
+    if (this._experimentalNativePPTXWarning === false) {
+      this._experimentalNativePPTXWarning = true
+
+      warn(
+        `${chalk.yellow`[EXPERIMENTAL]`} Native editable PPTX is an experimental feature powered by the dom-to-pptx engine. The output is generated directly from the rendered DOM (no LibreOffice).`
+      )
+    }
+
+    // Locate the browser bundle of dom-to-pptx (exposes window.domToPptx).
+    // Its "exports" map hides subpaths, so resolve the package entry and take
+    // the sibling browser build in dist/.
+    const bundlePath = path.join(
+      path.dirname(require.resolve('dom-to-pptx')),
+      'dom-to-pptx.bundle.js'
+    )
+
+    const html = new File(file.absolutePath)
+    html.buffer = Buffer.from(tpl.result)
+
+    const base64 = await this.usePuppeteer(html, async (page, { render }) => {
+      await render()
+
+      // The deck renders from a file:// origin; dom-to-pptx cannot read those
+      // local images (file:// fetch is blocked and <canvas> is tainted), so
+      // inline them as data URIs first (read from disk on the Node side).
+      const localSrcs: string[] = await page.evaluate(pptrCollectLocalImages)
+      const dataUris: Record<string, string> = {}
+      for (const src of localSrcs) {
+        try {
+          const buf = await readFile(fileURLToPath(src))
+          const ext = path.extname(src).slice(1).toLowerCase()
+          const mime =
+            ext === 'svg'
+              ? 'image/svg+xml'
+              : ext === 'jpg'
+                ? 'image/jpeg'
+                : `image/${ext || 'png'}`
+          dataUris[src] = `data:${mime};base64,${buf.toString('base64')}`
+        } catch {
+          // Unreadable asset — leave as-is.
+        }
+      }
+      await page.evaluate(pptrInlineImages, dataUris)
+
+      await page.addScriptTag({ path: bundlePath })
+      await page.evaluate(
+        () => (document as { fonts?: { ready?: Promise<unknown> } }).fonts?.ready
+      )
+      return await page.evaluate(
+        pptrNativePptxExporter,
+        tpl.rendered.size.width,
+        tpl.rendered.size.height
+      )
+    })
+
+    const ret = file.convert(this.options.output, { extension: 'pptx' })
+    ret.buffer = Buffer.from(base64, 'base64')
 
     return ret
   }

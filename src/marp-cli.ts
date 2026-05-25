@@ -230,6 +230,13 @@ export const marpCli = async (
           hidden: isOfficialContainerImage(), // Container image does not include LibreOffice Impress
           type: 'boolean',
         },
+        'pptx-native': {
+          describe:
+            '[EXPERIMENTAL] Generate editable PPTX directly from the DOM via dom-to-pptx (no LibreOffice)',
+          group: OptionGroup.Converter,
+          conflicts: ['pptx-editable'],
+          type: 'boolean',
+        },
         notes: {
           conflicts: ['image', 'images', 'pptx', 'pdf'],
           describe: 'Convert slide deck notes into a text file',
