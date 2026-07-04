@@ -16,11 +16,11 @@ jobs:
       fail-fast: false
       matrix:
         node-version:
-          - "^18.20.8"
-          - "^20.20.0"
-          - "^22.23.1"
-          - "^24.18.0"
-          - "26.4.0"
+          - '^18.20.8'
+          - '^20.20.0'
+          - '^22.23.1'
+          - '^24.18.0'
+          - '26.4.0'
 
     steps:
       # - name: Output concurrency group
@@ -48,7 +48,7 @@ jobs:
       # https://stackoverflow.com/a/59365905
       - name: Jest
         env:
-          JEST_JUNIT_CLASSNAME: "{filepath}"
+          JEST_JUNIT_CLASSNAME: '{filepath}'
           JEST_JUNIT_OUTPUT_DIR: tmp/test-results
           MARP_TEST_CI: 1
         run: >-
