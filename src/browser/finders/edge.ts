@@ -1,11 +1,7 @@
 import path from 'node:path'
 import { error, CLIErrorCode } from '../../error'
-import { findExecutable, getPlatform } from '../../utils/finder'
-import {
-  translateWindowsPathToWSL,
-  getWindowsEnv,
-  getWSL2NetworkingMode,
-} from '../../utils/wsl'
+import * as finder from '../../utils/finder'
+import * as wsl from '../../utils/wsl'
 import { ChromeBrowser } from '../browsers/chrome'
 import { ChromeCdpBrowser } from '../browsers/chrome-cdp'
 import type { BrowserFinder, BrowserFinderResult } from '../finder'
@@ -18,7 +14,7 @@ const edge = (path: string): BrowserFinderResult => ({
 export const edgeFinder: BrowserFinder = async ({ preferredPath } = {}) => {
   if (preferredPath) return edge(preferredPath)
 
-  const platform = await getPlatform()
+  const platform = await finder.getPlatform()
   const installation = await (async () => {
     switch (platform) {
       case 'darwin':
@@ -26,7 +22,7 @@ export const edgeFinder: BrowserFinder = async ({ preferredPath } = {}) => {
       case 'linux':
         return (
           (await edgeFinderLinux()) ||
-          ((await getWSL2NetworkingMode()) === 'mirrored'
+          ((await wsl.getWSL2NetworkingMode()) === 'mirrored'
             ? await edgeFinderWSL() // WSL2 Fallback
             : undefined)
         )
@@ -44,7 +40,7 @@ export const edgeFinder: BrowserFinder = async ({ preferredPath } = {}) => {
 }
 
 const edgeFinderDarwin = async () =>
-  await findExecutable([
+  await finder.findExecutable([
     '/Applications/Microsoft Edge Canary.app/Contents/MacOS/Microsoft Edge Canary',
     '/Applications/Microsoft Edge Dev.app/Contents/MacOS/Microsoft Edge Dev',
     '/Applications/Microsoft Edge Beta.app/Contents/MacOS/Microsoft Edge Beta',
@@ -52,7 +48,7 @@ const edgeFinderDarwin = async () =>
   ])
 
 const edgeFinderLinux = async () =>
-  await findExecutable([
+  await finder.findExecutable([
     '/opt/microsoft/msedge-canary/msedge',
     '/opt/microsoft/msedge-dev/msedge',
     '/opt/microsoft/msedge-beta/msedge',
@@ -85,17 +81,17 @@ const edgeFinderWin32 = async ({
     }
   }
 
-  return await findExecutable(paths)
+  return await finder.findExecutable(paths)
 }
 
 const edgeFinderWSL = async () => {
-  const localAppData = await getWindowsEnv('LOCALAPPDATA')
+  const localAppData = await wsl.getWindowsEnv('LOCALAPPDATA')
 
   return await edgeFinderWin32({
     programFiles: '/mnt/c/Program Files',
     programFilesX86: '/mnt/c/Program Files (x86)',
     localAppData: localAppData
-      ? await translateWindowsPathToWSL(localAppData)
+      ? await wsl.translateWindowsPathToWSL(localAppData)
       : '',
     join: path.posix.join,
   })

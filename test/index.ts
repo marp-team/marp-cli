@@ -10,18 +10,26 @@ afterEach(() => {
 
 describe('Marp CLI API interface', () => {
   it('runs Marp CLI with specific options', async () => {
-    const marpCliSpy = jest.spyOn(marpCli, 'marpCli').mockResolvedValue(0)
+    const args: Parameters<typeof api> = [
+      [],
+      { baseUrl: 'https://example.com/' },
+    ]
 
-    const ret = await api([], { baseUrl: 'https://example.com/' })
+    const mockApiInterface = jest.fn().mockResolvedValue(0)
 
-    expect(ret).toBe(0)
-    expect(marpCliSpy).toHaveBeenCalled()
+    await jest.isolateModulesAsync(async () => {
+      jest.doMock('../src/marp-cli', () => ({
+        ...jest.requireActual('../src/marp-cli'),
+        apiInterface: mockApiInterface,
+      }))
 
-    const opts: marpCli.MarpCLIOptions = marpCliSpy.mock.calls[0][1]
+      const { default: isolatedApi } = await import('../src/index')
+      const ret = await isolatedApi(...args)
 
-    expect(opts.baseUrl).toBe('https://example.com/')
-    expect(opts.stdin).toBe(false)
-    expect(opts.throwErrorAlways).toBe(true)
+      expect(ret).toBe(0)
+    })
+
+    expect(mockApiInterface).toHaveBeenCalledWith(...args)
   })
 
   it('does not read input from stdin if called API', async () => {

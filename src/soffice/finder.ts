@@ -1,12 +1,6 @@
 import path from 'node:path'
 import { CLIErrorCode, error } from '../error'
-import {
-  findExecutable,
-  findExecutableBinary,
-  getPlatform,
-  isExecutable,
-  normalizeDarwinAppPath,
-} from '../utils/finder'
+import * as finder from '../utils/finder'
 
 const scoopRestPath = ['scoop', 'apps', 'libreoffice', 'current'] as const
 
@@ -18,11 +12,11 @@ export const findSOffice = async ({
   if (preferredPath) return sOffice(preferredPath)
 
   if (process.env.SOFFICE_PATH) {
-    const nPath = await normalizeDarwinAppPath(process.env.SOFFICE_PATH)
-    if (nPath && (await isExecutable(nPath))) return sOffice(nPath)
+    const nPath = await finder.normalizeDarwinAppPath(process.env.SOFFICE_PATH)
+    if (nPath && (await finder.isExecutable(nPath))) return sOffice(nPath)
   }
 
-  const platform = await getPlatform()
+  const platform = await finder.getPlatform()
   const installation = await (async () => {
     switch (platform) {
       case 'darwin':
@@ -43,7 +37,9 @@ export const findSOffice = async ({
 }
 
 const sOfficeFinderDarwin = async () =>
-  await findExecutable(['/Applications/LibreOffice.app/Contents/MacOS/soffice'])
+  await finder.findExecutable([
+    '/Applications/LibreOffice.app/Contents/MacOS/soffice',
+  ])
 
 const sOfficeFinderWin32 = async () => {
   const prefixes: string[] = []
@@ -80,11 +76,12 @@ const sOfficeFinderWin32 = async () => {
     prefixes.push(path.join(process.env.ALLUSERSPROFILE, ...scoopRestPath))
   }
 
-  return await findExecutable(
+  return await finder.findExecutable(
     prefixes.map((prefix) =>
       path.join(prefix, 'LibreOffice', 'program', 'soffice.exe')
     )
   )
 }
 
-const sOfficeFinderLinux = async () => await findExecutableBinary(['soffice'])
+const sOfficeFinderLinux = async () =>
+  await finder.findExecutableBinary(['soffice'])

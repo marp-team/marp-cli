@@ -1,7 +1,3 @@
-const { createJsWithBabelPreset } = require('ts-jest')
-
-const jsWithBabel = createJsWithBabelPreset()
-
 const esModules = [
   '@formatjs/intl-segmenter',
   '@sindresorhus/merge-streams',
@@ -39,13 +35,13 @@ module.exports = {
   prettierPath: null,
   setupFiles: ['./jest.setup.js'],
   transform: {
-    ...jsWithBabel.transform,
-    '_configs[/\\\\].+\\.mjs$': 'babel-jest',
+    '^.+\\.[mc]?[tj]sx?$': 'babel-jest',
     '\\.s?css$': '<rootDir>/test/_transformers/css.js',
     '\\.png$': '<rootDir>/test/_transformers/png.js',
     '\\.pug$': '<rootDir>/test/_transformers/pug.js',
   },
   transformIgnorePatterns: [`/node_modules/(?!${esModules.join('|')})`],
   testEnvironment: 'node',
-  testRegex: '(/(test|__tests__)/(?![_.]).*|(\\.|/)(test|spec))\\.[jt]sx?$',
+  testRegex:
+    '(/(test|__tests__)/(?![_.]).*|(\\.|/)(test|spec))(?<!\\.d)\\.[jt]sx?$',
 }

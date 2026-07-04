@@ -1,5 +1,6 @@
 import path from 'node:path'
 import * as chromeFinderModule from 'chrome-launcher/dist/chrome-finder'
+import which from 'which'
 import { ChromeBrowser } from '../../../src/browser/browsers/chrome'
 import { ChromeCdpBrowser } from '../../../src/browser/browsers/chrome-cdp'
 import { chromeFinder } from '../../../src/browser/finders/chrome'
@@ -8,10 +9,15 @@ import * as utils from '../../../src/utils/finder'
 import * as wsl from '../../../src/utils/wsl'
 
 jest.mock('chrome-launcher/dist/chrome-finder')
+jest.mock('which')
+
+const mockedWhich = jest.mocked(which<{ nothrow: true }>)
 
 afterEach(() => {
   jest.resetAllMocks()
   jest.restoreAllMocks()
+  mockedWhich.mockReset()
+  mockedWhich.mockRestore()
 })
 
 const itExceptWin = process.platform === 'win32' ? it.skip : it
@@ -233,9 +239,9 @@ describe('Chrome finder', () => {
     })
 
     it('finds possible binaries from PATH by using which command, and return resolved path', async () => {
-      jest.spyOn(utils, 'which').mockImplementation(async (command) => {
+      mockedWhich.mockImplementation(async (command) => {
         if (command === 'chrome') return executableMock('empty')
-        return undefined
+        return null
       })
 
       const chrome = await chromeFinder({})
@@ -244,21 +250,21 @@ describe('Chrome finder', () => {
         path: executableMock('empty'),
         acceptedBrowsers: [ChromeBrowser, ChromeCdpBrowser],
       })
-      expect(utils.which).toHaveBeenCalledWith('chrome')
+      expect(which).toHaveBeenCalledWith('chrome', { nothrow: true })
     })
 
     it('throws error if the path was not resolved', async () => {
-      jest.spyOn(utils, 'which').mockResolvedValue(undefined)
+      mockedWhich.mockResolvedValue(null)
 
       await expect(chromeFinder({})).rejects.toThrow(CLIError)
-      expect(utils.which).toHaveBeenCalled()
+      expect(which).toHaveBeenCalled()
     })
 
     it('throws error if the which command has rejected by error', async () => {
-      jest.spyOn(utils, 'which').mockRejectedValue(new Error('Test error'))
+      mockedWhich.mockRejectedValue(new Error('Test error'))
 
       await expect(chromeFinder({})).rejects.toThrow(CLIError)
-      expect(utils.which).toHaveBeenCalled()
+      expect(which).toHaveBeenCalled()
     })
   })
 })

@@ -3,7 +3,7 @@ import { name, version } from '../package.json'
 import { MarpCLIConfig } from './config'
 import { ResolvedEngine } from './engine'
 
-export const isMarpCore = async (engine: ResolvedEngine): Promise<boolean> =>
+const isMarpCore = async (engine: ResolvedEngine): Promise<boolean> =>
   (await engine.getPackage())?.name === '@marp-team/marp-core' ||
   engine === (await ResolvedEngine.resolveDefaultEngine())
 
@@ -13,7 +13,7 @@ export default async function outputVersion(config: MarpCLIConfig): Promise<0> {
   const { engine } = config
   const enginePackage = await engine.getPackage()
 
-  if (await isMarpCore(engine)) {
+  if (await _helpers.isMarpCore(engine)) {
     engineVer = `@marp-team/marp-core v${bundledCoreVer}`
 
     if (enginePackage && enginePackage.version !== bundledCoreVer) {
@@ -28,3 +28,6 @@ export default async function outputVersion(config: MarpCLIConfig): Promise<0> {
   console.log(`${name} v${version}${engineVer ? ` (w/ ${engineVer})` : ''}`)
   return 0
 }
+
+// For making mockable in tests
+export const _helpers = { isMarpCore }

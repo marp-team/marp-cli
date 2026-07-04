@@ -33,7 +33,7 @@
   "files": [
     "marp-cli.js",
     "lib/",
-    "types/"
+    "types/src/"
   ],
   "bin": {
     "marp": "marp-cli.js"
@@ -68,7 +68,10 @@
     "watch": "rollup -w -c"
   },
   "devDependencies": {
+    "@babel/core": "^7.29.7",
     "@babel/preset-env": "^7.29.7",
+    "@babel/preset-react": "^7.29.7",
+    "@babel/preset-typescript": "^7.29.7",
     "@formatjs/intl-segmenter": "^12.2.10",
     "@rollup/plugin-alias": "^6.0.0",
     "@rollup/plugin-commonjs": "^29.0.3",
@@ -93,6 +96,7 @@
     "@types/yargs": "^17.0.35",
     "@yao-pkg/pkg": "^6.20.0",
     "autoprefixer": "^10.5.2",
+    "babel-jest": "^30.4.1",
     "bespoke": "bespokejs/bespoke#5dd91d76ba088119836f60f514dc0a0b8b30e78d",
     "chalk": "^5.6.2",
     "cheerio": "^1.2.0",
@@ -139,12 +143,10 @@
     "stylelint-config-standard-scss": "^15.0.1",
     "supertest": "^7.2.2",
     "tar-stream": "^3.2.0",
-    "ts-jest": "^29.4.11",
-    "ts-key-enum": "^3.0.13",
-    "tslib": "^2.8.1",
     "tinyglobby": "^0.2.17",
+    "tslib": "^2.8.1",
     "typed-emitter": "^2.1.0",
-    "typescript": "^5.9.3",
+    "typescript": "^6.0.3",
     "typescript-eslint": "^8.62.0",
     "vhtml": "^2.2.0",
     "which": "^4.0.0",

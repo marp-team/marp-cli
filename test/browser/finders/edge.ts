@@ -1,3 +1,4 @@
+import fs from 'node:fs'
 import path from 'node:path'
 import { ChromeBrowser } from '../../../src/browser/browsers/chrome'
 import { ChromeCdpBrowser } from '../../../src/browser/browsers/chrome-cdp'
@@ -16,6 +17,12 @@ const winEdgeDev = ['Microsoft', 'Edge Dev', 'Application', 'msedge.exe']
 const winEdgeBeta = ['Microsoft', 'Edge Beta', 'Application', 'msedge.exe']
 const winEdgeStable = ['Microsoft', 'Edge', 'Application', 'msedge.exe']
 
+const mockExecutable = (predicate: (path: string) => boolean) =>
+  jest.spyOn(fs.promises, 'access').mockImplementation(async (targetPath) => {
+    if (predicate(targetPath.toString())) return
+    throw new Error('Not executable')
+  })
+
 describe('Edge finder', () => {
   describe('with preferred path', () => {
     it('returns the preferred path as edge', async () => {
@@ -33,9 +40,7 @@ describe('Edge finder', () => {
   describe('with Linux', () => {
     beforeEach(() => {
       jest.spyOn(utils, 'getPlatform').mockResolvedValue('linux')
-      jest
-        .spyOn(utils, 'isExecutable')
-        .mockImplementation(async (p) => p === '/opt/microsoft/msedge/msedge')
+      mockExecutable((p) => p === '/opt/microsoft/msedge/msedge')
     })
 
     it('finds possible executable path and returns the matched path', async () => {
@@ -55,13 +60,11 @@ describe('Edge finder', () => {
     })
 
     it('prefers the latest version if multiple binaries are matched', async () => {
-      jest
-        .spyOn(utils, 'isExecutable')
-        .mockImplementation(
-          async (p) =>
-            p === '/opt/microsoft/msedge-dev/msedge' ||
-            p === '/opt/microsoft/msedge-beta/msedge'
-        )
+      mockExecutable(
+        (p) =>
+          p === '/opt/microsoft/msedge-dev/msedge' ||
+          p === '/opt/microsoft/msedge-beta/msedge'
+      )
 
       const edge = await edgeFinder({})
 
@@ -72,7 +75,7 @@ describe('Edge finder', () => {
     })
 
     it('throws error if no executable path is found', async () => {
-      jest.spyOn(utils, 'isExecutable').mockResolvedValue(false)
+      mockExecutable(() => false)
       await expect(edgeFinder({})).rejects.toThrow(CLIError)
     })
   })
@@ -80,13 +83,10 @@ describe('Edge finder', () => {
   describe('with macOS', () => {
     beforeEach(() => {
       jest.spyOn(utils, 'getPlatform').mockResolvedValue('darwin')
-      jest
-        .spyOn(utils, 'isExecutable')
-        .mockImplementation(
-          async (p) =>
-            p ===
-            '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge'
-        )
+      mockExecutable(
+        (p) =>
+          p === '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge'
+      )
     })
 
     it('finds possible executable path and returns the matched path', async () => {
@@ -106,15 +106,13 @@ describe('Edge finder', () => {
     })
 
     it('prefers the latest version if multiple binaries are matched', async () => {
-      jest
-        .spyOn(utils, 'isExecutable')
-        .mockImplementation(
-          async (p) =>
-            p ===
-              '/Applications/Microsoft Edge Dev.app/Contents/MacOS/Microsoft Edge Dev' ||
-            p ===
-              '/Applications/Microsoft Edge Beta.app/Contents/MacOS/Microsoft Edge Beta'
-        )
+      mockExecutable(
+        (p) =>
+          p ===
+            '/Applications/Microsoft Edge Dev.app/Contents/MacOS/Microsoft Edge Dev' ||
+          p ===
+            '/Applications/Microsoft Edge Beta.app/Contents/MacOS/Microsoft Edge Beta'
+      )
 
       const edge = await edgeFinder({})
 
@@ -125,7 +123,7 @@ describe('Edge finder', () => {
     })
 
     it('throws error if no executable path is found', async () => {
-      jest.spyOn(utils, 'isExecutable').mockResolvedValue(false)
+      mockExecutable(() => false)
       await expect(edgeFinder({})).rejects.toThrow(CLIError)
     })
   })
@@ -142,9 +140,7 @@ describe('Edge finder', () => {
       jest.resetModules()
 
       jest.spyOn(utils, 'getPlatform').mockResolvedValue('win32')
-      jest
-        .spyOn(utils, 'isExecutable')
-        .mockImplementation(async (p) => p === edgePath)
+      mockExecutable((p) => p === edgePath)
 
       process.env = {
         ...originalEnv,
@@ -201,7 +197,7 @@ describe('Edge finder', () => {
     })
 
     it('throws error if no executable path is found', async () => {
-      jest.spyOn(utils, 'isExecutable').mockResolvedValue(false)
+      mockExecutable(() => false)
       await expect(edgeFinder({})).rejects.toThrow(CLIError)
     })
   })
@@ -214,9 +210,7 @@ describe('Edge finder', () => {
 
     beforeEach(() => {
       jest.spyOn(utils, 'getPlatform').mockResolvedValue('wsl1')
-      jest
-        .spyOn(utils, 'isExecutable')
-        .mockImplementation(async (p) => p === wsl1EdgePath)
+      mockExecutable((p) => p === wsl1EdgePath)
       jest
         .spyOn(wsl, 'getWindowsEnv')
         .mockResolvedValue('C:\\Mock\\AppData\\Local')
@@ -268,7 +262,7 @@ describe('Edge finder', () => {
     })
 
     it('throws error if no executable path is found', async () => {
-      jest.spyOn(utils, 'isExecutable').mockResolvedValue(false)
+      mockExecutable(() => false)
       await expect(edgeFinder({})).rejects.toThrow(CLIError)
     })
   })

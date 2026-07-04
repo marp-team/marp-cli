@@ -3,8 +3,8 @@ import {
   resolveAnimationStyles,
   prepareMarpTransitions,
   parseTransitionData,
-  MarpTransitionKeyframes,
 } from './utils/transition'
+import type { MarpTransitionKeyframes } from './utils/transition'
 
 interface TransitionCallbackOption {
   back?: boolean

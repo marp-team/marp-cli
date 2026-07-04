@@ -2,7 +2,6 @@
 import '../_browser/matchMedia'
 import { Marp } from '@marp-team/marp-core'
 import { Element as MarpitElement } from '@marp-team/marpit'
-import { Key } from 'ts-key-enum'
 import bespoke from '../../src/templates/bespoke/bespoke'
 import {
   classes,
@@ -264,7 +263,7 @@ describe("Bespoke template's browser context", () => {
     })
 
     it('toggles fullscreen by hitting F11 key', () => {
-      keydown({ key: Key.F11 })
+      keydown({ key: 'F11' })
       expect(toggle).toHaveBeenCalled()
     })
   })
@@ -361,12 +360,12 @@ describe("Bespoke template's browser context", () => {
         const deck = bespoke()
 
         keydown(
-          { bubbles: true, key: Key.ArrowRight },
+          { bubbles: true, key: 'ArrowRight' },
           document.getElementById('element')!
         )
         expect(deck.slide()).toBe(0)
 
-        keydown({ bubbles: true, key: Key.ArrowRight }, deck.slides[0])
+        keydown({ bubbles: true, key: 'ArrowRight' }, deck.slides[0])
         expect(deck.slide()).toBe(1)
       })
     }
@@ -390,10 +389,10 @@ describe("Bespoke template's browser context", () => {
       render()
       const deck = bespoke()
 
-      keydown({ key: Key.ArrowRight })
+      keydown({ key: 'ArrowRight' })
       expect(deck.slide()).toBe(1)
 
-      keydown({ key: Key.ArrowLeft })
+      keydown({ key: 'ArrowLeft' })
       expect(deck.slide()).toBe(0)
 
       keydown({ key: ' ' })
@@ -402,22 +401,22 @@ describe("Bespoke template's browser context", () => {
       keydown({ key: ' ', shiftKey: true })
       expect(deck.slide()).toBe(0)
 
-      keydown({ key: Key.PageDown })
+      keydown({ key: 'PageDown' })
       expect(deck.slide()).toBe(1)
 
-      keydown({ key: Key.PageUp })
+      keydown({ key: 'PageUp' })
       expect(deck.slide()).toBe(0)
 
-      keydown({ key: Key.ArrowDown })
+      keydown({ key: 'ArrowDown' })
       expect(deck.slide()).toBe(1)
 
-      keydown({ key: Key.ArrowUp })
+      keydown({ key: 'ArrowUp' })
       expect(deck.slide()).toBe(0)
 
-      keydown({ key: Key.End })
+      keydown({ key: 'End' })
       expect(deck.slide()).toBe(2)
 
-      keydown({ key: Key.Home })
+      keydown({ key: 'Home' })
       expect(deck.slide()).toBe(0)
     })
 
@@ -425,34 +424,34 @@ describe("Bespoke template's browser context", () => {
       render('* A\n* B\n* C\n\n---\n\n* D\n* E')
       const deck = bespoke()
 
-      keydown({ key: Key.ArrowRight, shiftKey: true })
+      keydown({ key: 'ArrowRight', shiftKey: true })
       expect(deck.slide()).toBe(0)
       expect(deck.fragmentIndex).toBe(3)
 
-      keydown({ key: Key.ArrowDown, shiftKey: true })
+      keydown({ key: 'ArrowDown', shiftKey: true })
       expect(deck.slide()).toBe(1)
       expect(deck.fragmentIndex).toBe(2)
 
-      keydown({ key: Key.ArrowLeft, shiftKey: true })
+      keydown({ key: 'ArrowLeft', shiftKey: true })
       expect(deck.slide()).toBe(0)
       expect(deck.fragmentIndex).toBe(3)
 
-      keydown({ key: Key.ArrowRight })
+      keydown({ key: 'ArrowRight' })
       expect(deck.slide()).toBe(1)
       expect(deck.fragmentIndex).toBe(0)
 
-      keydown({ key: Key.PageDown, shiftKey: true })
+      keydown({ key: 'PageDown', shiftKey: true })
       expect(deck.fragmentIndex).toBe(2)
 
-      keydown({ key: Key.ArrowUp, shiftKey: true })
+      keydown({ key: 'ArrowUp', shiftKey: true })
       expect(deck.slide()).toBe(0)
       expect(deck.fragmentIndex).toBe(3)
 
-      keydown({ key: Key.ArrowRight })
+      keydown({ key: 'ArrowRight' })
       expect(deck.slide()).toBe(1)
       expect(deck.fragmentIndex).toBe(0)
 
-      keydown({ key: Key.PageUp, shiftKey: true })
+      keydown({ key: 'PageUp', shiftKey: true })
       expect(deck.slide()).toBe(0)
       expect(deck.fragmentIndex).toBe(3)
     })
@@ -1074,22 +1073,22 @@ describe("Bespoke template's browser context", () => {
               .mockReturnValue(rects[i] as DOMRect)
           })
 
-          keydown({ key: Key.ArrowRight }, window)
+          keydown({ key: 'ArrowRight' }, window)
           expect(deck.slide()).toBe(1)
 
-          keydown({ key: Key.ArrowLeft }, window)
+          keydown({ key: 'ArrowLeft' }, window)
           expect(deck.slide()).toBe(0)
 
-          keydown({ key: Key.ArrowDown }, window)
+          keydown({ key: 'ArrowDown' }, window)
           expect(deck.slide()).toBe(2)
 
-          keydown({ key: Key.ArrowUp }, window)
+          keydown({ key: 'ArrowUp' }, window)
           expect(deck.slide()).toBe(0)
 
-          keydown({ key: Key.End }, window)
+          keydown({ key: 'End' }, window)
           expect(deck.slide()).toBe(2)
 
-          keydown({ key: Key.Home }, window)
+          keydown({ key: 'Home' }, window)
           expect(deck.slide()).toBe(0)
 
           expect(focus).toHaveBeenCalled()
@@ -1885,7 +1884,7 @@ describe("Bespoke template's browser context", () => {
       opts: transitionUtils.MarpTransitionResolvableKeyframeSettings = {}
     ) => {
       jest
-        .spyOn(transitionUtils, '_testElementAnimation')
+        .spyOn(transitionUtils._helpers, 'testElementAnimation')
         .mockImplementation((elm, resolve) => {
           resolve(
             keyframes.includes(elm.style.animationName)
@@ -2065,7 +2064,7 @@ describe("Bespoke template's browser context", () => {
 
       // Set mocked keyframes
       jest
-        .spyOn(transitionUtils, '_testElementAnimation')
+        .spyOn(transitionUtils._helpers, 'testElementAnimation')
         .mockImplementation((elm, resolve) => {
           if (elm.style.animationName === 'marp-incoming-transition-custom') {
             return resolve({ defaultDuration: '3s' })

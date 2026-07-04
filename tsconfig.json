@@ -4,13 +4,15 @@
     "@tsconfig/node22/tsconfig.json"
   ],
   "compilerOptions": {
+    "isolatedModules": true,
     "jsx": "react",
-    "module": "esnext",
+    "module": "preserve",
     "moduleResolution": "bundler",
     "noImplicitAny": false,
     "resolveJsonModule": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "types": ["jest", "node"]
   },
-  "include": ["src"],
+  "include": ["src", "test", "scripts"],
   "exclude": ["**/__mocks__"]
 }
