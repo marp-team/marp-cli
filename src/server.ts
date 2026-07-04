@@ -4,7 +4,7 @@ import fs from 'node:fs'
 import { Server as HttpServer } from 'node:http'
 import path from 'node:path'
 import querystring from 'node:querystring'
-import url from 'node:url'
+import { URL } from 'node:url'
 import { promisify } from 'node:util'
 import type { Express, Request, Response } from 'express'
 import serveIndex from 'serve-index'
@@ -141,10 +141,11 @@ export class Server extends (EventEmitter as new () => TypedEmitter<Server.Event
   }
 
   private async preprocess(req: Request, res: Response) {
-    const { pathname, query } = url.parse(req.url)
+    const requestUrl = new URL(req.url, 'http://localhost')
+    const { pathname } = requestUrl
     if (!pathname) return
 
-    const qs = querystring.parse(query || '')
+    const qs = querystring.parse(requestUrl.search.slice(1))
     const response = async (fn: string) => {
       try {
         const { result, type } = await this.convertMarkdown(fn, qs)
