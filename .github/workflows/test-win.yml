@@ -15,17 +15,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - node-version: '^18.20.8'
-            jest-opts: --reporters=default
-          - node-version: '^20.20.0'
-            jest-opts: --reporters=default --reporters=jest-junit
-          - node-version: '22.23.1'
-            jest-opts: --reporters=default --reporters=jest-junit
-          - node-version: '^24.18.0'
-            jest-opts: --reporters=default --reporters=jest-junit
-          - node-version: '^26.4.0'
-            jest-opts: --reporters=default --reporters=jest-junit
+        node-version:
+          - "^18.20.8"
+          - "^20.20.0"
+          - "^22.23.1"
+          - "^24.18.0"
+          - "26.4.0"
 
     steps:
       # - name: Output concurrency group
@@ -53,14 +48,14 @@ jobs:
       # https://stackoverflow.com/a/59365905
       - name: Jest
         env:
-          JEST_JUNIT_CLASSNAME: '{filepath}'
+          JEST_JUNIT_CLASSNAME: "{filepath}"
           JEST_JUNIT_OUTPUT_DIR: tmp/test-results
           MARP_TEST_CI: 1
         run: >-
-          npm run test:coverage -- --ci --max-workers ${{ steps.cpu-cores.outputs.count }} ${{ matrix.jest-opts }} ||
-          npm run test:coverage -- --ci --bail -i ${{ matrix.jest-opts }} ||
-          npm run test:coverage -- --ci --bail -i ${{ matrix.jest-opts }} --no-cache ||
-          npm run test:coverage -- --ci --bail -i ${{ matrix.jest-opts }} --no-cache
+          npm run test:coverage -- --ci --max-workers ${{ steps.cpu-cores.outputs.count }} --reporters=default --reporters=jest-junit ||
+          npm run test:coverage -- --ci --bail -i --reporters=default --reporters=jest-junit ||
+          npm run test:coverage -- --ci --bail -i --reporters=default --reporters=jest-junit --no-cache ||
+          npm run test:coverage -- --ci --bail -i --reporters=default --reporters=jest-junit --no-cache
 
       - uses: actions/upload-artifact@v7
         with:
@@ -73,7 +68,7 @@ jobs:
           flags: windows
 
       - uses: codecov/test-results-action@v1
-        if: ${{ !cancelled() && contains(matrix.jest-opts, 'jest-junit') }}
+        if: ${{ !cancelled() }}
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: windows
