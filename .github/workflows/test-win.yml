@@ -15,22 +15,27 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version:
-          - '^18.20.8'
-          - '^20.20.0'
-          - '22.22.0'
-          - '^24.14.0'
-          - '^26.0.0'
+        include:
+          - node-version: '^18.20.8'
+            jest-opts: --reporters=default
+          - node-version: '^20.20.0'
+            jest-opts: --reporters=default --reporters=jest-junit
+          - node-version: '22.23.1'
+            jest-opts: --reporters=default --reporters=jest-junit
+          - node-version: '^24.18.0'
+            jest-opts: --reporters=default --reporters=jest-junit
+          - node-version: '^26.4.0'
+            jest-opts: --reporters=default --reporters=jest-junit
 
     steps:
       # - name: Output concurrency group
       #   run: echo "${{ github.workflow }}-${{ (github.ref_name == 'main' && github.run_id) || format('{0}-{1}', github.actor, github.head_ref || github.ref_name) }}"
 
       - name: Get number of CPU cores
-        uses: SimenB/github-actions-cpu-cores@v2
+        uses: SimenB/github-actions-cpu-cores@v3
         id: cpu-cores
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v6
@@ -52,23 +57,23 @@ jobs:
           JEST_JUNIT_OUTPUT_DIR: tmp/test-results
           MARP_TEST_CI: 1
         run: >-
-          npm run test:coverage -- --ci --max-workers ${{ steps.cpu-cores.outputs.count }} --reporters=default --reporters=jest-junit ||
-          npm run test:coverage -- --ci --bail -i --reporters=default --reporters=jest-junit ||
-          npm run test:coverage -- --ci --bail -i --reporters=default --reporters=jest-junit --no-cache ||
-          npm run test:coverage -- --ci --bail -i --reporters=default --reporters=jest-junit --no-cache
+          npm run test:coverage -- --ci --max-workers ${{ steps.cpu-cores.outputs.count }} ${{ matrix.jest-opts }} ||
+          npm run test:coverage -- --ci --bail -i ${{ matrix.jest-opts }} ||
+          npm run test:coverage -- --ci --bail -i ${{ matrix.jest-opts }} --no-cache ||
+          npm run test:coverage -- --ci --bail -i ${{ matrix.jest-opts }} --no-cache
 
       - uses: actions/upload-artifact@v7
         with:
           name: coverage-${{ matrix.node-version }}
           path: coverage
 
-      - uses: codecov/codecov-action@v5
+      - uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: windows
 
       - uses: codecov/test-results-action@v1
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && contains(matrix.jest-opts, 'jest-junit') }}
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: windows
