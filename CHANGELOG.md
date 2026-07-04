@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v4.4.1 - 2026-07-04
+
 ### Changed
 
 - Upgrade Marpit to [v3.2.2](https://github.com/marp-team/marpit/releases/tag/v3.2.2) ([#729](https://github.com/marp-team/marp-cli/pull/729))
