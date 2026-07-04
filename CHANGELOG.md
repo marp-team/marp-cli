@@ -9,6 +9,10 @@
 - Upgrade Node.js LTS to v26.4.0 ([#729](https://github.com/marp-team/marp-cli/pull/729))
 - Upgrade dependent packages ([#729](https://github.com/marp-team/marp-cli/pull/729))
 
+### Fixed
+
+- Fix Node.js deprecation warning `DEP0169` (`url.parse()`) ([#730](https://github.com/marp-team/marp-cli/pull/730))
+
 ## v4.4.0 - 2026-05-06
 
 ### Added
