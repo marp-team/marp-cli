@@ -567,8 +567,7 @@ export const marpCli = async (
           }
 
           let resolverForObservation:
-            | ((helper: ObservationHelper) => void)
-            | undefined
+            ((helper: ObservationHelper) => void) | undefined
 
           while ((resolverForObservation = resolversForObservation.shift())) {
             resolverForObservation({ stop: () => res(0) })

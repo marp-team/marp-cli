@@ -1,17 +1,7 @@
-import {
-  darwinFast,
-  linux,
-  win32,
-  wsl,
-} from 'chrome-launcher/dist/chrome-finder'
+import * as chromeFinderModule from 'chrome-launcher/dist/chrome-finder'
 import { error, CLIErrorCode } from '../../error'
-import {
-  findExecutableBinary,
-  getPlatform,
-  isExecutable,
-  normalizeDarwinAppPath,
-} from '../../utils/finder'
-import { getWSL2NetworkingMode } from '../../utils/wsl'
+import * as finder from '../../utils/finder'
+import * as wsl from '../../utils/wsl'
 import { ChromeBrowser } from '../browsers/chrome'
 import { ChromeCdpBrowser } from '../browsers/chrome-cdp'
 import type { BrowserFinder, BrowserFinderResult } from '../finder'
@@ -25,11 +15,11 @@ export const chromeFinder: BrowserFinder = async ({ preferredPath } = {}) => {
   if (preferredPath) return chrome(preferredPath)
 
   if (process.env.CHROME_PATH) {
-    const path = await normalizeDarwinAppPath(process.env.CHROME_PATH)
-    if (path && (await isExecutable(path))) return chrome(path)
+    const path = await finder.normalizeDarwinAppPath(process.env.CHROME_PATH)
+    if (path && (await finder.isExecutable(path))) return chrome(path)
   }
 
-  const platform = await getPlatform()
+  const platform = await finder.getPlatform()
   const installation = await (async () => {
     switch (platform) {
       case 'darwin':
@@ -49,25 +39,28 @@ export const chromeFinder: BrowserFinder = async ({ preferredPath } = {}) => {
   error('Chrome browser could not be found.', CLIErrorCode.NOT_FOUND_BROWSER)
 }
 
-const chromeFinderDarwin = () => darwinFast()
+const chromeFinderDarwin = () => chromeFinderModule.darwinFast()
 const chromeFinderLinux = async () => {
   try {
-    const linuxPath = linux()[0]
+    const linuxPath = chromeFinderModule.linux()[0]
     if (linuxPath) return linuxPath
   } catch {
     // no ops
   }
 
   // WSL2 Fallback
-  if ((await getWSL2NetworkingMode()) === 'mirrored') return chromeFinderWSL()
+  if ((await wsl.getWSL2NetworkingMode()) === 'mirrored')
+    return chromeFinderWSL()
 
   return undefined
 }
-const chromeFinderWin32 = (): string | undefined => win32()[0]
-const chromeFinderWSL = (): string | undefined => wsl()[0]
+const chromeFinderWin32 = (): string | undefined =>
+  chromeFinderModule.win32()[0]
+
+const chromeFinderWSL = (): string | undefined => chromeFinderModule.wsl()[0]
 
 const chromeFinderFallback = async () =>
-  await findExecutableBinary([
+  await finder.findExecutableBinary([
     'google-chrome-stable',
     'google-chrome',
     'chrome', // FreeBSD Chromium

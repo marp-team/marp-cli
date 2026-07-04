@@ -15,13 +15,10 @@ type FunctionalEngine<T extends typeof Marpit = typeof Marpit> = (
 ) => Marpit | typeof Marpit | Promise<Marpit | typeof Marpit>
 
 export type Engine<T extends typeof Marpit = typeof Marpit> =
-  | Marpit
-  | typeof Marpit
-  | FunctionalEngine<T>
+  Marpit | typeof Marpit | FunctionalEngine<T>
 
 export type ResolvableEngine<T extends typeof Marpit = typeof Marpit> =
-  | Engine<T>
-  | string
+  Engine<T> | string
 
 const preResolveAsyncSymbol = Symbol('preResolveAsync')
 

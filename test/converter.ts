@@ -919,7 +919,7 @@ describe('Converter', () => {
         it(
           'follows setting timeout',
           async () => {
-            await using browserManager = new BrowserManager({ timeout: 1 })
+            await using browserManager = new BrowserManager({ timeout: 50 })
 
             await expect(
               pdfInstance({

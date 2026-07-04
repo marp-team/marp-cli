@@ -7,7 +7,8 @@ import { apiInterface } from './marp-cli'
 
 type Overwrite<T, U> = Omit<T, Extract<keyof T, keyof U>> & U
 
-export { ObservationHelper, waitForObservation } from './marp-cli'
+export { waitForObservation } from './marp-cli'
+export type { ObservationHelper } from './marp-cli'
 export { CLIError, CLIErrorCode } from './error'
 
 export const marpCli = apiInterface

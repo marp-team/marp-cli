@@ -1,13 +1,7 @@
 import path from 'node:path'
 import { error, CLIErrorCode } from '../../error'
 // import { getWSL2NetworkingMode } from '../../utils/wsl'
-import {
-  getPlatform,
-  findExecutable,
-  findExecutableBinary,
-  isExecutable,
-  normalizeDarwinAppPath,
-} from '../../utils/finder'
+import * as finder from '../../utils/finder'
 import { FirefoxBrowser } from '../browsers/firefox'
 import type { BrowserFinder, BrowserFinderResult } from '../finder'
 
@@ -25,11 +19,11 @@ export const firefoxFinder: BrowserFinder = async ({ preferredPath } = {}) => {
   if (preferredPath) return firefox(preferredPath)
 
   if (process.env.FIREFOX_PATH) {
-    const nPath = await normalizeDarwinAppPath(process.env.FIREFOX_PATH)
-    if (nPath && (await isExecutable(nPath))) return firefox(nPath)
+    const nPath = await finder.normalizeDarwinAppPath(process.env.FIREFOX_PATH)
+    if (nPath && (await finder.isExecutable(nPath))) return firefox(nPath)
   }
 
-  const platform = await getPlatform()
+  const platform = await finder.getPlatform()
   const installation = await (async () => {
     switch (platform) {
       case 'darwin':
@@ -54,7 +48,7 @@ export const firefoxFinder: BrowserFinder = async ({ preferredPath } = {}) => {
 }
 
 const firefoxFinderDarwin = async () =>
-  await findExecutable([
+  await finder.findExecutable([
     '/Applications/Firefox Nightly.app/Contents/MacOS/firefox',
     '/Applications/Firefox Developer Edition.app/Contents/MacOS/firefox',
     '/Applications/Firefox.app/Contents/MacOS/firefox', // Firefox stable, ESR, and beta
@@ -87,7 +81,7 @@ const firefoxFinderWin32 = async () => {
     }
   }
 
-  return await findExecutable(
+  return await finder.findExecutable(
     [
       winFirefoxNightly,
       winFirefoxNightlyAlt,
@@ -121,7 +115,7 @@ const firefoxFinderWSL = async () => {
     prefixes.push(`/mnt/${drive}/Program Files (x86)`)
   }
 
-  return await findExecutable(
+  return await finder.findExecutable(
     [
       winFirefoxNightly,
       winFirefoxNightlyAlt,
@@ -134,7 +128,7 @@ const firefoxFinderWSL = async () => {
 }
 
 const firefoxFinderLinuxOrFallback = async () =>
-  await findExecutableBinary(
+  await finder.findExecutableBinary(
     // In Linux, Firefox must have only an executable name `firefox` in every
     // editions, but some distributions may have provided different executable
     // names.

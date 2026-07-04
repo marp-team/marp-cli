@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Upgrade Marpit to [v3.2.2](https://github.com/marp-team/marpit/releases/tag/v3.2.2) ([#729](https://github.com/marp-team/marp-cli/pull/729))
+- Upgrade Marp Core to [v4.3.1](https://github.com/marp-team/marp-core/releases/v4.3.1) ([#729](https://github.com/marp-team/marp-cli/pull/729))
+- Upgrade Node.js LTS to v26.4.0 ([#729](https://github.com/marp-team/marp-cli/pull/729))
+- Upgrade dependent packages ([#729](https://github.com/marp-team/marp-cli/pull/729))
+
 ## v4.4.0 - 2026-05-06
 
 ### Added

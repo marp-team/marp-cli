@@ -1,3 +1,4 @@
+import fs from 'node:fs'
 import path from 'node:path'
 import which from 'which'
 import { FirefoxBrowser } from '../../../src/browser/browsers/firefox'
@@ -25,6 +26,12 @@ const itExceptWin = process.platform === 'win32' ? it.skip : it
 
 const executableMock = (name: string) =>
   path.join(__dirname, `../../utils/_executable_mocks`, name)
+
+const mockExecutable = (predicate: (path: string) => boolean) =>
+  jest.spyOn(fs.promises, 'access').mockImplementation(async (targetPath) => {
+    if (predicate(targetPath.toString())) return
+    throw new Error('Not executable')
+  })
 
 describe('Firefox finder', () => {
   describe('with preferred path', () => {
@@ -143,11 +150,9 @@ describe('Firefox finder', () => {
   describe('with macOS', () => {
     beforeEach(() => {
       jest.spyOn(utils, 'getPlatform').mockResolvedValue('darwin')
-      jest
-        .spyOn(utils, 'isExecutable')
-        .mockImplementation(
-          async (p) => p === '/Applications/Firefox.app/Contents/MacOS/firefox'
-        )
+      mockExecutable(
+        (p) => p === '/Applications/Firefox.app/Contents/MacOS/firefox'
+      )
     })
 
     it('finds possible executable path and returns the matched path', async () => {
@@ -166,14 +171,12 @@ describe('Firefox finder', () => {
     })
 
     it('prefers the latest version if multiple binaries are matched', async () => {
-      jest
-        .spyOn(utils, 'isExecutable')
-        .mockImplementation(
-          async (p) =>
-            p ===
-              '/Applications/Firefox Developer Edition.app/Contents/MacOS/firefox' ||
-            p === '/Applications/Firefox.app/Contents/MacOS/firefox'
-        )
+      mockExecutable(
+        (p) =>
+          p ===
+            '/Applications/Firefox Developer Edition.app/Contents/MacOS/firefox' ||
+          p === '/Applications/Firefox.app/Contents/MacOS/firefox'
+      )
 
       const firefox = await firefoxFinder({})
 
@@ -184,7 +187,7 @@ describe('Firefox finder', () => {
     })
 
     it('throws error if no executable path is found', async () => {
-      jest.spyOn(utils, 'isExecutable').mockResolvedValue(false)
+      mockExecutable(() => false)
       await expect(firefoxFinder({})).rejects.toThrow(CLIError)
     })
   })
@@ -204,9 +207,7 @@ describe('Firefox finder', () => {
       jest.resetModules()
 
       jest.spyOn(utils, 'getPlatform').mockResolvedValue('win32')
-      jest
-        .spyOn(utils, 'isExecutable')
-        .mockImplementation(async (p) => p === firefoxPath)
+      mockExecutable((p) => p === firefoxPath)
 
       process.env = {
         ...originalEnv,
@@ -306,11 +307,9 @@ describe('Firefox finder', () => {
       jest.resetModules()
 
       jest.spyOn(utils, 'getPlatform').mockResolvedValue('wsl1')
-      jest
-        .spyOn(utils, 'isExecutable')
-        .mockImplementation(
-          async (p) => p === '/mnt/c/Program Files/Mozilla Firefox/firefox.exe'
-        )
+      mockExecutable(
+        (p) => p === '/mnt/c/Program Files/Mozilla Firefox/firefox.exe'
+      )
 
       process.env = { ...originalEnv, PATH: undefined }
     })
@@ -374,7 +373,7 @@ describe('Firefox finder', () => {
     })
 
     it('throws error if no executable path is found', async () => {
-      jest.spyOn(utils, 'isExecutable').mockResolvedValue(false)
+      mockExecutable(() => false)
       await expect(firefoxFinder({})).rejects.toThrow(CLIError)
     })
   })

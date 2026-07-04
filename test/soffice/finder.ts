@@ -1,3 +1,4 @@
+import fs from 'node:fs'
 import path from 'node:path'
 import which from 'which'
 import { CLIError } from '../../src/error'
@@ -28,6 +29,12 @@ const itExceptWin = process.platform === 'win32' ? it.skip : it
 
 const executableMock = (name: string) =>
   path.join(__dirname, `../utils/_executable_mocks`, name)
+
+const mockExecutable = (predicate: (path: string) => boolean) =>
+  jest.spyOn(fs.promises, 'access').mockImplementation(async (targetPath) => {
+    if (predicate(targetPath.toString())) return
+    throw new Error('Not executable')
+  })
 
 describe('SOffice finder', () => {
   describe('with preferred path', () => {
@@ -124,12 +131,9 @@ describe('SOffice finder', () => {
   describe('with macOS', () => {
     beforeEach(() => {
       jest.spyOn(utils, 'getPlatform').mockResolvedValue('darwin')
-      jest
-        .spyOn(utils, 'isExecutable')
-        .mockImplementation(
-          async (p) =>
-            p === '/Applications/LibreOffice.app/Contents/MacOS/soffice'
-        )
+      mockExecutable(
+        (p) => p === '/Applications/LibreOffice.app/Contents/MacOS/soffice'
+      )
     })
 
     it('finds possible executable path and returns the matched path', async () => {
@@ -145,7 +149,7 @@ describe('SOffice finder', () => {
     })
 
     it('throws error if no executable path is found', async () => {
-      jest.spyOn(utils, 'isExecutable').mockResolvedValue(false)
+      mockExecutable(() => false)
       await expect(findSOffice({})).rejects.toThrow(CLIError)
     })
   })
@@ -163,9 +167,7 @@ describe('SOffice finder', () => {
       jest.resetModules()
 
       jest.spyOn(utils, 'getPlatform').mockResolvedValue('win32')
-      jest
-        .spyOn(utils, 'isExecutable')
-        .mockImplementation(async (p) => p === sofficePath)
+      mockExecutable((p) => p === sofficePath)
 
       process.env = {
         ...originalEnv,

@@ -2,7 +2,7 @@ version: 2.1
 
 orbs:
   browser-tools: circleci/browser-tools@1.5.1
-  codecov: codecov/codecov@5.0.3
+  codecov: codecov/codecov@6.0.0
 
 executors:
   node:
@@ -12,7 +12,7 @@ executors:
         default: false
       version:
         type: string
-        default: '22.22.0' # Specify LTS major and minor for development
+        default: '26.4.0' # Specify LTS major and minor for development
     docker:
       - image: cimg/node:<< parameters.version >><<# parameters.browser >>-browsers<</ parameters.browser >>
     working_directory: ~/marp-cli
@@ -94,13 +94,16 @@ commands:
 
   test:
     parameters:
+      junit:
+        type: boolean
+        default: true
       runInBand:
         type: boolean
         default: false
     steps:
       - run:
           name: Jest
-          command: npm run test:coverage -- --ci --reporters=default --reporters=jest-junit <<#parameters.runInBand>>-i<</parameters.runInBand>><<^parameters.runInBand>>--maxWorkers=2<</parameters.runInBand>>
+          command: npm run test:coverage -- --ci --reporters=default <<# parameters.junit >>--reporters=jest-junit<</ parameters.junit >> <<#parameters.runInBand>>-i<</parameters.runInBand>><<^parameters.runInBand>>--maxWorkers=2<</parameters.runInBand>>
           environment:
             JEST_JUNIT_CLASSNAME: '{filepath}'
             JEST_JUNIT_OUTPUT_DIR: tmp/test-results
@@ -109,13 +112,16 @@ commands:
       - codecov/upload:
           flags: linux
 
-      - store_test_results:
-          path: tmp/test-results
+      - when:
+          condition: << parameters.junit >>
+          steps:
+            - store_test_results:
+                path: tmp/test-results
 
-      - codecov/upload:
-          flags: linux
-          report_type: test_results
-          dir: tmp/test-results
+            - codecov/upload:
+                flags: linux
+                report_type: test_results
+                dir: tmp/test-results
 
       - store_artifacts:
           path: ./coverage
@@ -149,6 +155,7 @@ jobs:
           browser: true
       - lint
       - test:
+          junit: false
           runInBand: true
 
   test-node20:
@@ -177,7 +184,7 @@ jobs:
     executor:
       name: node
       browser: true
-      version: '24.14'
+      version: '24.18'
     steps:
       - prepare:
           browser: true
@@ -188,7 +195,7 @@ jobs:
     executor:
       name: node
       browser: true
-      version: '26.0'
+      version: '26.4.0'
     steps:
       - prepare:
           browser: true

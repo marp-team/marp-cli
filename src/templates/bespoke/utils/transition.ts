@@ -33,7 +33,7 @@ export const _resetResolvedKeyframes = () => {
   })
 }
 
-export const _testElementAnimation = (
+const testElementAnimation = (
   elm: HTMLElement,
   callback: (ret: MarpTransitionResolvableKeyframeSettings | undefined) => void
 ) => {
@@ -44,6 +44,9 @@ export const _testElementAnimation = (
   })
   /* c8 ignore stop */
 }
+
+// For making mockable in tests
+export const _helpers = { testElementAnimation }
 
 const resolvedMarpTransitionKeyframes = new Map<
   string,
@@ -100,7 +103,7 @@ const resolveKeyframeSetting = (keyframe: string) =>
       setting.defaultDuration = durationVar
     }
 
-    _testElementAnimation(elm, resolve)
+    _helpers.testElementAnimation(elm, resolve)
   })
 
 const resolveMarpTransitionKeyframes = (transitionName: string) => {
