@@ -1,5 +1,5 @@
 import { URL } from 'node:url'
-import { Marpit } from '@marp-team/marpit'
+import type { Marpit } from '@marp-team/marpit'
 import type MarkdownIt from 'markdown-it'
 import { warn } from '../cli'
 import { debug } from '../utils/debug'
