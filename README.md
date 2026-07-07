@@ -518,7 +518,7 @@ The functional engine should export a function as the default export, which shou
 The function must return a class that inherits from Marpit, or an instance of a Marpit-based engine created with the constructor options passed as an argument.
 
 ```javascript
-// engine.mjs (ES modules)
+// engine.mjs
 import { MarpitBasedEngine } from 'marpit-based-engine'
 
 export default () => MarpitBasedEngine // Return a class inherited from Marpit
@@ -553,10 +553,6 @@ export default async (constructorOptions) => {
   return new MarpitBasedEngine(constructorOptions)
 }
 ```
-
-> [!WARNING]
->
-> Currently ES Modules can resolve only when using Marp CLI via Node.js. [The standalone binary](#standalone-binary) cannot resolve ESM. ([vercel/pkg#1291](https://github.com/vercel/pkg/issues/1291))
 
 #### `marp` getter property
 
@@ -650,10 +646,6 @@ export default {
 By default we use configuration file that is placed on current directory, but you may also specify the path for a configuration file by `--config-file` (`--config` / `-c`) option.
 
 If you want to prevent looking up a configuration file, you can pass `--no-config-file` (`--no-config`) option.
-
-> [!WARNING]
->
-> Currently ES Modules can resolve only when using Marp CLI via Node.js. [The standalone binary](#standalone-binary) cannot resolve ESM. ([vercel/pkg#1291](https://github.com/vercel/pkg/issues/1291))
 
 ### Options
 

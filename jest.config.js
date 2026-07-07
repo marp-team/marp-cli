@@ -1,5 +1,4 @@
 const esModules = [
-  '@formatjs/intl-segmenter',
   '@sindresorhus/merge-streams',
   'ansi-regex',
   'array-union',
