@@ -65,7 +65,7 @@ describe('Converter', () => {
 
   const instance = (opts: Partial<ConverterOption> = {}) =>
     new Converter({
-      browserManager,
+      getBrowserManager: () => browserManager,
       themeSet,
       allowLocalFiles: false,
       engine: Marp,
@@ -85,7 +85,7 @@ describe('Converter', () => {
       await using browserManager = new BrowserManager({ timeout: 12345 })
 
       const options = {
-        browserManager,
+        getBrowserManager: () => browserManager,
         themeSet,
         allowLocalFiles: true,
         engine: Marp,
@@ -923,7 +923,7 @@ describe('Converter', () => {
 
             await expect(
               pdfInstance({
-                browserManager,
+                getBrowserManager: () => browserManager,
                 output: 'test.pdf',
               }).convertFile(new File(onePath))
             ).rejects.toThrow(TimeoutError)
@@ -944,7 +944,7 @@ describe('Converter', () => {
             })
 
             await pdfInstance({
-              browserManager,
+              getBrowserManager: () => browserManager,
               output: 'test.pdf',
             }).convertFile(new File(onePath))
 
@@ -1229,7 +1229,7 @@ describe('Converter', () => {
               })
 
               await instance({
-                browserManager,
+                getBrowserManager: () => browserManager,
                 output: 'a.png',
                 type: ConvertType.png,
                 imageScale: 0.5,
@@ -1271,7 +1271,7 @@ describe('Converter', () => {
               )
 
               await instance({
-                browserManager,
+                getBrowserManager: () => browserManager,
                 output: 'a.png',
                 type: ConvertType.png,
                 imageScale: 0.5,
@@ -1312,7 +1312,7 @@ describe('Converter', () => {
 
               await expect(
                 instance({
-                  browserManager,
+                  getBrowserManager: () => browserManager,
                   output: 'a.png',
                   type: ConvertType.png,
                   imageScale: 0.5,
@@ -1405,7 +1405,7 @@ describe('Converter', () => {
             })
 
             await instance({
-              browserManager,
+              getBrowserManager: () => browserManager,
               output: 'b.jpg',
               type: ConvertType.jpeg,
               imageScale: 0.25,
@@ -1424,7 +1424,7 @@ describe('Converter', () => {
             writeFileSpy.mockClear()
 
             await instance({
-              browserManager,
+              getBrowserManager: () => browserManager,
               output: 'b.jpg',
               type: ConvertType.jpeg,
               imageScale: 0.25,
@@ -1449,7 +1449,7 @@ describe('Converter', () => {
             })
 
             await instance({
-              browserManager,
+              getBrowserManager: () => browserManager,
               output: 'b.jpg',
               type: ConvertType.jpeg,
               imageScale: 0.25,
@@ -1468,7 +1468,7 @@ describe('Converter', () => {
             writeFileSpy.mockClear()
 
             await instance({
-              browserManager,
+              getBrowserManager: () => browserManager,
               output: 'b.jpg',
               type: ConvertType.jpeg,
               imageScale: 0.25,

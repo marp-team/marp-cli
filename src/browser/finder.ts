@@ -3,6 +3,8 @@ import { debugBrowserFinder } from '../utils/debug'
 import { isExecutable, normalizeDarwinAppPath } from '../utils/finder'
 import type { Browser } from './browser'
 import { chromeFinder as chrome } from './finders/chrome'
+import { defaultFinders } from './finders/definition'
+import type { FinderName } from './finders/definition'
 import { edgeFinder as edge } from './finders/edge'
 import { firefoxFinder as firefox } from './finders/firefox'
 
@@ -19,19 +21,10 @@ export type BrowserFinder = (
   opts: BrowserFinderOptions
 ) => Promise<BrowserFinderResult>
 
-export type FinderName = keyof typeof availableFindersMap
-
-const availableFindersMap = { chrome, edge, firefox } as const
-
-export const availableFinders = Object.keys(
-  availableFindersMap
-) as readonly FinderName[]
-
-export const defaultFinders = [
-  'chrome',
-  'edge',
-  'firefox',
-] as const satisfies readonly FinderName[]
+const availableFindersMap = { chrome, edge, firefox } as const satisfies Record<
+  FinderName,
+  BrowserFinder
+>
 
 export const findBrowser = async (
   finders: readonly FinderName[] = defaultFinders,

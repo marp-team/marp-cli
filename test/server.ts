@@ -30,7 +30,7 @@ describe('Server', () => {
 
   const converter = (opts: Partial<ConverterOption> = {}) =>
     new Converter({
-      browserManager,
+      getBrowserManager: () => browserManager,
       themeSet,
       allowLocalFiles: false,
       engine: Marp,

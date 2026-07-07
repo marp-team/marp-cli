@@ -2,7 +2,8 @@ import path from 'node:path'
 import { ChromeBrowser } from '../../src/browser/browsers/chrome'
 import { ChromeCdpBrowser } from '../../src/browser/browsers/chrome-cdp'
 import { FirefoxBrowser } from '../../src/browser/browsers/firefox'
-import { defaultFinders, findBrowser } from '../../src/browser/finder'
+import { findBrowser } from '../../src/browser/finder'
+import { defaultFinders } from '../../src/browser/finders/definition'
 import { CLIError } from '../../src/error'
 
 afterEach(() => {
