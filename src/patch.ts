@@ -1,10 +1,7 @@
 import module from 'node:module'
-import { isStandaloneBinary } from './utils/binary'
-import { debug } from './utils/debug'
 
 export const patcher = {
   patch: () => {
-    patcher.patchSegmenter()
     patcher.enableCompileCache()
   },
   enableCompileCache: () => {
@@ -13,14 +10,6 @@ export const patcher = {
       ;(module as any).enableCompileCache?.()
     } catch {
       // no ops
-    }
-  },
-  patchSegmenter: () => {
-    // Avoid SEGFAULT in the standalone binary. pkg is using a Node.js build with small ICU.
-    // https://github.com/nodejs/node/issues/51752
-    if (isStandaloneBinary() && process.config.variables['icu_small']) {
-      debug('Using a polyfilled implementation for Intl.Segmenter.')
-      require('@formatjs/intl-segmenter/polyfill-force.js') // eslint-disable-line @typescript-eslint/no-require-imports
     }
   },
 }

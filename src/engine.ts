@@ -3,11 +3,9 @@ import path from 'node:path'
 import url from 'node:url'
 import type { Marp } from '@marp-team/marp-core'
 import type { Marpit } from '@marp-team/marpit'
-import importFrom from 'import-from'
 import { resolve as importMetaResolve } from 'import-meta-resolve'
 import { packageUp } from 'package-up'
-import { error, isError } from './error'
-import { isStandaloneBinary } from './utils/binary'
+import { error } from './error'
 import { debugEngine } from './utils/debug'
 
 type FunctionalEngine<T extends typeof Marpit = typeof Marpit> = (
@@ -47,8 +45,7 @@ export class ResolvedEngine<T extends Engine = Engine> {
 
         // Bundled Marp Core
         Object.assign(
-          // eslint-disable-next-line @typescript-eslint/no-require-imports -- import statement brings TypeError in the standalone binary
-          () => Promise.resolve(require('@marp-team/marp-core').Marp),
+          () => import('@marp-team/marp-core').then(({ Marp }) => Marp),
           { [preResolveAsyncSymbol]: true }
         ),
       ])
@@ -74,11 +71,11 @@ export class ResolvedEngine<T extends Engine = Engine> {
       if (typeof eng === 'string') {
         resolved =
           (from &&
-            (await this._silentImportOrRequire(
+            (await this._silentImport(
               eng,
               path.dirname(path.resolve(from))
             ))) ||
-          (await this._silentImportOrRequire(eng))
+          (await this._silentImport(eng))
       } else if (typeof eng === 'function' && eng[preResolveAsyncSymbol]) {
         resolved = await (eng as any)()
       } else {
@@ -119,21 +116,6 @@ export class ResolvedEngine<T extends Engine = Engine> {
 
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     return require(pkgPath) as Record<string, any>
-  }
-
-  static isESMAvailable() {
-    // Standalone binary that is built by pkg cannot import ESM module.
-    // https://github.com/vercel/pkg/issues/1291
-    return !isStandaloneBinary()
-  }
-
-  private static async _silentImportOrRequire<T = any>(
-    moduleId: string,
-    from?: string
-  ): Promise<T | null> {
-    if (this.isESMAvailable()) return this._silentImport(moduleId, from)
-
-    return this._silentRequire(moduleId, from)
   }
 
   private static async _silentImport<T = any>(
@@ -186,38 +168,6 @@ export class ResolvedEngine<T extends Engine = Engine> {
 
       return null
     }
-  }
-
-  private static async _silentRequire<T = any>(
-    moduleId: string,
-    from?: string
-  ): Promise<T | null> {
-    try {
-      const resolvedFrom = from
-        ? path.dirname(path.resolve(from))
-        : process.cwd()
-
-      return importFrom(resolvedFrom, moduleId) as T | null
-
-      /* c8 ignore start */
-    } catch (e) {
-      debugEngine(
-        'Failed to require %s.',
-        moduleId + (from ? ` from ${from}` : '')
-      )
-      debugEngine('%O', e)
-
-      if (isError(e) && e.code === 'ERR_REQUIRE_ESM') {
-        // Show reason why `require()` failed in the current context
-        if (isStandaloneBinary()) {
-          error(
-            'A standalone binary version of Marp CLI is currently not supported resolving ESM. Please consider using CommonJS, or trying to use Marp CLI via Node.js.'
-          )
-        }
-      }
-      return null // Jest allows importing ESM via `require()` so this line cannot measure coverage.
-    }
-    /* c8 ignore stop */
   }
 
   // NOTE: It cannot test because of overriding `require` in Jest context.

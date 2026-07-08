@@ -24,7 +24,9 @@ const packToTarGz = (binary) => {
   pack.entry({ name: binaryName, mode: 0o755 }, binary)
   pack.finalize()
 
-  return pack.pipe(zlib.createGzip())
+  return pack.pipe(
+    zlib.createGzip({ level: zlib.constants.Z_BEST_COMPRESSION })
+  )
 }
 
 // Clean up dist directory
@@ -69,7 +71,9 @@ if (os.includes('windows')) {
   fs.readFile(path.resolve(bin, 'marp-cli-win.exe'), (err, buffer) => {
     if (err) throw err
 
-    const pack = new ZipStream()
+    const pack = new ZipStream({
+      zlib: { level: zlib.constants.Z_BEST_COMPRESSION },
+    })
 
     pack.entry(buffer, { name: `${binaryName}.exe` })
     pack.finalize()
