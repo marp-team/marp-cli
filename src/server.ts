@@ -7,7 +7,6 @@ import querystring from 'node:querystring'
 import { URL } from 'node:url'
 import { promisify } from 'node:util'
 import type { Express, Request, Response } from 'express'
-import serveIndex from 'serve-index'
 import TypedEmitter from 'typed-emitter'
 import favicon from './assets/favicon.png'
 import {
@@ -192,7 +191,10 @@ export class Server extends (EventEmitter as new () => TypedEmitter<Server.Event
   }
 
   private async setup() {
-    const express = await import('express')
+    const [express, serveIndex] = await Promise.all([
+      import('express'),
+      import('serve-index').then((serveIndex) => serveIndex.default),
+    ])
 
     this.server = express.default()
     this.server

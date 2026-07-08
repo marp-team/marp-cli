@@ -1,6 +1,6 @@
 import fs from 'node:fs'
 import path from 'node:path'
-import { Element, Marpit, Options, RenderResult } from '@marp-team/marpit'
+import type { Marpit, Options, RenderResult } from '@marp-team/marpit'
 import { OutlinePage } from '../engine/pdf/outline-plugin'
 import transitionPlugin, { EngineTransition } from '../engine/transition-plugin'
 import barePug from './bare/bare.pug'
@@ -87,7 +87,7 @@ Object.defineProperty(bare, 'printable', { value: true })
 
 export const bespoke: Template<TemplateBespokeOption> = async (opts) => {
   const rendererOptions = {
-    container: new Element('div', { id: ':$p' }),
+    container: { tag: 'div', id: ':$p' },
     inlineSVG: true,
     slideContainer: [],
   } satisfies Options

@@ -1,6 +1,7 @@
 import chalk from 'chalk'
-import { availableFinders } from './browser/finder'
-import { BrowserManager } from './browser/manager'
+import { availableFinders } from './browser/finders/definition'
+import type { FinderName } from './browser/finders/definition'
+import type { BrowserManager } from './browser/manager'
 import * as cli from './cli'
 import { DEFAULT_PARALLEL, fromArguments } from './config'
 import { Converter, ConvertedCallback, ConvertType } from './converter'
@@ -65,7 +66,7 @@ const coerceBrowser = (browser: string | false) => {
 
   const normalize = (str: string) => str.toLowerCase().trim()
   const isAvailable = (finder: string) =>
-    (availableFinders as string[]).includes(normalize(finder))
+    availableFinders.includes(normalize(finder) as FinderName)
 
   const normalized = normalize(browser)
   if (normalized === '' || normalized === 'auto') return 'auto'
@@ -423,13 +424,20 @@ export const marpCli = async (
     const config = await fromArguments(args)
     if (args.version) return await version(config)
 
-    // Initialize browser manager
-    browserManager = new BrowserManager(config.browserManagerOption())
+    // Initialize browser manager (import is delayed for better performance when not using browser)
+    const browserManagerOption = config.browserManagerOption()
+    const getBrowserManager = async () => {
+      if (!browserManager) {
+        const { BrowserManager } = await import('./browser/manager')
+        browserManager = new BrowserManager(browserManagerOption)
+      }
+      return browserManager
+    }
 
     // Initialize converter
     const converter = new Converter({
       ...(await config.converterOption()),
-      browserManager,
+      getBrowserManager,
     })
     const cvtOpts = converter.options
 
@@ -533,7 +541,9 @@ export const marpCli = async (
           )
 
           // Preview window
-          const preview = new Preview({ browserManager: browserManager! })
+          const preview = new Preview({
+            browserManager: await getBrowserManager(),
+          })
           preview.on('exit', () => res(0))
           preview.on('opening', (location: string) => {
             const loc = location.substring(0, 50)

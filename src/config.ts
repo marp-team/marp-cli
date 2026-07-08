@@ -3,8 +3,8 @@ import path from 'node:path'
 import chalk from 'chalk'
 import { cosmiconfig } from 'cosmiconfig'
 import { osLocale } from 'os-locale'
-import { availableFinders } from './browser/finder'
-import type { FinderName } from './browser/finder'
+import { availableFinders } from './browser/finders/definition'
+import type { FinderName } from './browser/finders/definition'
 import type { BrowserManagerConfig } from './browser/manager'
 import { info, warn } from './cli'
 import { ConvertType, type ConverterOption } from './converter'
@@ -130,7 +130,7 @@ export class MarpCLIConfig {
   browserManagerOption() {
     const finders = (() => {
       const isAvailableFinder = (f: string): f is FinderName =>
-        (availableFinders as string[]).includes(f)
+        availableFinders.includes(f as FinderName)
 
       const browser = this.args.browser ?? this.conf.browser ?? 'auto'
 

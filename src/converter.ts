@@ -1,7 +1,7 @@
 import path from 'node:path'
 import { URL } from 'node:url'
 import type { Marp, MarpOptions } from '@marp-team/marp-core'
-import { Marpit, Options as MarpitOptions } from '@marp-team/marpit'
+import type { Marpit, Options as MarpitOptions } from '@marp-team/marpit'
 import chalk from 'chalk'
 import type { Page, HTTPRequest, Viewport } from 'puppeteer-core'
 import type { Browser } from './browser/browser'
@@ -62,8 +62,8 @@ export const mimeTypes = {
 export interface ConverterOption {
   allowLocalFiles: boolean
   baseUrl?: string
-  browserManager: BrowserManager
   engine: Engine
+  getBrowserManager: () => BrowserManager | Promise<BrowserManager>
   globalDirectives: { theme?: string } & Partial<TemplateMeta>
   html?: MarpOptions['html']
   imageScale?: number
@@ -130,7 +130,8 @@ export class Converter {
   }
 
   get browser(): Promise<Browser> {
-    return this.options.browserManager.browserForConversion()
+    return (async () =>
+      (await this.options.getBrowserManager()).browserForConversion())()
   }
 
   get template(): Template {

@@ -3,8 +3,10 @@ import { debugBrowser } from '../utils/debug'
 import { createMemoizedPromiseContext } from '../utils/memoized-promise'
 import type { Browser, BrowserProtocol } from './browser'
 import { ChromeCdpBrowser } from './browsers/chrome-cdp'
-import { defaultFinders, findBrowser } from './finder'
-import type { BrowserFinderResult, FinderName } from './finder'
+import { findBrowser } from './finder'
+import type { BrowserFinderResult } from './finder'
+import { defaultFinders } from './finders/definition'
+import type { FinderName } from './finders/definition'
 
 export interface BrowserManagerConfig {
   /** Browser finders */

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 import fs from 'node:fs'
 import path from 'node:path'
-import { Marpit } from '@marp-team/marpit'
+import type { Marpit } from '@marp-team/marpit'
 import { isDynamicPattern } from 'tinyglobby'
 import { warn } from './cli'
 import { isError } from './error'
