@@ -1,19 +1,18 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import chalk from 'chalk'
-import { cosmiconfig, cosmiconfigSync } from 'cosmiconfig'
+import { cosmiconfig } from 'cosmiconfig'
 import { osLocale } from 'os-locale'
 import { availableFinders } from './browser/finder'
 import type { FinderName } from './browser/finder'
 import type { BrowserManagerConfig } from './browser/manager'
-import { info, warn, error as cliError } from './cli'
+import { info, warn } from './cli'
 import { ConvertType, type ConverterOption } from './converter'
 import { ResolvableEngine, ResolvedEngine } from './engine'
 import { keywordsAsArray } from './engine/meta-plugin'
 import { error, isError } from './error'
 import { TemplateOption } from './templates'
 import { Theme, ThemeSet } from './theme'
-import { isStandaloneBinary } from './utils/binary'
 import { isOfficialContainerImage } from './utils/container'
 import { debugConfig } from './utils/debug'
 
@@ -124,10 +123,6 @@ export class MarpCLIConfig {
     })()
 
     return conf
-  }
-
-  static isESMAvailable() {
-    return ResolvedEngine.isESMAvailable()
   }
 
   private constructor() {} // eslint-disable-line @typescript-eslint/no-empty-function
@@ -435,9 +430,7 @@ export class MarpCLIConfig {
   }
 
   private async loadConf(confPath?: string) {
-    const explorer = MarpCLIConfig.isESMAvailable()
-      ? cosmiconfig(MarpCLIConfig.moduleName)
-      : cosmiconfigSync(MarpCLIConfig.moduleName)
+    const explorer = cosmiconfig(MarpCLIConfig.moduleName)
 
     try {
       const ret = await (async () => {
@@ -472,15 +465,6 @@ export class MarpCLIConfig {
       debugConfig('Error occurred during loading configuration file: %o', e)
 
       const isErr = isError(e)
-
-      if (isErr && e.code === 'ERR_REQUIRE_ESM') {
-        // Show reason why `require()` failed in the current context
-        if (isStandaloneBinary()) {
-          cliError(
-            'A standalone binary version of Marp CLI is currently not supported resolving ESM. Please consider using CommonJS, or trying to use Marp CLI via Node.js.'
-          )
-        }
-      }
 
       error(
         [
