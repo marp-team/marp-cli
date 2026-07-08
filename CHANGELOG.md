@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Change
+
+- Adopt [Node.js SEA](https://nodejs.org/api/single-executable-applications.html) for building the standalone binary ([#568](https://github.com/marp-team/marp-cli/issues/568), [#731](https://github.com/marp-team/marp-cli/pull/731))
+  - Now the standalone binary allows using ES Modules and `import()` in the engine and configuration file
+
 ## v4.4.1 - 2026-07-04
 
 ### Changed
