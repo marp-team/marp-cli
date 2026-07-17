@@ -6,10 +6,14 @@
 
 - Adopt [Node.js SEA](https://nodejs.org/api/single-executable-applications.html) for building the standalone binary ([#568](https://github.com/marp-team/marp-cli/issues/568), [#731](https://github.com/marp-team/marp-cli/pull/731))
   - Now the standalone binary allows using ES Modules and `import()` in the engine and configuration file
+- Upgrade Marp Core to [v4.4.0](https://github.com/marp-team/marp-core/releases/v4.4.0) ([#734](https://github.com/marp-team/marp-cli/pull/734))
+- Upgrade dependent packages ([#734](https://github.com/marp-team/marp-cli/pull/734))
 
 ### Fixed
 
-- Improve boot time by loading Marpit and Puppeteer on demand ([#732](https://github.com/marp-team/marp-cli/pull/732))
+- Improve CLI boot time by loading Marpit and Puppeteer on demand ([#732](https://github.com/marp-team/marp-cli/pull/732))
+- `gaia` theme renders an incorrect PDF background when using Firefox browser (`--browser firefox`) on macOS ([#734](https://github.com/marp-team/marp-cli/pull/734))
+- Mitigate slow PDF rendering of `gaia` theme on macOS/iOS when generated via Chrome/Chromium ([#734](https://github.com/marp-team/marp-cli/pull/734))
 
 ## v4.4.1 - 2026-07-04
 
