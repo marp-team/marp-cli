@@ -12,7 +12,9 @@
 ### Fixed
 
 - Improve CLI boot time by loading Marpit and Puppeteer on demand ([#732](https://github.com/marp-team/marp-cli/pull/732))
-- `gaia` theme renders an incorrect PDF background when using Firefox browser (`--browser firefox`) on macOS ([#734](https://github.com/marp-team/marp-cli/pull/734))
+- Improve PDF rendering compatibility with macOS Firefox (`--browser firefox`)
+  - Fixed: `gaia` theme renders an incorrect PDF background ([#734](https://github.com/marp-team/marp-cli/pull/734))
+  - Fixed: `uncover` theme renders incorrect page numbers ([#735](https://github.com/marp-team/marp-cli/pull/735))
 - Mitigate slow PDF rendering of `gaia` theme on macOS/iOS when generated via Chrome/Chromium ([#734](https://github.com/marp-team/marp-cli/pull/734))
 
 ## v4.4.1 - 2026-07-04
