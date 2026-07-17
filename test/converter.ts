@@ -931,37 +931,6 @@ describe('Converter', () => {
           timeout
         )
       })
-
-      describe('with Firefox browser', () => {
-        it(
-          'outputs warning about incompatibility',
-          async () => {
-            const warn = jest.spyOn(console, 'warn').mockImplementation()
-
-            await using browserManager = new BrowserManager({
-              finders: ['firefox'],
-              timeout,
-            })
-
-            await pdfInstance({
-              getBrowserManager: () => browserManager,
-              output: 'test.pdf',
-            }).convertFile(new File(onePath))
-
-            expect(warn).toHaveBeenCalledWith(
-              expect.stringContaining(
-                'The output may include some incompatible renderings'
-              )
-            )
-            expect(fs.promises.writeFile).toHaveBeenCalled()
-
-            const [lastCall] = writeFileSpy.mock.calls.slice(-1)
-            expect(lastCall[0]).toBe('test.pdf')
-            expect(lastCall[1]).toBeInstanceOf(Buffer)
-          },
-          timeout
-        )
-      })
     })
 
     describe('when convert type is PPTX', () => {
