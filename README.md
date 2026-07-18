@@ -126,9 +126,6 @@ We also provide standalone binaries for Linux, macOS (Apple Silicon), and Window
 
 [releases]: https://github.com/marp-team/marp-cli/releases
 
-> [!NOTE]
-> The standalone binary only supports specific architectures, and cannot load configuration files or engines written as ES Module. For the best experience, _we recommend installing Marp CLI through Node.js or Homebrew whenever possible._
-
 ## Basic usage
 
 > [!IMPORTANT]
