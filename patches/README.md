@@ -10,6 +10,12 @@ Patches in this directory will be applied when `npm install` run, through `prepa
 
 ## Reasons for patches
 
+### [@yao-pkg/pkg](https://github.com/yao-pkg/pkg)
+
+This patch exposes the existing `useLocalNode` option of the internal SEA API through the public Node.js API. Marp CLI runs pkg with a stripped official Node.js binary as `process.execPath` to reduce the standalone binary size.
+
+- https://yao-pkg.github.io/pkg/guide/custom-node
+
 ### [jsdom](https://github.com/jsdom/jsdom)
 
 This patch makes the latest JSDOM allow to mock `window.location` in tests.

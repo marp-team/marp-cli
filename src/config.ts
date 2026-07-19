@@ -1,7 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import chalk from 'chalk'
-import { cosmiconfig } from 'cosmiconfig'
+import { cosmiconfig, defaultLoaders } from 'cosmiconfig'
 import { osLocale } from 'os-locale'
 import { availableFinders } from './browser/finders/definition'
 import type { FinderName } from './browser/finders/definition'
@@ -430,7 +430,13 @@ export class MarpCLIConfig {
   }
 
   private async loadConf(confPath?: string) {
-    const explorer = cosmiconfig(MarpCLIConfig.moduleName)
+    const explorer = cosmiconfig(MarpCLIConfig.moduleName, {
+      ...('pkg' in process && {
+        // The standalone binary is using Node.js 26 and later, which supports stripping types from TypeScript files.
+        // So use the loader for JS to avoid bundling heavy `typescript` module into the binary.
+        loaders: { '.ts': defaultLoaders['.js'] },
+      }),
+    })
 
     try {
       const ret = await (async () => {

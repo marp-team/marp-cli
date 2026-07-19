@@ -44,7 +44,7 @@ Use `./marp-cli.js` instead of `marp` command.
 
 #### Standalone binary
 
-Standalone binaries created by [pkg](https://github.com/zeit/pkg) will output to `./bin` directory.
+Standalone binaries created by [pkg](https://yao-pkg.github.io/pkg/) will output to `./bin` directory.
 
 ```bash
 # Build & create standalone binaries
@@ -52,7 +52,7 @@ npm run build:standalone
 ```
 
 ```bash
-./bin/marp-cli-linux --help
+./bin/marp --help
 ```
 
 ### Testing
