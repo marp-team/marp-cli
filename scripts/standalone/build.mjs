@@ -37,23 +37,24 @@ async function prepareNode() {
       'Node.js v26 or later is required to build standalone binaries.'
     )
 
-  const patchedNode = path.join(
+  const tmpNode = path.join(
     tmpDir,
     `node${process.platform === 'win32' ? '.exe' : ''}`
   )
 
-  await fs.copyFile(process.execPath, patchedNode)
+  await fs.copyFile(process.execPath, tmpNode)
 
-  // Patch into the Node.js binary to shrink the size by removing unnecessary symbols and debug information
+  // Prebuild patch for the Node.js binary
   switch (process.platform) {
     case 'darwin':
-      await run('strip', ['-S', '-x', patchedNode])
-      await run('codesign', ['--force', '--sign', '-', patchedNode])
+      // Strip local symbols and re-sign the binary
+      await run('strip', ['-S', '-x', tmpNode])
+      await run('codesign', ['--force', '--sign', '-', tmpNode])
       break
     case 'linux':
-      await run('strip', ['--strip-unneeded', patchedNode])
-      break
+      // Strip unneeded symbols
+      await run('strip', ['--strip-unneeded', tmpNode])
   }
 
-  return patchedNode
+  return tmpNode
 }
