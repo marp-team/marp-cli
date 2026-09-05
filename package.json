@@ -166,6 +166,11 @@
   "overrides": {
     "pptxgenjs@4.0.1": {
       "image-size": "npm:dry-uninstall@0.3.0"
+    },
+    "puppeteer-core": {
+      "@puppeteer/browsers@2.13.2": {
+        "extract-zip": "npm:dry-uninstall@0.3.0"
+      }
     }
   },
   "publishConfig": {
