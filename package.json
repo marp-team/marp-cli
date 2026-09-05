@@ -129,7 +129,7 @@
     "portfinder": "^1.0.38",
     "postcss": "^8.5.26",
     "postcss-url": "^10.1.4",
-    "pptxgenjs": "^4.0.1",
+    "pptxgenjs": "4.0.1",
     "prettier": "^3.9.6",
     "pug": "^3.0.4",
     "rollup": "^4.63.1",
@@ -162,6 +162,11 @@
     "serve-index": "^1.9.2",
     "tmp": "^0.2.7",
     "ws": "^8.21.3"
+  },
+  "overrides": {
+    "pptxgenjs@4.0.1": {
+      "image-size": "npm:dry-uninstall@0.3.0"
+    }
   },
   "publishConfig": {
     "access": "public"
