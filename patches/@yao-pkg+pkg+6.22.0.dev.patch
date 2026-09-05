@@ -1,0 +1,64 @@
+diff --git a/node_modules/@yao-pkg/pkg/lib-es5/config.d.ts b/node_modules/@yao-pkg/pkg/lib-es5/config.d.ts
+--- a/node_modules/@yao-pkg/pkg/lib-es5/config.d.ts
++++ b/node_modules/@yao-pkg/pkg/lib-es5/config.d.ts
+@@ -31,5 +31,7 @@ export interface ParsedInput {
+     targets?: string;
+     /** `--build`: force rebuilding base Node.js binaries from source. */
+     build?: boolean;
++    /** Use `process.execPath` as the base Node.js executable for SEA. */
++    useLocalNode?: boolean;
+     /** Pre-merge flag values keyed by CLI name (see `RawFlags`). */
+     flags: RawFlags;
+@@ -132,5 +134,7 @@ export interface ResolvedConfig {
+     flags: ResolvedFlags;
+     /** Force rebuilding base Node.js binaries from source. */
+     forceBuild: boolean;
++    /** Use `process.execPath` as the base Node.js executable for SEA. */
++    useLocalNode: boolean;
+     /** Resolved single-output base path (absolute). */
+     output: string;
+diff --git a/node_modules/@yao-pkg/pkg/lib-es5/config.js b/node_modules/@yao-pkg/pkg/lib-es5/config.js
+--- a/node_modules/@yao-pkg/pkg/lib-es5/config.js
++++ b/node_modules/@yao-pkg/pkg/lib-es5/config.js
+@@ -337,5 +337,6 @@ function parseOptionsInput(options) {
+         outputPath: options.outputPath,
+         targets: joinList(options.targets),
+         build: options.build,
++        useLocalNode: options.useLocalNode === true,
+         flags,
+         apiPkg: Object.keys(apiPkg).length ? apiPkg : undefined,
+@@ -811,5 +812,6 @@ async function resolveConfig(parsed) {
+         pkg,
+         flags,
+         forceBuild: parsed.build === true,
++        useLocalNode: parsed.useLocalNode === true,
+         output,
+         autoOutput,
+diff --git a/node_modules/@yao-pkg/pkg/lib-es5/index.js b/node_modules/@yao-pkg/pkg/lib-es5/index.js
+--- a/node_modules/@yao-pkg/pkg/lib-es5/index.js
++++ b/node_modules/@yao-pkg/pkg/lib-es5/index.js
+@@ -119 +119 @@ async function exec(argvOrOptions) {
+-    const { input, inputFin, inputJson, config, configJson, pkg, flags, forceBuild, targets: resolvedTargets, } = await (0, config_1.resolveConfig)(parsed);
++    const { input, inputFin, inputJson, config, configJson, pkg, flags, forceBuild, useLocalNode, targets: resolvedTargets, } = await (0, config_1.resolveConfig)(parsed);
+@@ -164,3 +164,4 @@ async function exec(argvOrOptions) {
+                 addition: (0, config_1.isConfiguration)(input) ? input : undefined,
+                 doCompress: flags.compress,
++                useLocalNode,
+             });
+@@ -177,4 +178,5 @@ async function exec(argvOrOptions) {
+             await (0, sea_1.default)(inputFin, {
+                 targets,
+                 signature: flags.signature,
++                useLocalNode,
+             });
+diff --git a/node_modules/@yao-pkg/pkg/lib-es5/types.d.ts b/node_modules/@yao-pkg/pkg/lib-es5/types.d.ts
+--- a/node_modules/@yao-pkg/pkg/lib-es5/types.d.ts
++++ b/node_modules/@yao-pkg/pkg/lib-es5/types.d.ts
+@@ -213,5 +213,7 @@ export interface PkgExecOptions extends PkgBaseOptions {
+     bakeOptions?: string | string[];
+     /** Build base binaries from source instead of downloading prebuilt ones. */
+     build?: boolean;
++    /** Use the Node.js executable running pkg as the base for a SEA build. */
++    useLocalNode?: boolean;
+     /** Package names to treat as public. `['*']` for all packages. */
+     publicPackages?: string[];

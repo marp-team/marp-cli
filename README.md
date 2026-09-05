@@ -757,7 +757,9 @@ export default config
 
 #### TypeScript (`marp.config.ts`)
 
-If you installed `typescript` into your local project together with Marp CLI, you can write a config by TypeScript `marp.config.ts`. Marp CLI will try to transpile `.ts` with the project configuration `tsconfig.json`.
+If you've installed both of Marp CLI and TypeScript (up to v6) into your local Node.js project, you can write a config by TypeScript: `marp.config.ts`. Marp CLI will try to transpile `.ts` with the project setting `tsconfig.json`.
+
+If you're using the standalone binary, Marp CLI will try to load `marp.config.ts` by [Node.js native TypeScript support](https://nodejs.org/learn/typescript/run-natively). In this case, the project setting `tsconfig.json` will not be used, and there are [some constraints](https://nodejs.org/learn/typescript/run-natively#constraints).
 
 In TypeScript configuration, you can specify the custom engine as the generics for `defineConfig` helper, like this:
 

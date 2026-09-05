@@ -23,4 +23,5 @@ cosmiconfig.cosmiconfig = (moduleName, options) => {
   })
 }
 
-module.exports = cosmiconfig
+// Copy the frozen default loaders so tests can spy on loader overrides.
+module.exports = { ...cosmiconfig, defaultLoaders: { ...defaultLoaders } }
