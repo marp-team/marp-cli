@@ -4,6 +4,8 @@
 
 ### Changed
 
+- Optimize the size of standalone binaries ([#736](https://github.com/marp-team/marp-cli/pull/736))
+- Use Node.js native TypeScript support in the standalone binary ([#736](https://github.com/marp-team/marp-cli/pull/736))
 - Upgrade Node.js and dependent packages ([#738](https://github.com/marp-team/marp-cli/pull/738))
 
 ## v4.5.0 - 2026-07-17
