@@ -25,6 +25,7 @@ export class ResolvedEngine<T extends Engine = Engine> {
 
   private _cachedPackage?: Record<string, any> | null
 
+  private static readonly _classPaths = new WeakMap<object, string>()
   private static _defaultEngine: ResolvedEngine<typeof Marp> | undefined
 
   static async resolve<T extends Engine = Engine>(
@@ -41,7 +42,8 @@ export class ResolvedEngine<T extends Engine = Engine> {
     ) {
       ResolvedEngine._defaultEngine = await ResolvedEngine.resolve([
         // Manually-installed Marp Core
-        '@marp-team/marp-core',
+        '@marp-team/marp-core/full', // v5
+        '@marp-team/marp-core', // v4 or earlier
 
         // Bundled Marp Core
         Object.assign(
@@ -82,6 +84,8 @@ export class ResolvedEngine<T extends Engine = Engine> {
         resolved = eng
       }
 
+      const classPath = this._classPaths.get(resolved)
+
       // Resolve default export
       while (
         resolved &&
@@ -92,7 +96,15 @@ export class ResolvedEngine<T extends Engine = Engine> {
         resolved = resolved.default
       }
 
-      if (resolved) break
+      if (resolved) {
+        if (
+          classPath &&
+          (typeof resolved === 'function' || typeof resolved === 'object')
+        ) {
+          this._classPaths.set(resolved, classPath)
+        }
+        break
+      }
     }
 
     if (!resolved)
@@ -144,10 +156,20 @@ export class ResolvedEngine<T extends Engine = Engine> {
         url.pathToFileURL(basePath).toString()
       )
 
+      const importModule = async (specifier: string) => {
+        const imported = await import(specifier)
+
+        if (resolved.startsWith('file:')) {
+          this._classPaths.set(imported, url.fileURLToPath(resolved))
+        }
+
+        return imported
+      }
+
       // Try to import without `file:` protocol first
       if (resolved.startsWith('file:')) {
         try {
-          return await import(url.fileURLToPath(resolved))
+          return await importModule(url.fileURLToPath(resolved))
 
           // NOTE: Fallback cannot test because of overriding `import` in Jest context.
           /* c8 ignore start */
@@ -156,7 +178,7 @@ export class ResolvedEngine<T extends Engine = Engine> {
         }
       }
 
-      return await import(resolved)
+      return await importModule(resolved)
       /* c8 ignore stop */
     } catch (e) {
       debugEngine(
@@ -170,9 +192,12 @@ export class ResolvedEngine<T extends Engine = Engine> {
     }
   }
 
-  // NOTE: It cannot test because of overriding `require` in Jest context.
-  /* c8 ignore start */
   private findClassPath(klass) {
+    const classPath = ResolvedEngine._classPaths.get(klass)
+    if (classPath) return classPath
+
+    // NOTE: It cannot test because of overriding `require` in Jest context.
+    /* c8 ignore start */
     for (const moduleId in require.cache) {
       const expt = require.cache[moduleId]?.exports
 
@@ -185,6 +210,6 @@ export class ResolvedEngine<T extends Engine = Engine> {
         return moduleId
     }
     return undefined
+    /* c8 ignore stop */
   }
-  /* c8 ignore stop */
 }
