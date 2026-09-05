@@ -7,7 +7,6 @@ import { Marp } from '@marp-team/marp-core'
 import { Options } from '@marp-team/marpit'
 import type { Cheerio } from 'cheerio'
 import { load } from 'cheerio'
-import { imageSize } from 'image-size'
 import { PDFDocument, PDFDict, PDFName, PDFHexString, PDFNumber } from 'pdf-lib'
 import { TimeoutError } from 'puppeteer-core'
 import { fromBuffer as yauzlFromBuffer } from 'yauzl'
@@ -41,6 +40,25 @@ type JSON = string | number | boolean | null | JSON[] | { [key: string]: JSON }
 
 const data = <T extends JSON>(elm: Cheerio<any>, name: string) =>
   elm.data(name) as Record<string, T> | undefined
+
+const imageSize = async (buffer: Buffer) => {
+  const pdf = await PDFDocument.create()
+  const pngSignature = Buffer.from([
+    0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a,
+  ])
+
+  if (buffer.subarray(0, 8).equals(pngSignature)) {
+    const { width, height } = await pdf.embedPng(buffer)
+    return { width, height }
+  }
+  if (buffer[0] === 0xff && buffer[1] === 0xd8) {
+    // pdf-lib's JPEG parser ignores byteOffset, so use a standalone array.
+    const { width, height } = await pdf.embedJpg(Uint8Array.from(buffer))
+    return { width, height }
+  }
+
+  throw new Error('Unsupported image format: expected PNG or JPEG')
+}
 
 describe('Converter', () => {
   const onePath = path.resolve(__dirname, '_files/1.md')
@@ -1137,7 +1155,7 @@ describe('Converter', () => {
           const png = writeFileSpy.mock.calls[0][1] as Buffer
           expect(png.toString('ascii', 1, 4)).toBe('PNG')
 
-          const { width, height } = imageSize(png)
+          const { width, height } = await imageSize(png)
           expect(width).toBe(1280)
           expect(height).toBe(720)
         },
@@ -1158,7 +1176,7 @@ describe('Converter', () => {
             expect(writeFileSpy.mock.calls[0][1]).toBeInstanceOf(Buffer)
 
             const png = writeFileSpy.mock.calls[0][1] as Buffer
-            const { width, height } = imageSize(png)
+            const { width, height } = await imageSize(png)
 
             expect(width).toBe(960)
             expect(height).toBe(720)
@@ -1180,7 +1198,7 @@ describe('Converter', () => {
             expect(writeFileSpy.mock.calls[0][1]).toBeInstanceOf(Buffer)
 
             const png = writeFileSpy.mock.calls[0][1] as Buffer
-            const { width, height } = imageSize(png)
+            const { width, height } = await imageSize(png)
 
             expect(width).toBe(640)
             expect(height).toBe(360)
@@ -1208,7 +1226,7 @@ describe('Converter', () => {
               expect(lastCall[1]).toBeInstanceOf(Buffer)
 
               const png = lastCall[1] as Buffer
-              const { width, height } = imageSize(png)
+              const { width, height } = await imageSize(png)
 
               expect(width).toBe(640)
               expect(height).toBe(360)
@@ -1250,7 +1268,7 @@ describe('Converter', () => {
               expect(lastCall[1]).toBeInstanceOf(Buffer)
 
               const png = lastCall[1] as Buffer
-              const { width, height } = imageSize(png)
+              const { width, height } = await imageSize(png)
 
               expect(width).toBe(640)
               expect(height).toBe(360)
@@ -1311,7 +1329,7 @@ describe('Converter', () => {
           expect(jpeg[0]).toBe(0xff)
           expect(jpeg[1]).toBe(0xd8)
 
-          const { width, height } = imageSize(jpeg)
+          const { width, height } = await imageSize(jpeg)
           expect(width).toBe(1280)
           expect(height).toBe(720)
         },
@@ -1332,7 +1350,7 @@ describe('Converter', () => {
             expect(writeFileSpy.mock.calls[0][1]).toBeInstanceOf(Buffer)
 
             const jpeg = writeFileSpy.mock.calls[0][1] as Buffer
-            const { width, height } = imageSize(jpeg)
+            const { width, height } = await imageSize(jpeg)
 
             expect(width).toBe(960)
             expect(height).toBe(720)
@@ -1354,7 +1372,7 @@ describe('Converter', () => {
             expect(writeFileSpy.mock.calls[0][1]).toBeInstanceOf(Buffer)
 
             const jpeg = writeFileSpy.mock.calls[0][1] as Buffer
-            const { width, height } = imageSize(jpeg)
+            const { width, height } = await imageSize(jpeg)
 
             expect(width).toBe(320)
             expect(height).toBe(180)
@@ -1384,7 +1402,7 @@ describe('Converter', () => {
             expect(lastCall[1]).toBeInstanceOf(Buffer)
 
             const jpeg = lastCall[1] as Buffer
-            const { width, height } = imageSize(jpeg)
+            const { width, height } = await imageSize(jpeg)
 
             expect(width).toBe(320)
             expect(height).toBe(180)
@@ -1428,7 +1446,7 @@ describe('Converter', () => {
             expect(lastCall[1]).toBeInstanceOf(Buffer)
 
             const jpeg = lastCall[1] as Buffer
-            const { width, height } = imageSize(jpeg)
+            const { width, height } = await imageSize(jpeg)
 
             expect(width).toBe(320)
             expect(height).toBe(180)
