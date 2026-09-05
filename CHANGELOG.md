@@ -2,9 +2,13 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Upgrade Node.js and dependent packages ([#738](https://github.com/marp-team/marp-cli/pull/738))
+
 ## v4.5.0 - 2026-07-17
 
-### Change
+### Changed
 
 - Adopt [Node.js SEA](https://nodejs.org/api/single-executable-applications.html) for building the standalone binary ([#568](https://github.com/marp-team/marp-cli/issues/568), [#731](https://github.com/marp-team/marp-cli/pull/731))
   - Now the standalone binary allows using ES Modules and `import()` in the engine and configuration file
