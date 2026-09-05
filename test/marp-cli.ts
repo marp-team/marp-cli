@@ -3,6 +3,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { version as coreVersion } from '@marp-team/marp-core/package.json'
 import { version as marpitVersion } from '@marp-team/marpit/package.json'
+import { defaultLoaders } from 'cosmiconfig'
 import * as cosmiconfigExplorer from 'cosmiconfig/dist/Explorer' // eslint-disable-line import-x/namespace
 import stripAnsi from 'strip-ansi'
 import { version as cliVersion } from '../package.json'
@@ -1386,6 +1387,24 @@ describe('Marp CLI', () => {
           ).toBe(0)
 
           expect(debug).toHaveBeenCalledWith(expect.stringContaining('loaded'))
+        })
+
+        it('uses JS loader for TypeScript config in the standalone binary', async () => {
+          const conf = assetFn('_configs/typescript/marp.config.ts')
+          const jsLoader = jest
+            .spyOn(defaultLoaders, '.js')
+            .mockResolvedValue({})
+
+          jest.spyOn(console, 'log').mockImplementation()
+
+          Object.assign(process, { pkg: {} })
+
+          try {
+            expect(await marpCli(['-v', '-c', conf])).toBe(0)
+            expect(jsLoader).toHaveBeenCalledWith(conf, expect.any(String))
+          } finally {
+            Reflect.deleteProperty(process, 'pkg')
+          }
         })
       })
     })
