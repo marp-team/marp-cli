@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## v4.5.1 - 2026-09-06
+
 ### Changed
 
 - Optimize the size of standalone binaries ([#736](https://github.com/marp-team/marp-cli/pull/736))
