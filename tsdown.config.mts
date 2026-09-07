@@ -18,6 +18,7 @@ export default defineConfig((options) => {
     outDir: 'lib',
     dts: false,
     target: 'es2019',
+    sourcemap: true,
     minify: !options.watch && {
       // CLIError must retain its class name in the public API.
       compress: { keepNames: { class: true, function: false } },
@@ -89,7 +90,7 @@ export default defineConfig((options) => {
             autoprefixer(),
             cssnano({
               // Keep empty transition keyframes so their names can be detected.
-              preset: ['default', { autoprefixer: false, discardEmpty: false }],
+              preset: ['default', { discardEmpty: false }],
             }),
           ],
         },
