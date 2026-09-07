@@ -7,7 +7,7 @@ afterEach(() => {
 
 describe('Prepare for CLI interface', () => {
   it('parses argv and return normalized result', () => {
-    const argv = ['node', 'marp-cli.js', '--pdf', 'test.md']
+    const argv = ['node', 'marp-cli.mjs', '--pdf', 'test.md']
     jest.replaceProperty(process, 'argv', argv)
 
     expect(cliPrepare()).toStrictEqual({

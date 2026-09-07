@@ -30,6 +30,7 @@ module.exports = {
   coveragePathIgnorePatterns: ['/node_modules/', '.*\\.d\\.ts'],
   coverageProvider: 'v8',
   coverageThreshold: { global: { lines: 95 } },
+  moduleNameMapper: { '^(.+\\.scss)\\?inline$': '$1' },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   prettierPath: null,
   setupFiles: ['./jest.setup.js'],

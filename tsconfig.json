@@ -4,15 +4,17 @@
     "@tsconfig/node22/tsconfig.json"
   ],
   "compilerOptions": {
+    "allowImportingTsExtensions": true,
     "isolatedModules": true,
     "jsx": "react",
     "module": "preserve",
     "moduleResolution": "bundler",
+    "noEmit": true,
     "noImplicitAny": false,
     "resolveJsonModule": true,
     "sourceMap": true,
     "types": ["jest", "node"]
   },
-  "include": ["src", "test", "scripts"],
+  "include": ["src", "test", "scripts", "tsdown.config.mts"],
   "exclude": ["**/__mocks__"]
 }

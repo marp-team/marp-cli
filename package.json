@@ -26,59 +26,56 @@
     "url": "https://github.com/marp-team/marp-cli"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=22"
   },
-  "main": "lib/index.js",
-  "types": "types/src/index.d.ts",
+  "main": "lib/index.mjs",
+  "types": "lib/index.d.mts",
   "files": [
-    "marp-cli.js",
-    "lib/",
-    "types/src/"
+    "marp-cli.mjs",
+    "lib/"
   ],
   "bin": {
-    "marp": "marp-cli.js"
+    "marp": "marp-cli.mjs"
   },
   "browserslist": [
     "> 1% and last 3 versions",
     "Firefox ESR"
   ],
+  "prettier": {
+    "semi": false,
+    "singleQuote": true,
+    "trailingComma": "es5"
+  },
   "scripts": {
-    "build": "npm -s run clean && rollup -c",
+    "build": "tsdown",
     "build:standalone": "run-s build standalone",
     "check:audit": "npm audit --audit-level=moderate",
     "check:format": "npm -s run format -- -c",
-    "check:ts": "tsc --noEmit",
+    "check:ts": "tsc",
     "clean": "node -e \"fs.rmSync('lib',{recursive:true,force:true})\"",
-    "format": "prettier \"**/*.{css,js,jsx,json,md,mjs,scss,ts,tsx,yaml,yml}\"",
+    "format": "prettier \"**/*.{css,js,jsx,json,md,mjs,mts,scss,ts,tsx,yaml,yml}\"",
     "format:write": "npm -s run format -- --write",
     "lint:js": "eslint --cache",
     "lint:css": "stylelint \"src/**/*.{css,scss}\"",
-    "prepack": "npm-run-all --parallel check:* lint:* test:coverage --parallel build types",
+    "prepack": "npm-run-all --parallel check:* lint:* test:coverage --sequential build",
     "prepare": "npx --no patch-package || exit 0",
     "preversion": "run-p check:* lint:* test:coverage",
     "standalone": "node ./scripts/standalone/build.mjs",
     "standalone:pack": "node ./scripts/standalone/pack.mjs",
     "test": "jest",
     "test:coverage": "jest --coverage",
-    "types": "node -e \"fs.rmSync('types',{recursive:true,force:true})\" && tsc --declaration --emitDeclarationOnly --outDir types",
     "version": "curl https://raw.githubusercontent.com/marp-team/actions/v1/lib/scripts/version.js | node && git add -A CHANGELOG.md",
-    "watch": "rollup -w -c"
+    "watch": "npm -s run clean && tsdown -w --no-clean"
   },
   "devDependencies": {
     "@babel/core": "^7.29.7",
     "@babel/preset-env": "^7.29.7",
     "@babel/preset-react": "^7.29.7",
     "@babel/preset-typescript": "^7.29.7",
-    "@rollup/plugin-alias": "^6.0.0",
-    "@rollup/plugin-commonjs": "^29.0.3",
-    "@rollup/plugin-json": "^6.1.0",
-    "@rollup/plugin-node-resolve": "^16.0.3",
-    "@rollup/plugin-replace": "^6.0.3",
-    "@rollup/plugin-terser": "^1.0.0",
-    "@rollup/plugin-typescript": "^12.3.0",
     "@rollup/plugin-url": "^8.0.2",
     "@tsconfig/node22": "^22.0.6",
     "@tsconfig/recommended": "^1.0.13",
+    "@tsdown/css": "^0.22.14",
     "@types/debug": "^4.1.13",
     "@types/dom-view-transitions": "^1.0.6",
     "@types/express": "^5.0.6",
@@ -130,16 +127,14 @@
     "prettier": "^3.9.6",
     "pug": "^3.0.4",
     "resedit": "^3.0.2",
-    "rollup": "^4.63.1",
     "rollup-plugin-license": "^3.7.1",
-    "rollup-plugin-postcss": "^4.0.2",
-    "sass": "^1.103.1",
+    "sass-embedded": "^1.103.1",
     "strip-ansi": "^7.2.0",
     "stylelint": "^16.26.1",
     "stylelint-config-standard-scss": "^15.0.1",
     "supertest": "^7.2.2",
     "tinyglobby": "^0.2.17",
-    "tslib": "^2.8.1",
+    "tsdown": "^0.22.14",
     "typed-emitter": "^2.1.0",
     "typescript": "npm:@typescript/typescript6@^6.0.2",
     "typescript-eslint": "^8.68.0",

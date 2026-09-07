@@ -8,7 +8,7 @@ const compress = process.env.MARP_CLI_PKG_COMPRESS || 'Brotli'
 export default {
   compress,
   outputPath: 'bin',
-  scripts: 'lib/**/*.js',
+  scripts: 'lib/**/*.{js,mjs}',
   sea: true,
   targets: ['host'],
   debug,
@@ -23,7 +23,7 @@ export default {
     ignore: [
       '**/node_modules/**/typescript/**',
       '**/*.map',
-      '**/*.ts',
+      '**/*.{ts,mts,cts}',
       '**/{test,tests,__tests__}/**',
       '**/*.{test,spec}.*',
       '**/*.md',

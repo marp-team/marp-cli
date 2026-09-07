@@ -16,8 +16,6 @@ jobs:
       fail-fast: false
       matrix:
         node-version:
-          - '^18.20.8'
-          - '^20.20.2'
           - '^22.23.2'
           - '^24.20.0'
           - '26.8.1'

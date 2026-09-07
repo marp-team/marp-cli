@@ -10,7 +10,7 @@ declare module '*.pug' {
   export default pug
 }
 
-declare module '*.scss' {
+declare module '*.scss?inline' {
   const scss: string
   export default scss
 }

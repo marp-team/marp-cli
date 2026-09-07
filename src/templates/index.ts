@@ -4,9 +4,9 @@ import type { Marpit, Options, RenderResult } from '@marp-team/marpit'
 import { OutlinePage } from '../engine/pdf/outline-plugin'
 import transitionPlugin, { EngineTransition } from '../engine/transition-plugin'
 import barePug from './bare/bare.pug'
-import bareScss from './bare/bare.scss'
+import bareScss from './bare/bare.scss?inline'
 import bespokePug from './bespoke/bespoke.pug'
-import bespokeScss from './bespoke/bespoke.scss'
+import bespokeScss from './bespoke/bespoke.scss?inline'
 
 type RendererResult = RenderResult &
   TemplateMeta & {

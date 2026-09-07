@@ -18,7 +18,7 @@ import {
 import { CLIError, CLIErrorCode, error, isError } from './error'
 import { File, markdownExtensions } from './file'
 import serverIndex from './server/index.pug'
-import style from './server/index.scss'
+import style from './server/index.scss?inline'
 import { WatchNotifier, notifier } from './watcher'
 
 export class Server extends (EventEmitter as new () => TypedEmitter<Server.Events>) {

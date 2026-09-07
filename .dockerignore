@@ -1,11 +1,12 @@
 **/*
 !src/
 !scripts/
+!patches/
+!.npmrc
 !docker-entrypoint
 !LICENSE
-!marp-cli.js
+!marp-cli.mjs
 !package.json
 !package-lock.json
-!postcss.config.js
-!rollup.config.mjs
+!tsdown.config.mts
 !tsconfig.json

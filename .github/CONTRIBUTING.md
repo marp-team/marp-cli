@@ -36,10 +36,10 @@ npm run watch
 
 ### Use built version
 
-Use `./marp-cli.js` instead of `marp` command.
+Use `./marp-cli.mjs` instead of `marp` command.
 
 ```bash
-./marp-cli.js --help
+./marp-cli.mjs --help
 ```
 
 #### Standalone binary

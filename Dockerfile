@@ -32,7 +32,7 @@ ENV MARP_USER=marp:marp PATH=$PATH:/home/marp/.cli CHROME_PATH=/usr/local/bin/ch
 # Copy Marp CLI files
 USER marp
 WORKDIR /home/marp/.cli
-COPY --chown=marp:marp package.json package-lock.json marp-cli.js LICENSE docker-entrypoint ./
+COPY --chown=marp:marp package.json package-lock.json marp-cli.mjs LICENSE docker-entrypoint ./
 RUN npm ci --omit=dev && npm cache clean --force
 
 # Copy built files
@@ -46,4 +46,4 @@ CMD ["--help"]
 LABEL maintainer="Marp team"
 
 # Generate V8 compile cache
-RUN node /home/marp/.cli/marp-cli.js --version
+RUN node /home/marp/.cli/marp-cli.mjs --version

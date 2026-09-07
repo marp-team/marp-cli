@@ -1,7 +1,9 @@
-import { version as bundledCoreVer } from '@marp-team/marp-core/package.json'
+import corePackage from '@marp-team/marp-core/package.json' with { type: 'json' }
 import { name, version } from '../package.json'
 import { MarpCLIConfig } from './config'
 import { ResolvedEngine } from './engine'
+
+const { version: bundledCoreVer } = corePackage
 
 const isMarpCore = async (engine: ResolvedEngine): Promise<boolean> =>
   (await engine.getPackage())?.name === '@marp-team/marp-core' ||

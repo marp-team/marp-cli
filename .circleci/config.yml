@@ -145,31 +145,6 @@ jobs:
     steps:
       - audit
 
-  test-node18:
-    executor:
-      name: node
-      browser: true
-      version: '18.20'
-    steps:
-      - prepare:
-          browser: true
-      - lint
-      - test:
-          junit: false
-          runInBand: true
-
-  test-node20:
-    executor:
-      name: node
-      browser: true
-      version: '20.20'
-    steps:
-      - prepare:
-          browser: true
-      - lint
-      - test:
-          runInBand: true
-
   test-node22:
     executor:
       name: node
@@ -207,12 +182,6 @@ workflows:
   test:
     jobs:
       - audit
-      - test-node18:
-          requires:
-            - audit
-      - test-node20:
-          requires:
-            - audit
       - test-node22:
           requires:
             - audit
