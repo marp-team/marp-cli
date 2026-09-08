@@ -146,7 +146,7 @@
   },
   "dependencies": {
     "@marp-team/marp-core": "^4.4.0",
-    "@marp-team/marpit": "^3.2.2",
+    "@marp-team/marpit": "^3.2.3",
     "chokidar": "^4.0.3",
     "cosmiconfig": "^9.0.2",
     "puppeteer-core": "^24.43.1",
