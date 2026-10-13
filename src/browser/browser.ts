@@ -39,6 +39,113 @@ let wslTmp: string | undefined
 
 const wslHostMatcher = /^\/mnt\/[a-z]\//
 
+/**
+ * Browser profiles are placed under this sub-directory of the temporary
+ * directory. Each profile `foo` has a mutex file `foo.lock` while the Marp CLI
+ * process that created it is alive. Profiles without a mutex were left by
+ * finished processes, and the next process removes them in background.
+ * (https://github.com/marp-team/marp-cli/issues/678)
+ */
+export const browserDataDirParent = 'marp-cli-browser'
+
+const lockFiles = new Set<string>()
+let releaseLocksRegistered = false
+
+const releaseLocks = () => {
+  for (const lockFile of lockFiles) {
+    try {
+      fs.unlinkSync(lockFile)
+    } catch {
+      // no ops
+    }
+  }
+  lockFiles.clear()
+}
+
+const lockDataDir = (dir: string) => {
+  const lockFile = `${dir}.lock`
+
+  // Create the mutex before the profile, so that a cleanup in other processes
+  // never removes the profile before locking. A tiny file is written
+  // synchronously, to keep the mutex independent from async file operations
+  // for conversions.
+  fs.mkdirSync(path.dirname(dir), { recursive: true })
+  fs.writeFileSync(lockFile, String(process.pid), { flag: 'wx' })
+
+  lockFiles.add(lockFile)
+
+  if (!releaseLocksRegistered) {
+    process.once('exit', releaseLocks)
+    releaseLocksRegistered = true
+  }
+}
+
+/**
+ * A mutex is stale if the process that created it is no longer alive. It
+ * happens when the process was killed without running "exit" handlers.
+ */
+const isStaleLock = async (lockFile: string) => {
+  try {
+    const pid = Number.parseInt(await fs.promises.readFile(lockFile, 'utf8'))
+    if (!Number.isInteger(pid) || pid <= 0) return false
+
+    process.kill(pid, 0)
+    return false
+  } catch (e: unknown) {
+    // ESRCH: No process with the PID. (EPERM means the process is alive.)
+    return (e as NodeJS.ErrnoException)?.code === 'ESRCH'
+  }
+}
+
+/** @internal */
+export const cleanUpUnusedDataDirs = async (parent: string, keep: string) => {
+  const entries = await fs.promises.readdir(parent, { withFileTypes: true })
+  const names = new Set(entries.map((entry) => entry.name))
+
+  const removeStaleLock = async (lockFile: string) => {
+    if (!(await isStaleLock(lockFile))) return false
+
+    try {
+      await fs.promises.rm(lockFile, { force: true })
+    } catch (e: unknown) {
+      debugBrowser('Failed to remove stale lock: %s (%o)', lockFile, e)
+    }
+    return true
+  }
+
+  await Promise.all([
+    // Profile directories
+    ...entries
+      .filter((entry) => entry.isDirectory() && entry.name !== keep)
+      .map(async (entry) => {
+        const target = path.join(parent, entry.name)
+
+        if (
+          names.has(`${entry.name}.lock`) &&
+          !(await removeStaleLock(`${target}.lock`))
+        )
+          return
+
+        try {
+          await fs.promises.rm(target, { recursive: true, force: true })
+          debugBrowser('Removed unused data directory: %s', target)
+        } catch (e: unknown) {
+          debugBrowser('Failed to remove data directory: %s (%o)', target, e)
+        }
+      }),
+
+    // Stale mutex files without profile directory
+    ...entries
+      .filter(
+        (entry) =>
+          entry.isFile() &&
+          entry.name.endsWith('.lock') &&
+          !names.has(entry.name.slice(0, -'.lock'.length))
+      )
+      .map((entry) => removeStaleLock(path.join(parent, entry.name))),
+  ])
+}
+
 export abstract class Browser
   extends (EventEmitter as new () => TypedEventEmitter<BrowserEvents>)
   implements AsyncDisposable
@@ -184,10 +291,18 @@ export abstract class Browser
           if (wslTmp === undefined) wslTmp = await getWindowsEnv('TMP')
           if (wslTmp !== undefined) {
             needToTranslateWindowsPathToWSL = true
-            return path.win32.resolve(wslTmp, this.#dataDirName)
+            return path.win32.resolve(
+              wslTmp,
+              browserDataDirParent,
+              this.#dataDirName
+            )
           }
         }
-        return path.resolve(os.tmpdir(), this.#dataDirName)
+        return path.resolve(
+          os.tmpdir(),
+          browserDataDirParent,
+          this.#dataDirName
+        )
       })()
 
       // Ensure the data directory is created
@@ -195,8 +310,22 @@ export abstract class Browser
         ? await translateWindowsPathToWSL(dir)
         : dir
 
+      try {
+        lockDataDir(mkdirPath)
+      } catch (e: unknown) {
+        debugBrowser('Failed to lock data directory: %s (%o)', mkdirPath, e)
+      }
+
       await fs.promises.mkdir(mkdirPath, { recursive: true })
       debugBrowser(`Created data directory: %s`, mkdirPath)
+
+      // Remove profiles left by finished processes, without blocking conversion
+      cleanUpUnusedDataDirs(
+        path.dirname(mkdirPath),
+        path.basename(mkdirPath)
+      ).catch((e: unknown) => {
+        debugBrowser('Failed to clean up unused data directories (%o)', e)
+      })
 
       return dir
     })

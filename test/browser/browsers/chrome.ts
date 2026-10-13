@@ -375,12 +375,22 @@ describe('ChromeBrowser', () => {
         const mockedMkdir = jest.mocked(fs.promises.mkdir)
         await new ChromeBrowser({ path: '/path/to/chrome' }).launch()
 
+        const dataDirPrefix = path.join(
+          os.tmpdir(),
+          'marp-cli-browser',
+          'marp-cli-'
+        )
+        const findDataDir = () =>
+          mockedMkdir.mock.calls.find(([dir]) =>
+            dir.toString().startsWith(dataDirPrefix)
+          )?.[0]
+
         expect(mockedMkdir).toHaveBeenCalledWith(
-          expect.stringContaining(path.join(os.tmpdir(), 'marp-cli-')),
+          expect.stringContaining(dataDirPrefix),
           { recursive: true }
         )
 
-        const userDataDir = mockedMkdir.mock.calls[0][0]
+        const userDataDir = findDataDir()
         expect(puppeteer.launch).toHaveBeenCalledWith(
           expect.objectContaining({
             args: expect.arrayContaining([`--user-data-dir=${userDataDir}`]),
@@ -390,7 +400,7 @@ describe('ChromeBrowser', () => {
         // Check uniqueness
         mockedMkdir.mockClear()
         await new ChromeBrowser({ path: '/path/to/chrome' }).launch()
-        expect(userDataDir).not.toEqual(mockedMkdir.mock.calls[0][0])
+        expect(userDataDir).not.toEqual(findDataDir())
       })
 
       it('makes data directory to Windows if trying to spawn Chrome in the host Windows from WSL', async () => {
