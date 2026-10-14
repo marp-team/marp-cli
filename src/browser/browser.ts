@@ -49,9 +49,10 @@ const wslHostMatcher = /^\/mnt\/[a-z]\//
 export const browserDataDirParent = 'marp-cli-browser'
 
 const lockFiles = new Set<string>()
-let releaseLocksRegistered = false
 
-const releaseLocks = () => {
+// "exit" handlers can only run synchronous operations, so the mutex files are
+// removed by the sync API here.
+process.once('exit', () => {
   for (const lockFile of lockFiles) {
     try {
       fs.unlinkSync(lockFile)
@@ -60,36 +61,49 @@ const releaseLocks = () => {
     }
   }
   lockFiles.clear()
+})
+
+interface DataDirLock {
+  pid: number
+  platform: NodeJS.Platform
 }
 
-const lockDataDir = (dir: string) => {
+const lockDataDir = async (dir: string) => {
   const lockFile = `${dir}.lock`
+  const lock: DataDirLock = { pid: process.pid, platform: process.platform }
 
   // Create the mutex before the profile, so that a cleanup in other processes
-  // never removes the profile before locking. A tiny file is written
-  // synchronously, to keep the mutex independent from async file operations
-  // for conversions.
-  fs.mkdirSync(path.dirname(dir), { recursive: true })
-  fs.writeFileSync(lockFile, String(process.pid), { flag: 'wx' })
+  // never removes the profile before locking.
+  await fs.promises.mkdir(path.dirname(dir), { recursive: true })
+
+  const handle = await fs.promises.open(lockFile, 'wx')
+  try {
+    await handle.writeFile(JSON.stringify(lock))
+  } finally {
+    await handle.close()
+  }
 
   lockFiles.add(lockFile)
-
-  if (!releaseLocksRegistered) {
-    process.once('exit', releaseLocks)
-    releaseLocksRegistered = true
-  }
 }
 
 /**
  * A mutex is stale if the process that created it is no longer alive. It
  * happens when the process was killed without running "exit" handlers.
+ *
+ * A mutex created on another platform (e.g. Windows and WSL share the
+ * temporary directory) is always kept, because PIDs belong to a different
+ * environment and we cannot determine whether the process is still running.
  */
 const isStaleLock = async (lockFile: string) => {
   try {
-    const pid = Number.parseInt(await fs.promises.readFile(lockFile, 'utf8'))
-    if (!Number.isInteger(pid) || pid <= 0) return false
+    const lock: Partial<DataDirLock> = JSON.parse(
+      await fs.promises.readFile(lockFile, 'utf8')
+    )
 
-    process.kill(pid, 0)
+    if (lock.platform !== process.platform) return false
+    if (!Number.isInteger(lock.pid) || (lock.pid as number) <= 0) return false
+
+    process.kill(lock.pid as number, 0)
     return false
   } catch (e: unknown) {
     // ESRCH: No process with the PID. (EPERM means the process is alive.)
@@ -311,7 +325,7 @@ export abstract class Browser
         : dir
 
       try {
-        lockDataDir(mkdirPath)
+        await lockDataDir(mkdirPath)
       } catch (e: unknown) {
         debugBrowser('Failed to lock data directory: %s (%o)', mkdirPath, e)
       }

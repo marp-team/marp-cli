@@ -129,7 +129,7 @@ describe('Browser class', () => {
 
       await fs.promises.writeFile(
         path.join(parent, 'locked.lock'),
-        String(process.pid)
+        JSON.stringify({ pid: process.pid, platform: process.platform })
       )
       await cleanUpUnusedDataDirs(parent, 'current')
 
@@ -145,12 +145,12 @@ describe('Browser class', () => {
       await fs.promises.mkdir(path.join(parent, 'stale'), { recursive: true })
       await fs.promises.writeFile(
         path.join(parent, 'stale.lock'),
-        String(finished.pid)
+        JSON.stringify({ pid: finished.pid, platform: process.platform })
       )
       await fs.promises.mkdir(path.join(parent, 'alive'), { recursive: true })
       await fs.promises.writeFile(
         path.join(parent, 'alive.lock'),
-        String(process.pid)
+        JSON.stringify({ pid: process.pid, platform: process.platform })
       )
 
       await cleanUpUnusedDataDirs(parent, 'current')
@@ -161,6 +161,23 @@ describe('Browser class', () => {
       expect(fs.existsSync(path.join(parent, 'alive.lock'))).toBe(true)
     })
 
+    it('keeps profiles locked on another platform, because the PID cannot be checked', async () => {
+      const parent = path.join(tmp, browserDataDirParent)
+      const finished = spawnSync(process.execPath, ['-e', ''])
+      const otherPlatform = process.platform === 'win32' ? 'linux' : 'win32'
+
+      await fs.promises.mkdir(path.join(parent, 'other'), { recursive: true })
+      await fs.promises.writeFile(
+        path.join(parent, 'other.lock'),
+        JSON.stringify({ pid: finished.pid, platform: otherPlatform })
+      )
+
+      await cleanUpUnusedDataDirs(parent, 'current')
+
+      expect(fs.existsSync(path.join(parent, 'other'))).toBe(true)
+      expect(fs.existsSync(path.join(parent, 'other.lock'))).toBe(true)
+    })
+
     it('removes stale lock files without the profile, and keeps alive ones', async () => {
       const parent = path.join(tmp, browserDataDirParent)
       const finished = spawnSync(process.execPath, ['-e', ''])
@@ -168,11 +185,11 @@ describe('Browser class', () => {
       await fs.promises.mkdir(parent, { recursive: true })
       await fs.promises.writeFile(
         path.join(parent, 'orphan.lock'),
-        String(finished.pid)
+        JSON.stringify({ pid: finished.pid, platform: process.platform })
       )
       await fs.promises.writeFile(
         path.join(parent, 'creating.lock'),
-        String(process.pid)
+        JSON.stringify({ pid: process.pid, platform: process.platform })
       )
 
       await cleanUpUnusedDataDirs(parent, 'current')
@@ -196,7 +213,9 @@ describe('Browser class', () => {
 
       expect(path.dirname(dir)).toBe(parent)
       expect(fs.existsSync(dir)).toBe(true)
-      expect(fs.readFileSync(`${dir}.lock`, 'utf8')).toBe(String(process.pid))
+      expect(fs.readFileSync(`${dir}.lock`, 'utf8')).toBe(
+        JSON.stringify({ pid: process.pid, platform: process.platform })
+      )
 
       // The cleanup runs in background
       await new Promise((resolve) => setTimeout(resolve, 100))
