@@ -41,27 +41,12 @@ const wslHostMatcher = /^\/mnt\/[a-z]\//
 
 /**
  * Browser profiles are placed under this sub-directory of the temporary
- * directory. Each profile `foo` has a mutex file `foo.lock` while the Marp CLI
- * process that created it is alive. Profiles without a mutex were left by
- * finished processes, and the next process removes them in background.
+ * directory. Each profile `foo` has a mutex file `foo.lock` while the browser
+ * using it is open. Profiles without a mutex were left by closed browsers or
+ * finished processes, and the next browser run removes them in background.
  * (https://github.com/marp-team/marp-cli/issues/678)
  */
 export const browserDataDirParent = 'marp-cli-browser'
-
-const lockFiles = new Set<string>()
-
-// "exit" handlers can only run synchronous operations, so the mutex files are
-// removed by the sync API here.
-process.once('exit', () => {
-  for (const lockFile of lockFiles) {
-    try {
-      fs.unlinkSync(lockFile)
-    } catch {
-      // no ops
-    }
-  }
-  lockFiles.clear()
-})
 
 interface DataDirLock {
   pid: number
@@ -83,7 +68,7 @@ const lockDataDir = async (dir: string) => {
     await handle.close()
   }
 
-  lockFiles.add(lockFile)
+  return lockFile
 }
 
 /**
@@ -171,6 +156,7 @@ export abstract class Browser
   protocolTimeout: number
   timeout: number
   #dataDirName: string
+  #lockFile: string | undefined
 
   private _puppeteerDataDir = createMemoizedPromiseContext<string>()
   private _puppeteer = createMemoizedPromiseContext<PuppeteerBrowser>()
@@ -240,6 +226,17 @@ export abstract class Browser
       }
 
       this._puppeteer.value = undefined
+    }
+
+    // Release the mutex, so that the next browser run can remove the profile.
+    // If the process was killed before closing, the mutex becomes stale and is
+    // removed by the PID check instead.
+    if (this.#lockFile) {
+      await fs.promises.rm(this.#lockFile, { force: true })
+      this.#lockFile = undefined
+
+      // Relaunching after close must lock the profile again
+      this._puppeteerDataDir.value = undefined
     }
   }
 
@@ -325,7 +322,7 @@ export abstract class Browser
         : dir
 
       try {
-        await lockDataDir(mkdirPath)
+        this.#lockFile = await lockDataDir(mkdirPath)
       } catch (e: unknown) {
         debugBrowser('Failed to lock data directory: %s (%o)', mkdirPath, e)
       }

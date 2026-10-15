@@ -223,5 +223,23 @@ describe('Browser class', () => {
         false
       )
     })
+
+    it('releases the lock file when the browser is closed', async () => {
+      const browser = new FirefoxBrowser({ path: '/path/to/firefox' })
+      const dir: string = await (browser as any).puppeteerDataDir()
+
+      expect(fs.existsSync(`${dir}.lock`)).toBe(true)
+
+      await browser.close()
+
+      expect(fs.existsSync(`${dir}.lock`)).toBe(false)
+      expect(fs.existsSync(dir)).toBe(true)
+
+      // A relaunch after closing locks a profile again
+      const relaunchedDir: string = await (browser as any).puppeteerDataDir()
+      expect(fs.existsSync(`${relaunchedDir}.lock`)).toBe(true)
+
+      await browser.close()
+    })
   })
 })
