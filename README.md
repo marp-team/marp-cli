@@ -19,7 +19,7 @@ It can convert Marp / Marpit Markdown files into static HTML / CSS, PDF, PowerPo
 
 ### npx
 
-[npx (`npm exec`)](https://docs.npmjs.com/cli/commands/npx) is the best way to use the latest Marp CLI if you wanted
+[npx (`npm exec`)](https://docs.npmjs.com/cli/commands/npx) is the best way to use the latest Marp CLI if you want
 one-shot Markdown conversion _without install_. Just run below if you have
 installed [Node.js](https://nodejs.org/) v18 and later.
 
@@ -129,7 +129,7 @@ We also provide standalone binaries for Linux, macOS (Apple Silicon), and Window
 ## Basic usage
 
 > [!IMPORTANT]
-> Several kind of conversions with 🌐 icon require to install any of compatible browsers, [Google Chrome], [Microsoft Edge], or [Mozilla Firefox]. When an unexpected problem has occurred while converting, please update your browser to the latest version. Check out [browser options](#browser-options) too.
+> Several kinds of conversions with 🌐 icon require to install any of compatible browsers, [Google Chrome], [Microsoft Edge], or [Mozilla Firefox]. When an unexpected problem has occurred while converting, please update your browser to the latest version. Check out [browser options](#browser-options) too.
 
 ### Convert to HTML
 
@@ -188,7 +188,7 @@ A created PPTX includes rendered Marp slide pages and the support of [Marpit pre
 
 #### _[EXPERIMENTAL]_ Generate editable pptx (`--pptx-editable`)
 
-A converted PPTX usually consists of pre-rendered background images, that is meaning **contents cannot to modify or re-use** in PowerPoint. If you want to generate editable PPTX for modifying texts, shapes, and images in GUI, you can pass `--pptx-editable` option together with `--pptx` option.
+A converted PPTX usually consists of pre-rendered background images, that means **the contents cannot be modified or re-used** in PowerPoint. If you want to generate editable PPTX for modifying texts, shapes, and images in GUI, you can pass `--pptx-editable` option together with `--pptx` option.
 
 ```bash
 marp --pptx --pptx-editable slide-deck.md
@@ -243,7 +243,7 @@ marp slide-deck.md -o title-slide@2x.png --image-scale 2
 
 > [!TIP]
 >
-> `--image-scale` is not affect to the actual size of presentation.
+> `--image-scale` does not affect the actual size of the presentation.
 >
 > The scale factor is also available for PPTX conversion. By default, Marp CLI will use `2` as the default scale factor in PPTX, to suppress deterioration of slide rendering in full-screen presentation.
 
@@ -263,7 +263,7 @@ Because of [the security reason](https://github.com/marp-team/marp-cli/pull/10#u
 
 Marp CLI would output incomplete result with warning if the blocked local file accessing is detected. We recommend uploading your assets to online.
 
-If you really need to use local files in these conversion, `--allow-local-files` option helps to find your local files. _Please use only to the trusted Markdown because there is a potential security risk._
+If you really need to use local files in these conversions, `--allow-local-files` option helps to find your local files. _Please use only to the trusted Markdown because there is a potential security risk._
 
 ```bash
 marp --pdf --allow-local-files slide-deck.md
@@ -318,7 +318,7 @@ Unlike opening with browser, you may present deck with the immersive window.
 
 ### Choose browser (`--browser`)
 
-You can specify the kind of browser for conversion by `--browser` option. Available browsers are `chrome`, `edge`, and `firefox`. If set comma-separated browsers, Marp CLI will try to use the first available browser among them.
+You can specify the kind of browser for conversion by `--browser` option. Available browsers are `chrome`, `edge`, and `firefox`. If you set comma-separated browsers, Marp CLI will try to use the first available browser among them.
 
 ```bash
 # Use Firefox for image conversion
@@ -381,7 +381,7 @@ The `bespoke` template is using [Bespoke.js](https://github.com/bespokejs/bespok
 #### Docs
 
 - **[Slide transitions in `bespoke` template][transitions]**<br />
-  Learn all about of slide transitions for `bespoke` template: Built-in transitions, custom transitions, and morphing animations.
+  Learn all about slide transitions for `bespoke` template: Built-in transitions, custom transitions, and morphing animations.
 
 <p align="center">
   <a href="./docs/bespoke-transitions/README.md">
